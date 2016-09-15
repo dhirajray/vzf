@@ -1,0 +1,347 @@
+<?php 
+ $deshboard		= new Admin_Model_Deshboard(); 
+ $defaultimagecheck = new Admin_Model_Common();
+ ?>
+<script type="text/javascript">
+	$(function(){
+
+		var totalfield  = $('#totalfield').val();
+		var shw = $(".historyUserList li").size();
+		if(shw>20){ $('.showmoretop').show(); }
+
+		var  defaultArticle = 20;
+		$('.historyUserList li:lt('+defaultArticle+')').show();
+
+		$('.showmoretop').click(function(){
+		 	if ($(window).scrollTop() == $(document).height() - $(window).height())
+		 	{ 
+		 	 	defaultArticle=defaultArticle+20; 
+		   		$('.historyUserList li:lt('+defaultArticle+')').show();
+
+		   		if(defaultArticle>=totalfield){ $('.showmoretop').hide(); }
+		   	}
+		});
+
+
+		// Search users
+
+		$("#searchtopusers").submit(function()
+		{
+			var ken	=	$('#searchfield').val().length;
+			if(ken<3){
+				$messageError('Minimum 3 characters required');
+				return false;
+			}
+		});
+
+		//comparision starts here
+
+		$('body').on('click', '.add_to_compare:not(.addedUser)' , function()
+		{
+		 	var userid 		=	$(this).attr('userid');
+		 	var imgdiv		=	$(this).attr('imagesource');
+		 	var username	=	$(this).attr('username');
+		 	var shwusers 	= 	$("#compareBox .compareusers").size();
+		 	var offset 		= 	$(this).closest('li').offset();
+		 	var visibleUser = 3;
+		 	
+
+		 	if(shwusers>0){ $('.submitCompare').show('fast'); } else { $('.submitCompare').hide('fast');}
+		 	
+			if(shwusers>visibleUser){
+				 $messageError('Only '+shwusers+' users can be compared at one time!'); 
+				return false;
+			 }
+		 	
+		 	$('.historyUserList  li .add_to_compare[userid="'+userid+'"]').addClass('addedUser disabled');
+
+		 	$('#compareBox').show();
+		 	var offsetFake = '';
+		 	$('<div id="fakeCompaireDiv" style="Width:150px; display:none; float:left;"></div').appendTo('#compareBoxList').show('show', function(){
+		 			 offsetFake = $('#fakeCompaireDiv').offset();
+
+		 	$('<div class="compareusers" style="z-index:20; position:absolute; left:'+offset.left+'px; top:'+offset.top+'px;"><div class="userPic"><a href="javascript:void(0);" class="removeCompare">x</a><img class="imgStyle" src="'+imgdiv+'"></div><div class="rpUserName"> '+username+'<input type="hidden" name="comparedid[]" value="'+userid+'"> </div></div>').appendTo('#compareBoxList');
+
+		 		$('#compareForm .compareusers:last').animate({left:offsetFake.left+'px', top:offsetFake.top+'px'},{
+			 		complete:function(){
+			 		$(this).removeAttr('style');
+			 		$('#fakeCompaireDiv').remove();
+			 		}
+		 		}
+		 	);
+		 	});
+		});
+
+		$('body').on('click', '.removeCompare',function()
+		{
+			var ParentEL = $(this).closest('.compareusers');
+			var userId = ParentEL.find('input[type="hidden"]').val();
+			var offset = $('.historyUserList a[userid="'+userId+'"]').closest('li').offset();
+			var offsetThis = ParentEL.offset();
+
+			ParentEL.css({position:'absolute', zIndex:'20', left:offsetThis.left+'px', top:offsetThis.top+'px'}).animate({ left:offset.left+'px', top:offset.top+'px', opacity:0},{
+						complete:function(){
+							$('.historyUserList a[userid="'+userId+'"]').removeClass('addedUser disabled');
+							var shwusers = $("#compareBox .compareusers").size();
+							$(this).closest('.compareusers').hide('slow',function(){
+								$(this).remove();
+							});
+							if(shwusers<2){ $('#compareBox').hide(); }
+							if(shwusers<3){ $('.submitCompare').hide('slow'); }
+						}
+				}
+			
+				);
+
+		});
+
+
+	});
+</script>
+
+
+<h1 class="pageTitle">
+	<!--<span class="pageIcons "></span> -->
+	User cross referencing
+	
+</h1>
+
+<!--<div class="pull-right topStar">
+	Top <span class="topStarIcon">5</span>Users
+</div> -->
+<div class="clearfix"></div>
+
+<div id="pageContainer">					
+	<!--Container -->
+	<div id="topCompairSearch" class="clearfix">
+		<form method="post" id="searchtopusers">
+			<div class="appendType  pull-left">				
+					<input type="text" name="searchfield" id="searchfield" placeholder="Search Users"> 
+				    <button type="submit" name="submit" id="submit" class="btn btn-black">Search</button>
+				<div class="clearfix"></div>
+			</div>	
+		</form>	
+	
+		<div id="compareBox" class="pull-right" >
+			<form method="post" id="compareForm" action="<?php  echo BASE_URL.'/admin/reporting/compareusers';?>">
+				<div id="compareBoxList" class="pull-left"></div>
+				<input type="hidden" name="searchfield" value="<?php echo $this->search ?>"> 
+				<input type="submit" class="submitCompare pull-left btn btn-black btn-medium" name="submit" value="Compare" style="display:none">
+			</form>
+		</div>
+	</div>
+
+
+
+
+
+	<div id="dashboardWrapper">
+	<?php if (!empty($this->search)) { 	?>
+
+	<!--live dbee-->
+		<div class="listCompare">
+		<h2 class="">Search results for -  <?php echo $this->search; 	  echo "<span class='pull-right'>Total : ".($this->totUsers).'<input type="hidden" value="'.($this->totUsers).'" id="totalfield" ></span>'; ?>	</h2>		
+		
+			<?php if (($this->totUsers)>0){ ?>
+			<div id="liveDbee" class="historyUserList">
+				<ul>
+				<?php foreach($this->paginator as $liveDbee) : 
+                  $ProfilePicdbpic = $defaultimagecheck->checkImgExist($liveDbee->ProfilePic,'userpics','default-avatar.jpg');
+				?>
+					<li style="display:none">
+						<div class="compairBtn">
+							<a href="javascript:void(0)" class="btn show_details_user" userid="<?php echo $this->escape($liveDbee->UserID);?>">View history</a><br />
+							
+							<a href="javascript:void(0)" class=" add_to_compare  btn btn-green"  userid="<?php echo $this->escape($liveDbee->UserID);?>" imagesource="<?php echo IMGPATH.'/users/medium/'.$ProfilePicdbpic ?>" width="70" height="70">+ Compare user</a> 
+						</div>
+						<div class="userPic">
+							
+							<img src="<?php echo IMGPATH.'/users/medium/'.$ProfilePicdbpic ?>" width="70" height="70" border="0" />
+						</div>
+						<div class="userDetails">
+							<div class="usertitle">
+								<span class="username"><?php echo $this->escape($this->myclientdetails->customDecoding($liveDbee->Name)).' '.$this->escape($this->myclientdetails->customDecoding($liveDbee->lname));?></span>
+								<h3></h3>
+							</div>
+							
+						</div>
+
+					</li>
+				<?php  endforeach; ?>
+				</ul>
+			</div>
+			
+			<!-- <span class="showmoretop " style="float:left; font-weight:bold; margin:10px; cursor:pointer">view more</span> -->
+			<?php //echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml'); ?>	
+			<?php } else { ?>
+			<div class="dashBlockEmpty">Users Not Found!</div>
+			<?php } ?>	
+			<div class="clearfix"></div>
+		</div>
+	<!--end live dbee-->
+	<?php } else { ?>
+
+	<!--live dbee-->
+	<div class="listCompare">
+		<h2 class="">Most active platform users</h2>
+		
+				<?php 
+				if (count($this->liveDbeeData)){ ?>
+				<div id="liveDbee" class="historyUserList ">
+					<ul>
+				<?php foreach($this->liveDbeeData as $liveDbee) : 
+                $liveDbeedbeepic = $defaultimagecheck->checkImgExist($liveDbee->image,'userpics','default-avatar.jpg');
+				?>
+				<li>
+					<div class="compairBtn">
+						<a href="javascript:void(0)" class="btn show_details_user" userid="<?php echo $this->escape($liveDbee->UserID);?>">View history</a><br />
+						<a href="javascript:void(0)" class=" add_to_compare  btn btn-green"  userid="<?php echo $this->escape($liveDbee->UserID);?>" imagesource="<?php echo IMGPATH.'/users/medium/'.$liveDbeedbeepic ?>" width="70" height="70" username="<?php echo $this->escape($liveDbee->username);?>">+ Compare user</a> 
+					</div>
+					<div class="userPic">
+						<img src="<?php echo IMGPATH.'/users/medium/'.$liveDbeedbeepic ?>" width="70" height="70" border="0" />
+					</div>
+					<div class="userDetails">
+						<div class="usertitle">
+							<span class="username"><?php echo $this->escape($this->myclientdetails->customDecoding($liveDbee->username)).' '.$this->escape($this->myclientdetails->customDecoding($liveDbee->lname));?></span>
+							<h3><strong><?php echo $this->escape($liveDbee->total);?></strong> <i> posts</i></h3>
+						</div>
+						
+					</div>
+
+				</li>
+			<?php  endforeach; ?>
+				</ul>
+				
+			</div>
+			<?php } else { ?>
+			<div class="notfound">Users Not Found!</div>
+			<?php } ?>	
+		<div class="clearfix"></div>
+	</div>
+	<!--end live dbee-->
+
+	<!--Live Groops-->
+	<div class="listCompare">
+		<h2 class="">Most active group users</h2>
+		
+				<?php 
+				if (count($this->liveGroupData)){ ?>
+				<div id="liveDbee" class="historyUserList ">
+					<ul>
+				<?php foreach($this->liveGroupData as $liveGroup) :
+                  $liveGroupdbpic = $defaultimagecheck->checkImgExist($liveGroup->image,'userpics','default-avatar.jpg');
+				 ?>
+				<li>
+					<div class="compairBtn">
+						<a href="javascript:void(0)" class="btn show_details_user" userid="<?php echo $this->escape($liveGroup->UserID);?>">View history</a><br />
+						<a href="javascript:void(0)" class=" add_to_compare btn btn-green"  userid="<?php echo $this->escape($liveGroup->UserID);?>" imagesource="<?php echo IMGPATH.'/users/small/'.$liveGroupdbpic ?>" width="70" height="70" username="<?php echo $this->escape($liveGroup->username);?>">+ Compare user</a> 
+					</div>
+					<div class="userPic">
+						<img src="<?php echo IMGPATH.'/users/medium/'.$liveGroupdbpic ?>" width="70" height="70" border="0" />
+					</div>
+					<div class="userDetails">
+						<div class="usertitle">
+							<span class="username"><?php echo $this->escape($this->myclientdetails->customDecoding($liveGroup->username)).' '.$this->escape($this->myclientdetails->customDecoding($liveGroup->lname));?></span>
+							<h3><strong><?php echo $this->escape($liveGroup->total);?></strong> <i> groups</i></h3>
+						</div>
+						
+					</div>
+
+				</li>
+			<?php  endforeach; ?>
+				</ul>
+				
+			</div>
+			<?php } else { ?>
+			<div class="notfound">Users Not Found!</div>
+			<?php } ?>	
+		<div class="clearfix"></div>
+	</div>
+
+
+	<!--end Live group-->
+
+	<!--Latest commnets-->
+
+	<div class="listCompare">
+		<h2 class="">User who commented the most</h2>
+		
+				<?php 
+				if (count($this->latestCommentData)){ ?>
+				<div id="liveDbee" class="historyUserList ">
+					<ul>
+				<?php foreach($this->latestCommentData as $latestComment) :
+                  $latestCommentdbpic = $defaultimagecheck->checkImgExist($latestComment->image,'userpics','default-avatar.jpg');
+				 ?>
+				<li>
+					<div class="compairBtn">
+						<a href="javascript:void(0)" class="btn show_details_user" userid="<?php echo $this->escape($latestComment->UserID);?>">View history</a><br /> 
+						<a href="javascript:void(0)" class=" add_to_compare btn btn-green"  userid="<?php echo $this->escape($latestComment->UserID);?>" imagesource="<?php echo IMGPATH.'/users/medium/'.$latestCommentdbpic ?>" width="70" height="70" username="<?php echo $this->escape($latestComment->username);?>">+ Compare user</a> 
+					</div>
+					<div class="userPic">
+						<img src="<?php echo IMGPATH.'/users/medium/'.$latestCommentdbpic ?>" width="70" height="70" border="0" />
+					</div>
+					<div class="userDetails">
+						<div class="usertitle">
+							<span class="username"><?php echo $this->escape($this->myclientdetails->customDecoding($latestComment->username)).' '.$this->escape($this->myclientdetails->customDecoding($latestComment->lname));?></span>
+							<h3><strong><?php echo $this->escape($latestComment->total);?></strong> <i> comments</i></h3>
+						</div>
+						
+					</div>
+
+				</li>
+			<?php  endforeach; ?>
+				</ul>
+				
+			</div>
+			<?php } else { ?>
+			<div class="notfound">Users Not Found!</div>
+			<?php } ?>	
+			<div class="clearfix"></div>
+	</div>
+
+	<?php 
+	if ($this->plateform_scoring==0){ ?>
+	<!--End Latest commnets-->
+	<div class="listCompare">
+		<h2 class="">Most active scorers</h2>
+		
+				<?php 
+				if (count($this->liveScoreData) ){ ?>
+				<div id="liveDbee" class="historyUserList ">
+					<ul>
+				<?php foreach($this->liveScoreData as $liveScore) : 
+                 $liveScoreedbpic = $defaultimagecheck->checkImgExist($liveScore->image,'userpics','default-avatar.jpg');
+				?>
+				<li>
+					<div class="compairBtn">
+						<a href="javascript:void(0)" class="btn show_details_user" userid="<?php echo $this->escape($liveScore->UserID);?>">View history</a><br /> 
+						<a href="javascript:void(0)" class=" add_to_compare btn btn-green"  userid="<?php echo $this->escape($liveScore->UserID);?>" imagesource="<?php echo IMGPATH.'/users/medum/'.$liveScoreedbpic ?>" username="<?php echo $this->escape($liveScore->username);?>">+ Compare user</a> 
+					</div>
+					<div class="userPic">
+						<img src="<?php echo IMGPATH.'/users/medium/'.$liveScoreedbpic ?>" width="70" height="70" border="0" />
+					</div>
+					<div class="userDetails">
+						<div class="usertitle">
+							<span class="username"><?php echo $this->escape($this->myclientdetails->customDecoding($liveScore->username)).' '.$this->escape($this->myclientdetails->customDecoding($liveScore->lname));?></span>
+							<h3><strong><?php echo $this->escape($liveScore->total);?></strong> <i> comments</i></h3>
+						</div>
+						
+					</div>
+
+				</li>
+			<?php  endforeach; ?>
+				</ul>
+				
+			</div>
+			<?php } else { ?>
+			<div class="notfound">Users Not Found!</div>
+			<?php } ?>	
+
+			<div class="clearfix"></div>
+	</div>
+	<?php } ?>
+
+<?php } ?>
+</div>
+</div>

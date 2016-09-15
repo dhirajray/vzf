@@ -1,0 +1,1009 @@
+<script type="text/javascript" src="<?php echo BASE_URL; ?>/adminraw/fullcalendar-2.0.2/lib/moment.min.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL; ?>/adminraw/fullcalendar-2.0.2/fullcalendar.min.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyDXdTKWaNO-2wcXWL8N3Jy-Q4XI5qXyazg&sensor=false"></script>
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>/adminraw/fullcalendar-2.0.2/fullcalendar.css" type="text/css" />
+
+<script>
+var d = new Date();
+var Currtime = d.getHours() + ":" + d.getMinutes();
+var startTimeHour ='';
+var startTimeMinute ='';
+var endTimeHour ='';
+var endTimeMinute ='';
+
+
+
+var date = new Date();
+var d = date.getDate();
+var m = date.getMonth();
+var y = date.getFullYear();
+function eventBgUploader (){
+  var eventBgUploader = '<div class="dropzone" id="myrightBanner">\
+              <div class="appendType fallback"  >\
+                <input type="file" name="eventbackground">\
+               </div>\
+             </div>';
+  $('.typeUploadImg .bgEventUploader').html(eventBgUploader);
+  var myDropzoneBannerval = new Dropzone("#myrightBanner",{
+        url: BASE_URL+'/admin/event/splash',
+        maxFiles: 1,
+        maxFilesize: 10,
+        addRemoveLinks: true,
+        uploadMultiple:false,
+        parallelUploads: 1,
+        acceptedFiles: '.png, .jpg, .jpeg, .gif, .JPG',
+    dictFileTooBig: "Sorry the file you tried to upload is too large ({{filesize}}MB), max allowed filesize is {{maxFilesize}}MB."
+     });
+
+    myDropzoneBannerval.on("error", function (file, serverFileName) {
+        $messageError(serverFileName);
+    });
+    myDropzoneBannerval.on("maxfilesexceeded", function (file, serverFileName) {
+        $messageError('You can upload only 5 file');
+    });     
+    myDropzoneBannerval.on("success", function (file, serverFileName) {
+      $('a.previewPage, #bghidden').remove();
+        $('#backgroundImage').append(serverFileName.content);
+         var bgname = $('#bghidden').val();
+         $('#backgroundImage img').attr('src', BASE_URL+'/event/'+bgname);
+
+         $('#backgroundImage').after('<div class="fieldInput previewPage"><a data-url="'+BASE_URL+'/event/splashdemo/image/'+bgname+'" href="javascript:void(0);">Preview splash</a></div>');
+    });
+    myDropzoneBannerval.on("removedfile", function (file) { 
+     $('.previewPage').html('');
+});
+}
+  $(document).ready(function() {
+
+   /* initialize the calendar
+  -----------------------------------------------------------------*/
+  
+ 
+    
+$('#eventbgcolor').colpick({
+  layout:'hex',
+  submit:0,
+  colorScheme:'dark',
+  onChange:function(hsb,hex,rgb,el,bySetColor) {
+    $(el).css('background','#'+hex);
+    // Fill the text box just if the color was set using the picker, and not the colpickSetColor function.
+    if(!bySetColor) $(el).val('#'+hex);
+  }
+}).keyup(function(){
+  $(this).colpickSetColor(this.value);
+});
+
+  var date = new Date();
+  var d = date.getDate();
+  var m = date.getMonth();
+  var y = date.getFullYear();
+  var Event;
+  
+var calendar = $('#calendar').fullCalendar({
+  //isRTL: true,
+   buttonHtml: {
+    prev: '<i class="ace-icon fa fa-chevron-left"></i>',
+    next: '<i class="ace-icon fa fa-chevron-right"></i>'
+  },
+  buttonText:{
+    today:    'current month',
+    month:    'month',
+    week:     'week',
+    day:      'day'
+  },
+  columnFormat:{
+    week: 'ddd D/M'
+  },
+  timeFormat: 'h(:mm)a',
+  timezone: 'Europe/London',
+  header: {
+    left: 'prev,next today',
+    center: 'title',
+    right: 'month,agendaWeek,agendaDay'
+  },
+  events: 
+    {
+      url: BASE_URL+'/admin/event/jsondata',
+      type: 'POST',
+      data: {
+          custom_param1: 'something',
+          custom_param2: 'somethingelse'
+      },
+      success:function(){
+             var getHash = location.hash;               
+          setTimeout(function (){
+              if(getHash){
+             
+                  if(getHash=="#eventScrolldiv"){
+                     $scrolling('#spcialDBbody');
+                  }
+                  
+                 }
+          }, 1000);
+               //location.hash ='#eventScroll' ;          
+      },
+      error: function() {
+          alert('there was an error while fetching events!');
+      },
+      color: '#fcf9a9',   // a non-ajax option
+      textColor: 'black' // a non-ajax option
+  },
+  editable: true,
+  eventResize: function(event, delta, revertFunc) {
+    EndDate = event.end._i;
+     var htmlLightbox = '<div id="detailsDialog" data-pop="delete"><div class="dbDcenter">Are you sure you want to move '+event.title+'  to '+event.end.format("DD-MM-YYYY HH:mm:ss")+'?</div></div>';
+      $('#detailsDialog').remove();
+      $('body').append(htmlLightbox);
+      $( "#detailsDialog" ).dialog({
+                width:300,
+                title:'Confirmation', 
+                modal:true,
+                draggable:false,
+                close:function(){
+                   revertFunc();                  
+                },
+                buttons: {
+                  "Yes": function() {
+                    $.ajax({
+                      url:BASE_URL+"/admin/event/edit",
+                      data:{'end':event.end.format(),'id':event.id},
+                      type :"POST",
+                      success:function(result)
+                      {
+                        if(result.status=='success')
+                        {
+                          $messageSuccess(result.message);
+                          loadMap();
+                        }else{
+                          $messageError(result.message);
+                        }
+                      }
+                   }); 
+                     $(this).dialog("close" );
+                  }
+                }
+
+           });
+  },
+   eventDrop: function(event,delta,revertFunc) {
+      console.log(event.start);
+      StartDate = event.start._i;
+       var htmlLightbox = '<div id="detailsDialog" data-pop="delete"><div class="dbDcenter">Are you sure you want to move '+event.title+' to '+event.start.format("DD-MM-YYYY HH:mm:ss")+'?</div></div>';
+      $('#detailsDialog').remove();
+      $('body').append(htmlLightbox);
+      $( "#detailsDialog" ).dialog({
+                width:300,
+                title:'Confirmation', 
+                modal:true,
+                draggable:false,
+                close:function(){  
+                  revertFunc();
+                },
+                buttons: {
+                  "Yes": function() {
+                    $.ajax({
+                      url:BASE_URL+"/admin/event/edit",
+                      data:{'start':event.start.format(),'id':event.id},
+                      type :"POST",
+                      success:function(result)
+                      {
+                        if(result.status=='success')
+                        {
+                            $messageSuccess(result.message);
+                            loadMap();
+                        }else{
+                          $messageError(result.message);
+                        }
+                      }
+                   }); 
+                     $(this).dialog("close" );
+                  }
+                }
+
+           });
+       
+  },
+  droppable: false, // this allows things to be dropped onto the calendar !!!
+  selectable: true,
+  selectHelper: false,
+  select: function(start, end, allDay) 
+  {
+    var myDate=start.format("DD-MM-YYYY");
+    current =moment().format("DD-MM-YYYY");
+
+    currentmyDate=current.split("-");
+    var  currentnewDate=currentmyDate[1]+"/"+currentmyDate[0]+"/"+currentmyDate[2];
+    eventBgUploader();
+
+    myDate=myDate.split("-");
+    var newDate=myDate[1]+"/"+myDate[0]+"/"+myDate[2];
+
+    startTimeHour =currentmyDate[0];
+    startTimeMinute =currentmyDate[2];
+    endTimeHour =myDate[0];
+    endTimeMinute =myDate[2];
+
+    eventTime = new Date(newDate).getTime();
+    var milliseconds = new Date(currentnewDate).getTime();
+    if(milliseconds<=eventTime){
+       $('#searchContainer').show();
+       $scrolling('#searchContainer');
+       $('#startdate_type').val(start.format("DD-MM-YYYY")+" "+Currtime);
+    }else{
+      $messageError("Events can't be added on a past date");
+    }
+    return false;
+  },
+  eventClick: function(calEvent, jsEvent, view) {
+   
+    $.ajax({
+        url:BASE_URL+"/admin/event/geteventdetails",
+        dataType:'json',
+        data:{'id':calEvent.id},
+        type :"POST",
+        success:function(response)
+        {
+          if(response.status=='success')
+          { 
+            $('#eventTitle').val(response.title);
+            $('#eventDescription').val(response.description);
+            $('#eventadress').val(response.adress);
+            
+            $('#eventend_type').val(response.end);
+
+             eventBgUploader();
+          var startTime = response.start.split(':');
+          var StartDate = startTime[0].split(' ')[0];
+          var  startTimeHour = startTime[0].split(' ')[1];
+          var startTimeMinute = startTime[1];
+
+          var endTime = response.end.split(':');
+          var endDate = endTime[0].split(' ')[0];
+          var  endTimeHour = endTime[0].split(' ')[1];
+          var endTimeMinute = endTime[1];
+            $('#startdate_type').val(StartDate+' '+startTimeHour+':'+startTimeMinute);
+            $('#eventend_type').val(endDate+' '+endTimeHour+':'+endTimeMinute);
+  
+
+            
+            $('#timezoneevent option[value="'+response.timezoneevent+'"]').prop('selected',true);
+            $select('#timezoneevent');
+           /* $('#type option[value="'+response.type+'"]').prop('selected',true);
+            $select('#type');*/
+            $('#select_type').hide();
+            $('#eventbgcolor').val(response.bgcolor).css({background:response.bgcolor});
+            customFieldTotal =1;
+              $('#searchContainer .searchField:last').prevAll('.customFieldsEvent').remove();
+             $.each(response.metaData, function(i, value){
+                  var htmlFieldAdd = '<div class="searchField customFieldsEvent">\
+                      <label class="label">Custom field '+customFieldTotal+': </label>\
+                      <div class="fieldInput">\
+                        <input type="text" class="" value="'+value.label+'"  name="customFieldsEventLabel[]" placeholder="Label">\
+                        <input type="text" class="" value="'+value.value+'" name="customFieldsEventValue[]" placeholder="Description">\
+                        <a href="javascript:void(0)"  class="fa fa-times-circle closeCustomFields"></a>\
+                      </div>\
+                  </div>';
+                customFieldTotal +=1;
+              
+                $('#searchContainer .searchField:last').before(htmlFieldAdd);
+              });
+            if(response.logo!="")
+            {
+              $('#logoImage').html('<img width="100" src="'+BASE_URL+'/event/'+response.logo+'">\
+                 <a class="fa-stack fa-lg removeImg" id="logoImageID" href="javascript:void(0)">\
+                    <i class="fa fa-circle fa-stack-2x"></i>\
+                    <i class="fa fa-times fa-stack-1x fa-inverse"></i>\
+                 </a><input type="hidden" name="logohidden" id="logohidden" value="'+response.logo+'" >');
+            }
+            if(response.bgimage)
+            {
+                $('#backgroundImage').html('<img width="100" src="'+BASE_URL+'/event/'+response.bgimage+'">\
+                 <a class="fa-stack fa-lg removeImg" id="backgroundImageID" href="javascript:void(0)">\
+                    <i class="fa fa-circle fa-stack-2x"></i>\
+                    <i class="fa fa-times fa-stack-1x fa-inverse"></i>\
+                 </a><input type="hidden" name="bghidden" id="bghidden" value="'+response.bgimage+'" >');
+            }
+            $('#specialdbsubmit').after('<input type="hidden" name="eventid" id="eventid" value="'+calEvent.id+'" />');
+            $('#specialdbsubmit').val(' Save ');
+             $('#searchContainer').show();
+             $scrolling('#searchContainer');
+          }
+        }
+     });
+    return false;
+
+    $('#surveyDialog1').remove();
+    var modal = '<div id="surveyDialog1">\
+                     <form class="no-margin">\
+                        <label>Change event name &nbsp;</label>\
+                        <textarea style="width: 579px; height: 160px;" class="middle" id="eventeditTitle" >' + calEvent.title + '</textarea>\
+                     </form>\
+                </div>';          
+     $('body').append(modal);
+     $( "#surveyDialog1" ).dialog({
+      dialogClass:'surveyDialog',             
+      width:600,
+      height:500,  
+      title:calEvent.title,
+      close:function(){
+         $(this).dialog("destroy");
+      },
+      open:function()
+      {                
+           $fluidDialog();
+           $("#datacollect").html(''); 
+      },
+      buttons: {
+        "Save": function() {
+            calEvent.title = title = $("#eventeditTitle").val();
+             $.ajax({
+                url:BASE_URL+"/admin/event/edit",
+                data:{'title':title,'id':calEvent.id},
+                type :"POST",
+                success:function(result)
+                {
+                  if(result.status=='success')
+                  {
+                      $messageSuccess(result.message);
+                      calendar.fullCalendar('updateEvent', calEvent);
+                      loadMap();
+                  }else{
+                    $messageError(result.message);
+                  }
+                }
+             }); 
+            $(this).dialog("destroy");
+        },
+        "Delete": function() {
+           calendar.fullCalendar('removeEvents' , function(ev){
+            $.ajax({
+                url:BASE_URL+"/admin/event/delete",
+                data:{'id':calEvent.id},
+                type :"POST",
+                success:function(result)
+                {
+                  if(result.status=='success'){
+                      $messageSuccess('Event deleted successfully');
+                      loadMap();
+                    }
+                  else
+                    $messageError(result.message);
+                }
+             }); 
+            return (ev._id == calEvent._id);
+          });
+          $(this).dialog("destroy");
+        }
+      }
+    });
+  }
+
+});
+  
+  $('body').on('click','.editevent',function(){
+       var eventid = $(this).attr('data-id');
+       $.ajax({
+        url:BASE_URL+"/admin/event/geteventdetails",
+        dataType:'json',
+        data:{'id':eventid},
+        type :"POST",
+        success:function(response)
+        {
+          if(response.status=='success')
+          {
+            eventBgUploader();
+            $('.addbuttonPublish').remove();
+            $('#eventTitle').val(response.title);
+            $('#eventDescription').val(response.description);
+            $('#eventadress').val(response.adress);
+            $('#startdate_type').val(response.start);
+            $('#eventend_type').val(response.end);
+            $('#timezoneevent option[value="'+response.timezoneevent+'"]').prop('selected',true);
+            $select('#timezoneevent');
+            
+
+            if(response.promoted==1)
+              $('#promoted').attr('checked',true);
+            else
+              $('#promoted').attr('checked',false);
+
+            $('#select_type').hide();
+            if(response.logo!="")
+            {
+              $('#logoImage').html('<img width="100" src="'+BASE_URL+'/event/'+response.logo+'">\
+                 <a class="fa-stack fa-lg removeImg" id="logoImageID" href="javascript:void(0)">\
+                    <i class="fa fa-circle fa-stack-2x"></i>\
+                    <i class="fa fa-times fa-stack-1x fa-inverse"></i>\
+                 </a><input type="hidden" name="logohidden" id="logohidden" value="'+response.logo+'" >');
+            }
+            if(response.bgimage)
+            {
+                $('#backgroundImage').html('<img width="100" src="'+BASE_URL+'/event/'+response.bgimage+'">\
+                 <a class="fa-stack fa-lg removeImg" id="backgroundImageID" href="javascript:void(0)">\
+                    <i class="fa fa-circle fa-stack-2x"></i>\
+                    <i class="fa fa-times fa-stack-1x fa-inverse"></i>\
+                 </a><input type="hidden" name="bghidden" id="bghidden" value="'+response.bgimage+'" >');
+            }
+            $('#eventbgcolor').val(response.bgcolor).css({background:response.bgcolor});
+            customFieldTotal =1;
+            $('.customFieldsEvent').remove();
+             $.each(response.metaData, function(i, value){
+                  var htmlFieldAdd = '<div class="searchField customFieldsEvent">\
+                      <label class="label">Custom field '+customFieldTotal+': </label>\
+                      <div class="fieldInput">\
+                        <input type="text" class="" value="'+value.label+'"  name="customFieldsEventLabel[]" placeholder="Label">\
+                        <input type="text" class="" value="'+value.value+'" name="customFieldsEventValue[]" placeholder="Description">\
+                        <a href="javascript:void(0)"  class="fa fa-times-circle closeCustomFields"></a>\
+                      </div>\
+                  </div>';
+                customFieldTotal +=1;
+                $('#addedCustomFields').before(htmlFieldAdd);
+              });
+           
+            $('#specialdbsubmit').after('<input type="hidden" name="eventid" id="eventid" value="'+eventid+'" />');
+            $('#specialdbsubmit').val(' Save ');
+            $('#searchContainer').show();
+            $scrolling('#searchContainer');
+          }
+        }
+     });
+  });
+
+  $('body').on('click','.deleteevent',function(){
+       var eventid = $(this).attr('data-id');
+
+            //  var id = $(this).attr('data-id');
+              msg ='Are you sure you want to delete this event?';
+              $('#dialogConfirmSetting').remove();
+              $('body').append('<div id="dialogConfirmSetting">'+msg+'</div>');
+
+              $( "#dialogConfirmSetting" ).dialog({
+              resizable: false,
+              title:'Please confirm',
+              modal: true,
+              buttons: {
+              "Yes": function() {
+              $( this ).dialog( "close" );
+                 $.ajax({
+                      url:BASE_URL+"/admin/event/delete",
+                      data:{'id':eventid},
+                      type :"POST",
+                      success:function(result)
+                      {
+                        if(result.status=='success'){
+                          $('#remove_'+eventid).remove();
+                          $messageSuccess('Deleted successfully');
+                          window.location.reload(true);
+                          }
+                        else
+                          $messageError(result.message);
+                      }
+                   });       
+              }
+              }
+        });
+  });
+  
+  $('body').on('click','.addbuttonPublish',function(){
+    $('#statusEvent').val(1);
+  });
+
+ $('body').on('click','.addbutton',function(){
+    $('#statusEvent').val(0);
+  });
+
+  $('body').on('click','.publishevent',function(){
+
+      var parentTable = $(this).closest('.listBtnsWrp');
+       var thisEl = $(this);
+       var eventid = thisEl.attr('data-id');
+       var status = thisEl.attr('data-status');      
+        var sStatus =1;
+        var statusHtml = 'UnPublish';     
+        if(status=="1")
+        {
+          sStatus = 0;
+          statusHtml = 'Publish';
+          thisEl.addClass('publish');
+          thisEl.removeClass('unpublish');
+
+        $('.btn:not(.publishevent)',parentTable).addClass('disabled');
+        }else{
+                thisEl.removeClass('publish');
+          thisEl.addClass('unpublish');
+
+          $('.btn:not(.publishevent)',parentTable).removeClass('disabled');
+        }
+       $.ajax({
+          url:BASE_URL+"/admin/event/publish",
+          dataType:'json',
+          data:{'id':eventid,'status':sStatus},
+          type :"POST",
+          success:function(result)
+          {
+            if(result.status=='success')
+            {
+                $messageSuccess(result.message);
+                thisEl.attr('data-status',sStatus);
+                thisEl.html(statusHtml);
+                thisEl.addClass(statusHtml);
+            }
+            else
+              $messageError(result.message);
+          }
+       });
+  });
+  
+
+  $('body').on('click','.promotedevent',function(){
+      
+      var thisEl = $(this);
+      var eventid = thisEl.attr('data-id');
+      var promoted = thisEl.attr('data-promoted');      
+      if(thisEl.hasClass('disabled'))
+        return false;
+
+      var sStatus =1;
+      var statusHtml = 'UnPromote';     
+      if(promoted==1)
+      {
+        sStatus = 0;
+        statusHtml = 'Promote';
+        thisEl.addClass('btn-green');
+        thisEl.removeClass('btn-danger');
+      }else{
+        thisEl.addClass('btn-danger');
+        thisEl.removeClass('btn-green');
+      }
+       $.ajax({
+          url:BASE_URL+"/admin/event/promote",
+          dataType:'json',
+          data:{'id':eventid,'status':sStatus},
+          type :"POST",
+          success:function(result)
+          {
+            if(result.status=='success')
+            {
+                $messageSuccess('Updated successfully');
+                thisEl.attr('data-promoted',sStatus);
+                thisEl.html(statusHtml);
+            }
+            else
+              $messageError(result.message);
+          }
+       });
+  });
+
+
+  $("#startdate_type" ).datetimepicker({dateFormat: "dd-mm-yy",minDate: 0});
+  $("#eventend_type" ).datetimepicker({dateFormat: "dd-mm-yy", minDate: 0});
+
+  $("#addevent").submit(function(e)
+  {
+      var eventTitle = $('#eventTitle').val();
+      var start = $('#startdate_type').val();
+      var end = $('#eventend_type').val();
+      startTime = start.split(" ");
+      endTime = end.split(" ");
+      if(eventTitle=='')
+      {
+        $messageError('Please enter your event title');
+        return false;
+      }
+      else if(end=='' || start==""){
+        $messageError('Please enter a start date and end date');
+        return false;
+      }/*
+      else if(endTime[1]=='00:00' || startTime[1]=="00:00" || startTime[1] =='00:00:00' || endTime[1] =='00:00:00'){
+        $messageError('Please enter start time and end time');
+        return false;
+      }*/
+      else if($('#type').val()==3)
+      {
+        var formObj = $(this);
+        var formURL = formObj.attr("action");
+        var formData = new FormData(this);
+         $('#detailsDialog').remove();
+              var htmlLightbox = '<div id="detailsDialog">\
+                  <div id="userInfoContainer"></div>\
+              </div>';
+              $('body').append(htmlLightbox);
+              $( "#detailsDialog" ).dialog({
+            dialogClass:'detailsDialogBox',title:'Please note',             
+            open:function(event, ui){
+              $fluidDialog();   
+              $('#userInfoContainer').html("You can invite users to your Private Event by clicking on the event list below.");
+            },
+            buttons: {                     
+              "OK": function() 
+              {  
+                
+                $.ajax({
+                  url: formURL,
+                  type: 'POST',
+                  data:  formData,
+                  mimeType:"multipart/form-data",
+                  dataType:'json',
+                  contentType: false,
+                  cache: false,
+                  processData:false,
+                  async : false,
+                  success: function(response)
+                  {
+                     if(response.status=='success')
+                     {  
+                        $messageSuccess(response.message); 
+                        location.href =BASE_URL+"/admin/event#eventScrolldiv";
+                        location.reload(true);    
+                    }else
+                      $messageError(response.message);
+                  }
+                });
+                
+              }
+
+            }
+        }).resize();
+      }else
+      {
+          var formObj = $(this);
+          var formURL = formObj.attr("action");
+          var formData = new FormData(this);
+          $.ajax({
+            url: formURL,
+            type: 'POST',
+            data:  formData,
+            mimeType:"multipart/form-data",
+            dataType:'json',
+            contentType: false,
+            cache: false,
+            processData:false,
+            async : false,
+            success: function(response)
+            {
+               if(response.status=='success')
+               {  
+                  $messageSuccess(response.message);
+                  window.location.reload(true);
+              }else
+                $messageError(response.message);
+            }
+          });
+      }
+      e.preventDefault(); //Prevent Default action.
+  });
+
+
+
+$('body').on('click', '.eventListing' , function(){
+
+
+  if($(this).hasClass('active')==false){
+      $(this).closest('ul').find('.active').removeClass('active');
+      $(this).closest('ul').find('.eventListing .eventDetails').hide();
+       $('.eventDetails', this).slideDown('fast');
+       $(this).addClass('active');
+       
+  }else{
+     $('.eventDetails', this).slideUp('fast');
+     $(this).removeClass('active');
+  }
+    
+        
+    
+});
+$('body').on('click', '.listBtnsWrp a' , function(e){
+  e.stopPropagation();
+});
+
+var customFieldTotal = 1;
+$('body').on('click', '#addMoreFieldEvent', function(){
+  var thisEl = $(this);
+  var parent =  thisEl.closest('.searchField');
+  var htmlFieldAdd = '<div class="searchField customFieldsEvent">\
+                          <input type="text" class=""  name="customFieldsEventLabel[]" placeholder="Label">\
+                          <input type="text" class=""  name="customFieldsEventValue[]" placeholder="Description">\
+                          <a href="javascript:void(0)"  class="fa fa-times-circle closeCustomFields"></a>\
+                    </div>';
+      customFieldTotal +=1; 
+
+     $('#addedCustomFields', parent).append(htmlFieldAdd);               
+     
+}); 
+
+$('body').on('click', '.closeCustomFields' , function(e){
+  e.stopPropagation();
+  $(this).closest('.customFieldsEvent').fadeOut(function() {
+          $(this).remove();
+          customFieldTotal -=1;
+        });
+});
+$('body').on('click', '.openSearchBlock' , function(e){
+  e.stopPropagation();
+  $('#eventbgcolor').removeAttr('style');
+  $('.closeCustomFields').trigger('click');
+  $('#eventid').remove();
+  eventBgUploader();
+});
+
+
+  $('body').on('click', '.removeImg', function(){
+      This = $(this).attr('id');
+      if(This=="logoImageID"){
+         $('#logoImage').html('');
+      }else{
+         $('#backgroundImage').html('');
+      }
+  });
+
+    $('body').on('click', '.previewPage', function()
+    {
+        url = $(this).attr('data-url');
+        eventTitle = $("#eventTitle").val();
+        startdate = $("#startdate_type").val();
+        eventend = $("#eventend_type").val();
+        bghidden = $("#bghidden").val();
+        timezoneevent = $("select#timezoneevent option:selected").val();
+        var htmlLightbox = '<div id="detailsDialog"  title="Facebook Friends">\
+        <div id="datacollect" style="float:none"></div>\
+        <div id="userInfoContainer"></div>\
+        </div>';
+        var htmlPreview = '<div class="seeLargeView loader dashBlock">\
+        <h2>\
+        Preview\
+        <a class="closePupPreview pull-right" href="javascript:void(0);">\
+        <i class="fa fa-times"></i>\
+        </a>\
+        </h2>\
+        <div><iframe id="previewFrontend" src="'+BASE_URL+'/event/splashdemo?eventTitle='+eventTitle+'&start='+startdate+'&end='+eventend+'&image='+bghidden+'&timezoneevent='+timezoneevent+'" width="100%" height="100%"></iframe></div></div>';
+       
+        $('.seeLargeView').remove();
+        $('body').append(htmlPreview);
+        $('.overlayPopup').fadeIn();
+
+        $('#previewFrontend').load(function() {
+           $(this).closest('.seeLargeView').removeClass('loader');
+        });
+        var popHeight = $('.seeLargeView').height();
+        $('.seeLargeView iframe').height(popHeight-50);
+    });
+
+   $('body').on('click','.closePupPreview', function(){
+       $('.overlayPopup, .seeLargeView').fadeOut();
+   });   
+  //$scrolling('#spcialDBbody');
+
+
+ });
+
+</script>
+ <script>
+
+function loadMap() {
+  $.ajax({
+          url:BASE_URL+"/admin/event/renderhtml",
+          data:{'render':1},
+          type :"POST",
+          dataType:'json',
+          success:function(result)
+          { 
+
+              $('#searchresulthide').html(result.content);
+              $('.pagingContent').html(result.pagingContent);
+              $('#addevent')[0].reset();
+              $.each(result.json, function(i, value){
+                  jsonCode = $.parseJSON(value.mapjson);
+                  if(jsonCode.latitude!='' && jsonCode.longitude!=''){
+                    var mapID = 'map_'+value.mapid;                        
+                    creatMap(mapID,jsonCode.latitude,jsonCode.longitude);
+                  }                          
+             });
+          }
+    });
+
+  $.ajax({
+          url:BASE_URL+"/admin/event/renderhtmlunpublish",
+          data:{'render':1},
+          type :"POST",
+          dataType:'json',
+          success:function(result)
+          {
+            //console.log(result);
+
+              $('#searchresulthide2').html(result.content);
+              //$('.pagingContent').html(result.pagingContent);
+              //$('#addevent')[0].reset();
+              $.each(result.json, function(i, value){
+                  jsonCode = $.parseJSON(value.mapjson);
+                  if(jsonCode.latitude!='' && jsonCode.longitude!=''){
+                    var mapID = 'map_'+value.mapid;                        
+                    creatMap(mapID,jsonCode.latitude,jsonCode.longitude);
+                  }                          
+             });
+          }
+    });
+
+
+}
+
+function creatMap (mapid,latitude,longitude){
+   var myLatlng = new google.maps.LatLng(latitude,longitude);
+  var mapOptions = {
+    zoom: 15,
+    center: myLatlng,
+    disableDefaultUI: true
+  }
+  var map = new google.maps.Map(document.getElementById(mapid), mapOptions);
+
+  var marker = new google.maps.Marker({
+      position: myLatlng,
+      map: map,
+      title: 'Hello World!'
+  });
+
+  google.maps.event.addDomListener(window, 'load', creatMap);
+
+}
+  loadMap();
+</script>
+
+
+<h1 class="pageTitle dbeeViewAll">Events
+<a href="javascript:void(0);" class="btn btn-yellow btn-large openSearchBlock" >Create event</a></h1>
+<div id="searchWrapper" class="spSdbsSearchBox eventSearchWrp">
+  <div id="searchContainer" style="margin-bottom:20px;">  
+    <div id="exp_condition" class="expenddcondition1" >       
+      <div class="whiteBox addConditionWrapper"> 
+        <form name="addevent" id="addevent"  action ="<?php echo BASE_URL;?>/admin/event/add" method="POST" enctype="multipart/form-data">
+          <input type="hidden" name="status" id="statusEvent" value="0">
+          <div class="searchField"> 
+            <label class="label">Event title </label>
+            <div class="fieldInput"><textarea class="textarea" name="eventTitle" id="eventTitle" style="width:60%" ></textarea></div>
+          </div>
+          <div class="searchField"> 
+            <label class="label">Description </label>
+            <div class="fieldInput"><textarea class="textarea" name="eventDescription" id="eventDescription" style="width:60%" ></textarea></div>
+          </div>
+           <div class="searchField"> 
+            <label class="label">Address </label>
+            <div class="fieldInput"><textarea class="textarea" name="eventadress" id="eventadress" style="width:60%" ></textarea></div>
+          </div>
+        <div class="searchField"> 
+            <label class="label">Select timezone </label>
+            <div class="fieldInput"> <select name="timezoneevent" id="timezoneevent">
+              <option value="-12.0">(GMT -12:00) Eniwetok, Kwajalein</option>
+              <option value="-11.0">(GMT -11:00) Midway Island, Samoa</option>
+              <option value="-10.0">(GMT -10:00) Hawaii</option>
+              <option value="-9.0">(GMT -9:00) Alaska</option>
+              <option value="-8.0">(GMT -8:00) Pacific Time (US &amp; Canada)</option>
+              <option value="-7.0">(GMT -7:00) Mountain Time (US &amp; Canada)</option>
+              <option value="-6.0">(GMT -6:00) Central Time (US &amp; Canada), Mexico City</option>
+              <option value="-5.0">(GMT -5:00) Eastern Time (US &amp; Canada), Bogota, Lima</option>
+                <option value="-4.0">(GMT -4:00) Atlantic Time (Canada), Caracas, La Paz</option>
+              <option value="-3.5">(GMT -3:30) Newfoundland</option>
+                  <option value="-3.0">(GMT -3:00) Brazil, Buenos Aires, Georgetown</option>
+              <option value="-2.0">(GMT -2:00) Mid-Atlantic</option>
+              <option value="-1.0">(GMT -1:00 hour) Azores, Cape Verde Islands</option>
+              <option value="0.0" selected="selected">(GMT) Western Europe Time, London, Lisbon, Casablanca</option>
+              <option value="1.0">(GMT +1:00 hour) Brussels, Copenhagen, Madrid, Paris</option>
+              <option value="2.0">(GMT +2:00) Kaliningrad, South Africa</option>
+              <option value="3.0">(GMT +3:00) Baghdad, Riyadh, Moscow, St. Petersburg</option>
+              <option value="3.5">(GMT +3:30) Tehran</option>
+              <option value="4.0">(GMT +4:00) Abu Dhabi, Muscat, Baku, Tbilisi</option>
+              <option value="4.5">(GMT +4:30) Kabul</option>
+              <option value="5.0">(GMT +5:00) Ekaterinburg, Islamabad, Karachi, Tashkent</option>
+              <option value="5.5">(GMT +5:30) Bombay, Calcutta, Madras, New Delhi</option>
+              <option value="5.75">(GMT +5:45) Kathmandu</option>
+              <option value="6.0">(GMT +6:00) Almaty, Dhaka, Colombo</option>
+              <option value="7.0">(GMT +7:00) Bangkok, Hanoi, Jakarta</option>
+              <option value="8.0">(GMT +8:00) Beijing, Perth, Singapore, Hong Kong</option>
+              <option value="9.0">(GMT +9:00) Tokyo, Seoul, Osaka,  </option>
+              <option value="9.5">(GMT +9:30) Adelaide, Darwin</option>
+              <option value="10.0">(GMT +10:00) Eastern Australia, Guam, Vladivostok</option>
+              <option value="11.0">(GMT +11:00) Magadan, Solomon Islands, New Caledonia</option>
+              <option value="12.0">(GMT +12:00) Auckland, Wellington, Fiji, Kamchatka</option> </select></div>
+          </div>
+
+          <div class="searchField" id="select_type"> 
+            <label class="label">Select type </label>
+            <div class="fieldInput"> 
+              <select name="type" id="type">
+                <option value="1">Open</option>
+                <option value="2">Attendee confirmation required</option>
+                <option value="3">Private</option>
+              </select>
+            </div>
+          </div>
+          <div class="searchField"> 
+            <label class="label">Start date / time </label>
+            <div class="fieldInput"><input type="text" name="startdate" id="startdate_type" class="uploadType"></div>
+          </div>
+          <div class="searchField"> 
+            <label class="label">End date / time </label>
+            <div class="fieldInput"><input type="text" name="enddate"  id="eventend_type" class="uploadType" ></div>
+          </div>
+
+           <div class="searchField"> 
+            <label class="label">Logo</label>
+            <div class="fieldInput">
+              <div class="appendType">
+                <input type="text" readonly="" style="width:200px;" name="" class="uploadType">
+                <a href="javascript:void(0);" class="btn btn-black">Browse<input type="file" name="eventlogo" class="fileType"></a>
+              </div>
+              <div class="clearfix"></div>
+              <div class="eventLogo removeImgWrp" id="logoImage"></div>
+            </div>            
+          </div>
+
+          <div class="searchField"> 
+             <label class="label" style="margin-top:0;"><a href="javascript:void(0);" class="btn btn-yellow" id="addMoreFieldEvent"><i class="fa fa-plus"></i> Add custom field</a></label>
+             <div class="fieldInput" id="addedCustomFields">
+             </div>
+          </div>
+
+          <div class="searchField typeUploadImg"> 
+            <label class="label">Background image </label>
+            <div class="fieldInput bgEventUploader">
+              <div class="clear"></div>
+            </div> 
+            <div class="fieldInput eventLogo removeImgWrp" id="backgroundImage"></div>                      
+          </div>
+
+          
+          <div class="searchField"> 
+            <label class="label">Background color </label>
+            <div class="fieldInput">
+              <div class="colorPickerEvent">
+                <input type="text" name="eventbgcolor" for="fontColor_colpicker"  id="eventbgcolor" class="uploadType">
+                <label id="fontColor_colpicker" for="eventbgcolor" class="colpicker" type="button"><i> </i></label>
+              </div>
+            </div>
+         </div>
+         
+         <div class="searchField">
+            <label class="label">Promote:</label>
+            <div class="fieldInput" style="padding-top:6px">
+                <label class="labelCheckbox">
+                     <input type="checkbox" id="promoted" value="on" name="promoted" >
+                     <label for="promoted" class="checkbox"></label>Yes
+                  </label>
+            </div>
+         </div>
+          <div class="searchField"> 
+            <label class="label">&nbsp;</label>
+            <div class="fieldInput">
+              <input type="submit" id="specialdbsubmit" class="addbutton btn btn-green btn-medium pull-left" value="Save"> 
+              &nbsp;
+              <input type="reset"  class="btn btn-medium openSearchBlock " value="Close" style=""> 
+              <input type="submit"  class="addbuttonPublish btn btn-green btn-medium pull-left" value="Save & Publish" style="margin-left:10px;"> 
+            </div>
+          </div>
+          <div class="noteInfo" style="margin-left:175px">By publishing your event you make it visible to platform users. You can choose to save your event but publish it at a later date.</div>
+        </form>
+        <div class="clearfix"></div>
+      </div>
+    </div>
+  </div>
+
+<div id="spcialDBbody" class="box-body dbtabContainer">
+ 
+  <ul class="dbtab">
+    <li class="active"><a href="#searchresulthide3" >Calender</a></li>
+    <li ><a href="#searchresulthide" >Current events</a></li>
+    <li><a href="#searchresulthide2" >Previous events</a></li>
+  </ul>
+
+<ul id="searchresulthide3" class="listStyle1 dbtabContent" style="display:block">
+  <div id="messageWrapper" class="dbtabContainer advWrpMain"> 
+  <h2 class="infoCal">Click on a date to add an event</h2>
+  <div id='calendar'></div>
+</div>
+</ul>
+
+<ul id="searchresulthide" class="listStyle1 dbtabContent" style="display:none;">
+
+</ul>
+<ul id="searchresulthide2" class="listStyle1 dbtabContent" style="display:none;">
+
+</ul>
+</div>

@@ -1,0 +1,16 @@
+<?php 
+foreach($this->userlist as $key => $value)
+{ 
+?> 
+<div id="newpic" class="proPic loginbackgroundimage">
+ <div class="follower-box">
+    <div class="usImg">
+       <strong id="headerImg">
+       <img  src="<?php echo IMGPATH.'/users/small/'.$value['ProfilePic']?>" width="40" height="40" class="imgStyle"> 
+       </strong>
+    </div>
+    <span class="oneline"> <?php echo $this->myclientdetails->customDecoding($value['Name']).' '.$this->myclientdetails->customDecoding($value['lname']); ?></span>
+ </div>
+ <a href="javascript:void(0);" rel="dbTip" class="removeimage1 removeUser removeCompare" data-id="<?php echo $value['UserID'];?>" data-type="<?php echo $this->type; ?>">x</a>
+</div>
+<?php } ?>

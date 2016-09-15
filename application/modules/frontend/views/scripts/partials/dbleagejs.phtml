@@ -1,0 +1,24 @@
+
+<script type="text/javascript">
+function dbpartofleague()
+{
+  //dbpartofleague
+  lgtitle = $('#leaguename').val();
+  lgid    = $('#leaguedbpartid').val();
+  lgtitle = (typeof(lgtitle)=='undefined') ? '' :lgtitle;
+  lgid    = (typeof(lgid)=='undefined') ? '' :lgid;
+  if(lgid!='' && lgtitle!='')
+  {
+    $('.dbpartofleague').show();
+    $('.partlgtitle').html(lgtitle);
+    $('.partlghref').prop('href',BASE_URL+'/league/index/id/'+lgid);
+  }
+  else
+  {
+    $('.dbpartofleague').hide();
+  }
+}
+$(function(){
+  dbpartofleague();
+});
+</script>

@@ -1,0 +1,54 @@
+<?php 
+
+$commonbynew 	=	new Application_Model_Commonfunctionality();
+
+    $IDs = '';
+
+     $startnew =$this->startnew;
+	 $dbeeList = array();
+	  //if($startnew==10)
+	
+    if(count($this->favouritesdbees) > 0) 
+    {
+    	if($this->seemore!=1)
+		{
+    	$return.= '<div id="middleWrpBox"><div class="user-name titleHdpad">Influencial Posts</div></div><div class="next-line"></div>';
+        }
+    	$k=1;        
+        	 if(strlen($row->Text)>250) $dots='...'; else $dots='';
+
+        if($k=='1' && $initial=='1') setcookie("CookiePostDate", $row->PostDate, time()+3600);
+        foreach ($this->favouritesdbees as $row) :   
+			$IDs .= $row['DbeeID'].',';
+	     	$return.=$commonbynew->displayLayoutDbs($row,$this->Social_Content_Block,'fav',$this->adminpostscore);
+			$k++;
+			$dbeeList[] = $row['DbeeID'];
+		 endforeach;
+		 $startnew = (int)$startnew; 
+	}
+	else 
+	{
+	 	if($this->seemore!=1)
+		{
+		 	$return.= '<div id="middleWrpBox"><div class="user-name">Influencial Posts</div><div class="next-line"></div>';
+		 	$return.= '</div><div class="noFound"><strong>You have not marked a post as influential.</strong></div>';
+
+		 	if($this->dbeenotavailmsg==1) $nomsg = '<div class="noFound"><strong>You have not marked a post as influential.</strong></div>';
+			/*else 	$nomsg = '<div class="next-line"></div><div class="noFound" style="margin-top:35px;"><strong>No results</strong></div></div>';*/
+	    }
+	    else
+	    {
+	    	$nomsg = '<div class="noFound"><strong> No results.</strong></div>';
+	    }
+		
+		$seemorelabel = $nomsg;
+	}
+
+	$IDs=substr($IDs,0,-1);
+
+	$return.='<div id="see-more-feeds'.$startnew.'"><div id="more-feeds-loader" style="cursor:pointer; color:#333333; text-align:center;" >'.$seemorelabel.'</div></div>';
+
+	echo $return.'~#~'.$this->end.'~#~'.$IDs.'~#~'.$startnew.'~#~'.implode(',', $dbeeList);
+?>
+
+     

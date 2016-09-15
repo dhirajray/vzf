@@ -1,0 +1,54 @@
+<?php  
+
+$commonbynew 	=	new Application_Model_Commonfunctionality();
+
+
+  $dbeeList = array();   
+if(count($this->dbeealldbees) > 0) 
+{
+        $k=1;       
+        foreach ($this->dbeealldbees as $row) :
+			$IDs .= $row['DbeeID'].',';
+
+			$slice = array();
+			if($row['TaggedUsers']!="")
+			{
+			 $slice=explode(',', $row['TaggedUsers']);
+		    }
+
+
+		if(count($slice) > 0 && $this->session_data['UserID']!=$row['User'] && $row['PrivatePost']==1)
+		{
+			if(in_array($this->session_data['UserID'], $slice))
+	        {
+	     	$return.=$commonbynew->displayLayoutDbs($row,$this->Social_Content_Block,'all',$this->plateform_scoring,$this->adminpostscore);
+	     	}
+		}
+	    else
+	    {
+	        $return.=$commonbynew->displayLayoutDbs($row,$this->Social_Content_Block,'all',$this->plateform_scoring,$this->adminpostscore);
+	    }
+	    
+			$k++;
+			$dbeeList[] = $row['DbeeID'];
+		endforeach; 
+
+		
+}
+else 
+{
+	if($this->dbeenotavailmsg==1) $nomsg = "<div class='noFound'><strong>- no more ".POST_NAME."s available to show -</strong></div>";
+	else 	$nomsg = '<div class="noFound" ><strong>You have not yet been tagged in a post.</strong></div></div>';
+   $seemorelabel = $nomsg;
+} 
+	 
+$startnew=$this->startnew;
+		$return.='<div id="see-more-feeds'.$startnew.'"><div id="more-feeds-loader" style="cursor:pointer; color:#333333; text-align:center;background:none" onclick="javascript:seemorefeeds('.$startnew.',5);">'.$seemorelabel.'</div></div>';
+		//$return.= '~#~'.'';
+		//$return.= '~#~'.$IDs;
+		echo $return.'~#~'.$startnew.'~#~'.$IDs.'~#~'.$startnew.'~#~'.implode(',', $dbeeList);
+ 
+			
+
+?>
+       

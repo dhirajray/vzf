@@ -1,0 +1,574 @@
+
+
+<div class="summeryResult" ></div>
+<h1 class="pageTitle ">Comparison results
+<span><a class="pull-right btn btn-black btn-mini" type="submit" value="<< Back" name="submit" href="javascript:history.go(-1)">Back</a></span>
+</h1>
+
+<?php  if(isset($_POST)){ if(!empty($this->search) ) {?>
+<form method="post"  action="<?php  echo BASE_URL.'/admin/Reporting/topusers';?>">	
+	<input type="hidden" name="searchfield" value="<?php echo $this->search ?>"> 	
+	<input type="submit" class="pull-right btn btn-black " name="submit" value=" Back to search " style="margin-left:5px" >
+</form>
+<?php } ?>
+
+<div class="clearfix"> </div>
+<div id="summaryWrapper">
+	<h2 class="titleSummary">Summary report</h2>
+	<div class="kcRightPanel" id="hashTagSelectedWrapper">
+  	 <ul id="cmpUsers"> </ul>
+   </div>
+   <div class="clearfix"></div>
+</div>
+
+<?php
+$deshboard  =   new Admin_Model_Deshboard();
+$userModal	=	new Admin_Model_User();
+$common		=   new Admin_Model_Common();
+$influence  =   new Admin_Model_Influence();
+
+?>
+
+<?php
+
+$user1	=	'';
+
+
+
+$usersdetail 	= 	array();
+
+$getcharttotal 	=	array();
+$TypeDBchart	=	array();
+$totaldbs		=	array();
+
+$getcmnts 		=	array();
+$Typecmnts		=	array();
+$totalcmnts		=	array();
+
+$getscore		=	array();
+$Typescore		=	array();
+$totalscore		=	array();
+
+$dtlBymescore	=	array();
+$dtlBymescoreType=	array();
+
+$dtlonmescore	=	array();
+$dtlonmescoreType=	array();
+
+$dtlTotInfluence	=	array();
+$dtlonmeInfluence	=	array();
+
+$getgrouptotal 	=	array();
+$TypeDBgroup	=	array();
+$totalgroup		=	array();
+
+$expertposition	=	array();
+
+$kp = 1;
+
+foreach ($this->userslist as $key => $compareuserid) 
+{
+	
+
+	$userRec	=	$userModal->getUsers($compareuserid,'haveUid'); 
+	$userArr	=	$userRec->toarray();
+	$ProfilePic = $common->checkImgExist($userArr[0]['ProfilePic'],'userpics','default-avatar.jpg');
+	$ret 	=	'';   	
+	$ret 	.= '<div class="box_image">
+	
+	<img src="'.IMGPATH.'/users/medium/'.$ProfilePic.'" width="100" height="100" border="0" />
+	</div>
+	<h2>'. $this->myclientdetails->customDecoding($userArr[0]['Name']).'</h2>
+		<h6> Account creation <br>'. $common->getSocialType_CM($userArr[0]['Socialtype']).' </h6>';
+
+	$usersdetail[] = $ret;
+
+	$kpArray[$kp]['UserName'] = $this->myclientdetails->customDecoding($userArr[0]['Name']);
+
+    // ************ Comments Section ***********
+
+	$ugetcharttotal = 	array();
+	$uTypeDBchart	=	array();	
+
+	$bymescore 		=	array();
+	$bymescoreType 	=	array();
+
+	$onmescore 		=	array();
+	$onmescoreType 	=	array();
+
+	$ugetgrouptotal =	array();
+	$uTypeDBgroup	=	array();
+
+
+	$ugetmemtotal	=	array();
+	$TypeDBmemgroup		=	array();
+
+	$experttotal	=	array();
+
+	//************************************************
+
+	$expertData = 	$deshboard->userasexpert($compareuserid);
+
+	$expertArr			=	explode('=',$expertData );
+
+	foreach ($expertArr as $key => $value) {
+		$experttotal[] = (int)$value;
+	}
+	$expertposition[] = $experttotal;
+	//*********** End of Expert section Types and Start of Dbee section ***********//
+
+	$TotalChartData = 	$deshboard->TotalChartData($compareuserid);
+	$imparr			=	explode('=',$TotalChartData );
+	//$totaldbs[]		=	(int)$imparr[1];
+	$getchartData 	= 	$deshboard->PostBreakdownComparrsion($compareuserid);
+	$totdbs = 0;
+	foreach ($getchartData as $key => $value) {
+		$ugetcharttotal[] = (int)$value['dbee'];
+		$uTypeDBchart[]	  =	$common->getdbeeType_CM($value['Type']);	
+		$totdbs +=  (int)$value['dbee'];
+	}
+
+	$getcharttotal[]	=	$ugetcharttotal;
+	$TypeDBchart[]		=	$uTypeDBchart;
+	$totaldbs[]		=	$totdbs;
+
+	//*********** End of Dbee Types and Start of comments section ***********//
+
+	$getcommentData 	= 	$deshboard->TotalChartDataChild($compareuserid,'comment');
+	$cmntImparr			=	explode('=',$getcommentData );
+
+	$totalcmnt[]		=	(int)$cmntImparr[0];
+	$getcmnts[]			=	array( (int)$cmntImparr[1],(int)$cmntImparr[2]);
+	$Typecmnts[]		=	array('Comments made', 'Comments received ');
+
+	//*********** End of comments Types and Start of Score section ***********//
+
+	$getscoreData 	= 	$deshboard->TotalChartDataChild($compareuserid,'score');
+	$scoreImparr	=	explode('=',$getscoreData );
+
+	$totalscore[]	=	(int)$scoreImparr[0];
+	$getscore[]		=	array( (int)$scoreImparr[1],(int)$scoreImparr[2]);
+	$Typescore[]	=	array('Score Made', 'Score Recieved');
+
+	$getbymescoretype 	= 	$deshboard->getusersscorewithtype($compareuserid,'byme');
+
+	foreach ($getbymescoretype as $bmkey => $bmvalue) {
+		$bymescore[] 		= 	(int)$bmvalue['score'];
+		$bymescoreType[]   =	$common->getscoreType_CM($bmvalue['Type']);	
+	}
+
+	$dtlBymescore[]		=	$bymescore;
+	$dtlBymescoreType[]	=	$bymescoreType;	 
+
+	$getonmescoretype 	= 	$deshboard->getusersscorewithtype($compareuserid,'onme');
+
+	foreach ($getonmescoretype as $onkey => $onvalue) {
+		$onmescore[] 		= (int)$onvalue['score'];
+		$onmescoreType[]   =	$common->getscoreType_CM($onvalue['Type']);	
+	}
+
+	$dtlonmescore[]		=	$onmescore;
+	$dtlonmescoreType[]	=	$onmescoreType;	 
+
+
+	//*********** End of Start Types and Start of Group action ***********//
+
+	$getgroupData 	= 	$deshboard->TotalChartDataChild($compareuserid,'group');
+
+	$grpTotal = 0;	
+	foreach ($getgroupData as $grkey => $grvalue) 
+	{
+		$ugetgrouptotal[] 	= 	(int)$grvalue['group'];
+		$uTypeDBgroup[]	=	$common->getgroupType_CM($grvalue['type']);
+		$grpTotal			+= 	(int)$grvalue['group'];
+	}
+
+	$grpTot[] =  $grpTotal;
+
+	$getgrouptotal[] 	=	$ugetgrouptotal;
+	$TypeDBgroup[]		=	$uTypeDBgroup;
+
+	$getgmemData 	= 	$deshboard->TotalChartDataChild($compareuserid,'groupmember');
+		
+	$gmTot = 0;
+	foreach ($getgmemData as $grmkey => $grmvalue) 
+	{
+		$ugetmemtotal[] 	= 	(int)$grmvalue['gmTot'];
+		$uTypememgroup[]	=	$common->getgroupType_CM($grmvalue['GroupPrivacy']);
+		$gmTot			+= 	(int)$grmvalue['gmTot'];
+	}
+	$memTot[] =  $gmTot;
+	$totalmemgroup[]		=	(int)$imparr[5];		
+	$getgroupmMemtotal[] 	=	$ugetmemtotal;
+	$TypeDBMemgroup[]		=	$uTypememgroup;
+	/*************** User influence *************************************/
+
+	$getbymeInfluence 	= 	$influence->influenceUserlist($compareuserid,'byme');
+
+	$bymeInfluence['Influenced by'] 		= 	(int)$getbymeInfluence[0]['infTot'];
+	
+	$getonmeInfluence 	= 	$influence->influenceUserlist($compareuserid,'onme');
+
+	$bymeInfluence['Influenced others']     = 	(int)$getonmeInfluence[0]['infTot'];
+
+	$dtlonmeInfluence[]		=	$bymeInfluence;
+
+	$dtlTotInfluence[]		=	(int)($getbymeInfluence[0]['infTot']+$getonmeInfluence[0]['infTot']);
+	
+
+$kp++;
+}   
+			?>
+			<script type="text/javascript">
+			
+			
+
+			$(function(){
+
+				$(window).resize(function(){
+					$('.commnentHeight').equalizeHeights();  
+					$('.usersdbsHeight').equalizeHeights();  
+					$('.groupUsersHeight').equalizeHeights();  
+					$('.scoreMadeHeight').equalizeHeights();  
+					$('.scoreReceiveHeight').equalizeHeights();  
+					$('.titleDbeeType').equalizeHeights();  
+					$('.loadeddbs').removeAttr('style');
+					var firstTdW =  $('.titleDbeeType td:first').width(); 
+					$('.loadeddbs').css({width:firstTdW});
+				}).resize();
+			});
+			</script>
+
+
+			<div class="compBlock">
+				<div class="compheading"></div>
+				<div class="responsiveTable">
+				<table class="compuser1 compareListBlock">
+					<tr>
+						<?php
+						$jp = 1;
+						for ($i=0; $i<count($this->userslist); $i++)
+						{  ?>
+							<td class="compareColumn">
+							<table style="width:100%;">
+								<tr class="userdetails"><td  colspan="2"><?php echo $usersdetail[$i] ?></td></tr>
+								<tr class="titleDbeeType"><td>Posts</td><td class='loadeddbsvalue'><?php echo $totaldbs[$i];
+								$kpArray[$jp]['UserPost'] = $totaldbs[$i]; ?></td></tr>
+
+								<tr>
+									<td colspan="2" class="usersdbsHeight" style="padding:0px;">
+										<table style="width:100%;">
+											<?php $dbvalue =''; foreach ($getcharttotal[$i] as $dbkey => $dbvalue) { ?>
+											<tr>
+												<td class='loadeddbs'>
+													<div class="  <?php echo $TypeDBchart[$i][$dbkey] ?> "></div>
+													 <?php echo $TypeDBchart[$i][$dbkey] ?> 
+												</td>
+												<td class='loadeddbsvalue'><?php echo $dbvalue ?></td>
+											</tr>							
+											<?php } 
+
+											if(count($getcharttotal[$i])==0) $textme = 3; else $textme = '';
+											
+											for( $si = 5 ; $si>count($getcharttotal[$i]); $si--) { ?>	
+												<tr><td class='loadeddbs'>
+												<?php
+												echo $texme = ($textme==$si) ? 'no records found' : '&nbsp;';
+												?> 
+											</td><td class='loadeddbsvalue' >&nbsp; </td></tr>						
+											<?php }	?>
+										</table>
+									</td>
+								</tr>
+
+								<tr class="titleDbeeType"><td>Comments</td><td class='loadeddbsvalue'> 
+									<?php 
+								echo $totalcmnt[$i]; ?></td></tr>
+
+								<tr>
+									<td colspan="2" class="commnentHeight" style="padding:0px;">
+										<table style="width:100%;">
+											<?php  foreach ($getcmnts[$i] as $cmntkey => $cmntvalue) { ?>
+											<tr>
+												<td class='loadeddbs'>													
+													<?php echo $Typecmnts[$i][$cmntkey] ;
+													if($Typecmnts[$i][$cmntkey]=='Comments made'){ $kpArray[$jp]['userComment'] = $cmntvalue;} 
+													?>
+												</td>
+												<td class='loadeddbsvalue'><?php echo $cmntvalue ?> 
+												</td>
+											</tr>
+											<?php } ?>
+
+											<?php  for( $si = 2 ; $si>count($getcmnts[$i]); $si--) { ?>	
+											<tr><td class='loadeddbs'>
+												
+												&nbsp; 
+											</td><td class='loadeddbsvalue'>&nbsp; </td></tr>						
+											<?php }	?>
+
+										</table>
+									</td>
+								</tr>
+								<?php if ($this->plateform_scoring==0){ ?>
+								<tr class="titleDbeeType"><td>Scores</td><td class='loadeddbsvalue'><?php echo $totalscore[$i];
+								$kpArray[$jp]['UserScores'] = $totalscore[$i]; ?></td></tr>
+								<tr  class="scoreUserHead"><td class='loadeddbs'><?php echo $Typescore[$i][0] ?></td><td class='loadeddbsvalue'><?php echo $getscore[$i][0];
+								$kpArray[$jp]['ScoreMade'] = $getscore[$i][0]; ?></td></tr>
+								<tr>
+									<td colspan="2" class="scoreMadeHeight" style="padding:0px;">
+										<table style="width:100%;">
+											<?php $scorevalue='';	
+											foreach ($dtlonmescore[$i] as $scorekey => $scorevalue) {   ?>	
+											<tr><td class='loadeddbs'>
+												<div class=" ">
+													<?php echo $dtlonmescoreType[$i][$scorekey] ?>
+												</div>
+												</td>
+												<td class='loadeddbsvalue' ><?php echo $scorevalue ?></td>
+											</tr>
+											<?php }	
+											if(count($dtlonmescore[$i])==0) $textme = 4; else $textme = '';
+											
+											for( $si = 4 ; $si>count($dtlonmescore[$i]); $si--) { ?>	
+											<tr ><td class='loadeddbs' >
+												<?php
+												echo $texme = ($textme==$si) ? 'no records found' : '&nbsp;';
+												?> 
+											</td><td class='loadeddbsvalue' >&nbsp; </td></tr>						
+											<?php }	?>
+										</table>
+									</td>
+								</tr>		
+
+
+								<tr class="scoreUserHead"><td class='loadeddbs'><?php echo $Typescore[$i][1] ?></td><td class='loadeddbsvalue'><?php echo $getscore[$i][1];
+								$kpArray[$jp]['scoreReceive'] = $getscore[$i][1]; ?></td></tr>
+								<tr>
+									<td colspan="2" class="scoreReceiveHeight" style="padding:0px;">
+										<table style="width:100%;">
+											<?php $scorevalue='';  
+											foreach ($dtlBymescore[$i] as $scorekey => $scorevalue) {  ?>	
+												<tr><td class='loadeddbs'>
+													<div class=" "><?php echo $dtlBymescoreType[$i][$scorekey] ?></div>
+													
+													<?php  
+													if($scorevalue!='')
+													{
+														if($dtlBymescoreType[$i][$scorekey]=='Agree'){ $kpArray[$jp]['Like'] = $scorevalue;} 
+													}
+													?>
+												</td><td class='loadeddbsvalue' ><?php echo $scorevalue ?>
+
+												 </td></tr>								
+											<?php }	
+											if(count($dtlBymescore[$i])==0) $textme = 4; else $textme = '';
+											
+											for( $si = 4 ; $si>count($dtlBymescore[$i]); $si--) { ?>	
+											<tr  ><td class='loadeddbs' >
+												<?php
+												echo $texme = ($textme==$si) ? 'no records found' : '&nbsp;';
+												?> 
+											</td><td class='loadeddbsvalue' >&nbsp; </td></tr>						
+											<?php }	?>
+										</table>
+									</td>
+								</tr>	
+								<?php } ?>
+
+								<tr class="titleDbeeType"><td>Created groups</td><td class='loadeddbsvalue'> <?php echo $grpTot[$i];
+								$kpArray[$jp]['UserGroups'] = $grpTot[$i]; ?> </td></tr>
+								<tr>
+									<td colspan="2" class="groupUsersHeight" style="padding:0px;">
+										<table style="width:100%;">
+											<?php  foreach ($getgrouptotal[$i] as $grpkey => $grpvalue) { ?>
+											<tr><td class='loadeddbs'><?php echo $TypeDBgroup[$i][$grpkey] ?> </td><td class='loadeddbsvalue'><?php echo $grpvalue ?></td></tr>							
+											<?php } 
+											
+											if(count($getgrouptotal[$i])==0) $textme = 2; else $textme = '';
+											
+											for( $si = 3 ; $si>count($getgrouptotal[$i]); $si--) { ?>	
+											<tr><td class='loadeddbs'>
+												<?php
+												echo $texme = ($textme==$si) ? 'no records found' : '&nbsp;';
+												?> 
+											</td><td class='loadeddbsvalue' >&nbsp; </td></tr>						
+											<?php }	?>
+										</table>
+									</td>
+								</tr>	
+								<tr class="titleDbeeType"><td>Group memberships</td><td class='loadeddbsvalue'> 
+									<?php echo $memTot[$i];
+									$kpArray[$jp]['UserGroups'] = $memTot[$i]; 
+								?> </td></tr>
+								<tr>
+									<td colspan="2" class="groupUsersHeight" style="padding:0px;">
+										<table style="width:100%;">
+											<?php  foreach ($getgroupmMemtotal[$i] as $grpmkey => $grpmvalue) { ?>
+											<tr><td class='loadeddbs'><?php echo $TypeDBMemgroup[$i][$grpmkey] ?> </td><td class='loadeddbsvalue'><?php echo $grpmvalue ?></td></tr>							
+											<?php } 
+											if(count($getgroupmMemtotal[$i])==0) $textme = 2; else $textme = '';
+											
+											for( $si = 3 ; $si>count($getgroupmMemtotal[$i]); $si--) { ?>	
+											<tr><td class='loadeddbs'>
+												<?php
+												echo $texme = ($textme==$si) ? 'no records found' : '&nbsp;';
+												?> 
+											</td><td class='loadeddbsvalue' >&nbsp; </td></tr>						
+											<?php }	?>
+										</table>
+									</td>
+								</tr>	
+
+								<tr class="titleDbeeType"><td>Expert information</td><td class='loadeddbsvalue'>&nbsp;</td></tr>
+								<tr>
+									<td colspan="2" class="groupUsersHeight" style="padding:0px;">
+										<table style="width:100%;">
+											<?php $totalCount = 1;  foreach ($expertposition[$i] as $expkey => $expvalue) { ?>
+											<tr><td class='loadeddbs'><?php echo $common->getExpertInfo_CM($expkey) ?> </td><td class='loadeddbsvalue'><?php echo $expvalue;  if($totalCount==1) { $totalExpert = $expvalue; } ?></td></tr>							
+											<?php $totalCount++; } $kpArray[$jp]['totalExpert'] = $totalExpert; ?>
+											
+											<?php  for( $si = 3 ; $si>count($expertposition[$i]); $si--) { ?>	
+											<tr><td class='loadeddbs'>
+												
+												&nbsp; 
+											</td><td class='loadeddbsvalue' >&nbsp; </td></tr>						
+											<?php }	?>
+										</table>
+									</td>
+								</tr>	
+
+								<tr class="titleDbeeType"><td>Influence count</td><td class='loadeddbsvalue'><?php echo $dtlTotInfluence[$i] ?></td></tr>
+								<tr>
+									<td colspan="2" class="groupUsersHeight" style="padding:0px;">
+										<table style="width:100%;">
+											<?php $totalCount = 1;  
+											if($dtlTotInfluence[$i]>0) {
+											foreach ($dtlonmeInfluence[$i] as $expkey => $expvalue) { ?>
+											<tr><td class='loadeddbs'><?php echo $expkey ?> </td><td class='loadeddbsvalue'><?php echo $expvalue;   ?></td></tr>							
+											<?php $totalCount++; }  
+											}
+											else
+											{ ?>
+											<tr><td class='loadeddbs'>
+												<?php
+												echo $texme = 'no records found' ;
+												?> 
+												&nbsp; 
+											</td><td class='loadeddbsvalue' >&nbsp; </td></tr>						
+											<?php }	?>
+										</table>
+									</td>
+								</tr>			
+
+							</table>	
+
+							<?php $jp++;
+								}  
+
+								
+							?>
+						</tr>				
+					</table>	
+				</div>
+				</div>
+				<?php 
+				$layoutsobj = new Admin_Model_Layouts();
+				$scoreset =  $layoutsobj->scoringFromDb();
+				$configurations = $deshboard->getConfigurations();
+				$post_score_setting = json_decode($configurations['ScoreNames'],true);
+
+		
+				 $arrayCount = count($kpArray);
+				 $Expert = array();
+				 for ($i=1; $i <= $arrayCount; $i++) 
+				 {  
+				 	$userPost[$kpArray[$i]['UserName']] = $kpArray[$i]['UserPost'];
+				 	$UserComment[$kpArray[$i]['UserName']] = $kpArray[$i]['userComment'];
+				 	$userScores[$kpArray[$i]['UserName']] = $kpArray[$i]['UserScores'];
+				 	$scoreMade[$kpArray[$i]['UserName']] = $kpArray[$i]['ScoreMade'];
+				 	$userGroups[$kpArray[$i]['UserName']] = $kpArray[$i]['UserGroups'];
+				 	$scoreReceive[$kpArray[$i]['UserName']] = $kpArray[$i]['scoreReceive'];
+				 	$Expert[$kpArray[$i]['UserName']] = $kpArray[$i]['totalExpert'];
+				 	$Like[$kpArray[$i]['UserName']] = $kpArray[$i]['Like'];
+				 }
+				 
+
+					 $totalArray = array();
+					 asort($userPost);
+					 $totalArray['userPost'] = $userPost;
+					 asort($UserComment);
+					 $totalArray['userComment'] = $UserComment;
+					 asort($userScores);
+					 $totalArray['userScores'] = $userScores;
+					 asort($userGroups);
+					 $totalArray['userGroups'] = $userGroups;
+					 asort($scoreReceive);
+					 $totalArray['scoreReceive'] = $scoreReceive;
+
+					 asort($scoreMade);
+					 $totalArray['scoreMade'] = $scoreMade;
+
+					 asort($Expert);
+					 $totalArray['totalExpert'] = $Expert;
+ 
+					 asort($Like);
+					 $totalArray['Like'] = $Like;
+
+					
+					
+					 $content='';
+
+
+					 $highestValue       = end($totalArray['Like']);
+					 $keyForHighestValue = key($totalArray['Like']);
+					 if ($this->plateform_scoring==0){
+					 	if($highestValue !='')
+					 	{
+						 	$scorediv=$this->myclientdetails->ShowScoreIcon($post_score_setting[2]['ScoreIcon2']);
+						 	$content.= '<li><h2><div class=""></div>'.$scorediv. ' '.$keyForHighestValue.' is the most '.strtolower($scoreset['Like']).'d</h2></li>';
+						}
+					}
+
+					 $highestValue       = end($totalArray['userPost']);
+					 $keyForHighestValue = key($totalArray['userPost']);
+					 $content.= '<li><h2><div class="summaryIcons spPostIcon "></div>'.$keyForHighestValue.' has posted the most</h2></li>';
+
+					 $highestValue       = end($totalArray['userComment']);
+					 $keyForHighestValue = key($totalArray['userComment']);
+					 
+					 $content.='<li><h2> <div class="summaryIcons spCommentIcon "></div>'.$keyForHighestValue.' has commented the most</h2></li>';
+
+					 $highestValue       = end($totalArray['totalExpert']);
+					 $keyForHighestValue = key($totalArray['totalExpert']);
+
+					 $content.= '<li><h2><div class="summaryIcons spExpertIcon "></div>'.$keyForHighestValue.' has been the expert most number of times</h2></li>';
+
+					/*  $highestValue       = end($totalArray['userGroups']);
+					 $keyForHighestValue = key($totalArray['userGroups']);
+					 
+					 $content.= $keyForHighestValue.' has created the most groups<br />';*/
+
+					 $highestValue       = end($totalArray['scoreMade']);
+					 $keyForHighestValue = key($totalArray['scoreMade']);
+					if ($this->plateform_scoring==0){
+						if($highestValue  !='')
+						{
+						 $content.= '<li><h2><div class="summaryIcons spScoreIcon "></div>'.$keyForHighestValue.' has scored the most</h2></li>';
+						}
+					}
+
+					/* $highestValue       = end($totalArray['scoreMade']);
+					 $keyForHighestValue = key($totalArray['scoreMade']);
+					 echo 'ScoreMade '.$keyForHighestValue.' '.$highestValue.'<br />';*/
+				?>
+
+
+<script type="text/javascript">
+$(document).ready(function () {
+	$('#cmpUsers').append('<?php echo $content; ?>');
+});
+</script>
+
+
+<?php } ?>

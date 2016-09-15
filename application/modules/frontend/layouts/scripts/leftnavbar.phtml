@@ -1,0 +1,203 @@
+
+<?php
+
+	$liveStream = ($dbeecontrollers=='myhome')?'active':''; //$dbeecontrollersaction
+	//$profileActive = ($dbeecontrollers=='Dashboarduser')?'active':'';
+	$groupActive = ($dbeecontrollers=='Group' && $this->vip==0)?'active':'';		
+	$vgroupActive = ($dbeecontrollers=='Group' && $this->vip==1)?'active':'';
+
+	$leftSideBar = '<div id="leftsideMenu">';
+	$leftSideBar .= $sideProfilePic;
+	$leftSideBar .= '<ul>';
+		$leftSideBar .= '<li class="'.$liveStream.'" ><a href="javascript:void(0)" class="showPoststream" title="News Feed" call="livepost" id="livestream"><i class="fa fa-newspaper-o fa-lg"></i><span class="labelSidebar" id="labelSidebar">News Feed</span></a></li>
+
+		<li class="'.$profileActive.'"><a href="javascript:void(0)" class="showPoststream" title="My Posts" call="mypost" ><i class="fa fa-pencil fa-lg"></i><span class="labelSidebar">My Posts</span></a>
+		</li>';
+
+		 if($this->session_data['role']!=100) { 
+		 	$active="";
+		 	if($dbeecontrollersaction == 'viewall'){ $active='class="active"';  }
+		 if($this->showAllUsers==1){ 
+		 	$hidestyle='style="display: block;"';
+		 }else
+		 {
+		   $hidestyle='style="display: none;"';
+		 }
+
+		/*$leftSideBar .= '<li '.$active.' id="alluserslist" '.$hidestyle.'><a href="'.URL.'/platformusers/viewall" title="All Users"><i class="fa fa-user fa-lg"></i><span class="labelSidebar">All Users</span></a></li>';*/
+	   
+		
+		$leftSideBar .='<li class="'.$groupActive.'">
+			<a href="'.BASE_URL.'/Group" title="Groups"><i class="fa fa-users fa-lg"></i><span class="labelSidebar">Groups</span></a>
+			</li>';
+				/*if($this->creategrpglobal==1 || $data['usertype']==10){
+				$leftSideBar .= '<li><a href="javascript:void(0);" class="group-creategroups">Create a Group</a></li>';
+				}
+								
+				$leftSideBar .= '<li><a href="'.BASE_URL.'/Group">Created Groups</a></li>
+				<li><a href="'.BASE_URL.'/Group/index/member/1" class="group-memgroups">My Groups</a></li>';
+				  
+				$leftSideBar .= '<li><a href="javascript:void(0);" id="search-groups" >Search Groups</a></li>
+		   </ul>';*/
+		
+			
+		
+		 if($this->eventglobal==1)
+		 {
+		 	if($this->session_data['role']!=1){
+					$leftSideBar .= '<li><a href="javascript:void(0);" data-from="main" id="event_section"><i class="fa fa-calendar fa-lg"></i><span class="labelSidebar">Live Events</span></a></li>';
+	  			}else{
+	  				$leftSideBar .= '<li><a href="javascript:void(0);" id="my_event_section"><i class="fa fa-calendar fa-lg"></i><span class="labelSidebar">Live Events</span></a></li>';
+	  			}
+	      }
+		 
+		if($this->ShowVideoEvent==1 || ($this->ShowLiveVideoEvent==1 && (clientType == 2 || clientType == 3)))
+		{ 
+			$leftSideBar .= '<li>
+			<a href="javascript:void(0);" title="Video Broadcast" id="spacialdb_section" data-from="main"><i class="fa fa-television fa-lg"></i><span class="labelSidebar">Video Broadcasts<span></a>
+			';
+			if($this->ShowVideoEvent==1){
+				//$leftSideBar .= '<li><a title="Video Events" href="javascript:void(0);" id="spacialdb_section"  >Scheduled Broadcasts</a></li>';
+			}
+			if($this->ShowLiveVideoEvent==1 && (clientType == 2 || clientType == 3))
+			{
+				//$leftSideBar .= '<li><a href="javascript:void(0);" id="liveBroadcast">Live Broadcasts</a></li>';
+			}
+			
+			$leftSideBar .= '</li>';
+
+		}
+	    
+		if($this->IsSurveysOn==1) 
+		{				
+			$leftSideBar .= '<li>
+				<a href="javascript:void(0);" id="SurveysRightBtn"  title="Surveys"><i class="fa fa-check-square-o fa-lg"></i><span class="labelSidebar">Surveys</span></a>
+						
+			    </li>';
+		 } 
+		
+		if($this->socialloginabilitydetail['Facebookstatus']==1 && $this->socialloginabilitydetail['Twitterstatus']==1 && $this->socialloginabilitydetail['Linkedinstatus']==1){ 
+			//echo'nothing just hide';
+		}
+		else
+		{
+
+        if($this->socialloginabilitydetail['allSocialstatus']==0){                                
+      
+			 if($this->session_data['role']!=1) {  
+			$leftSideBar .= '<li><a href="javascript:void(0);" id="socialConnect"><i class="fa fa-link fa-lg"></i><span class="labelSidebar">Link Social Accounts</span></a></li>';
+			 } } } 
+
+			 if($this->Social_Block==0 && $this->socialloginabilitydetail['allSocialinvite']==0) { 
+			if($this->socialloginabilitydetail['Facebookinvite']==1 && $this->socialloginabilitydetail['Twitterinvite']==1){
+							//echo'do nothing';
+						} else{ 
+			$leftSideBar .= '<li><a href="javascript:void(0);" class="socialfriends" data-for = "inviteToSite" data-uniqueValue = "0" ><i class="fa fa-share-alt-square fa-lg"></i><span class="labelSidebar">Social Connections</span></a></li>';
+
+			 } } 			 
+		 
+		 }else{
+			$leftSideBar .= '<li><a href="'.BASE_URL.'/group/groupdetails/group/'.$this->session_data['groupid'].'" class="group-memgroups"><i class="fa fa-users fa-lg"></i><span class="labelSidebar">My Group</a></span></li>';
+		 } 
+	if($data["UserID"]==$this->session_data['UserID'] && ismobile==1) { 
+		$MyUserId=$this->session_data['UserID']; 
+		$leftSideBar .= '<h2 class="mymenuItem" title="Click to open or Drag to re-arrange">
+   My Menu
+</h2>
+    <li>
+        <a id="my-comments-home" class="userMenuRight" commentsid="'.$MyUserId.'" href="javascript:void(0);">
+            <i class="fa fa-comment-o fa-lg"></i><span id="labelSidebarMyComment" class="labelSidebar Dt1">Comments</span>
+        </a>
+    </li>
+    <li>
+        <a id="my-tagged_db" class="userMenuRight" data_myid="
+            '.$MyUserId.'" href="javascript:void(0);">
+            <i class="fa fa-pencil fa-lg"></i><span id="labelSidebarFav" class="labelSidebar">Tagged posts</span>
+        </a>
+    </li>
+    <li>
+        <a id="my-following-profile" class="userMenuRight" href="javascript:void(0);" following_user_uid="
+            '.$MyUserId.'">
+            <i class="fa fa-male fa-lg"></i><span>Following</span>
+        </a>
+    </li>
+    <li>
+        <a id="my-followers-profile" class="userMenuRight" href="javascript:void(0);"  follow_user_uid="
+            '.$MyUserId.'">
+            <i class="fa fa-child fa-lg"></i><span>Followers</span>
+        </a>
+    </li>';
+   
+    /*<li>
+        <a id="my-influence" class="userMenuRight" onclick="javascript:seeglobaldbeelist(67,1,\'dbee-feed-favourite\',\'favourite\',\'list\',\'fav\')" href="javascript:void(0);">
+            <i class="fa fa-lightbulb-o fa-lg"></i> <span id="labelSidebarFav" class="labelSidebar infLnkTxt">Influence </span>
+        </a>
+    </li>*/
+}     			
+
+	$leftSideBar .= '</ul>';
+
+	/* post tag and relative post div */
+ 		$myhome_obj    = new Application_Model_Myhome();
+
+        $countTopDBeeTag    = $myhome_obj->getsearchHashTopComment();
+        $countTopCommentTag = $myhome_obj->getsearchHashTopdbee();
+        
+        if (count($countTopDBeeTag) > 0 && $resultData['DbTag']!='')
+        {
+            $data   = array();
+            $result = array();
+            foreach ($countTopDBeeTag as $value) 
+            {
+                $keywords = preg_split("/[\s,]+/", $value['DbTag']);
+                foreach ($keywords as $keywordsvalue)
+                    $result[] = $keywordsvalue;
+            }
+            $vals = array_count_values($result);
+        }
+        
+        if (count($countTopCommentTag) > 0) 
+        {
+            $data2   = array();
+            $result2 = array();
+            foreach ($countTopCommentTag as $value2) 
+            {
+                $keywords2 = preg_split("/[\s,]+/", $value2['DbTag']);
+                foreach ($keywords2 as $keywordsvalue2)
+                    $result2[] = $keywordsvalue2;
+            }
+            $vals2 = array_count_values($result2);
+        }
+        
+        if (!empty($vals2) && !empty($vals))
+            $vals3 = array_merge($vals2, $vals);
+        else if (!empty($vals2))
+            $vals3 = $vals2;
+        else if (!empty($vals))
+            $vals3 = $vals;
+        else if (empty($vals) && empty($vals2))
+            $vals3 = array();
+
+		 $i=0; 
+		if(count($vals3)!=0) { 
+			arsort($vals3);
+            $output = array_slice($vals3, 0, 10);
+
+			$leftSideBar.='<div class="whiteBox hashTagresult popularTagsListing noCollapse active" style="display:block; margin-top:10px;">
+				<h2>Popular tags</h2>
+				<div class="rboxContainer tagsListingWrp">';
+					foreach ($output as $paramName => $paramValue) { 
+					$leftSideBar.='<a href="'.BASE_URL.'/myhome/hashtag/tag/'.$paramName.'" class="hasTagCloud oneline">'.$paramName.'</a>';
+					  $i++;} 
+				$leftSideBar.='</div></div>';
+			
+		}
+	$leftSideBar .='<span class="navMinicon"></span>';
+	if($this->profileholder==1 && ismobile!=0){
+	$leftSideBar .= '<div id="userEdvert" class="label"></div>';
+	 } 
+	$leftSideBar .= '</div>';
+
+              	
+        
+	?>

@@ -1,0 +1,73 @@
+<?php
+$dbees='';
+
+$counter=1;
+
+$comm_obj = new Application_Model_Commonfunctionality();
+$myhome_obj = new Application_Model_Myhome();
+$myclientdetails = new Application_Model_Clientdetails();
+if(count($this->dbeedata)>0) {
+
+	$dbees .= '<div unselectable="on" class="unselectable" style=" padding:10px 5px; color:#000; font-weight:bold;">POSTS</div><div style="clear:both"></div>';
+
+	foreach($this->dbeedata as $rs):
+
+		if($counter%2==0) $class='searchres-row-even';
+
+		else $class='searchres-row-odd';
+		
+		$dbeeurl = $myhome_obj->getdburl($rs['DbeeID']);
+		$dbees .= '<div class="'.$class.'" style="padding:5px">'.substr($rs['Text'],0,50).'...</div>|'.$rs['Text'].'|1~'.$comm_obj->generateUrl($dbeeurl).'<div style="clear:both"></div>';
+
+		$counter++;
+
+	endforeach;
+
+	if($this->TotalDbees>5) $dbees .= '<div unselectable="on" class="unselectable sUserMainMore" style=" padding:10px 5px; text-align:center;"><a data-type="dbee" href="'.BASE_URL.'/myhome/serchresult/q/'.$this->q.'/tab/dbee" style="color:#333">see more</a></div><div style="clear:both"></div>'; 
+
+}
+
+
+
+$users='';
+
+$counter=1;
+
+
+
+if(count($this->userdata)>0) {
+
+
+
+	$users .=  '<div unselectable="on" class="unselectable sUserMainTitle" style="padding:10px 5px; color:#000; font-weight:bold;" data-total="'.count($this->userdata).'">USERS</div>';
+
+	foreach($this->userdata as $rs):
+        $Name = $myclientdetails->customDecoding($rs['Name']);
+        $lname = $myclientdetails->customDecoding($rs['lname']);
+        $Username = $myclientdetails->customDecoding($rs['Username']);
+        $checkImage = new Application_Model_Commonfunctionality();
+        $pic1 = $checkImage->checkImgExist($rs['ProfilePic'],'userpics','default-avatar.jpg');
+		if($counter%2==0) $class='searchres-row-even';
+
+		else $class='searchres-row-odd';
+
+		$users .= '<div class="'.$class.'" style="padding:5px;"><div style="float:left; padding-bottom:5px;"><img src="'.IMGPATH.'/users/small/'.$pic1.'" width="40" height="40" border="0" /></div><div style=" margin-left:52px;">'.$Name.' '.$lname.'<br><div style="color:#f7b947" class="oneline">@'.$Username.'</div></div></div>|'.$Name.' '.$lname.'|2~'.$Username.'<div style="clear:both"></div>';
+
+		$counter++;
+
+	endforeach;
+
+	if($this->TotalUser>5) $users .= '<div unselectable="on" class="unselectable sUserMainMore " style=" padding:10px 5px; text-align:center;"><a data-type="user" href="'.BASE_URL.'/myhome/serchresult/q/'.$this->q.'/tab/user" style="color:#333">see more</a></div><div style="clear:both"></div>';
+
+}
+
+
+
+$return=$dbees.$users;
+ 
+
+
+echo $return;
+
+?>
+

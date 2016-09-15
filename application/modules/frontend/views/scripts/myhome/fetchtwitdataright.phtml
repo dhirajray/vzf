@@ -1,0 +1,87 @@
+<?php
+if(!empty($this->profileholder) && !empty($this->userid))
+{
+   $addtoreply=true;
+}else{
+   $addtoreply=false;
+}
+ $dbeetwiter  = new Application_Model_Myhome();
+
+ $keyword = explode(" ",$this->twittertag);
+           
+
+$count =  count($keyword);
+
+$counter=1;
+
+$profileholder = false;
+$stoptweetreply = 0;
+
+$from=0;
+$counter=1;
+$return='';
+
+    
+$divtitle='';
+
+ $twTags='';
+for ($i=0; $i < $count; $i++) { 
+             $twTags .='<li><span>'.$keyword[$i].'</span></li>';
+            }
+                  
+ $return.= '<ul class="twTagsTab">'.$twTags.'</ul><ul id="twiterKeyContainer"> ';
+            
+
+            for ($i=0; $i < $count; $i++) 
+            { 
+              /* if($i==2)
+               {
+                  $active = 'class="active"';
+                  $visible = 'style="display:block;"';
+               }else{
+
+                  $visible ='';
+                  $active = '';
+               }*/
+               
+               $return.= '<li>';
+               $return.= '<div class="twKeyDetails"><ul>';
+
+               foreach($dbeetwiter->gettwitterNew($this->dbeeid, $keyword[$i]) as $row)
+               { 
+					if(!file_get_contents($row['ProfilePic'])) $imgPath=BASE_URL."/timthumb.php?src=/userpics/twitteruserDefault.png&q=100&w=48&h=48";
+					else $imgPath=str_replace('http://a0.twimg.com/','https://si0.twimg.com/',$row['ProfilePic']);
+                  $return.="<li><div class='photoTwitter'><img src='".$imgPath."' /></div><div class='rightTwitterDetails'><b>". $row['ScreenName'] ."</b>".str_replace('<a href=','<a target=\"_blank\" href=',$row['Tweet'])."</div>";
+                  
+                  if($from==0)
+                   { // IF NOT FROM HOME
+                     $return.="<div class='twitter-addtoreply-div' ".$divtitle." >";
+                     if($addtoreply)
+                        $return.="<a href=\"javascript:addtoreply(".$counter.",'".$row['ScreenName']."')\" class='addtoreply addtoreply".$counter."'>Add tweet to my comment</a>";
+                     else
+                        $return.="<a href='javascript:void(0);' class='addtoreply addtoreply-blocked'>Add tweet to my comment</a>";
+                     $return.="</div></li>";
+                  }
+                  
+                  $hiddenval="<div  class='twitterCommentReplyBox'>
+                  <div class='photoTwitter'>
+                  <img src='".$imgPath."' /></div>
+                  <div class='rightTwitterDetails'><b>". $row['ScreenName'] ."</b></a>".str_replace('<a href=','<a target=\"_blank\" href=',$row['Tweet'])."</div>
+                  <div style='float:right;'><a href='javascript:void(0);' onclick='javascript:removetweetfromnewcomment();'>remove</a></div>
+                  </div>";
+                  $hidden.="<input type='hidden' id='twitter-result-".$counter."' value=\"".str_replace('"','\'',$hiddenval)."\">";
+                  $counter++;
+               }
+               $return.='</ul>';
+               //$return ='';
+               $return.= $hidden;
+               $return.= '</div>';
+               $return.= '</li>';
+            }
+            $return.= '</ul>';
+			
+			echo $return;
+
+	//echo 'refresh~'.$return.'~#~1';
+
+?>

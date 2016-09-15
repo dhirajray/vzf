@@ -1,0 +1,133 @@
+<?php
+$storage            = new Zend_Auth_Storage_Session();
+$checkImage = new Application_Model_Commonfunctionality();
+$data               = $storage->read();
+$this->session_data = $data;
+$userlogincheck     = $data['UserID'];
+$personaledit       = ($this->userid==$this->session_data['UserID'])?true:false;
+$where              = array('UserID' => $this->userid);
+$userdata = $this->myclientdetails->getRowMasterfromtable('tblUsers', array('role','sidebartab','usertype','ProfilePic','username'), $where);
+$userpathxxx=BASE_URL.'/user/'.$this->myclientdetails->customDecoding($userdata['username']);
+$userprofilepicxxx = $checkImage->checkImgExist($userdata['ProfilePic'],'userpics','default-avatar.jpg');
+
+
+$sidebartab = $userdata['sidebartab']; 
+if($userdata['sidebartab']=='null' || trim($userdata['sidebartab'])==''){
+  $sidebartab =  json_encode( array('2','1','3','0','4'));   //  '["2","1","3","0","4"]';
+}
+echo $abc;
+?>
+
+<script>
+   var sidebarTab = <?php echo $sidebartab; ?> ;
+ 
+   $(document).ready(function(){
+       
+    <?php if($this->userid==$this->session_data['UserID']) {?>
+
+
+    topmessagedisplay('.topmessagedisplay',<?php echo $personaledit ?>,<?php echo $this->userid ?>,'notedit');
+    adminliveDisplay('.adminonlive'); 
+    loaduserpdf('.userpdfleft');
+    //fetchspecificadvert(<?php echo $this->userid; ?>,4);
+
+  });
+
+</script>
+<?php if($this->userid==$this->session_data['UserID']) {?>
+   <div id="userEdvert"></div>
+    <?php } ?>
+
+    <?php $sortMob = 'id="sortable"';        
+       if(ismobile)$sortMob = '';
+     ?>
+
+     
+<div <?php echo $sortMob ?> class="mobSortlist">
+    <?php if($this->userid==$this->session_data['UserID'] && ismobile==0) {?>
+    <div class="whiteBox userMenuSideBar">
+     <?php
+      $MyUserId=$this->session_data['UserID']; 
+      $uName = ($this->session_data['full_name']!='') ? $this->session_data['full_name'] : $this->session_data['Name']            
+      ?>
+        <div class="rtListOver">
+            <h2 class="mymenuItem" title="">
+                <a href="<?=$userpathxxx?>" class="myprphotort" style="background-image:url(<?=IMGPATH?>/users/<?=$userprofilepicxxx?>);"></a> 
+                <div class="userinfoRt">
+                    <a href="<?=$userpathxxx?>"><?= $this->myclientdetails->customDecoding($uName) ?><span>Go to profile</span></a>
+                </div>
+            </h2>
+        </div>
+        <div class="rboxContainer" id="mymenuItem" style="display:block">
+            <div class="rbcRow">
+                <a id="my-comments-home" class="userMenuRight" commentsid="
+                    <?=$MyUserId?>" href="javascript:void(0);">
+                    <i class="fa fa-comment"></i><span id="labelSidebarMyComment" class="labelSidebar Dt1">Comments</span>
+                </a>
+            </div>
+           
+           <div class="rbcRow">
+            <a id="my-poll" class="userMenuRight" onclick="javascript:seeglobaldbeelist(<?=$MyUserId?>,1,'dbee-feed-favourite','myhome','polllist','mypoll')" href="javascript:void(0);">
+              <i class="fa fa-signal"></i>
+              <span id="labelSidebarFav" class="labelSidebar infLnkTxt">Polls </span>
+            </a>
+           </div> 
+
+            <div class="rbcRow">
+                <a id="my-tagged_db" class="userMenuRight" data_myid="
+                    <?=$MyUserId?>" href="javascript:void(0);">
+                    <i class="fa fa-pencil"></i><span id="labelSidebarFav" class="labelSidebar">Tagged posts</span>
+                </a>
+            </div>
+            <div class="rbcRow">
+                <a id="my-following-profile" class="userMenuRight" href="javascript:void(0);" following_user_uid="
+                    <?=$MyUserId?>">
+                    <i class="fa fa-male"></i><span>Following</span>
+                </a>
+            </div>
+            <div class="rbcRow">
+                <a id="my-followers-profile" class="userMenuRight" href="javascript:void(0);"  follow_user_uid="
+                    <?=$MyUserId?>">
+                    <i class="fa fa-child"></i><span>Followers</span>
+                </a>
+            </div>
+         <?php if($checkImage->TotalInfluence($MyUserId) > 0) {?>
+            <!-- <div class="rbcRow">
+                <a id="my-influence" class="userMenuRight" onclick="javascript:seeglobaldbeelist(<?=$MyUserId?>,1,'dbee-feed-favourite','favourite','list','fav')" href="javascript:void(0);">
+                    <i class="fa fa-lightbulb-o"></i> <span id="labelSidebarFav" class="labelSidebar infLnkTxt">Influence </span>
+                </a>
+            </div> -->
+            <?php } ?>
+            
+        </div>
+    </div>
+    <?php
+   }
+
+   if($this->userid==$this->session_data['UserID']) {?>
+    
+  <?php
+  }
+   ?>
+
+
+        
+  <?php  } ?>
+  </div>
+    
+    <?php 
+       $commonmodel_obj      = new Application_Model_Commonfunctionality(); 
+   if($this->eventglobal==1 && $this->userid==$this->session_data['UserID']){
+       echo $commonmodel_obj->displayEvent();
+   } echo $commonmodel_obj->displayPromotedExpertPost();
+    ?>
+  <script type="text/javascript"> 
+      $(document).ready(function(){
+      $('#sortable .userMenuSideBar h2').trigger('click');
+      $('#sortable').addClass('hmRtmenu');
+      $('#sortable.hmRtmenu').find('.userMenuSideBar').addClass('active');
+      $('#sortable.hmRtmenu').find('.upcommingevent').addClass('active');
+      
+      
+      });
+    </script>

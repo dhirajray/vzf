@@ -1,0 +1,181 @@
+<?php 
+	$commonmodel_obj      = new Application_Model_Commonfunctionality();
+
+if($this->notifyvar == 'group') $this->type ='12';
+?>
+<script>
+$(function() {
+	fetchadvert();
+	seenotification(0,<?php echo $this->type;?>);
+	$('.notificationSorting li[data="<?php echo $this->type;?>"]').addClass('sortresnotify-active');
+
+});
+</script>
+<input type="hidden" id="noti-type" value="1">
+<input type="hidden" id="dbeeuser" value="<?php echo $this->user ?>">
+
+<input type="hidden" id="dbeepopchk" value="1">
+<input type="hidden" id="frompop" value="0">
+
+
+<div  class="notificationMainPage leftBigSide">
+	<div id="postMenu">
+		
+		<ul id="postMenuLinks" class="tabLinks">
+			<li class="userproLinks">
+				<a id="notes-tab-2" class="notestab active" onclick="javascript:seenotification(0,2);">All notifications 
+				</a>
+			</li>
+		</ul>
+		<div class="btn btn-yellow btn-mini dropDown notificationDrpDwn  pull-right">
+                    Sort by type <i class="fa fa-angle-down"></i>
+                    <ul class="dropDownList right">
+                    	
+                    	<li><a href="javascript:void(0);"  onclick="javascript:seenotification(0,2);">All</a></li>
+                        <li><a href="javascript:void(0);"  onclick="javascript:seenotification2(0,2);">Comments</a></li>
+						<li><a href="javascript:void(0);"  onclick="javascript:seenotification2(0,1);">Posts</a></li>
+						<li>				
+							<a id="notes-new-3" class="" onclick="javascript:seenotification2(0,3);">Mentions	
+							</a>
+						</li>
+						<li>
+							<a id="notes-new-4" class="" onclick="javascript:seenotification2(0,4);">Following	
+							</a>
+						</li>
+
+						<?php if($this->plateform_scoring==0) { ?>
+						<li>
+							<a id="notes-new-6" class="" onclick="javascript:seenotification2(0,6);">Scores
+							</a>
+						</li>
+						<?php } ?>
+						<!-- li>
+							<a id="notes-new-5" class="" onclick="javascript:seenotification2(0,5);">Favourites
+							</a>
+						</li> -->
+						<li>
+							<a id="notes-new-7" class="" onclick="javascript:seenotification2(0,7);">Reposts	
+							</a>
+						</li>
+						<li>
+							<a id="notes-new-11" class="" onclick="javascript:seenotification2(0,11);">Experts	
+							</a>
+						</li>
+						<li>
+							<a href="javascript:void(0);"  onclick="javascript:seenotification2(0,12);">Groups</a>
+						</li>
+						<li>
+							<a id="notes-new-14" class="" onclick="javascript:seenotification2(0,10);">Messages	
+							</a>				
+						</li>
+						
+
+						<?php /*if($this->IsLeagueOn==0) { ?>
+						<li>
+							<a id="notes-new-14" class="" onclick="javascript:seenotification2(0,14);">Leagues	
+							</a>				
+						</li>
+						<?php }*/ ?>
+						<!-- <li>
+							<a id="notes-new-14" class="" onclick="javascript:seenotification2(0,33);">Influence	
+							</a>				
+						</li> -->
+						<li><a id="notes-new-14" class="" onclick="javascript:seenotification2(0,35);">Private group posts</a></li>
+                    </ul>
+                </div>
+		<!-- <ul id="postMenuLinks" class="tabLinks">
+			<li class="userproLinks">
+				<a id="notes-tab-2" class="notestab" onclick="javascript:seenotification2(0,2);">comments 
+				<span class="balloonBox top right" id="notifications-onpageredbee-wrapper" style="display: none;">new </span>
+				</a>
+			</li>
+			<li>
+				<a id="notes-tab-1" class="notestab"  onclick="javascript:seenotification2(0,1);">posts	
+				<span class="balloonBox top right" id="notifications-onpagedbee-wrapper" style="display: none;">new </span>
+				</a>
+			</li>
+			<li>				
+				<a id="notes-tab-3" class="notestab" onclick="javascript:seenotification2(0,3);"> mentions				
+				<span class="balloonBox top right" id="notifications-onpage-wrapper" style="display: none;">new </span>
+				</a>
+			</li>
+			<li>
+				<a id="notes-tab-4" class="notestab" onclick="javascript:seenotification2(0,4);"> following				
+				<span class="balloonBox top right" id="notifications-onpage-wrapper" style="display: none;">new </span>
+				</a>
+			</li>
+			<li>
+				<a id="notes-tab-6" class="notestab" onclick="javascript:seenotification2(0,6);"> scores				
+				<span class="balloonBox top right" id="notifications-onpage-wrapper" style="display: none;">new </span>
+				</a>
+			</li>
+			<li>
+				<a id="notes-tab-5" class="notestab" onclick="javascript:seenotification2(0,5);"> favourites				
+				<span class="balloonBox top right" id="notifications-onpage-wrapper" style="display: none;">new </span>
+				</a>
+			</li>
+			<li>
+				<a id="notes-tab-7" class="notestab" onclick="javascript:seenotification2(0,7);"> reposts				
+				<span class="balloonBox top right" id="notifications-onpage-wrapper" style="display: none;">new </span>
+				</a>
+			</li>
+			<li>
+				<a id="notes-tab-11" class="notestab" onclick="javascript:seenotification2(0,11);"> experts				
+				<span class="balloonBox top right" id="notifications-onpage-wrapper" style="display: none;">new </span>
+				</a>
+			</li>
+			<li>
+				<a id="notes-tab-12" class="notestab" onclick="javascript:seenotification2(0,12);"> groups				
+				<span class="balloonBox top right" id="notifications-onpage-wrapper" style="display: none;">new </span>
+				</a>
+			</li>
+			<li>
+				<a id="notes-tab-14" class="notestab" onclick="javascript:seenotification2(0,14);"> leagues				
+				<span class="balloonBox top right" id="notifications-onpage-wrapper" style="display: none;">new </span>
+				</a>				
+			</li>			
+		</ul> -->
+
+		<span class="closeNavations"> </span>
+	</div>
+
+	<div id="leftListing-league">
+		<div id="notification-feed" style="min-height:140px;"></div>
+	
+	</div>	
+	<!-- <div id="rightListing">	
+		
+	</div>	 -->
+	
+	<div class="clearfix"></div>
+</div>
+
+<div id="rightListing">
+	<?php
+
+		$rightmenu = $this->partial('partials/rightmenu.phtml', array('userid' => $this->user,'myclientdetails' => $this->myclientdetails,'eventglobal'=>$this->eventglobal));
+			echo $rightmenu;
+	 ?>				
+</div>
+<div class="clearfix"> </div>
+
+</div>
+</div>
+
+
+<!-- SCRIPT FOR FADE POPUP -->
+
+<div id="redb-popup" class="popup_block"><?php echo POST_NAME;?> successfully posted on your profile</div>
+
+
+<script type="text/javascript">
+
+var $=jQuery.noConflict();
+
+$(document).ready(function(){
+
+	fadepopup();
+
+});
+
+</script>

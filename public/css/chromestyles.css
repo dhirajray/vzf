@@ -1,0 +1,37 @@
+@charset "utf-8";
+/* CSS Document */
+
+textarea, input { outline: none; }
+
+.search-go {
+	margin-top:2px;
+}
+
+.twitter-addtag {
+	margin-top:0px;
+}
+
+.navLinksText {
+	margin:-4px 0 0 -6px;
+}
+
+.dropmenudiv_a{
+	margin-top:8px;
+}
+
+.twitter-addtag {
+	margin-top:20px;
+}
+
+.topnotespos {
+	top:28px;
+}
+
+.topnotesmsgpos {
+	top:28px;
+}
+
+.topnotesgrppos {
+	top:28px;
+}
+

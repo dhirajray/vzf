@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title><?php echo $this->eventResult[0]['title']; ?></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link href="<?php echo URL."/css1/dbee.css";?>?v=<?php echo filemtime('css1/dbee.css');?>" rel="stylesheet" type="text/css" media="all"/>
+	<link rel="icon" type="image/png" href="<?php echo BASE_URL; ?>/img/favicon.png">
+	<?php if($this->session_data['UserID']!=''){?>
+			<link href="<?php echo URL."/plateformcss";?>" rel="stylesheet" type="text/css" media="all"/>	
+		<?php } ?>
+     <?php //print_r($this->eventResult); ?>
+</head>
+
+<body style="background:<?php echo $this->eventResult[0]['bgcolor']; ?>">
+	<?php if($this->eventResult[0]['bgimage']!='') {?>
+	<div class="bgCover"><img src="<?php echo BASE_URL; ?>/event/<?php echo $this->eventResult[0]['bgimage']; ?>"/></div>
+	<?php } ?>
+	<div id="splashWrp">
+			<div class="splashCnt">
+				<div class="splashCenter">
+					 <h1><?php  $commonmodel_obj = new Application_Model_Commonfunctionality(); echo $this->eventResult[0]['title']; ?></h1>
+					 <div class="eventVenue">
+
+					 	<?php if($this->eventResult[0]['address']!='') echo '<p><i class="fa fa-map-marker"></i> '.$this->eventResult[0]['address'].'</p>'; ?>
+			          <?php if($this->eventResult[0]['start']!='') echo "<p>".date('\<\s\p\a\n \c\l\a\s\s\=\"\d\a\t\e\p\a\n\"\>\<\i \c\l\a\s\s\=\"f\a\ \f\a\-\c\a\l\e\n\d\a\r\"\>\<\/\i\>d M Y<\/\s\p\a\n\> \<\s\p\a\n \c\l\a\s\s\=\"\t\i\m\e\p\a\n\"\>\<\i \c\l\a\s\s\=\"\f\a \f\a\-\c\l\o\c\k\-\o\"\>\<\/\i\> h:i A\<\/\s\p\a\n\>', strtotime($this->eventResult[0]['start']))."</p>"; ?>
+			          <span class="splashTo">To</span>
+			          
+			          <?php if($this->eventResult[0]['end']!='') echo "<p>".date('\<\s\p\a\n \c\l\a\s\s\=\"\d\a\t\e\p\a\n\"\>d M Y<\/\s\p\a\n\> \<\s\p\a\n \c\l\a\s\s\=\"\t\i\m\e\p\a\n\"\>h:i A\<\/\s\p\a\n\>', strtotime($this->eventResult[0]['end']))."</p>"; ?>
+
+			          <?php if($this->eventResult[0]['timezoneevent']!='') echo '<span>'.$commonmodel_obj->timezoneevent($this->eventResult[0]['timezoneevent']).'</span>'; ?>
+			          <?php 
+			          $variable = $this->eventModel->getAllMetaDataEvent($this->eventResult[0]['id']); 
+			          foreach ($variable as  $value) {
+			          	if($value['label']!='') echo '<p>'.$value['label'].': '.$value['value'].'</p>';
+			          }
+			          ?>
+			     	 </div>
+			          <div class="enterWrp">
+			          	<a class="btn" style="padding:10px" href="<?php echo BASE_URL.'/event/eventdetails/id/'.$this->eventResult[0]['id']; ?>">Enter Event</a>
+			          </div>
+				</div>
+			</div>
+	</div>
+</body>
+</html>

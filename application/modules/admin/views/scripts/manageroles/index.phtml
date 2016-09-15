@@ -1,0 +1,378 @@
+<!--<script type="text/javascript" src="<?php // echo BASE_URL."/js/message.js"; ?>?v=<?php // echo filemtime('/js/message.js');?>"></script>-->
+<script type="text/javascript" >
+   $('body').on('keypress','#invietvipuser',function(e){   	
+	  keyword = $.trim($(this).val());	  
+	    if (e.which==13){
+	       if(keyword.length>=2){	    
+	        data ='keyword='+keyword+'&from=Roleani';	        
+	       $.ajax({
+	          url:BASE_URL+"/admin/usergroup/dbeeuser",
+	          data:data,
+	          dataType : 'json',			
+	          type :"POST",
+	          beforeSend:function(){
+	          	$('#subadminresults').html('<div class="loaderRole"></div>');        
+	          },
+	          success:function(responce){
+	        	 //alert(responce);exit;          
+	             $('#subadminresults').html(responce.content);	             
+	             $('#subadminresults').flexslider({
+	                      animation: "slide",
+	                      animationLoop: false,
+	                      itemWidth:150,
+	                      itemMargin: 5
+	                  });
+	          		}
+	       });	    
+
+	       $(this).removeClass('error');
+	       return false;   
+
+	       }else{
+	          $messageError('Please type minimum 2 characters')
+	        }
+	    }
+	  
+	  
+	 });
+
+
+
+$('body').on('change','input:radio',function(e){
+	  	var radid = $(this).attr('id');
+	  	if(radid=='nonsiteusers')
+	  	{
+	  		$('.nonsiteusers').show();
+	  		$('.siteusers').hide();
+	  	}
+	  	else
+	  	{
+	  		$('.siteusers').show();
+	  		$('.nonsiteusers').hide();
+	  	}
+	});
+
+$('body').on('click','#createsubadmin',function(e){	
+	  		$('.rolesiteusers').show();
+	  	    $('.newUser,.companyrole,.jobtitlerole,.emailrole,.namerole').hide();
+	  		$('#addroleUsersBtn').hide();
+	  		$('#addUsersroleBtn').show();
+});
+
+// existsUser
+/*$('body').on('click','.newUser',function(e){	
+	  	var tabid = $(this).attr('userroletype');
+	  	if(tabid=='1')
+	  	{
+	  		$('.rolesiteusers').hide();
+	  		$('.companyrole,.jobtitlerole,.emailrole,.namerole').show();
+	  		$('#addroleUsersBtn').show();
+	  		$('#addUsersroleBtn').hide();
+	  	}
+	});
+$(function(){
+  $('.existsUser').click(function(){  
+  var tabid = $(this).attr('userroletype');
+	  	if(tabid=='2')
+	  	{
+	  		$('.rolesiteusers').show();
+	  		$('.companyrole,.jobtitlerole,.emailrole,.namerole').hide();
+	  		$('#addroleUsersBtn').hide();
+	  		$('#addUsersroleBtn').show();
+	  	}	
+})	
+})*/
+</script>
+<?php  
+$request = $this->request;       
+$this->title = "Manage sub-admins";
+$this->headTitle($this->title);
+?>
+
+<!--for message to user-->
+<h1 class="pageTitle">
+Manage sub-admins<a href="javascript:void(0);" class="btn btn-yellow btn-large openSearchBlock pull-right" id="createsubadmin" >Create sub-admin</a>
+</h1>
+<div  id="searchWrapper" class="spSdbsSearchBox">
+	
+		<div id="searchContainer" style="display :none">	
+			<div id="exp_condition" class="expenddcondition1"  >				
+<div id="messageWrapper">				 
+<ul class="dbtab">
+    <li class="active"><a userRoletype="1" forcontent="newUsers" href="#" class="newUser">Create a new sub-admin</a></li>
+	<li class="active"><a userRoletype="2" forcontent="existsUsers" href="#" class="existsUser">Make an existing user a sub-admin</a></li>
+</ul>
+</div>
+                <div class="whiteBox addConditionWrapper">
+									<div class="searchField namerole"> 
+										<label class="label">First name: </label>
+										<div class="fieldInput"><input type="text" id="usernameInput" name="usernameInput" placeholder="Write first name here" ></div>
+									</div>
+									<div class="searchField namerole"> 
+										<label class="label">Last name: </label>
+										<div class="fieldInput"><input type="text" id="userlnameInput" name="userlnameInput" placeholder="Write last name here" ></div>
+									</div>
+									<div class="searchField emailrole"> 
+										<label class="label">Email: </label>
+										<div class="fieldInput"><input type="text" placeholder="Write email here" name="useremail" id="useremail" ></input></div>
+									</div>
+								    <div class="searchField rolesiteusers" style="display:none"> 
+										<label class="label">Search users</label>
+										<div class="fieldInput ">
+											<!-- <div class="srcUsrWrapper" data-search="users">	
+												<div class="sprite searchIcon2"></div>
+												<input type="text" placeholder="type user name and press enter" socialfriendlist="true" class="userFatchList" id="invietvipuser">
+												<div style="display:none;" class="srcUsrtotal"><i>total</i></div>
+											</div> -->
+											<div>
+                                                <input id="invietvipuser" class="sprite searchIcon2 searchsubadmin" type="text" name="searchfield" placeholder="Search">
+											</div>	
+											<?php if(clientID!=21){?>	
+											<span style="display:inline-block; margin:5px 0px; color:#999; font-size:13px;">
+												    You can only invite users who hold a platform account to become a sub administrator. Users who have signed up via a social APIs can't be invited.
+											</span>
+											<?php } ?>
+											<div id="subadminresults"></div>
+										</div>		
+								    </div>
+
+									 <div class="searchField jobtitlerole"> 
+									 <label class="label">Job title :</label>
+										<div class="fieldInput">
+										<input type="text" id="jobtitleInput" name="jobtitleInput" placeholder="Job title">
+										</div>
+									</div>
+									<div class="searchField companyrole"> 
+									 	<label class="label">Company :</label>
+										<div class="fieldInput">
+											<input type="text" id="companyInput" name="companyInput" placeholder="Company">
+										</div>
+									</div>
+<style>
+.object_ok
+{
+border: 1px solid green; 
+color: #333333; 
+}
+
+.object_error
+{
+border: 1px solid #AC3962; 
+color: #333333; 
+}
+</style>
+
+									<div class="searchField companyrole"> 
+									 	<label class="label">User name :</label>
+										<div class="fieldInput">
+											<input type="text" id="usernamerInput" name="usernamerInput" placeholder="User name" style="width: 450px; display: inline-block"><span id="status" style="margin-left: 10px;"></span></div>
+									</div>
+									<div class="searchField companyrole"> 
+									 	<label class="label">Password :</label>
+										<div class="fieldInput">
+											<input type="password" id="passwordInput" name="passwordInput" placeholder="Password" style="width: 450px; display: inline-block">
+											<span>
+												<input id="userpass" type="checkbox" onclick="selectpasscheckbox(this)" value="checkpass" name="checkpassval[]" title="show password">
+                                                <label for="userpass"></label>
+											</span>	
+										</div>
+									</div>	
+									<div class="searchField"> 
+										<label class="label">Role</label>
+										<div class="fieldInput appendType">
+										<?php
+											  $roles = new Admin_Model_User();
+											  $selctAllRols = $roles->getselRolswithoutAdmin();
+										?>									
+										<div class="formRow">
+											<select name="rools" id="userRols">
+											<option value="selectrole" name="selectrole" selectrol="selectrole">Select a role</option>	
+											<?php foreach ($selctAllRols as $rolval):
+											?>	
+											<option value=<?php echo $rolval['role'];?> name="selectrols" selectrol=<?php echo $rolval['role_id']?>><?php echo $rolval['role'];?></option>
+											<?php endforeach; ?>	
+											</select>	
+										</div>
+										</div>		
+								    </div>
+									<div class="searchField"> 
+										<label class="label">&nbsp;</label>
+										<input id="calling" type="hidden" value="roleusers">
+										<input id='results' value='' type="hidden">
+										<div class="fieldInput">
+											<input type="submit" id="addroleUsersBtn" class="addbutton btn btn-green btn-medium pull-left addroleUsersBtn" value="+ Add Sub-admin" style="">
+
+											<input type="submit" id="addUsersroleBtn" class="addbutton btn btn-green btn-medium pull-left addUsersroleBtn" value="+ Add Sub-admin"
+											style="display: none;">  
+											&nbsp;
+											<input type="submit" id="" class="btn btn-medium openSearchBlock " value="Close"> 
+										</div>
+									</div>
+							<div class="clearfix"></div>							
+						</div>
+						<div class="clearfix"></div>
+			</div>
+			<div class="clearfix"></div>
+		</div>
+		<div class="clearfix"></div>	
+</div>	
+<!--for message to user-->
+
+<div class="userUpBar">
+						<!-- <div class="userSearchBox">
+							<div class="appendType  pull-left">	
+								<form action="<?php echo $this->url(array('controller'=>'manageroles','action'=>'index'));?>" method="POST">
+									<input type="text" placeholder="Search" id="searchfield" name="searchfield"> 
+									<button class="btn btn-black" id="submit" name="submit" type="submit">Search</button>
+								</form>			
+								<div class="clearfix"></div>
+							</div>
+						</div> -->
+						<!-- <div class="pull-right buttonRight">						
+							<?php
+							$curDate = date('Y-m-d');
+							$csvlimit = "SELECT COUNT(*) AS TotalSentToday FROM `tblUsers` WHERE clientID=".clientID." AND DATE_FORMAT(`RegistrationDate`,'%Y-%m-%d')='".$curDate."'  AND fromcsv=1";
+							$todaysLim = $this->myclientdetails->passSQLquery($csvlimit);
+							if($todaysLim[0]['TotalSentToday']<1001)
+							{	
+							 ?>							
+							<?php
+							}
+							else 
+							{
+								echo '<div class="dropDown pull-left" id="imprtVip"><a href="#" class="btn dropDownTarget"><i class="fa fa-file-excel-o fa-lg"></i> Import Custom users from CSV</a></div><br> <div class="message warning pull-right" style="width:56%" >Daily import limit exhausted</div>';
+							}
+							?>	
+						</div> -->
+					</div>	
+
+<div class="clearfix"></div>
+
+<div class="clearfix"><?php echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml'); ?></div>
+<div class="rpGraphTop clearfix">
+	<h2 class="pull-left">Total: <?php echo $this->totUsers; ?></h2>
+	
+	<!-- <div class="search pull-right">
+		<form action="<?php echo $this->url(array('controller'=>'manageroles','action'=>'index'));?>" method="POST" >
+			<select class="gh-tb"  maxlength="200" value="" id="statussearch" name="statussearch" onchange="this.form.submit()" > 
+				<option value="0"  > - Sort by status - </option>
+				<option value="4" <?php if($this->statussearch==4) { echo "selected=\"selected\" "; } ?> > All </option>
+				<option value="1" <?php if($this->statussearch==1) { echo "selected=\"selected\" "; } ?> > Active </option>
+				<option value="2" <?php if($this->statussearch==2) { echo "selected=\"selected\" "; } ?> > Deactive </option>
+				<option value="3" <?php if($this->statussearch==3) { echo "selected=\"selected\" "; } ?> > Pending </option>
+			</select>
+				
+		</form>
+	</div> -->	
+	<!-- <div class="search pull-right" style="margin-right:5px">
+		<form action="<?php echo $this->url(array('controller'=>'manageroles','action'=>'index'));?>" method="POST" >
+			<select class="gh-tb"  maxlength="200" value="" id="orderfield" name="orderfield" onchange="this.form.submit()" > 
+				<option value="0"  > - Sort results - </option>
+				<option value="1" <?php if($this->orderfield==1) { echo "selected=\"selected\" "; } ?> > User name (a-z)</option>
+				<option value="2" <?php if($this->orderfield==2) { echo "selected=\"selected\" "; } ?> > User name (z-a)</option>
+				<option value="3" <?php if($this->orderfield==3) { echo "selected=\"selected\" "; } ?> > Newest first </option>
+				<option value="4" <?php if($this->orderfield==4) { echo "selected=\"selected\" "; } ?> > Oldest first </option>
+
+				<option value="5" <?php if($this->orderfield==5) { echo "selected=\"selected\" "; } ?> > Last CSV uploaded </option>
+				
+			</select>
+				
+		</form>
+	</div> -->	
+</div>
+<form name="userform" id="userform">
+	<div class="responsiveTable">
+	<table class="table-border userListTable table table-hover table-stripe">
+		<thead>
+			<?php  if (count($this->paginator)){ ?>
+			<?php $rowchange	=	0; 
+			?>
+			<tr>
+			    <td colspan="8">
+			    	<div class="rpGraphTop clearfix">
+			    		<?php if ($this->seachfield !='') { ?>
+			    		<a href="<?php echo BASE_URL ?>/admin/manageroles" class="btn btn-black pull-left">Back</a>
+			    		<?php }?>
+						<form action="<?php echo BASE_URL ?>home/Reporting/getcsv" method="post">
+							<div>
+								<div class="pull-left" style="font-weight:normal; line-height: 28px;">Please refresh browser to check user account creation status.</div>
+							</div>
+							<input type="hidden" name="calling" value="usersList">
+							<input type="hidden" name="filename" value="users list">
+
+							<input type="hidden" name="seachfieldChk" value="<?php echo $this->seachfield; ?>">
+							<input type="hidden" name="orderfieldChk" value="<?php echo $this->orderfield; ?>">
+							<input type="hidden" name="records" value="">
+						</form>
+					</div>
+				</td>
+			    
+			</tr>
+			<tr>
+			    <td>Name</td>
+			    <td>Username</td>
+				<td>Email</td>
+				<!-- <td>Gender</td> -->
+				<td>Roles</td>
+				<td>Status</td>
+				<td width="220">Action</td>
+			 
+			</tr>
+		</thead>
+		<tbody>
+			<?php foreach($this->paginator as $user) : 
+               //echo'<pre>';print_r($user);
+			?>
+			<?php if($rowchange%2==1) {$color = '#CCC';} else {$color ='#FFF';} ?>
+			<tr id="userslist_<?php echo $this->escape($user->UserID);?>">
+				<?php
+							 $deleteAccount = true;
+							 $getDbs =$this->myclientdetails->getfieldsfromtable(array("count('DbeeID') as post"),'tblDbees','User',$user->UserID);
+							 if($getDbs[0]['post']==0)
+							 {
+							 	$getcmnts =$this->myclientdetails->getfieldsfromtable(array("count('CommentID') as tcmnt"),'tblDbeeComments','UserID',$user->UserID);
+							 	if($getcmnts[0]['tcmnt']>0) $deleteAccount = false;
+							 }
+							 else
+							 {
+							 	$deleteAccount = false;
+							 }
+
+							?>
+			    <td ><?php echo $this->myclientdetails->customDecoding($this->escape($user->Name)).' '.$this->myclientdetails->customDecoding($this->escape($user->lname));?></td>
+			    <td><?php echo $this->myclientdetails->customDecoding($this->escape($user->Username));?></td>
+				<td><?php echo $this->myclientdetails->customDecoding($this->escape($user->Email));?></td>
+				<td><?php 
+				          $roles = new Admin_Model_User();
+				          $rolesval = $roles->getRolsdatails($user->role);
+				          echo $rolesval[0]['role'];
+				     ?></td>
+				<td class="usrStatusTd"><?php
+				if($user->Status==1){ 
+					if($user->Status==1){ echo "<span style='color:green'>Active</span>";} else { echo "<span style='color:red'>Inactive</span>"; }
+					} else {
+						echo "<span style='color:#0000ff'>Pending</span>";
+					} 
+				?></td>
+				<td>
+
+					<?php if($user->Status==1) {?>
+						 <!-- <a class="btn btn-green btn-mini inviteAction" href="<?php echo BASE_URL.'home/user/userdetails/uid/'.$this->escape($user->UserID);?>"><i class="fa fa-eye-open "></i> Full details</a> <span class="sprt">  </span> -->
+
+						 <a class="btn btn-danger btn-mini roledelAction" email="<?php echo $this->escape($user->Email);?>" userid="<?php echo $this->escape($user->UserID);?>" username="<?php echo $this->myclientdetails->customDecoding($user->Username);?>" role="<?php echo $user->role;?>" action="openDialog" calling="deletevips" href="javascript:void(0);">
+								<i class="fa fa-trash"></i>
+							Remove sub-admin access
+						</a>
+						 <?php } ?>  
+				</td>
+			</tr>
+			<?php $rowchange++; endforeach; ?>
+				<?php } else { ?>
+				<tr><td colspan=5><!-- <a href="<?php echo BASE_URL ?>home/user" class="btn btn-black pull-left">Back to main list</a> --></td></tr>	
+				<tr><td colspan=5>No users found!</td></tr>	
+				<?php } ?>
+		</tbody>
+	</table>
+</div>
+</form>
+<?php echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml'); ?>

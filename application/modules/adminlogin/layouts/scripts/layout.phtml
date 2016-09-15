@@ -1,0 +1,73 @@
+<?php 
+//echo BASE_URL;die;
+$this->headMeta()->appendHttpEquiv('Content-Type', 'text/html;charset=utf-8');
+$this->headTitle()->setSeparator(' - ');
+$this->headTitle('db csp - analytics');        
+echo $this->doctype(); ?>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <?php echo $this->headMeta(); ?> 
+    <?php echo $this->headTitle(); ?>
+    <?php 
+		$this->myconfigdetails = new Admin_Model_Deshboard();
+		$resultArray = $this->myconfigdetails->getTempConfiguration();
+		//echo'<pre>';print_r($resultArray);	 
+    ?> 
+	<!-- <link rel="icon" type="image/png" href="<?php echo BASE_URL.'/adminraw/images/'.$resultArray->FaviconLogo; ?>"> -->
+	<link rel="icon" type="image/png" href="<?php echo BASE_URL.'/images/'.$resultArray->FaviconLogo; ?>">
+	<link  href="<?php echo BASE_URL."/adminraw/css/fontawesome/css/font-awesome.min.css"; ?>" rel="stylesheet" type="text/css" media="all">
+	<link  href="<?php echo BASE_URL."/adminraw/css/ui-lightness/jquery-ui-1.9.2.custom.min.css"; ?>" rel="stylesheet" type="text/css" media="all">
+	<link rel="stylesheet" href="<?php echo BASE_URL."/adminraw/css/dbee.css"; ?>">
+
+
+	<script src="<?php echo BASE_URL."/adminraw/js/jquery-1.9.1.min.js"; ?>"></script>
+	<script src="<?php echo BASE_URL."/adminraw/js/jquery-migrate-1.1.1.min.js"; ?>"></script>
+	<script src="<?php echo BASE_URL."/adminraw/js/jquery.cookie.js"; ?>"></script>
+	<script type="text/javascript" src="<?php echo BASE_URL."/adminraw/js/jquery-ui-1.9.2.custom.js"; ?>"></script>
+
+	<script type="text/javascript">
+		$(function(){
+			$('#submit-element input').replaceWith('<button type="submit" class="btn btn-yellow btn-medium pull-right">Log in</button>');
+			$('body').on('keypress','#loginBox input',function(event) {
+				$(this).siblings('ul.errors').fadeOut(function() {
+					$(this).remove();
+				});
+			});
+
+
+			$('#submit-element .btn').click(function(){
+				var error  = false; 
+				$('.loginCenter input').each(function(){
+					var val = $.trim($(this).val());
+					if(val=='') error = true;
+					else  error = false;
+				});
+               if(error==true){
+               	 $('.loginErrorMsg').html('<i class="fa fa-warning"></i>Please fill both username and password').show();
+               	  return false;
+               }else{
+               	 $('.loginErrorMsg').hide();
+               }
+			});
+		});
+	</script>
+</head>
+<body>
+	<!--Start header form here-->	
+	<!--end header form here-->
+		<div class="pageContainer">
+			<div class="clearfix"></div>
+			<div class="LoginWrapper">
+				<a href="<?php echo BASE_URL?>/admin/login" class="clientLogoWrapper"><img src="<?php echo BASE_URL?>/adminraw/img/clientLogo.png" /></a>
+				<div id="loginBox">
+					<div class="loginCenter">
+						
+						<?php echo $this->layout()->content; ?>	
+					</div>						
+				</div>
+			</div>
+		</div>
+	<!--end container form here-->
+</body>
+</html>

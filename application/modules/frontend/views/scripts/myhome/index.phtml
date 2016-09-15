@@ -1,0 +1,305 @@
+
+<?php 
+
+	$commonmodel_obj      = new Application_Model_Commonfunctionality();
+
+	if($this->ismypost=='1')
+	{
+		?>
+		<script type="text/javascript">
+		$('document').ready(function(){
+			$('.showPoststream[call="mypost"]').trigger('click');
+		})
+		</script>
+		<?php
+	} 
+	else
+	{
+		?>
+		<script type="text/javascript">
+			if(hash=='' || window.location.hash=="" || window.location.hash=='#_=_'){
+			fetchintialfeeds();
+			}
+		</script>
+		<?php
+	}
+
+?>
+<script>
+
+/*$('.notificationDrpDwn').on('mouseover',function(){
+   alert('--')
+});*/	
+
+$('body').on('click', '.notificationDrpDwn', function(event) {
+            $(this).toggleClass('on').toggleClass('off');
+});
+$('body').on('click',function(event) {
+	   //console.log(event.target);
+	   if($(event.target).is('.dropDowntarget,.dropDownIconimg')!=true){
+	   	    //console.log(event.target);
+	   		$('.notificationDrpDwn').addClass('off').removeClass('on');
+	   }
+});
+
+
+function reloadFeeds() {	
+
+	var end=$('#reloadend').val();
+
+	end=parseInt(end)+5;
+
+	//document.getElementById('dbee-post-options-wrapper').style.display='none';
+
+	<? if(eregi("chrome", $_SERVER['HTTP_USER_AGENT']) || preg_match('/MSIE (.*?);/', $_SERVER['HTTP_USER_AGENT'])) { ?>
+
+	$('#dbee-feeds').load('/myhome/dbeereload', function() { fadepopup(); });
+
+	<? } else { ?>
+
+	$('#dbee-feeds').fadeOut('slow').load('myhome/dbeereload/5', function() { fadepopup(); Shadowbox.init(); Shadowbox.setup(); }).fadeIn("slow");
+
+	<? } ?>
+ 
+}
+
+
+
+<?php 
+ $newsrssname=$this->rssurl[0]['Name'];
+
+?>
+
+$(function() {
+		if(localTick == false)
+	 		setInterval("dbeeInactive()", 1000);
+
+		$('#leftsideMenu ul li').click(function(event) {
+			$(this).closest('#leftsideMenu').find('.active').removeClass('active');
+			if($(this).closest('li').is(":visible")==true){
+				$(this).closest('li').addClass('active');
+			}else{
+				$(this).addClass('active');
+			}
+		});
+
+	<?php if($this->session_data['role']!=4) {?>
+	<?php }else{ ?>
+		loadgroupdbees("<?=$this->session_data['groupid'];?>");
+	<?php } ?>
+	fetchadvert();
+		<?php			
+		if(($this->userResult['Socialtype']=='2' && $this->myclientdetails->customDecoding($this->userResult['Email'])=='twitteruser@db-csp.com' && $this->userResult['EmailBox']=='0') || ($this->userResult['Socialtype']=='4'  && $this->myclientdetails->customDecoding($this->userResult['Email'])=='gplususer@db-csp.com' && $this->userResult['EmailBox']=='0')) 
+		{ 
+		
+		$image_status = 0;
+		if($this->ShowPPBox=='1' && ($this->ProfilePic=='default-avatar.jpg' || $this->ProfilePic=='default-avatar-female.jpg'))
+		{
+			$image_status = 1;
+		}
+		
+		?>
+		setTimeout(function(){
+			if($('#dbeePopupWrapper').is(':visible')==false){
+				showEmailBoxs('<?php echo $image_status; ?>');
+			}
+		},8000);
+		
+		<?php }
+		else if($this->ShowPPBox=='1' && ($this->ProfilePic=='default-avatar.jpg' || $this->ProfilePic=='default-avatar-female.jpg' || $this->ProfilePic=='default-profilepic-std.png')){ 
+			
+			$name = $this->myclientdetails->customDecoding($this->Name);
+			$lastname = $this->myclientdetails->customDecoding($this->lname);
+
+		?>
+
+		setTimeout(function(){
+			if($('#dbeePopupWrapper').is(':visible')==false){
+					uploadprofilepicbox('<?=addslashes($name)?>','<?=addslashes($lastname)?>');
+			}
+		},5000);
+		
+		<?php } ?>
+		
+	
+	$('.rssFeedLinksClick a').click(function(event) {
+		event.preventDefault();
+		$('.rssFeedLinksClick .active').removeClass('active');
+		$('.rssFeedLinksClick a:nth-child('+($(this).index()+1)+')').addClass('active');
+	
+		var selId	=	$(this).attr('dataid'); 
+			$('#rightListing .rightportion').addClass('hide');
+			$('#rightListing #'+selId+'').removeClass('hide');
+	});
+
+	
+	//fillcategory();
+	//filldisplayby();
+
+	/*myfeeds('<?php echo $this->rssurl[0]['ID']; ?>','<?php echo  $this->rssurl[0]['Logo']; ?>','<?php echo  $this->rssurl[0]['Name']; ?>',1);*/ //for RSS
+	  
+	$('#notifications-top-dbee').click(function() {				
+		fetchintialfeeds();
+	});
+
+	$('.arrowBtn').click(function(event) {
+		$('#dbee-feed-rss').toggleClass('active');
+		$('#rssfeed-wrapper,#rssfeed-logo, #rss-icons .rss-icon-edit, #rss-icons .rss-icon-list').slideToggle();
+	});
+
+});
+
+</script>
+
+<script type="text/javascript">
+
+
+var taskFired=false;
+function ScrollingList ()
+{	
+	
+	var feedtype = $('#feedtype').val(); 
+	dbeetype = $('#dbeetype').val(); 
+   	   if((feedtype=='all' || feedtype=='') && dbeetype!=6)  {
+	   		var mystart=$('#startnewall').val(); 
+	   		seemorefeeds(mystart,'<?php echo PAGE_NUM; ?>'); 
+   		}
+	   else if(feedtype=='mydbs') { var mystart=$('#startnewmydb').val();  seemoreglobaldbeelist(mystart,'<?php echo PAGE_NUM; ?>',<?php echo $this->userid?>,'myhome','mydbee','mydb'); }
+	   else if(feedtype=='group') { var mystart=$('#startnewmydb').val();  seemoreglobaldbeelist(mystart,'<?php echo PAGE_NUM; ?>',1,'myhome','mydbee','group'); }
+	   else if(feedtype=='mycomments') { var mystart=$('#startnewmycomments').val();seemoreglobaldbeelist(mystart,'<?php echo PAGE_NUM; ?>',1,'comment','index','mycomments');  }
+	   else if(feedtype=='following') { var mystart=$('#startnewfollowing').val(); seemoreglobaldbeelist(mystart,'<?php echo PAGE_NUM; ?>',1,'following','index','follow'); }
+
+	   else if(feedtype=='favourite') { var mystart=$('#startnewfav').val(); seemoreglobaldbeelist(mystart,'<?php echo PAGE_NUM; ?>',1,'favourite','list','fav'); }
+
+	   else if(feedtype=='mostcommented') { var mystart=$('#startnewmc').val(); seemoreglobaldbeelist(mystart,'<?php echo PAGE_NUM; ?>',1,'myhome','mostcommented','mostcommented'); }
+
+	   else if(feedtype=='cat') { var mystart=$('#startnewcat').val(); var mycat=$('#filtercat').val(); seemoreglobaldbeelist(mystart,'<?php echo PAGE_NUM; ?>',3,'myhome','catetorylist','dbcat',mycat); }
+
+	   else if(feedtype=='type') { var mystart=$('#startnewtype').val(); var mytype=$('#filtertype').val(); seemoreglobaldbeelist(mystart,'<?php echo PAGE_NUM; ?>',"1",'myhome','filtertype','filtertype',mytype); }
+
+	   else if(feedtype=='filter') { var mystart=$('#startnewfilter').val(); var myscore=$('#filterscore').val(); seemoreglobaldbeelist(mystart,'<?php echo PAGE_NUM; ?>',"1",'myhome','dbfeedfilter','filterscore',myscore); }
+
+	   else if(feedtype=='tagpost') { var mystart=$('#startnewfilter').val(); var myscore=$('#filterscore').val(); seemoreglobaldbeelist(mystart,'<?php echo PAGE_NUM; ?>',"1",'myhome','mytaggeddbee','filterscore',myscore); }
+
+	   else if(feedtype=='livevideo') { var mystart=$('#startnewlivevideo').val(); var mytype=$('#filtertype').val(); seemoreglobaldbeelist(mystart,'<?php echo PAGE_NUM; ?>',"1",'myhome','filtertype','liveBroadcast','c.type = 15 OR'); }
+	   
+}
+$(window).scroll(function(){
+	var iOS = ( navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false );
+	if(iOS){
+ 		if(($(window).scrollTop() + $(window).height() > $(document).height() - 100 ) && !busy) {
+ 			busy = true;
+ 			ScrollingList ();
+ 		}
+	}else{
+		if($(window).scrollTop() == $(document).height() - $(window).height() && !busy){ 
+			busy = true;
+ 			ScrollingList ();
+ 		}
+	}
+	
+});
+
+
+</script>
+
+<input type="hidden" id="dbeeuser" value="<?=$this->dbeeuser;?>">		
+<?php if($this->session_data['role']!=100) { ?>
+<input type="hidden" id="feedtype" value="">
+<?php }else{ ?>
+<input type="hidden" id="feedtype" value="group">
+<?php } ?>
+<input type="hidden" id="reloadend">
+
+<input type="hidden" id="group" value="<?=$group;?>">
+<input type="hidden" id="frompop" value="<?=$frompop;?>">
+<input type="hidden" id="startnewall" value="<?php echo PAGE_NUM; ?>">
+<input type="hidden" id="startnewfollowing" value="<?php echo PAGE_NUM; ?>">
+<input type="hidden" id="startnewfav" value="<?php echo PAGE_NUM; ?>">
+<input type="hidden" id="startnewmc" value="<?php echo PAGE_NUM; ?>">
+<input type="hidden" id="startnewcat" value="<?php echo PAGE_NUM; ?>">
+<input type="hidden" id="startnewtype" value="<?php echo PAGE_NUM; ?>">
+<input type="hidden" id="startnewfilter" value="<?php echo PAGE_NUM; ?>">
+<input type="hidden" id="startnewmydb" value="<?php echo PAGE_NUM; ?>">
+<input type="hidden" id="startnewmycomments" value="<?php echo PAGE_NUM; ?>">
+<input type="hidden" id="startnewlivevideo" value="<?php echo PAGE_NUM; ?>">
+<input type="hidden" id="filterscore">
+<input type="hidden" id="filtertype">
+<input type="hidden" id="whereIam" value="myhome">
+
+<input type="hidden" id="dbeetype" value="">
+<input type="hidden" id="page" value="">
+
+			
+<!-- top end  -->
+
+	
+		<!--Start Page Container from here inheriting from Header and Left PHTML-->
+		
+
+
+
+				<!--this is page listing-->
+				<!--this is page listing-->
+				
+					<div id="leftListing">
+				      <?php
+
+						$this->myclientdetails = new Admin_Model_Clientdetails();
+						$catlist = $this->myclientdetails->getAllMasterfromtable('tblDbeeCats',array('CatID','CatName'),'',array('Priority'=>'Desc'));
+						$this->myclientdetailsmisc = new Application_Model_Clientdetails();
+                        $catwithoutMisclisttot = $this->myclientdetailsmisc->getcatwithoutMisclist();
+                        $catwithoutMisclisttotval = count($catwithoutMisclisttot);
+                        $dbeecat  = new Application_Model_Myhome();
+                        
+                    if($catwithoutMisclisttotval>0){ ?>					           
+					<div style="display:block;" class="formcat dropDown off notificationDrpDwn pull-right">
+                    	<div class="dropDowntarget">Sort by category <i class="fa fa-caret-down dropDownIconimg"></i></div>
+                        <div class="dropDownList right">
+	                    <ul class="autoCat">
+	                        <li><a href="javascript:void(0);" onclick="javascript:fetchintialfeeds();" class="Catdropdwnall">All</a></li> 
+	                        <?php foreach ($catlist as $catval):
+									  if($catval['CatID']==10){ 
+										  $myselect ="selected";
+									   }else{$myselect =" ";}
+							    $dbeealldbees = $dbeecat->getdbeesearchid($catval['CatID']);
+							    $dbeeallwithcatcount = count($dbeealldbees);
+							    if($dbeeallwithcatcount!=0){		   
+							?>                	
+	                    	<li><a href="javascript:void(0);"  onclick="javascript:seencategories(<?php echo $catval['CatID']?>);" class="Catdropdwn" catid=<?php echo $catval['CatID']?> value=<?php echo $catval['CatName'];?> name="selectcats" countpostwithcat="<?php echo $dbeeallwithcatcount?>"><?php echo $catval['CatName'];?>
+	                    	</a></li>
+	                    	<?php
+                                    }
+	                    	 endforeach; ?>
+	                    </ul>
+                        </div>
+                    </div>
+                    <?php  } ?>
+                    <div id="filtercat" value="" style="float: left; padding-top: 0;width: 49.5%;"></div>
+                    
+
+							<ul class="postListing" id="notifications-top-wrapper-dbee" style="display:none;">
+								<li style="display:block; text-align:center;" onclick="javascript:fetchintialfeeds()">
+									<span id="notifications-top-dbee" style="margin-top:-2px;">0</span> <span> new </span>
+								</li>
+							</ul>
+						
+						<div>
+							<ul class="postListing" id="dbee-feeds"></ul>
+						</div>
+
+					</div>
+
+					<div id="rightListing">
+						<?php
+						$rightmenu = $this->partial('partials/rightmenu.phtml', array('userid' => $this->userid,'myclientdetails' => $this->myclientdetails,'eventglobal'=>$this->eventglobal));
+   						echo $rightmenu;
+   						?>
+					</div>
+					<div class="clearfix"> </div>
+
+				<!--End page listing-->
+
+			</div>
+		</div>
+		<!--End Page Container from here-->

@@ -1,0 +1,217 @@
+<?php         
+   $this->title = "search by hashtag";
+   $this->headTitle($this->title);
+   ?>
+<input type="hidden" name="tag" value="<?php echo $this->tagvalue; ?>" id="hellotags" />
+   <h1 class="pageTitle ">Matching #tags <?php echo $this->hashtag; ?><span><a class="pull-right btn btn-black btn-mini Btnback" style="display:none" type="submit" value="<< Back" name="submit" href="javascript:history.go(-1)">Back</a></span></h1>
+   <?php if($this->tagvalue=='') {  ?><div class="pageSubeTitlevip">Analysis of users using the same #tag when creating and/or commenting on one or more posts</div><?php } ?>
+<div class="clearfix"> </div>
+<div class="userUpBar">
+   <div class="userSearchBox">
+      <div class="appendType  pull-left">
+         <form action="<?php echo $this->url(array('controller'=>'reporting','action'=>'hashtag'));?>" 		method="POST">
+            <input type="text" placeholder="#tag" id="hashtag" name="hashtag"> 
+            <button class="btn btn-black" id="submit" name="submit" type="submit">Search</button>
+         </form>
+         <div class="clearfix"></div>
+      </div>
+   </div>
+   <!-- <span>
+      <a class="pull-right btn btn-black btn-mini" style="display:none" type="submit" value="<< Back" name="submit" href="javascript:history.go(-1)">Back</a>
+   </span> -->
+</div>
+<div id="hashTagSelectedWrapper" class="matchingHagTagWrp">
+	<ul>
+    <li class="allTag" style="display:none"><div class="hashUrsrDetails"></div></li>
+    <li class="PostTag" style="display:none"><div class="hashUrsrDetails"></div></li>
+    <li class="CommentTag" style="display:none"><div class="hashUrsrDetails"></div></li>
+  </ul>
+</div>
+<div class="rpTagTop ">
+   <h2>Top #tags</h2>
+</div>
+<div class="clearfix"></div>
+<?php if($this->tagvalue!='') {  ?>
+<script type="text/javascript">
+  $(function() 
+   {  
+      showAllHashTag();
+      
+      function showPostHashTag()
+      {
+      	 url = "/admin/reporting/ajaxposthashtag";
+         ajaxResultHasTage(url, 'PostTag',0);
+      }
+      function showCommentHashTag()
+      {
+         url = "/admin/reporting/ajaxcommenthashtag";
+         ajaxResultHasTage(url, 'CommentTag',0);
+         setTimeout(function() {
+          showPostHashTag();
+          }, 500);
+         
+      }
+      function showAllHashTag()
+      {
+         url = "/admin/reporting/ajaxhashtag";
+         ajaxResultHasTage(url, 'allTag',0);
+          $loader();
+          setTimeout(function() {
+            showCommentHashTag();
+          }, 500);
+         
+      }
+
+    function ajaxResultHasTage(url, tagtype,pagingPost){  
+            $('.Btnback').show();
+            //$('.Btnback').css('display','block');
+            $('.taglisting').hide();
+            $('.rpTagTop ').hide();
+            var tag = $('#hellotags').val();             
+             $.ajax({                                      
+                  url:  BASE_URL+url,
+                  dataType:'json',
+                  data: {"tag":tag,'paging':pagingPost},                        
+                  method: 'POST',
+                  success: function(result) 
+                  {  
+
+                    if(result.success=='success')
+                    {       
+                      $removeLoader();          
+                      $('#hashTagSelectedWrapper').css('display','block')
+                      $('.'+tagtype+ ' .hashUrsrDetails').html(result.content);
+                      $('.matchingHagTagWrp  a[rel="'+tagtype+'"]').show();
+                      $('.'+tagtype).show();
+                      
+                    }
+                    $select('select');
+                    $('.goupusermain2').click(function(){
+                        var closestFl = $(this).closest('li');
+                        var totalCheckBox = $('.saveTolistCheckbox input[type="checkbox"]').size();
+                        if($(this).is(':checked')==true){
+                          closestFl.find('.saveTolistCheckbox input[type="checkbox"]').attr('checked', true);
+                          closestFl.find('.dropDownTarget').removeClass('disabled');
+                        }else{
+                          closestFl.find('.saveTolistCheckbox input[type="checkbox"]').attr('checked', false);
+                          closestFl.find(' .dropDownTarget').addClass('disabled')
+                        }
+                    });
+                    $removeLoader();                     
+                }
+
+            });  
+  }
+
+      $('body').on('click','.saveTolistCheckbox input[type="checkbox"]',function(){
+          var closestEl =  $(this).closest('.hashUrsrDetails');
+          var totalChecked = closestEl.find('input[type="checkbox"]:not(.goupusermain2):checked').size();
+         	if($(this).is(':checked')==true){
+         		closestEl.find('.dropDownTarget').removeClass('disabled');       		
+         	}
+     			if(totalChecked==0){   	   			
+     	   			closestEl.find('.dropDownTarget').addClass('disabled');
+     	   			closestEl.find('.goupusermain2').attr('checked', false);
+     	   		}
+     	});
+
+
+
+
+
+  $('body').on('click', '.matchingHagTagWrp .tagTab a',function(event) {
+      var tagContainer = $(this).attr('rel');
+       var parentId =  $(this).closest('#hashTagSelectedWrapper');
+       $('.tagTab a', parentId).removeClass('active');
+
+       var countext = '';
+       $(this).addClass('active');
+       $('.listing ', parentId).hide();
+       $('li.'+tagContainer+' .listing', parentId).show();
+        if(tagContainer=="allTag"){
+         
+           if($('#AllCount').val()>1)
+              countext =  $('#AllCount').val()+' users';
+            else
+              countext =  $('#AllCount').val()+' user';
+         }
+        else if(tagContainer=="PostTag"){
+            if($('#postCount').val()>1)
+              countext =  $('#postCount').val()+' users in post';
+            else
+              countext =  $('#postCount').val()+' user in post';
+        }
+        else if(tagContainer=="CommentTag"){
+            if($('#commentCount').val()>1)
+              countext =  $('#commentCount').val()+' users in comment';
+            else
+              countext =  $('#commentCount').val()+' user in comment';
+        }
+
+      $('.allHasTagUser .userPostcounter').html(countext);
+
+  });
+
+  $('body').on('click', '.PostMoreList',function(event) {
+
+  event.preventDefault();
+  var tag = $('#hellotags').val();
+  var pagingPost = $('#PostPage').val();
+  var closestFl = $(this).closest('li');
+
+   $.ajax({                                      
+        url:  BASE_URL+'/admin/reporting/ajaxposthashtagpaging',
+        dataType:'json',
+        data: {"tag":tag,'paging':pagingPost},                        
+        method: 'POST',
+        success: function(result) { 
+          if(result.content!=''){
+             $('.postTagListUL').append(result.content);
+             $('#PostPage').val(result.page);
+             if($('.goupusermain2').is(':checked')==true){
+          	   closestFl.find('.saveTolistCheckbox input[type="checkbox"]').attr('checked', true);
+             }
+         }
+      }
+
+  });
+  });
+
+
+});
+</script>
+<?php }  if($this->tagvalue=='') { ?>
+<div class="responsiveTable">
+<table class="table-border userListTable table table-hover table-stripe">
+<thead>
+  <?php  if (count($this->result)){  $userRec = new Admin_Model_reporting(); $rowchange  = 0;  ?>
+  <tr>
+    <td>#Tag name</td>
+    <td>Users</td>
+    <td>Report</td>
+  </tr>
+</thead>
+<tbody>
+<?php 
+foreach($this->result as $paramName => $paramValue) : 
+
+$paramName = str_replace('"', '', $paramName);
+$paramName = str_replace("'", '', $paramName);
+$countUser = count($userRec->getAllHashTagUser($paramName));
+ ?>
+<?php if($rowchange%2==1) {$color = '#CCC';} else {$color ='#FFF';} ?>
+<tr >
+    <td><?php echo $paramName;?></td>
+    <td><?php echo $countUser;?></td>
+  <td><?php 
+   if($countUser>1) echo '<a class="btn btn-mini btn-green reportTag" href="'.BASE_URL.'/admin/reporting/hashtag/tag/'.$paramName .'" >Report</a>';  ?></td>
+  </tr>
+<?php $rowchange++; 
+endforeach; ?>
+  <?php } else { ?>
+  <tr><td colspan="4">No users found!</td></tr> 
+  <?php } ?>
+</tbody>
+</table>
+</div>
+<?php } ?>

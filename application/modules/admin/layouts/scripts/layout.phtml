@@ -1,0 +1,749 @@
+<?php 
+
+$this->headMeta()->appendHttpEquiv('Content-Type', 'text/html;charset=utf-8');
+$this->headTitle()->setSeparator(' - ');
+$this->headTitle('OnSerro - analytics');
+echo $this->doctype(); ?>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable = no">
+    <?php echo $this->headMeta(); ?> 
+    <?php echo $this->headTitle(); ?>
+	<?php
+		 $request 		= 	Zend_Controller_Front::getInstance()->getRequest()->getParams();
+		 $currActive	=	$request['controller'];
+		 $currActiveAction	=	$request['action'];
+		 $currActivePage = $currActive.'/'.$currActiveAction;
+		 $homeActive	=	(($currActive=='Index' || $currActive=='index' || $currActive=='' || $currActive=='Dashboard' || $currActive=='dashboard') && ($currActiveAction!='survey' || $currActiveAction!='specialdbs' || $currActiveAction!='Survey' || $currActiveAction!='Specialdbs' || $currActiveAction!='profanityfilter'))?'active':'';
+		
+		 $deptActive	=	($currActive=='Departments' || $currActive=='departments' )?'active':'';
+		 $userActive	=	($currActive=='User' || $currActive=='user' )?'active':'';
+		 $advtActive	=	($currActive=='Advertisements' || $currActive=='advertisements' )?'active':'';
+		 $reptActive	=	($currActive=='Reporting' || $currActive=='reporting' || $currActive=='savedcharts' )?'active':'';
+		 $knctActive	=	($currActive=='Knowledgecenter' || $currActive=='knowledgecenter' )?'active':'';   
+		 $postsActive	=	($currActiveAction=='specialdbs' || $currActiveAction=='survey' || $currActiveAction=='Specialdbs' || $currActiveAction=='Survey' )?'active':'';
+		 $settingsActive	=	($currActive=='Configuration' || $currActive=='configuration' )?'active':'';
+		 $themeActive	=	($currActive=='Emailtempsetting' || $currActive=='emailtempsetting' || $currActive=='Themesetting' || $currActive=='themesetting' )?'active':'';
+		 $superadmintaskActive = ($currActive=='Dbeeauth' || $currActive=='dbeeauth' )?'active':'';
+
+		$this->myconfigdetails = new Admin_Model_Deshboard();
+		$resultArray = $this->myconfigdetails->getTempConfiguration();	
+		//echo'<pre>';print_r($resultArray); 
+	?>
+	<link rel="icon" type="image/png" href="<?php echo BASE_URL.'/images/'.$resultArray->FaviconLogo; ?>">   
+    <?php	
+		if ($_SERVER['SERVER_NAME'] == 'localhost') {
+		  $baseurl = BASE_URL;
+		  $minurl = '';
+		} else  {
+		   $baseurl = BASE_URL;
+		   $minurl = '';
+		}
+
+	     echo $this->headLink()
+			  ->appendStylesheet($baseurl."/adminraw/css/ui-lightness/jquery-ui-1.9.2.custom.min.css")
+			  ->appendStylesheet($baseurl."/adminraw/css/dbee.css")
+			  ->appendStylesheet($baseurl."/adminraw/js/flexslider/flexslider.css")
+			  ->appendStylesheet($baseurl."/adminraw/css/email-template.css")
+			  ->appendStylesheet($baseurl."/adminraw/js/colpick/colpick.css")
+			  ->appendStylesheet($baseurl."/adminraw/css/dropzone.css")
+			  ->appendStylesheet($baseurl."/adminraw/css/token-input-facebook.css")			 
+			  ->appendStylesheet($baseurl."/adminraw/js/select2/select2.css")
+			  ->appendStylesheet($baseurl."/adminraw/css/jquery.mentionsInput.css")
+			  ->appendStylesheet($baseurl."/adminraw/css/jquery.autocomplete.css")
+			  ->appendStylesheet($baseurl."/css1/dbcrop.css");
+			   
+
+		  echo $this->minifyHeadScript()	   
+			  ->appendFile($baseurl.'/adminraw/js/jquery-1.9.1.min.js')	   
+			  ->appendFile($baseurl.'/adminraw/js/jquery-migrate-1.1.1.min.js')			  	   
+			  ->appendFile($baseurl.'/adminraw/js/jquery-ui-1.9.2.custom.js')	
+			  ->appendFile($baseurl.'/adminraw/js/jquery.tokeninput.js')
+			  ->appendFile($baseurl.'/adminraw/js/jquery.ui.touch-punch.min.js')
+			  ->appendFile($baseurl.'/adminraw/js/flexslider/jquery.flexslider.js')
+			  ->appendFile($baseurl.'/adminraw/js/dropzone.js')
+			  ->appendFile($baseurl.'/adminraw/js/highstock.js')			  	    
+			  ->appendFile($baseurl.'/adminraw/js/exporting.js')	
+			  ->appendFile($baseurl.'/adminraw/js/jquery.dd.js')	
+			  ->appendFile($baseurl.'/adminraw/js/common.js')	
+			  ->appendFile($baseurl.'/adminraw/js/dashboard.js')			  	    
+			  ->appendFile($baseurl.'/adminraw/js/jquery.cookie.js')	
+			  ->appendFile($baseurl.'/adminraw/js/jquery.form.js')			  	    
+			  ->appendFile($baseurl.'/adminraw/js/charts.js')
+			  ->appendFile($baseurl.'/adminraw/js/search.js')	
+			  ->appendFile($baseurl.'/adminraw/js/userfunctions.js')
+			  ->appendFile($baseurl.'/adminraw/js/reporting.js')				      
+			  ->appendFile($baseurl.'/adminraw/js/othersearch.js')	    
+			  ->appendFile($baseurl.'/adminraw/js/specialdbs.js')
+			  ->appendFile($baseurl.'/adminraw/js/jquery-ui-timepicker-addon.js')
+			  ->appendFile($baseurl.'/adminraw/js/colpick/colpick.js')			  
+			  ->appendFile($baseurl.'/adminraw/js/banner.js')				  	    
+			  ->appendFile($baseurl.'/adminraw/js/globalsetting.js')
+			  ->appendFile($baseurl.'/adminraw/js/social.js')
+			  ->appendFile($baseurl.'/adminraw/js/select2/select2.min.js')
+			  ->appendFile($baseurl.'/js1/dbcrop.js');
+			 
+?>
+
+<script type="text/javascript" src="<?php echo BASE_URL; ?>/adminraw/js/jquery.tokeninput.js"></script>
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>/adminraw/css/token-input.css" type="text/css" />
+<script src="<?php echo BASE_URL; ?>/adminraw/js/tagit/tag-it.js" type="text/javascript" charset="utf-8"></script>
+<link href="<?php echo BASE_URL; ?>/adminraw/js/tagit/jquery.tagit.css" rel="stylesheet" type="text/css">
+<script charset="ISO-8859-1" src="//fast.wistia.com/assets/external/E-v1.js" async></script>
+	<?php  if( $currActive=='usergroup' || $currActive=='knowledgecenter' || $currActive=='myaccount' || $currActive=='savedcharts'){ ?>
+		<script type="text/javascript" src="<?php echo $baseurl;?>/adminraw/js/<?php echo $currActive; ?>.js"></script>
+	<?php  } ?>
+
+
+	<?php  if($currActiveAction=='vipgroups' || $currActiveAction=='listing' || $currActiveAction=='postreport' ){ ?>
+		<script type="text/javascript" src="<?php echo $baseurl;?>/adminraw/js/html2canvas.js"></script>
+		<script type="text/javascript" src="<?php echo $baseurl;?>/adminraw/js/jquery.plugin.html2canvas.js"></script>
+	<?php  } ?>
+
+	  
+
+	<?php
+	$this->myclientdetails = new Admin_Model_Clientdetails();
+
+	$resultArray = $this->myclientdetails->getRowMasterfromtable('tblConfiguration',array('ScoreNames'));
+	$scorSet = Zend_Json::decode($resultArray['ScoreNames']);
+	$scorCont = array();
+	foreach ($scorSet as $key => $value) {
+		if($key==1)  $scorCont['Love'] = $value['ScoreName'.$key];
+		if($key==2)  $scorCont['Like'] = $value['ScoreName'.$key];
+		if($key==3)  { $scorCont['Dis Like'] = $value['ScoreName'.$key]; $scorCont['DisLike'] = $value['ScoreName'.$key]; }
+		//if($key==4)  $scorCont['F O T'] = $value['ScoreName'.$key];
+		if($key==4)  $scorCont['Hate'] = $value['ScoreName'.$key];
+	} 
+	$scorSet = Zend_Json::encode($scorCont);
+
+	
+	$categorySet = $this->myclientdetails->getAllMasterfromtable('tblGroupTypes',array('TypeID','TypeName'),'',array('Priority'=>'DESC'));
+	$categorySetCnt = array();
+
+	foreach ($categorySet as $key => $value) {
+		  $categorySetCnt[$value['TypeID']] = $value['TypeName'];
+		
+	} 
+	$postCategorySet = Zend_Json::encode($categorySetCnt);
+
+	?>
+	
+    <script type="text/javascript">
+    		var SERVER_NAME = "<?php echo BASE_URL;?>";
+			var BASE_URL  = "<?php echo BASE_URL;?>";
+			var IMGPATH  = "<?php echo IMGPATH;?>";
+			var BASE_URL_FRONT = "<?php echo FRONT_URL;?>";
+			var SCORE_OPTION  = '<?php echo $scorSet;?>';
+			var GROUP_CATEGORIES  = <?php echo $postCategorySet;?>;
+			var PLATEFORM_SCORING = typeof ('<?php echo $this->plateform_scoring;?>') != 'undefined' ? '<?php echo $this->plateform_scoring;?>' : '';
+			var SESS_USER_ID 		=  "<?php echo $this->userid; ?>";
+        	var SESS2_USER_ID 		=  "<?php echo $this->userid; ?>";
+        	var clientID 		=  "<?php echo clientID; ?>";
+			var urlHash  = location.hash;
+			var localTick = true;
+			var isMobile = navigator.userAgent.match(/(iPad)|(iPhone)|(iPod)|(android)|(webOS)/i);
+			var jsonuserdetails = "";
+		$("document").ready(function(){
+			if(isMobile!=null){
+				$('html').addClass('deviceOn');
+				$('.headerTopContent .MainMenu > li > ul').closest('li').find('a:first').attr('href', 'javascript:void(0);');
+			}	
+			ajaxnotification();
+
+		});	
+	</script>
+<script type="text/javascript" src="<?php echo BASE_URL;?>/adminraw/js/jquery.autocomplete.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL;?>/adminraw/js/jquery.elastic.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL;?>/adminraw/js/underscore-min.js" ></script>
+<script type="text/javascript" src="<?php echo BASE_URL;?>/adminraw/js/jquery.mentionsInput.js"></script>
+
+<?php if ($_SERVER['SERVER_NAME'] != 'localhost' ) { ?>  
+<script> var localTick = false; </script>
+ <script src="<?php echo BASE_URL;?>/js1/socket.io.js"></script>  
+ <script src="<?php echo BASE_URL;?>/adminraw/js/app.js"></script>
+ <?php } ?> 
+
+ 
+<input type="hidden" id="BASE_URL" name="BASE_URL" value="<?php echo BASE_URL;?>">
+<?php  
+   $adminTut = array ( "videos1"  => array ( "title" => "Administration - Quick Summary","video" => "u40EdiekfMs",'controller'=>'index','action'=>'index'),
+                       "videos2"  => array ( "title" => "Dashboard Overview","video" => "hgmjo8_aTGo",'controller'=>'dashboard','action'=>'dbees'),
+                       "videos3"  => array ( "title" => "Video Posts and Surveys","video" => "6p6NfQqEvQk",'controller'=>'dashboard','action1'=>'specialdbs','action2'=>'survey'),
+                       "videos4"  => array ( "title" => "User Management and VIP Accounts","video" => "L_O3qiuLef8",'controller1'=>'user','action1'=>'index','controller2'=>'vipuser','action2'=>'index','controller3'=>'dashboard','action3'=>'vipgroups'),
+                       "videos5"  => array ( "title" => "Reports & Data Filtering","video" => "h17t37hHffc",'controller'=>'index','action'=>'index'),
+                       "videos6"  => array ( "title" => "Messages & Email Marketing","video" => "oy7vd_n49wo",'controller'=>'index','action'=>'index'),
+                       "videos7"  => array ( "title" => "Document Library","video" => "eEBpXPS89BI",'controller'=>'index','action'=>'index'),
+                       "videos8"  => array ( "title" => "Theme Settings & Email Templates","video" => "048K-WeiDuE",'controller'=>'index','action'=>'index'),
+                       "videos9"  => array ( "title" => "Platform Settings","video" => "Q3dCP2W45gw",'controller'=>'index','action'=>'index')
+                    );
+   
+  if($adminTut['videos1']['controller']==$currActive && $adminTut['videos1']['action']==$currActiveAction){
+  	  $videohelp =$adminTut['videos1']['title'];
+  }
+  if($adminTut['videos2']['controller']==$currActive && $adminTut['videos2']['action']==$currActiveAction){
+  	  $videohelp =$videohelp =$adminTut['videos2']['title'];
+  }
+  if(($adminTut['videos3']['controller']==$currActive && $adminTut['videos3']['action1']==$currActiveAction) || ($adminTut['videos3']['controller']==$currActive && $adminTut['videos3']['action2']==$currActiveAction)){     
+  	  $videohelp =$videohelp =$adminTut['videos3']['title'];
+  }
+  if(($adminTut['videos4']['controller1']==$currActive && $adminTut['videos4']['action1']==$currActiveAction) || ($adminTut['videos4']['controller2']==$currActive && $adminTut['videos4']['action2']==$currActiveAction) || ($adminTut['videos4']['controller3']==$currActive && $adminTut['videos4']['action3']==$currActiveAction)){     
+  	  $videohelp =$videohelp =$adminTut['videos4']['title'];
+  }
+
+  
+
+?>
+</head>
+<body>
+
+<div class="overlayPopup">
+	<a href="javascript:void(0)" class="fa fa-times-circle"></a>
+</div>
+<!--Start header form here-->
+  <?php 
+     $acl = Zend_Registry::get('aclTawarlina');
+     $authNamespace = new Zend_Session_Namespace('identify');
+     $authNamespace->setExpirationSeconds((1209600));
+     $role_id = $authNamespace->role;
+     $Roledetails = new Admin_Model_User();
+	 $AllRoledetails = $Roledetails->Rolesforacl($role_id);
+
+
+  ?>
+	<div id="header">
+		<div class="headerTop">
+			<div class="headerTopContent">			
+				<a href="#" class="closeMenu pull-right"><i class="fa fa-bars fa-2x"></i></a>
+				<ul class="MainMenu">
+					<?php if($acl->isAllowed($AllRoledetails[0]['role'],'dashboard','post')=='1' || $acl->isAllowed($AllRoledetails[0]['role'],'dashboard','comments')=='1' || $acl->isAllowed($AllRoledetails[0]['role'],'dashboard','groups')=='1' || $acl->isAllowed($AllRoledetails[0]['role'],'dashboard','notification')=='1' || $acl->isAllowed($AllRoledetails[0]['role'],'dashboard','scores')=='1' ){?>
+					<li class="<?php echo $homeActive;?>">
+
+						<?php if($acl->allow($AllRoledetails[0]['role'],'index',array('index'))){?>
+						<a href="<?php  echo BASE_URL.'/admin' ;?>"  title="Dashboard" rel="dbTip">
+							<i class="mMenu iconDashboard"></i>
+							<span>Dashboard</span>
+						</a>
+						<?php } ?>                       
+						<ul>
+							<?php if($acl->isAllowed($AllRoledetails[0]['role'],'dashboard','post')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin' ;?>">Dashboard</a></li><?php } 
+							if($acl->isAllowed($AllRoledetails[0]['role'],'dashboard','post')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin/dashboard/post' ;?>">Posts</a></li><?php } 
+							if($acl->isAllowed($AllRoledetails[0]['role'],'dashboard','comments')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin/dashboard/comments' ;?>">Comments</a></li><?php } 
+							if($acl->isAllowed($AllRoledetails[0]['role'],'dashboard','groups')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin/dashboard/groups' ;?>">User created groups</a></li><?php } 
+						    if($acl->isAllowed($AllRoledetails[0]['role'],'dashboard','notification')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin/dashboard/notification' ;?>">Notifications</a></li><?php } 
+							if($acl->isAllowed($AllRoledetails[0]['role'],'dashboard','scores')=='1'){?>
+							<?php if($this->plateform_scoring==0) {?>
+							<li><a href="<?php  echo BASE_URL.'/admin/dashboard/scores' ;?>">Live scoring</a></li><?php }} ?>
+						</ul>
+						<!--<div class="subMenu"></div>-->
+					</li>
+					<?php } if($acl->isAllowed($AllRoledetails[0]['role'],'dashboard','post')=='1' || $acl->isAllowed($AllRoledetails[0]['role'],'dashboard','specialdbs')=='1' || $acl->isAllowed($AllRoledetails[0]['role'],'livebroadcasts','index')=='1' || $acl->isAllowed($AllRoledetails[0]['role'],'survey','index')=='1'){?>
+					<li class="<?php echo $postsActive;?>">
+                    <?php if($acl->isAllowed($AllRoledetails[0]['role'],'dashboard','post')=='1'){ ?>              
+						<a href="javascript:void(0);" title="Post" rel="dbTip">
+							<i class="mMenu iconPosts"></i>
+							<span>Posts</span>
+						</a>
+                    	<?php }else{?>
+							<a title="Post" rel="dbTip">
+							<i class="mMenu iconPosts"></i>
+							<span>Posts</span>
+						</a>
+						<?php };?>
+						<ul>
+						<?php if($acl->isAllowed($AllRoledetails[0]['role'],'dashboard','post')=='1'){?>
+						<li><a href="<?php  echo BASE_URL.'/admin/dashboard/post' ;?>">Posts</a></li>
+						<?php } if($acl->isAllowed($AllRoledetails[0]['role'],'dashboard','post')=='1'){?>
+						<li><a href="<?php  echo BASE_URL.'/admin/dashboard/post/task/create/' ;?>">Create post</a></li>
+						<?php } if($acl->isAllowed($AllRoledetails[0]['role'],'dashboard','specialdbs')=='1'){?>
+						<li><a href="<?php  echo BASE_URL; ?>/admin/dashboard/specialdbs/task/create/">Video broadcasts</a></li>
+						<?php } if($acl->isAllowed($AllRoledetails[0]['role'],'livebroadcasts','index')=='1'){
+
+					   $domainAPI = $this->myclientdetails->getRowMasterfromtable('domainAPI',array('clientType'));							
+							
+						if($domainAPI['clientType']==2 || $domainAPI['clientType']==3) { ?>
+						
+						<li><a href="<?php  echo BASE_URL; ?>/admin/livebroadcasts/">Live video broadcasts</a></li>
+
+						<?php } } if($acl->isAllowed($AllRoledetails[0]['role'],'survey','index')=='1'){?>
+						<li><a href="<?php  echo BASE_URL.'/admin/survey/index/task/create/' ;?>">Surveys</a></li><?php } ?>
+						</ul>
+					</li>
+                     
+                     <?php } if($acl->isAllowed($AllRoledetails[0]['role'],'manageroles','index')=='1'){?>
+					<li class="<?php echo $userActive;?>">
+						<a href="<?php  echo BASE_URL.'/admin/manageroles' ;?>" title="Manage sub-admins" rel="dbTip">
+							<i class="mMenu iconSubAdmin"></i>
+							<span>Manage sub-admins</span>
+						</a>
+						<ul>
+							<li><a href="<?php  echo BASE_URL.'/admin/manageroles' ;?>">Manage sub-admins</a>
+							</li>
+							<li><a href="<?php  echo BASE_URL.'/admin/manageroles/rolesresource' ;?>">Roles & Permissions</a>
+							</li>
+							<li><a href="<?php  echo BASE_URL.'/admin/manageroles' ;?>">Create sub-admin</a>
+							</li>							
+						</ul>
+					</li>
+					<?php } if($acl->isAllowed($AllRoledetails[0]['role'],'event','index')=='1'){?>
+					<li class="<?php echo $postsActive;?>">
+					<a rel="dbTip" href="<?php  echo BASE_URL.'/admin/event' ;?>" title="Events">	
+					<i class="mMenu iconEvent"></i>				
+					<span>Events</span>
+					</a>
+					</li><?php }
+					 if($acl->isAllowed($AllRoledetails[0]['role'],'user','index')=='1' || $acl->isAllowed($AllRoledetails[0]['role'],'user','invitesocial')=='1'){
+
+					 	$totRequest = $this->myclientdetails->passSQLquery("select count(UserID) as tot from tblUsers where Status=2  AND clientID= ".clientID);
+					 	?>
+					<li class="<?php echo $userActive;?>">
+						<?php 
+							if($totRequest[0]['tot']>0) 
+							echo '<span style="padding: 4px; color: red; background: #ffc03a; position: absolute; right: 0px; z-index: 1; border-radius: 50%; width: 20px; height: 20px; top: -5px;">'.$totRequest[0]['tot'].'</span>';
+						?>
+						<?php if($acl->isAllowed($AllRoledetails[0]['role'],'user','index')=='1'){ ?>
+						<a href="<?php  echo BASE_URL.'/admin/user' ;?>" title="Users" rel="dbTip">
+							<i class="mMenu iconUsers"></i>
+							<span>Users</span>
+						</a>
+						<?php }else{?>
+						<a title="Users" rel="dbTip">
+							<i class="mMenu iconUsers"></i>
+							<span>Users</span>
+						</a> 
+						<?php };?>
+						<!-- <ul >
+							<?php if($acl->isAllowed($AllRoledetails[0]['role'],'user','index')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin/user' ;?>">Users </a></li>
+							<?php } if($acl->isAllowed($AllRoledetails[0]['role'],'user','index')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin/user' ;?>"> User accounts</a></li>
+							<?php } if($acl->isAllowed($AllRoledetails[0]['role'],'user','invitesocial')=='1'){
+								if(clientID!='21' && clientID!='22')
+								{?>
+							<li><a href="<?php  echo BASE_URL.'/admin/user/invitesocial' ;?>">Invite social connections</a></li>
+							<?php } } ?>
+
+							<li>
+								<a href="<?php  echo BASE_URL.'/admin/user/promotedexpert' ;?>">Promoted Expert</a>
+							</li> 
+							
+						</ul> -->
+					</li><?php } 
+					/*if(clientID!='21' && clientID!='22')
+					{
+					 if($acl->isAllowed($AllRoledetails[0]['role'],'vipuser','index')=='1' || $acl->isAllowed($AllRoledetails[0]['role'],'usertype','index')=='1' || $acl->isAllowed($AllRoledetails[0]['role'],'vipuser','vipgroups')=='1' ){?>
+						<li class="<?php echo $cusActive;?>">
+                        <?php if($acl->isAllowed($AllRoledetails[0]['role'],'vipuser','index')=='1'){ ?>
+						<a href="<?php  echo BASE_URL.'/admin/vipuser';?>" title="VIP Users" rel="dbTip">
+							<i class="mMenu iconcusUsers"></i>
+							<span>Custom users</span>
+						</a>
+                        <?php }else{?>
+						<a title="VIP Users" rel="dbTip">
+							<i class="mMenu iconcusUsers"></i>
+							<span>Custom users</span>
+						</a>
+						<?php };?>
+						<ul>
+						  <?php if($acl->isAllowed($AllRoledetails[0]['role'],'vipuser','index')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin/vipuser';?>">VIP users</a></li>
+							<?php } if($acl->isAllowed($AllRoledetails[0]['role'],'vipuser','index')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin/vipuser';?>">VIP user accounts</a></li>
+							<?php } if($acl->isAllowed($AllRoledetails[0]['role'],'usertype','index')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin/usertype/index' ;?>">VIP user types</a>
+							</li>
+							<?php } if($acl->isAllowed($AllRoledetails[0]['role'],'vipuser','vipgroups')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin/vipuser/vipgroups';?>">VIP user groups</a></li>
+							<?php } ?>
+						</ul>
+						</li><?php } 
+					}*/
+					 if($acl->isAllowed($AllRoledetails[0]['role'],'usergroup','listing')=='1'){?>
+					<li class="<?php echo $usergrpActive;?>">
+						<a href="<?php  echo BASE_URL.'/admin/usergroup/listing';?>" title="Admin User Sets" rel="dbTip">
+							<i class="mMenu iconUsersgrp"></i>
+							<span>Admin user groups</span>
+						</a>
+					</li>
+                    <?php } 
+					 if($acl->isAllowed($AllRoledetails[0]['role'],'reporting','index')=='1'){?>
+					<li class="<?php echo $reptActive;?>">
+						<a href="<?php echo BASE_URL.'/admin/reporting/index';?>" title="Reports" rel="dbTip">
+							<i class="mMenu iconReporting"></i>
+							<span>Reporting</span>
+						</a>
+						<ul id="reportListingMenu">
+							<?php if($acl->isAllowed($AllRoledetails[0]['role'],'reporting','index')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin/reporting' ;?>">Reports</a></li>
+							<?php } ?>
+							<?php if($acl->isAllowed($AllRoledetails[0]['role'],'reporting','index')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin/message/report' ;?>">Email stats</a></li>
+							<?php } ?>
+							<?php if($acl->isAllowed($AllRoledetails[0]['role'],'reporting','index')=='1'){?>
+                           <!--  <li><a href="<?php  echo BASE_URL.'/admin/influence' ;?>">influencers</a></li> -->
+                            <?php } ?>
+                            <?php if($acl->isAllowed($AllRoledetails[0]['role'],'reporting','index')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin/reporting/hashtag' ;?>">Matching #tags</a></li>
+							<?php } ?>
+							<?php if($acl->isAllowed($AllRoledetails[0]['role'],'reporting','index')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin/reporting#visited' ;?>">Posts visited</a></li>
+							<?php } ?>
+							<?php if($acl->isAllowed($AllRoledetails[0]['role'],'reporting','index')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin/leaguescore' ;?>">Scoring</a></li>
+							<?php } ?>
+							<?php if($acl->isAllowed($AllRoledetails[0]['role'],'reporting','index')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin/reporting#category' ;?>">Similar interest based</a></li>
+							<?php } ?>
+							<?php if($acl->isAllowed($AllRoledetails[0]['role'],'reporting','index')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin/reporting#social' ;?>">Social sharing</a></li>
+							<?php } ?>
+							<?php if($acl->isAllowed($AllRoledetails[0]['role'],'reporting','index')=='1'){?>
+                            <li><a href="<?php  echo BASE_URL.'/admin/savedcharts/listing' ;?>">saved reports</a></li>
+                            <?php } ?>
+                            <?php if($acl->isAllowed($AllRoledetails[0]['role'],'reporting','index')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin/reporting/trackingvisits' ;?>">Track logins</a></li>
+							<?php }  ?>
+							<?php if($acl->isAllowed($AllRoledetails[0]['role'],'reporting','index')=='1'){?>
+                            <li><a href="<?php  echo BASE_URL.'/admin/reporting/twittercomments' ;?>">Twitter usage</a></li>
+                            <?php } ?>
+                            <?php if($acl->isAllowed($AllRoledetails[0]['role'],'reporting','index')=='1'){?>
+                            <li><a href="<?php  echo BASE_URL.'/admin/reporting/topusers' ;?>">User cross referencing</a></li>
+                            <?php } ?>
+                            <?php if($acl->isAllowed($AllRoledetails[0]['role'],'reporting','index')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin/reporting/locations' ;?>">User location</a></li>
+							<?php } ?>
+							<?php if($acl->isAllowed($AllRoledetails[0]['role'],'reporting','index')=='1'){?>
+                            <!-- <li><a href="<?php  echo BASE_URL.'/admin/reporting#email' ;?>">Email Providers</a></li> -->
+                            <?php } ?>
+                            <?php if($acl->isAllowed($AllRoledetails[0]['role'],'reporting','index')=='1'){?>
+                            <!-- <li><a href="<?php  echo BASE_URL.'/admin/reporting#browser' ;?>">Browser Sources</a></li> -->
+                            <?php } ?>
+                            <?php if($acl->isAllowed($AllRoledetails[0]['role'],'reporting','index')=='1'){?>
+                            <!-- <li><a href="<?php  echo BASE_URL.'/admin/reporting#os' ;?>">Users OS</a></li> -->
+                            <?php } ?>
+						</ul>
+					</li>
+					<?php } if($acl->isAllowed($AllRoledetails[0]['role'],'message','index')=='1'){?>
+					<li class="<?php echo $msgActive;?>">
+						<a href="<?php echo BASE_URL.'/admin/message/index';?>" title="Messaging" rel="dbTip">
+							<i class="mMenu iconMessage"></i>
+							<span>Messaging</span>
+						</a>
+						<ul id="messagereportListingMenu">
+							<?php if($acl->isAllowed($AllRoledetails[0]['role'],'message','index')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin/message' ;?>">Messaging</a></li>
+							<?php } if($acl->isAllowed($AllRoledetails[0]['role'],'message','index')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin/message' ;?>">Create & Send</a></li>
+							<?php } ?>	
+						</ul>
+					</li>
+                    <?php } if($acl->isAllowed($AllRoledetails[0]['role'],'dbeeauth','index')=='1'){?>
+					<li class="<?php echo $dbeeauthActive;?>">
+						<a href="<?php echo BASE_URL.'/admin/dbeeauth/index';?>" title="Super admin task" rel="dbTip">
+							<i class="mMenu iconMessage"></i>
+							<span>Super admin task</span>
+						</a>
+						<ul id="messagereportListingMenu">
+							<?php if($acl->isAllowed($AllRoledetails[0]['role'],'dbeeauth','index')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin/dbeeauth/index' ;?>">Super admin Task</a></li>
+							<?php } /*if($acl->isAllowed($AllRoledetails[0]['role'],'dbeeauth','index')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin/dbeeauth/task2' ;?>">Task2</a></li>
+							<?php }*/ ?>	
+						</ul>
+					</li>
+                    <?php } 
+                    if($acl->isAllowed($AllRoledetails[0]['role'],'knowledgecenter','index')=='1'){?>
+					<li class="<?php echo $knctActive;?>">
+						<a href="<?php echo BASE_URL.'/admin/knowledgecenter/index';?>" title="Document Library" rel="dbTip">
+							<i class="mMenu iconKnowledgeCenter"></i>
+							<span>Document library</span>
+						</a>
+					</li>
+                    <?php } 
+                    if($acl->isAllowed($AllRoledetails[0]['role'],'advertisement','index')=='1' || $acl->isAllowed($AllRoledetails[0]['role'],'advertisement','trackreport')=='1'){?>
+					<li class="<?php echo $advtActive;?>">
+						<?php if($acl->isAllowed($AllRoledetails[0]['role'],'advertisement','index')=='1'){ ?>
+						<a href="<?php  echo BASE_URL.'/admin/advertisement' ;?>" title="Advertising" rel="dbTip">
+							<i class="mMenu iconAdvertisment"></i>
+							<span>Advertising</span>
+						</a>
+                        <?php }else{?>
+						<a title="Advertising" rel="dbTip">
+							<i class="mMenu iconAdvertisment"></i>
+							<span>Advertising</span>
+						</a>
+                        <?php };?>
+						<ul>
+							<?php if($acl->isAllowed($AllRoledetails[0]['role'],'advertisement','index')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin/advertisement' ;?>">Advertising</a></li>
+							<?php } if($acl->isAllowed($AllRoledetails[0]['role'],'advertisement','index')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin/advertisement' ;?>">Manage ads</a></li>
+							<?php } if($acl->isAllowed($AllRoledetails[0]['role'],'advertisement','trackreport')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin/advertisement/trackreport' ;?>">Ad tracking</a></li>
+							<?php } ?>
+						</ul>
+					</li>
+                    <?php } 
+                    if($acl->isAllowed($AllRoledetails[0]['role'],'platformsettings','themesetting')=='1' || $acl->isAllowed($AllRoledetails[0]['role'],'emailtempsetting','index')=='1'){?>
+					<li class="<?php echo $themeActive;?>">
+                        <?php if($acl->isAllowed($AllRoledetails[0]['role'],'platformsettings','themesetting')=='1'){ ?>
+						<a href="<?php echo BASE_URL.'/admin/platformsettings/themesetting';?>" title="Platform Settings" rel="dbTip">
+							<i class="mMenu iconAppearance"></i>
+							<span>Platform settings</span>
+						</a>
+						<?php }else{
+							if(clientID!=19){
+							?>
+						<a title="Platform Settings" rel="dbTip">
+						<i class="mMenu iconAppearance"></i>
+						<span>Platform settings</span>
+						</a>
+						<?php } };?>
+
+						<ul>
+							<?php if($acl->isAllowed($AllRoledetails[0]['role'],'platformsettings','themesetting')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin/platformsettings/themesetting' ;?>">Platform settings</a></li>
+							<?php } if($acl->isAllowed($AllRoledetails[0]['role'],'platformsettings','themesetting')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin/platformsettings/themesetting' ;?>">Theme configuration</a></li>
+							<?php } if($acl->isAllowed($AllRoledetails[0]['role'],'emailtempsetting','index')=='1'){?>
+							<li><a href="<?php  echo BASE_URL.'/admin/emailtempsetting' ;?>">Email templates</a></li>
+							<?php } ?>
+						</ul>
+					</li>
+					<?php }
+
+					if($acl->isAllowed($AllRoledetails[0]['role'],'widgets','feed')=='1'){?>
+					<li class="<?php echo $knctActive;?>">
+						<a href="<?php echo BASE_URL.'/admin/widgets/feed';?>" title="widgets" rel="dbTip">
+							<i class="mMenu iconWidgetsIcon" ></i>
+							<span>Widgets</span>
+						</a>
+					</li>
+                    <?php } 
+
+                    if($acl->isAllowed($AllRoledetails[0]['role'],'Restrictedurl','profanityfilter')=='1' || $acl->isAllowed($AllRoledetails[0]['role'],'Restrictedurl','index')=='1'){?>
+					<li class="<?php echo $settingsActive;?>">
+                        <?php if($acl->isAllowed($AllRoledetails[0]['role'],'Restrictedurl','profanityfilter')=='1'){ ?>
+						<a href="<?php echo BASE_URL.'/admin/Restrictedurl/';?>profanityfilter" title="Content Restrictions" rel="dbTip">
+							<i class="mMenu iconRestriction"></i>
+							<span>Content restrictions</span>
+						</a>
+						<?php }else{?>
+						<a title="Content Restrictions" rel="dbTip">
+							<i class="mMenu iconRestriction"></i>
+							<span>Content restrictions</span>
+						</a>
+						<?php };?>
+					<ul>
+						<?php if($acl->isAllowed($AllRoledetails[0]['role'],'Restrictedurl','profanityfilter')=='1'){?>
+						<li><a href="<?php  echo BASE_URL.'/admin/Restrictedurl/profanityfilter' ;?>">Content restrictions</a></li>
+						<?php } if($acl->isAllowed($AllRoledetails[0]['role'],'Restrictedurl','profanityfilter')=='1'){?>			
+							<li><a href="<?php  echo BASE_URL.'/admin/Restrictedurl/profanityfilter' ;?>">Profanity / keyword filter</a></li>
+						<?php } if($acl->isAllowed($AllRoledetails[0]['role'],'Restrictedurl','index')=='1'){?>	
+							<li><a href="<?php  echo BASE_URL.'/admin/Restrictedurl/index';?>">Restricted URLs</a></li>
+						<?php } ?>	
+					</ul>
+					</li>
+					<?php } 
+                     if($acl->isAllowed($AllRoledetails[0]['role'],'myaccount','configuration')=='1' || $acl->isAllowed($AllRoledetails[0]['role'],'myaccount','globalsettings')=='1' ){?>
+					<li class="<?php echo $settingsActive;?>">
+						<?php if($acl->isAllowed($AllRoledetails[0]['role'],'myaccount','globalsettings')=='1'){ ?>
+						<a href="<?php echo BASE_URL.'/admin/myaccount/globalsettings';?>" title="Settings" rel="dbTip">
+							<i class="mMenu iconCog"></i>
+							<span>Settings</span>
+						</a>
+						<?php }else{?>
+                        <a title="Settings" rel="dbTip">
+							<i class="mMenu iconCog"></i>
+							<span>Settings</span>
+						</a>
+						<?php }?>
+						
+						<?php/* 
+							if($acl->isAllowed($AllRoledetails[0]['role'],'myaccount','globalsettings')=='1'){?>
+								<li><a href="<?php echo BASE_URL.'/admin/myaccount/globalsettings';?>">Settings</a></li>
+								<li><a href="<?php echo BASE_URL.'/admin/myaccount/globalsettings';?>">Global Settings</a></li>
+							<?php } if($acl->isAllowed($AllRoledetails[0]['role'],'myaccount','configuration')=='1'){?>	
+								<li><a href="<?php echo BASE_URL.'/admin/myaccount/configuration';?>">General Settings</a></li>
+							<?php } */ ?>	
+						
+
+					</li>
+                    <?php } ?>
+				</ul>
+				
+
+				<div class="clearfix"></div>
+			</div>
+		</div>
+		<div class="headerBottom"></div>
+	</div>
+	<!--end header form here-->
+	<div class="subMenu"></div>
+<div id="topHeader">
+	<a href="javascript:void(0)" class="menuView" id="menuView"><i class="fa fa-bars fa-2x"></i></a>
+	<div class="logoWrapper">
+		<a href="<?php echo BASE_URL?>/admin" class="logoDbee">
+			<img src="<?php echo BASE_URL?>/adminraw/img/clientLogo.png" />
+		</a>					
+	</div>
+	<a href="<?php echo BASE_URL?>/myhome" class="btn btn-large btn-yellow goToPlatform">Go to platform</a>
+	<div class="searchAdvance ">
+		                <?php  if($this->session_data['role']==1){?>
+						<div class="srcMainWrapper">
+							<input type="text" name="commonsearch" id="commonsearch" class="" placeholder="Search user / keyword"  value=" " />
+						</div>
+						<?php } ?>
+					<div class="dropDown pull-left advancesSearchWrp">
+						<?php  if($this->session_data['role']==1){?>
+						<div class="dropDownTarget searchMain">
+							Advanced Search  
+						</div>
+						<?php } ?>
+							<div  class="dropDownList left">
+								<?php  if($this->session_data['role']==1){?><h2 class="topTitleSearch">Advanced Search <a href="javascript:void(0)" class="fa fa-times-circle"></a></h2><?php } ?>
+								<form class="popupHeader" name=""></form>
+									<form id="searchAdvanceForm">
+									
+									<div class="popupContent">
+										<div class="loadFilterWrp"  id="selectLoadFilter" style="display:none">
+
+										<?php
+										$filter		=	new Admin_Model_Searchfilter();
+										$getFilters	=	$filter->loadFilters($this->userid,'1');
+										 ?>
+											<?php
+											foreach ($getFilters as $key => $value)
+											{
+												echo '<div class="whiteBox conditiontext conditionRow filterRows" data-value="'.$value['filter_id'].'"> 
+														<span>'.$value['filter_name'].'</span>
+														<button type="button" class="removeFilter btn-mini btn pull-right"> Remove</button> 
+														<button type="button" class="loadFilter btn btn-mini pull-right"> Load</button> 
+													</div>';
+											} ?>
+
+										</div>
+										<div class="saveFilterWrapper">
+											<div class="subPopupContainer">
+												<form class="right">
+												<div class="formRow">
+													<label class="label">Name:</label>
+													<div class="field">
+														<input type="text" value="" placeholder="" id="fname" name="filterName" maxlength="20">
+													</div>
+												</div>
+											</form>
+											</div>
+											<div class="popupFooterWrapper">
+												<button type="button" class="btn btn-green" id="saveFilterName"><i class="fa fa-filter"> </i> Save filter</button>
+												<button type="button" class="btn cancelSaveFilter"><i class="fa fa-times-sign"> </i>Cancel</button>
+											</div>
+										</div>
+										
+										<h2 class="notfound" style="display:block;color:#000;">You can 'advanced search' by choosing a query selection and pressing 'Add'. You can add multiple query selections to an advanced search and save the selection as a custom filter for future searches.</h2>
+
+									</div>
+									<div class="popupFooter">
+										<button type="button" id="advanceSearchBtn" class="btn btn-yellow pull-right"><i class="fa fa-search fa-lg"></i> Search</button>
+										<button type="button" class="btn pull-right" id="clearSearchFilters" style="display:none"><i class="fa fa-minus fa-lg"></i> Clear all</button>
+										<button type="button" class="btn pull-right" id="saveSearchCondition" style="display:none"><i class="fa fa-save fa-lg"></i> Save</button>
+										<?php if(count($getFilters)==0) $showFilterBtn = 'display:none'; ?>
+										<button type="button" class="btn pull-left btn-yellow" id="loadFilterAdv" style="<?php echo $showFilterBtn; ?>"><i class="fa fa-filter fa-lg"></i> Load filter</button>
+										<div class="clearfix"></div>
+									</div>
+
+								</form>
+
+							</div>
+						</div>		
+					</div>		
+	<div class="headerRightBox">
+		<a href="<?php  echo BASE_URL.'/admin/logout'?>" class="fa fa-power-off fa-3x" title="Log out"></a>
+		<a href="" class="reloadPage" title="Refresh">
+         <i class="fa fa-repeat fa-2x"></i>
+		</a>
+		<?php  if($this->session_data['role']==1){?>
+		<a href="<?php  echo BASE_URL.'/admin/dashboard/notification'?>" class="notificationAlertBell" title="Notifications"><i class="fa fa-bell "></i><span>New</span></a>
+		<?php } ?>		
+		<a href="javascript:void(0);" class="fa  fa-search fa-3x topHeaderSearch" ></a>
+	</div>
+</div>
+	<!--Start container form here-->
+	<div id="container">
+	<?php
+	
+		if(strtolower($currActive)=='index' && strtolower($currActiveAction)=='index')
+		{ ?>
+	
+		<div class="notifyDataBox">
+			 <h1>Activity since you last logged in <i class="fa fa-close fa-lg closeNofifyBtn"></i></h1>
+			<div class="autoScroll">			
+			      <ul class="notifyListItem">		 
+				<?php
+					require_once 'includes/globalfileadmintopNotification.php';
+
+				 	$beforelogin = $this->myconfigdetails->AllactivityAdminbeforeLogin();
+
+				 if(count($beforelogin)>0)
+				 {
+				 	$notCount = 0;
+				 	foreach ($beforelogin as $key => $value) {
+				 		if($value['act_message']!='')
+				 		{
+					?>	         	 
+			         	 <li><?php echo  $topAdminactivityaMsg[$value['act_message']] .' : <span>'.$value['actTot']?></span> </li>
+
+			        <?php $notCount++;
+			         } }
+			     } else { ?>
+		        
+		         	 <div class="notifyListItem">         	 	
+		         	 	<h1>No activity found</h1>         	 	
+		         	 </div>         
+		          <?php } ?> 
+		          </ul> 
+        </div>
+        </div>
+        <?php } ?>
+		<div class="pageContainer">
+			<div id="successMsg" class="message success" style="display:none"></div>
+			<div id="errorMsg" class="message error" style="display:none"></div>
+			
+			<div class="clearfix"></div>
+			<div class="pageContent clearfix">
+				<?php echo $this->layout()->content; ?>		
+			</div>
+		</div>
+	</div>
+	<!--end container form here-->
+
+	<!--Start footer form here-->
+	<div id="footer">		
+		<a class="ftexpand" href="javascript:void(0);"></a>
+		<div class="ftContainer"> 
+			<div class="ftRight">
+				<div>Copyright 2013 & All Rights Reserved by My Planet Life Limited</div>
+			</div>
+			<div class="clearfix"></div>
+		</div>
+	</div>
+	<!--end footer form here-->
+	<!--Dialog box start from here-->
+		<div id="dialogLineGraph">
+			<div class="tipTotalbox">
+				<ul>
+					<li class="dbTotal"><h2><span>Dbee</span>24232</h2></li>
+					<li class="scoreTotal"><h2><span>Scores</span>24232</h2></li>
+					<li class="GroupsTotal"><h2><span>Groups</span>24232</h2></li>
+					<li class="CommentsTotal"><h2><span>Comments</span>24232</h2></li>
+				</ul>
+			</div>
+		</div>
+	<!--End Dialog box from here-->
+</body>
+</html>

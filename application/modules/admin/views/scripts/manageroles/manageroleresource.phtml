@@ -1,0 +1,70 @@
+<script>
+$(document).ready(function() {
+	//$('.rolecheckboxt').trigger('click');
+	//btn btn-black btn-medium pull-right openSearchBlock
+});
+</script>
+<?php  
+$request = $this->request;       
+$this->title = "Manage roles & resource";
+$this->headTitle($this->title);
+?>
+<h1 class="pageTitle ">Manage role permissions <a class="pull-right btn btn-black" type="submit" value="<< Back" name="submit" href="<?php echo $this->url(array('controller'=>'manageroles','action'=>'rolesresource'));?>">Back</a></h1>
+
+<div class="clearfix"></div>
+
+<form name="userform" id="userform" roleid="<?php echo $this->Roleid;?>">   
+	<div class="responsiveTable">
+		<table class="table-border userListTable table table-hover table-stripe" id="userRolesTable">
+			<thead>
+				<?php  if (count($this->paginator)){ ?>
+				<?php $rowchange	=	0; 
+				?> 
+				<tr>
+				    <td colspan="8">
+				    	<div class="clearfix">
+							<form action="" method="post">
+								<div>
+									<div class="pull-left" style="font-weight:normal; line-height: 28px;">Permissions for <span style="font-weight:bold"><?php echo $this->Rolename;?></span></div>
+
+										<a class="btn btn-green btn-mini addroleresourceval pull-right">
+										    <i class="fa fa-eye-open"></i>
+										 Save permissions
+										</a>
+								</div>						
+							</form>
+						</div>
+					</td>			    
+				</tr>
+				<tr>
+				    <td style="width: 100px;">Select</td>
+				    <td>Assigned Resource</td> 
+				</tr>
+			</thead>
+			<tbody>
+				<?php foreach($this->paginator as $resourcedata) : ?>
+				<?php if($rowchange%2==1) {$color = '#CCC';} else {$color ='#FFF';} ?>
+				<tr resourceid="rolelist_<?php echo $this->escape($resourcedata['id']);?>">
+				    <td class="rolescheck">
+						<label>
+							<input class="rolecheckboxt" type="checkbox"  value="<?php echo $resourcedata['id'] ?>" parentid="<?php echo $resourcedata['parent_id'] ?>" id="_<?php echo $resourcedata['id'] ?>" roleid="<?php echo $this->Roleid;?>">
+							<label for="_<?php echo $resourcedata['id'] ?>"></label>
+						</label>
+					</td>
+				    <td>
+				    	<h3>
+				    		<label class="selectAllCheckBox">
+								<input type="checkbox" id="all_<?php echo $resourcedata['id'] ?>">
+								<label for="all_<?php echo $resourcedata['id'] ?>"></label>
+								<span>Select all</span>
+							</label>
+				    		<?php echo $this->escape($resourcedata['resource']);?>	
+				    	</h3>
+				    </td>
+				</tr>
+				<?php $rowchange++; endforeach; ?>
+					<?php }?>
+			</tbody>
+		</table>
+	</div>
+</form>

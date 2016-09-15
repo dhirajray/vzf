@@ -1,0 +1,91 @@
+<?php 
+$user=$this->user;
+$read=$_POST['read'];
+$mid=$this->parent;
+$cookieuser=$this->loginuser;
+$sendmessage=$this->sendmessage;
+
+$messages = $this->messages;
+$CurrDate=date('Y-m-d');
+$return='';
+$messagefeed='';
+$dates='';
+$this->myclientdetails = new Application_Model_Clientdetails();
+
+$messagefeed.='<div class="next-line"></div>
+<div id="message-feed-wrapper" class="message-feed-wrapper">';
+
+if(count($messages)>0) {	
+	
+foreach($messages as $rowMsg):
+
+$dates.='<div style="float:left; width:90px; margin-bottom:5px; margin-right:25px;">
+<img src="'.IMGPATH.'/users/medium/'.$userPic.'" width="90" height="90" border="0" /></div><div align="center" style="width:90px; margin-bottom:15px;"><b>'.$this->myclientdetails->customDecoding($rowMsg['Name']).'</b></div></div>';
+	
+			$ago=date('d M', strtotime($rowMsg['MsgDate']));
+		if($cookieuser==$rowMsg['MessageTo']) {
+			$ChkUser=$rowMsg['MessageFrom'];			
+		}
+		else {
+			$ChkUser=$rowMsg['MessageFrom'];			
+		}
+		$Msguser = $this->msguserhelper($ChkUser);
+		//echo'<pre>';print_r($Msguser);die;
+		$userName=$Msguser['Name'];
+		$userPic=$Msguser['ProfilePic'];
+	    $checkImage = new Application_Model_Commonfunctionality();
+        $pic1 = $checkImage->checkImgExist($userPic,'userpics','default-avatar.jpg');
+		if($cookieuser==$rowMsg['MessageFrom']) // MESSAGE NOT SENT BY PROFILE HOLDER
+			$messagefeed.='<div class="msgouter"><div class="imgfloatmsg" >
+			<img src="'.IMGPATH.'/users/small/'.$pic1.'" border="0" /></div>
+		<div class="default-speechwrapper-lightgrey speechWrpBox" >
+		<div class="msgTxtboxFeed"><span><b>ME</b></span><span class="msgdate">'.$ago.'</span><br />'.$this->myclientdetails->escape($rowMsg['Message']).'</div>
+		
+		</div></div>';
+		else // MESSAGE SENT BY PROFILE HOLDER
+			$messagefeed.='<div class="msgouter"><div class="imgfloatmsg-right">
+		<img src="'.IMGPATH.'/users/small/'.$pic1.'" border="0" /></div>
+		<div class="default-speechwrapper-darkgrey speechWrpBox">
+		<div class="msgTxtbox"><span><b>'.$this->myclientdetails->customDecoding($userName).'</b></span><span class="msgdate">'.$ago.'</span>
+		<br />'.$rowMsg['Message'].'</div>
+		</div></div>';
+		$i++;
+endforeach;
+}     
+else {
+	$messagefeed.='<div align="center" class="noFound" style="margin-top:140px;">message feed empty</div>';
+}
+
+$messagefeed.='</div>';
+if($reload==''){
+	if($sendmessage) {
+		$messagefeed.="<div id='message-reply-wrapper'>
+		<div id='message-reply-wrapper-2' class='message-reply-wrapper'>
+			<textarea id='message-reply' class='message-reply' placeholder='leave a message...'></textarea>
+		</div>
+		<div class='postMessagefotter'>
+			<a href='".BASE_URL."/message' class='btn'>Back to my messages</a>
+			<div class='btn btn-yellow pull-right' id='postmessagesend' onclick='javascript:postmessage();'>Send</div>
+		</div>
+		<div id='postmessagesendsucc'></div>
+		<input type='hidden' id='hiddenuser' value='".$user."'>
+		<input type='hidden' id='parent' value='".$mid."'></div>";
+	} else {
+		if($this->serarch=='')
+		$messagefeed.='<div class="user-blocked-box">You are blocked from sending a message.</div>';
+	}
+}
+
+// SELECT ALL MESSAGES THAT WERE EXCHANGED BETWEEN THESE USERS
+
+/*
+}
+else {
+	$messagefeed.="<input type='hidden' id='hiddenuser' value='".$user."'>";
+}*/
+
+$return=$dates.'~#~'.$messagefeed;
+//$return=$messagefeed;
+echo $return;
+
+?>

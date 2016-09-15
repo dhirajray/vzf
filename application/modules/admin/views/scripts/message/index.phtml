@@ -1,0 +1,115 @@
+<link  href="<?php echo BASE_URL."/adminraw/css/jquery.tagit.css"; ?>?v=<?php echo filemtime('/adminraw/css/jquery.tagit.css');?>" rel="stylesheet" type="text/css" media="all">
+<link  href="<?php echo BASE_URL."/adminraw/css/tagit.ui-zendesk.css"; ?>?v=<?php echo filemtime('/adminraw/css/tagit.ui-zendesk.css');?>" rel="stylesheet" type="text/css" media="all">
+<script type="text/javascript" src="<?php echo BASE_URL."/adminraw/js/tag-it.js"; ?>?v=<?php echo filemtime('/adminraw/js/tag-it.js');?>"></script>
+<script type="text/javascript" src="<?php echo BASE_URL."/adminraw/js/message.js"; ?>?v=<?php echo filemtime('/adminraw/js/message.js');?>"></script>
+
+<h1 class="pageTitle">Messages</h1>
+<div id="messageWrapper" >	
+		<ul class="dbtab">
+			<li class="active"><a href="#" forContent="allUsers" msgType="1">All users</a></li>
+			<?php if($this->siteuserGroupsCnt!=0){ ?>
+			<li><a href="#" forContent="adminGroupUsers" msgType="2" checkValue="<?php echo $this->siteuserGroupsCnt ?>">Admin user sets</a></li>
+			<?php } /*if($this->publicGroupsCnt!=0 && $this->privateGroupsCnt!=0 && $this->requestGroupsCnt!=0){*/ ?>
+			<li><a href="#" forContent="groupUsers" msgType="3" checkValuepub="<?php echo $this->publicGroupsCnt ?>" checkValuepri="<?php echo $this->privateGroupsCnt ?>" checkValuereq="<?php echo $this->requestGroupsCnt ?>" id="userGroups">User Groups</a></li>
+			<?php /* }*/ if($this->allEventlistCnt!=0){ ?>
+			<li><a href="#" forContent="eventsUsers" msgType="5" checkValue="<?php echo $this->allEventlistCnt ?>">Events</a></li>
+			<?php } ?>
+			<li><a href="#" forContent="searchUsers" msgType="4">Search users</a></li>
+		</ul>
+		<div id="msgCntWraper"> </div>
+		<div id="userlistmsg"></div>
+		<ul class="mgSelectOptWrp">
+			<!--<?php if($this->publicGroupsCnt!=0){ ?>-->
+			<li>
+				<div class="searchField grpNameWrapper publicGroup">
+					<label class="label">User Group name </label>
+					<div class="fieldInput">
+							<select name="groupNameSelect" class="selectoptMsg" dataName="Public" >
+								<?php  foreach($this->publicGroups as $key => $groupval){ ?>
+									<option value="<?php echo $groupval['ID'];?>" id="<?php echo $groupval['ID'];?>" countgroup="<?php echo $groupval['cnt'];?>"><?php echo $groupval['GroupName'];?></option>
+								<?php } ?>
+							</select>											
+					</div>
+				</div>
+			</li>
+			<!--<?php } if($this->privateGroupsCnt!=0){ ?>-->
+			<li>
+				<div class="searchField grpNameWrapper privateGroup">
+					<label class="label">User Group name </label>
+					<div class="fieldInput">
+						<select name="groupNameSelect" class="selectoptMsg" dataName="Private">
+							<?php foreach($this->privateGroups as $key => $groupval){ ?>
+								<option value="<?php echo $groupval['ID'];?>" id="<?php echo $groupval['ID'];?>" countgroup="<?php echo $groupval['cnt'];?>"><?php echo $groupval['GroupName'];?></option>
+							<?php } ?>
+						</select>											
+					</div>
+				</div>
+			</li>
+			<!--<?php } if($this->requestGroupsCnt!=0){ ?>-->
+			<li>
+				<div class="searchField grpNameWrapper requestGroup">
+					<label class="label">User Group name </label>
+					<div class="fieldInput">
+						<select name="groupNameSelect" class="selectoptMsg" dataName="Request">
+							<?php foreach($this->requestGroups as $key => $groupval){ ?>
+								<option value="<?php echo $groupval['ID'];?>" id="<?php echo $groupval['ID'];?>" countgroup="<?php echo $groupval['cnt'];?>"><?php echo $groupval['GroupName'];?></option>
+							<?php } ?>
+						</select>											
+					</div>
+				</div>
+			</li>
+			<!--<?php } ?>-->
+			<li >
+				<div class="searchField">
+					<label class="label">Admin user set </label>
+					<div class="fieldInput">
+						<select name="siteusernameval" class="selectoptMsg" dataName="siteusernameval">
+							<?php  foreach($this->siteuserGroups as $key => $situsergroupval){ ?>
+								<option value="<?php echo $situsergroupval['ugid'];?>" id="<?php echo $situsergroupval['ugid'];?>" countgroup="<?php echo $situsergroupval['cnt'];?>"><?php  echo $situsergroupval['ugname'];?></option>
+							<?php } ?>
+						</select>											
+					</div>
+				</div>
+			</li>
+			<li>
+				<div class="searchField">
+					<label class="label">Events </label>
+					<div class="fieldInput">
+						<select name="eventeusernameval" class="selectoptMsg" dataName="eventeusernameval">
+							<?php  foreach($this->allEventlists as $key => $allEventlistsval){ 
+								?>
+								<option value="<?php echo $allEventlistsval['id'];?>" id="<?php echo $allEventlistsval['id'];?>"><?php  echo $allEventlistsval['title'];?></option>
+							<?php } ?>
+						</select>											
+					</div>
+				</div>
+			</li>
+			
+			<li>
+				<div class="searchField">
+					<label class="label">Search users </label>
+					<!-- <input id="submit_tag_names" type="hidden" value="" name="submit[tag_names]"> -->
+					<input id='submit_tag_names' type='hidden' value='' name=''>
+					<ul class='fieldInput' id='myTags'></ul>
+				</div>
+			</li>
+			<li>
+				<div class="searchField">
+					<label class="label">Mail template </label>
+					<div class="fieldInput">
+						<select name="emailTemplateSelect" class="selectoptMsg" dataName="emailTemplateSelect" selectLabel="">
+							<?php foreach($this->keywordshow as $key => $keywordval){ ?>
+								<option value="<?php echo $keywordval['id'];?>" id="<?php echo $keywordval['id'];?>"><?php echo $keywordval['keyword'];?></option>
+							<?php } ?>
+						</select>											
+					</div>
+				</div>
+			</li>
+		</ul>
+</div>
+<!-- SCRIPT FOR FADE POPUP -->
+<script type="text/javascript">
+var jsonusertype = '<?php echo $this->usertype; ?>';
+var jsonuserdetails = '<?php echo $this->userdetails; ?>';
+//alert(jsonuserdetails);
+</script>

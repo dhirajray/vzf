@@ -1,0 +1,179 @@
+<?php         
+$this->title = "Groups";
+$this->headTitle($this->title);
+$deshObj	= new Admin_Model_Deshboard();
+$comnObj	= new Admin_Model_Common();
+$grptypes 	=	$comnObj->grouptypes_CM();
+
+?>
+
+<h1 class="pageTitle dbeeViewAll">‘User created’ Groups <!--<a href="#" class="btn btn-yellow btn-large " id="openSearchBlock"><i class="searchSprite searchIcon"></i> Search</a>--></h1>
+
+<div  id="searchWrapper" style="display:none">
+	
+	<div id="searchContainer">	
+		<form id="search_form_group" >	
+			<div id="exp_criteria"  class="pull-left "> 		
+				<div id="open_title" class="attributs searchField" >
+					
+					<div class="searchField">
+						<span>User Name: </span> <input type="text" id="" name="group_user_name" >
+					</div>
+					<div class="searchField">
+						<span>Group Name: </span> <input type="text" id="dbee_text" name="group_name" >
+					</div>
+
+					
+				</div>
+
+				<div id="open_title" class="attributs searchField" >
+					
+					<div class="searchField">Group Privacy :  
+						<select id="" name="group_privacy">
+							<option value="">All</option>
+							<option value="1">Open</option>
+							<option value="2">Private</option>
+							<option value="3">Requested</option> 
+						</select> 
+					</div>
+					
+
+					<div class="searchField">Group Type: 
+						<select id="" name="group_type">
+							<option value="">All</option>
+							<?php  
+							foreach ($grptypes as $key => $value) { ?>
+								<option value="<?php echo $value['ID']  ?>"><?php echo $value['TypeName']  ?></option>
+							<?php }
+							?>	
+						</select> 
+					</div>
+					
+				</div>
+			
+
+				<div id="open_title" class="attributs searchField" >
+					
+					<div class="searchField">Group Created : </div>
+					<div class="searchField">
+						<span>From : </span> <input type="text" id="created_from" name="created_from"  >
+					</div>
+					<div class="searchField">
+						<span>To : </span> <input type="text" id="created_to" name="created_to" >
+					</div>	
+				</div>
+			</div>
+			<div class="clearfix"></div>		
+			<div class="searchBottomBar clearfix">
+				<div id="search_button" class="searchbutton" > 
+					<button type="button" name="groupsearch" id="groupsearch" value="SEARCH" class="btn btn-yellow btn-large pull-right"><i class="searchSprite searchListIcon"></i> Search</button>
+				</div>
+			</div>			
+		</form>
+
+		<div class="clearfix"></div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+	
+<div class="box-body" id="box_body">
+	<div id="listingTotalResults" style="float:right;margin: 10px 35px 0 0;"></div>
+	<div id="beforecall" style=""></div>
+	<div class="clearfix"></div>
+	<div id="searchresultvis" style="display:none"></div>
+	<div id="showmore" style="display:none;text-align: center;">
+		<img src="<?php echo BASE_URL ?>/images/show.png" style="border:0" title="Show More" alt="Show More">
+	</div>
+		<?php if (count($this->paginator)) { echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml');  ?>
+	<!--  <div class="pageheadinusr">
+	<?php //if($this->page != $this->lastpage){?>
+	showing <?php //echo $this->rectodis-20;?> to <?php //echo $this->rectodis;?> of <?php //echo $this->total;?>
+	<?php //}else{?>		
+		showing <?php //echo $this->page;?> page of <?php //echo $this->page;?> 
+	<?php // }?>
+	</div>-->
+	<div class="pageheadinusr" style="font-size:15px;">
+	<?php echo "Page ". $this->page." of ".$this->totalpage;?> 
+	</div>
+	<div class="pageheadinusrlft" style="font-size:15px;">
+	<?php echo $this->total.' groups';?> 
+	</div><?php }?>
+		<ul class="listing listingGroup scoredList" id="searchresulthide">
+					<?php if (count($this->paginator)){	
+						foreach($this->paginator as $liveGroup) :
+						
+						switch($liveGroup->GroupPrivacy)
+						{
+							case '1' :
+								$privacy =  ' - Open group';
+								break;
+							case '2' :
+								$privacy =  ' - Private group';
+								break;
+							case '3' :
+								$privacy =  ' - Requested to join group';
+								break;
+							case '4' :
+								$privacy =  ' - Admin group';
+							default :
+								$privacy =  ' Group ';
+							break;
+						}					
+					 $defaultimagecheck = new Admin_Model_Common(); 
+                     $liveGrouppic = $defaultimagecheck->checkImgExist($liveGroup->image,'userpics','default-avatar.jpg');
+                     $GroupPic = ($liveGroup->GroupPic=='default-avatar.jpg')?'default-avatar.jpg':$liveGroup->GroupPic;
+					?>
+					<li>
+						<div class="listUserPhoto">
+								<!--User profile pic  who scored someone-->								
+						<img src="<?php echo IMGPATH ?>/users/medium/<?php echo $liveGrouppic ?>" width="70" height="70" border="0" class="recievedUsePic"/>
+								<!--End User profile pic  who scored someone-->
+							</div>
+							<div class="dataListWrapper">
+								<div class="dataListbox">
+									<div class="scoredListTitle" style="font-size:14px;">
+										<a href="<?php echo BASE_URL ?>/group/groupdetails/group/<?php echo $liveGroup->ID ?>"><?php echo htmlentities($this->escape($liveGroup->GroupName), ENT_QUOTES, "UTF-8"); ?></a>	
+										
+										created by&nbsp;<a class="show_details_user" userid="<?php echo $this->escape($liveGroup->UserID);?>" href="javascript:void(0)"><?php echo $this->myclientdetails->customDecoding($this->escape($liveGroup->username)).' '.$this->myclientdetails->customDecoding($this->escape($liveGroup->lname)); ?></a><?php echo $privacy;?>
+										<span class="titleListDate"> -  <?php echo date('d M Y',strtotime($this->escape($liveGroup->Gdate))); ?></span> 
+										 <div style="float:right">
+										 <div class="cmtview livescorevew"><a class="btn btn-full btn-mini btn-yellow" target="_blank" href="<?php echo BASE_URL ?>/group/groupdetails/group/<?php echo $liveGroup->ID ?>" style="float:right"> View </a></div>
+										 <div style="padding-top:30px"><img src="<?php echo IMGPATH ?>/grouppics/medium/<?php echo $GroupPic ?>" width="90" height="90" border="0" class="recievedUsePic"/></div>
+										 </div>   							
+									</div>
+									
+										<?php if($this->escape($liveGroup->description)) {?>
+										<div class="scoredData">	
+											<?php echo htmlentities(substr($this->escape($liveGroup->description),0,100), ENT_QUOTES, "UTF-8");?>						
+											</div>
+										<?php } ?>
+										<div style="clear:both;color:#999999;line-height:30px;">	
+										<?php if($liveGroup->memcnt!=''){
+											echo $this->escape($liveGroup->memcnt);
+											echo ($liveGroup->memcnt==1)?' member':' members';
+												}
+											?>						
+											-	
+											<?php 
+											
+											if($liveGroup->dbcnt!=''){
+											echo $this->escape($liveGroup->dbcnt);
+											echo ($liveGroup->dbcnt==1)?' post':' posts';
+												}
+											?>						
+											</div>
+										
+									</div>
+								
+								<!-- <div class="scoredPostDate"><?php //echo  $this->escape($liveGroup->TypeName); ?><span class="titleListDate">On <?php //echo date('d M y',strtotime($this->escape($liveGroup->Gdate))); ?></span></div> -->
+							</div>
+
+					</li>	
+					<?php $rowchange++; endforeach; ?>
+					
+		<?php } else { ?>
+		<p style="position:relative; top:100px;" class="dashBlockEmpty">no groups found</p>
+		<?php } ?>
+		</ul>
+	</div>	
+<?php echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml');  ?>

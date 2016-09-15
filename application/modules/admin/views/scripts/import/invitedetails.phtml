@@ -1,0 +1,100 @@
+<?php         
+$this->title = "Invited";
+$this->headTitle($this->title);
+
+?>
+<h1 class="pageTitle ">Invite new users<div class="pageSubeTitle">Create quick invitation emails for people to join this platform/ community (Individually or in bulk via imported CSV contact database)</div></h1>
+<div class="userUpBar">
+	<div class="userSearchBox">
+		<div class="appendType  pull-left">	
+			<form action="<?php echo $this->url(array('controller'=>'import','action'=>'invitedetails'));?>" method="POST">
+				<input type="text" class="gh-tb"  maxlength="200" value="" id="searchfield" name="searchfield" placeholder="Search User" autocomplete="OFF">
+				<button class="btn btn-black" id="submit" name="submit" type="submit">Search</button>
+			</form>			
+			<div class="clearfix"></div>
+		</div>
+	</div>
+	<div class="pull-right buttonRight">
+		<div class="dropDown pull-left" id="userAddNew">
+			<a href="#" class="btn dropDownTarget"><i class="fa fa-plus fa-lg"></i> Invite new user</a>
+			<div class="dropDownList right">
+				<p class="validateTips " >All form fields are required.</p>									
+				<form class="right">
+					<div class="formRow">
+						<input type="text" name="inv_username" id="inv_username" placeholder="Name" />
+					</div>
+					<div class="formRow">
+						<input type="text" name="inv_useremail" id="inv_useremail" value="" placeholder="Email"/>
+						<div class="subText"><i class="fa-info-sign"></i> Separate multiple names and email addresses with a comma (,)</div>
+					</div>
+					<div class="formRow">
+						<button type="button" class="btn btn-green fluidBtn  pull-right" id="inviteUsersBtn" style="margin-right:0px;"> 
+							<i class="fa fa-plus fa-lg"></i>  Invite User 
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="dropDown pull-left">
+			<a href="#" class="btn dropDownTarget"><i class="fa fa-file-excel-o fa-lg"></i> Invite users from CSV</a>
+			<div class="dropDownList right" >
+				<form id="formid" method="POST" action="<?php echo $this->url(array('controller'=>'import','action'=>'getcsvrecords'));?>" enctype="multipart/form-data">
+					<div class="appendType formRow">
+						<input type="text" class="uploadType" name="" readonly>
+						<a class="btn btn-black" href="#">Browse <input type="file" class="fileType" name="csvfile" id="inviteusers"> </a>
+					</div>
+					<div class="formRow">
+						<button type="submit" name="csv_submit" id="csv_submit" value="Invite" class="btn fluidBtn btn-green">
+							<i class="fa fa-plus fa-lg"></i> Invite users
+						</button>
+					</div>
+					<div class="formRow">
+						<a href="<?php echo BASE_URL;?>downloadcenter/importformat.csv" class="pull-right link"><i class="fa-download-alt fa-lg"></i> Click Here to Download Example</a>
+					</div>
+					<div class="clearfix"></div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>	
+<div class="clearfix"></div>	
+	<?php if (count($this->paginator)){ ?>
+<table class="inviteDetailsTable table-border table table-hover table-stripe">
+	<thead>
+		<?php $rowchange	=	0; ?>
+	<tr>
+	    <td>Name</td>
+	    <td>Email</td>
+		<td>Status</td>
+		<td>Action</td>
+	</tr>
+	</thead>
+<tbody>
+<?php foreach($this->paginator as $user) : ?>
+<?php if($rowchange%2==1) {$color	=	'#EEE';} else {$color ='#EEE';} ?>
+<?php //print_r($user); die; ?>
+<tr id="userslist_<?php echo $this->escape($user->inv_id);?>">
+    <td><?php echo $this->escape($user->inv_name);?></td> 
+    <td><?php echo $this->escape($user->inv_email);?></td>
+	<td><?php  echo $this->Chkisadded($user->inv_email,$user->isadded,$user->inv_id);?></td>
+	<td>
+		<?php if(($user->isadded!=1)) { ?>
+        <a href="javascript:void(0)" class="btn btn-green btn-mini inviteAction" action="re" userid="<?php echo $this->escape($user->inv_id);?>" email="<?php echo $this->escape($user->inv_email);?>"><i class="fa fa-repeat"></i> Re Invite  <span id="recounter_<?php echo $this->escape($user->inv_id);?>">(<?php echo ($this->escape($user->reinvite));?>)</span></a>
+       <a href="javascript:void(0);" class="btn btn-danger btn-mini inviteAction"  action="openDialog" userid="<?php echo $this->escape($user->inv_id);?>" email="<?php echo $this->escape($user->inv_email);?>"> <i class="fa fa-trash"></i>  Delete </a> 
+        <?php } else { ?> 
+        <span > --- </span>
+        <?php } ?>
+       
+       	
+    </td> 
+</tr>
+
+
+<?php $rowchange++; endforeach; ?>
+</tbody>
+</table>
+	<?php } else { ?>
+	<h2 class="notfound">Users Not Found!</h2>	
+	<?php } ?>
+<?php echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml'); ?>
+

@@ -1,0 +1,25 @@
+<?php
+/**
+ * Login page view
+ *  
+ * @author Deepak Nagar
+ */
+echo '<h3>Forget Password:</h3>';
+if (!empty($this->message)) {
+	echo '<font color="red">';
+	echo $this->escape($this->message[0]);
+	echo '</font>';
+}
+?>
+
+<form action="" method="post">
+<div>
+	<span>Enter Recovry Code</span>
+	<span><input type="text" name="recovercode"></span>
+
+	<br><br>
+	<span><input type="submit" name="submit" value="SUBMIT"></span>
+</div>
+</form>
+
+

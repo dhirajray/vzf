@@ -1,0 +1,105 @@
+<script>
+function reloadMessages(id,rand) {
+	$('#message-feed-wrapper').fadeOut('slow').load('message/dbeemessage').fadeIn("slow");
+}
+
+$(function() {
+	fetchadvertmessage();
+	//dashboardprofile('<?php echo $this->user;?>',1);
+	
+	newmessagefeed('0');
+	$('#issearch').val('0');
+	//fillcategory();
+$(window).scrollTop(0);
+$(window).scroll(function(){
+	if  ($(window).scrollTop() == $(document).height() - $(window).height()){
+		$('#loaderid').append('<div  align="center" class="loding"><img src="'+BASE_URL+'/images/ajaxloader.gif"></div>');
+		var sarchto = $('#sertextmsgto').val();
+		
+		var start = $('#startnewmsg').val();	
+		var issearch = $('#issearch').val();
+		var search_company = $('select2-drop-mask').val();
+		var search_datefrom = $('#sertextmsgfrom').val();		
+		if(issearch==1){
+			var urldata = {'start':start,'search_company':search_company,'dateFrom':search_datefrom,'dateTo':sarchto};		
+			
+		}else{
+			var urldata = {'start':start};
+			}			
+		$.ajax({
+			type : "POST",
+			dataType : 'json',
+			url : BASE_URL + '/message/dbeemessage',
+			async : false,	
+			data: urldata,
+			complete : function() 
+			{			  
+			   setTimeout(function(){
+						$('#loaderid').remove();
+					}, 2000);	
+			},
+			success : function(response) {			
+				$('.noFound').remove();
+				$('#loaderid').remove();
+				$('.loding').remove();
+				var msg ='';
+	            $.each(response.content, function(i, value){
+	                   msg +='<li id="message-'+value.rowid+'" class="'+value.class+'" ChkUser="'+value.ChkUser+'" read="'+value.read+'" search="'+value.search+'" from="'+value.from+'" to="'+value.to+'">\
+	                      <div style="float:left; width:50px; height:50px;">'+value.profilelink+'<img src="'+IMGPATH+'/users/small/'+value.pic+'" width="50" height="50" border="0" /></a></div>\
+	                        <div id="dbcomment-speechwrapper1" '+value.cursor+'><div class="msgTxtbox"><div class="messageTextTop">\
+	                        <div style="float:left">'+value.sendlabel+'<b rel="dbTip" title="'+value.userTypenal+'">'+value.userName+'</b></div>'+value.archiveDiv+'<div id="blockuser-div-'+value.rowid+'" class="pull-left">'+value.blockDiv+'</div>\
+	                    </div>\
+	                    <div class="messageTextList aa">'+value.Message+'</div>'+value.morebtn+'</div><div style="float:right; width:auto; font-size:10px; color:#666">'+value.MsgDate+'</li>';
+        
+	              });
+				$('#dbee-feeds li:last').after(msg);				
+				$('#startnewmsg').val(parseInt(start)+parseInt('10')); 
+				
+			},			
+			error : function(error) {
+			
+			$("#content_data").html("Some problems have occured. Please try again later: "
+			+ error);
+			
+			}
+			
+			});
+		
+	}	
+});
+
+});
+</script>
+<?php 
+	$commonmodel_obj      = new Application_Model_Commonfunctionality();
+?>
+<div id="leftListing">
+	<ul class="postListing" id="dbee-feeds"> </ul>
+	<div id="loaderid"></div>	
+</div>	
+<div id="rightListing">
+	<div class="whiteBox" id="messageSearchCont"></div>
+	<?php echo $commonmodel_obj->displaybroadcastdbs();  ?>	
+	
+	<div class="whiteBox" id="rightListingads"></div>
+</div>
+<!--End page listing-->
+<div id="joingroup-popup" class="popup_block">Request sent to group admin.</div>
+<div id="follow-popup" class="popup_block"></div>
+
+<input type="hidden" id="dbeeuser" value="<?php echo $this->$userid?>">
+
+<input type="hidden" id="dbeepopchk" value="1">
+<input type="hidden" id="frompop" value="0">
+<input type="hidden" id="startnewmsg" value="10">
+<input type="hidden" id="msgsearch_name" value="">
+<input type="hidden" id="msgsearch_company" value="">
+<input type="hidden" id="msgsearch_datefrom" value="">
+<input type="hidden" id="msgsearch_dateto" value="">
+<input type="hidden" id="issearch" value="">
+<!-- SCRIPT FOR FADE POPUP -->
+<script type="text/javascript">
+var jsonData = '<?php echo $this->msguser->list; ?>';
+var jsonCompany = '<?php echo $this->msguser->company; ?>';
+
+</script>

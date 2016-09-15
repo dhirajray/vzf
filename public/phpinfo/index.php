@@ -1,0 +1,25 @@
+<?php
+$servername = "localhost";
+$username = "wwwdbcsp_clntusr";
+$password = "tOv.%~&ki1@t";
+$dbname = "wwwdbcsp_clientdev";
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+} 
+/*
+$sql = "SELECT * FROM tblUsers";
+$result = $conn->query($sql);
+
+if ($result->num_rows > 0) {
+    // output data of each row
+    while($row = $result->fetch_assoc()) {
+        echo "id: " . $row["UserID"]."<br>";
+    }
+} else {
+    echo "0 results";
+}*/
+$conn->close();
+?>

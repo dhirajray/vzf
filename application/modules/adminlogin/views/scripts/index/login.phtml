@@ -1,0 +1,34 @@
+<?php
+/**
+ * Login page view
+ *  
+ * @author Deepak Nagar
+ */
+$form = $this->chkform;
+?>
+	<h3>Admin Dashboard</h3>
+	
+	<?php 
+	$tickmarkmsg = '<i class="fa fa-warning"></i>';
+	$tickmarkclass = '';
+	if (($this->message[0]=='An email has been sent to your registered email address with a temporary password.')) {
+      $tickmarkmsg = '<i class="fa fa-check-circle-o"></i>';
+      $tickmarkclass = 'successMsg';
+	}
+	if (!empty($this->message)) {
+		echo '<span class="loginErrorMsg '.$tickmarkclass.'">'.$tickmarkmsg.$this->escape($this->message[0]).'</span>';
+	}else{
+		echo '<span class="loginErrorMsg" style="display:none"><i class="fa fa-warning"></i>Please fill both username and password</span>';
+	}	
+
+    //echo $result->isValid();echo'------';
+	$this->form->setName('login')
+	           ->setAction(BASE_URL.'/secureadmin/login')
+	           ->setMethod('post'); 
+	echo $this->form; 
+
+	?> 
+
+	<div class="forgetPass"><a href="<?php echo BASE_URL ?>/admin/forgotpassword" class="forgetPass bcktopLogin" style=" margin-top: 9px;"> Forgotten password?</a></div>
+	<div class="clearfix"> </div>
+

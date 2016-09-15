@@ -1,0 +1,610 @@
+dffsdfh
+<script type="text/javascript" src="<?php echo BASE_URL."/adminraw/js/platforminterface.js"; ?>?v=<?php echo filemtime('/adminraw/js/platforminterface.js');?>"></script>
+<script> 
+ var fileName;
+   $(document).ready(function(){
+          
+          var myDropzoneBannerval = new Dropzone("#loginBgUpload",{
+            url: BASE_URL+'/admin/myaccount/ajaxbackground',        
+            addRemoveLinks: true,
+            uploadMultiple:true,
+            parallelUploads: 1,
+            acceptedFiles: '.png, .jpg, .jpeg, .gif',
+          });
+
+          myDropzoneBannerval.on("error", function (file, serverFileName) {
+              $messageError(serverFileName);
+          });          
+
+          myDropzoneBannerval.on("success", function (file, serverFileName) {
+              //$('#hiddengroundimage').html('');
+              $('#hiddengroundimage').append('<input type="hidden" name="hiddenloginbackgroundimage[]" value="'+serverFileName.filename+'" class="hiddenloginbackgroundimage">');
+              fileName = serverFileName.filename;
+          });
+
+          myDropzoneBannerval.on("removedfile", function (file) {
+            $('.hiddenloginbackgroundimage').each(function(){
+                  if(fileName==$(this).val())
+                      $(this).remove();
+               });
+          });          
+
+
+   });
+
+
+  
+           // wait for the DOM to be loaded 
+          
+           $(document).ready(function() {        
+             
+            var colorPicker =   $('.colpicker').colpick({
+                                  layout:'hex',
+                                  submit:0,
+                                  colorScheme:'dark',
+                                  color:'<?php echo $this->getThemeConfiguration["backgroundColor"]; ?>',
+                                  onChange:function(hsb,hex,rgb,el,bySetColor) {
+                                    var colorType =  $(el).siblings('input').attr('name');
+                                    $(el).siblings('input').css('background','#'+hex).val('#'+hex);           
+                                  }
+                                });
+   
+        var colorPicker =   $('.colpicker backgroundsignColor').colpick({
+            layout:'hex',
+            submit:0,
+            colorScheme:'dark',
+            color:'<?php echo $this->getThemeConfiguration["SigninColor"]; ?>',
+            onChange:function(hsb,hex,rgb,el,bySetColor) {
+              var colorType =  $(el).siblings('input').attr('name');
+              $(el).siblings('input').css('background','#'+hex).val('#'+hex);           
+            }
+          });
+   
+            $('.colorPickerWrapper input').focusin(function(event) {
+              $(this).siblings('.colpicker').click();
+            });
+
+            $('body').on('click','.removeimage', function(){
+              var type = $(this).attr('type');
+              var imagename = $(this).attr('image-name');
+              bgnameArray = [];
+              Tthis = $(this);
+               $('.hiddenloginbackgroundimage').each(function(){
+                  if(imagename!=$(this).val())
+                    bgnameArray.push($(this).val());
+               });
+                var bgnameString = bgnameArray.join(); 
+                $.ajax({
+                  type : "POST",
+                  dataType : 'json',
+                  data:{'type':type,bgnameString:bgnameString},
+                  url :BASE_URL+ '/admin/myaccount/ajaxremoveimage',
+                  success : function(response) 
+                  { 
+                      //alert(response);exit;  
+                      if(response.sitelogo=='remove')
+                      {
+                        $('.sitelogoimage').hide();
+                        $('#hiddensitelogo').val('');
+                      }
+                      if(response.faviconlogo=='remove')
+                      {
+                        $('.faviconlogoimage').hide();
+                        $('#hiddenfaviconlogo').val('');
+                      }
+                      if(response.backgroundImage=='remove'){
+                        $('.imagebackground').hide();
+                        $('#hiddenbackgroundimage').val('');
+                      }  
+                      if(response.loginbackgroundImage=='remove'){
+                        Tthis.closest('.acntImgThumb').remove();
+                        $('#hiddengroundimage').html('');
+                        $.each(bgnameArray,function(index,value){
+                           $('#hiddengroundimage').append('<input type="hidden" name="hiddenloginbackgroundimage[]" value="'+value+'" class="hiddenloginbackgroundimage">');
+                         });
+                      }
+                      if(response.loginlogoimage=='remove'){
+                        $('.loginlogoimage').hide();
+                        $('#hiddenSigninImage').val('');
+                      }  
+                      $('#dbTipWrapper ').remove();
+                  }
+              });
+             });
+             
+   
+   
+              $.cookie("themepreview", 'hide', {
+                expires : 1,           //expires in 10 days
+                path    : '/', 
+                domain  : 'db-csp.com',
+                secure  : false
+              });
+
+               // bind 'myForm' and provide a simple callback function 
+                $('#ajaxseo').ajaxForm(function() { 
+   
+                  $messageSuccess("updated successfully");
+                });
+   
+                $('#ajaxstaticpages').ajaxForm(function() { 
+   
+                  $messageSuccess("Static page has been updated successfully");
+                });
+   
+   
+          $('#configuration').ajaxForm(function() { 
+                  
+                  $.cookie("themepreview", 'show', {
+                      expires : 1,           //expires in 10 days
+                      path    : '/', 
+                      domain  : 'db-csp.com',
+                      secure  : false
+                    });
+                  
+            var htmlLightbox = '<div id="detailsDialog"  title="Facebook Friends">\
+                                   <div id="datacollect" style="float:none"></div>\
+                                   <div id="userInfoContainer"></div>\
+                               </div>';
+               var htmlPreview = '<div class="seeLargeView loader dashBlock">\
+               <h2>\
+                Preview\
+                <a class="closePupPreview pull-right" href="javascript:void(0);">\
+                  <i class="fa fa-times"></i>\
+                </a>\
+                <a class="pull-right btn btn-green SavePupPreview" href="javascript:void(0);" style="margin-right:10px;">Save modification</a>\
+               </h2>\
+               <div><iframe id="previewFrontend" src="<?php echo BASE_URL; ?>" width="100%" height="100%"></iframe></div></div>';
+               $('.seeLargeView').remove();
+            $('body').append(htmlPreview);
+            $('.overlayPopup').fadeIn();
+            
+             $('#previewFrontend').load(function() {
+                $(this).closest('.seeLargeView').removeClass('loader');
+              });
+
+             var popHeight = $('.seeLargeView').height();
+             $('.seeLargeView iframe').height(popHeight-50);
+             
+             $('body').on('click','.closePupPreview', function(){
+              $('.overlayPopup, .seeLargeView').fadeOut();
+               $.cookie("themepreview", 'hide', {
+                expires : 1,           //expires in 10 days
+                path    : '/', 
+                domain  : 'db-csp.com',
+                secure  : false
+            });
+             });
+   
+              $('body').on('click','.SavePupPreview', function(){
+              $('.overlayPopup, .seeLargeView').fadeOut();
+               $.cookie("themepreview", 'hide', {
+                expires : 1,           //expires in 10 days
+                path    : '/', 
+                domain  : 'db-csp.com',
+                secure  : false
+              });
+               $.ajax(
+              {
+                  type : "POST",
+                  dataType : 'json',
+                  url : BASE_URL+'/admin/myaccount/ajaxsaveconfiguration',
+                  beforeSend : function() { 
+   
+                  },
+                  cache : false,
+                  success : function(response) 
+                  {               
+                      $messageSuccess(response.message);
+                      window.location.href=BASE_URL+"/admin/myaccount/themesetting";
+                      location.reload();
+                      
+                  },
+                  error : function(error) {
+   
+                  }
+   
+              });
+              });
+   
+               });
+   
+       $('body').on('click','.SigninPupPreview', function(){
+   
+               $('#configuration').ajaxForm(function() { 
+                  
+            $.cookie("themepreview", 'show', {
+              expires : 1,           //expires in 10 days
+              path    : '/', 
+              domain  : 'db-csp.com',
+              secure  : false
+            });
+                  
+                      var htmlLightbox = '<div id="detailsDialog"  title="Facebook Friends">\
+                                   <div id="datacollect" style="float:none"></div>\
+                                   <div id="userInfoContainer"></div>\
+                               </div>';
+               var htmlPreview = '<div class="seeLargeView loader dashBlock">\
+               <h2>\
+                Preview\
+                <a class="closePupPreview pull-right" href="javascript:void(0);">\
+                  <i class="fa fa-times"></i>\
+                </a>\
+                <a class="pull-right btn btn-green SavePupPreview" href="javascript:void(0);" style="margin-right:10px;">Save modification</a>\
+               </h2>\
+               <div><iframe id="previewFrontend" src="<?php echo BASE_URL; ?>/findex" width="100%" height="100%"></iframe></div></div>';
+               $('.seeLargeView').remove();
+            $('body').append(htmlPreview);
+            $('.overlayPopup').fadeIn();
+            
+             $('#previewFrontend').load(function() {
+              $(this).closest('.seeLargeView').removeClass('loader');
+            });
+             var popHeight = $('.seeLargeView').height();
+             $('.seeLargeView iframe').height(popHeight-50);
+             
+             $('body').on('click','.closePupPreview', function(){
+              $('.overlayPopup, .seeLargeView').fadeOut();
+               $.cookie("themepreview", 'hide', {
+                expires : 1,           //expires in 10 days
+                path    : '/', 
+                domain  : 'db-csp.com',
+                secure  : false
+            });
+             });
+   
+              $('body').on('click','.SavePupPreview', function(){
+              $('.overlayPopup, .seeLargeView').fadeOut();
+               $.cookie("themepreview", 'hide', {
+                expires : 1,           //expires in 10 days
+                path    : '/', 
+                domain  : 'db-csp.com',
+                secure  : false
+            });
+               $.ajax(
+              {
+                  type : "POST",
+                  dataType : 'json',
+                  url : BASE_URL+'/admin/myaccount/ajaxsaveconfiguration',
+                  beforeSend : function() { 
+   
+                  },
+                  cache : false,
+                  success : function(response) 
+                  {               
+                      $messageSuccess(response.message);
+                      window.location.href=BASE_URL+"/admin/myaccount/themesetting";
+                      location.reload();
+                      
+                  },
+                  error : function(error) {
+   
+                  }
+   
+              });
+              });
+   
+               });
+   
+       });
+
+
+    // for bg changer
+    
+      $('body').on('click', '.bgListing li a', function(e){
+        e.preventDefault();
+         var parentEl =  $(this).closest('.dropDown');
+        
+         var dataName  = $(this).attr('data-name');
+        
+          //$('.active', parentEl).removeClass('active');
+          $(this).toggleClass('active');
+
+
+           
+       
+
+          if($('.bgListing', parentEl).attr('data-type')=='signBg'){
+            if( $('#signinBgDone',parentEl).is(':visible')== false){
+              $('.btnGroups',parentEl).prepend('<a href="#" class="btn btn-green" id="signinBgDone">Done</a>');              
+            }
+
+          }
+      }); 
+
+      $('body').on('click', '#signinBgDone', function(e)
+      {
+         e.preventDefault();
+         var parentEl =  $(this).closest('.dropDown');
+         var parentEl2 =  $(this).closest('.signinBgRow');
+          //$('#hiddengroundimage').html('');
+          $('.bgListing li a.active').each(function(){
+           var dataName  = $(this).attr('data-name');
+            $('#hiddengroundimage').append('<input type="hidden" name="hiddenloginbackgroundimage[]" value="'+dataName+'" class="hiddenloginbackgroundimage">');
+            $('.resetValueUpload', parentEl2).trigger('click');
+         });
+         parentEl.removeClass('on');
+      });   
+
+       $('body').on('click', '#signinBgReset', function(e)
+       {
+          e.preventDefault();
+          var parentEl =  $(this).closest('.dropDown');
+          $('#hiddengroundimage').html('');
+          $('#signinBgDone',parentEl).remove();
+       });   
+
+      //var iframe = $(this).contents(), iframeH = $(this).height(),  iframeW = $(this).width();
+       
+
+        
+
+
+
+     
+     
+  }); 
+    
+</script> 
+<h1 class="pageTitle">Theme Configuration</h1>
+<!--Container -->
+<div class="accountContainer" style="margin-left:0px;">
+<div class="accountContent" style="display:block">
+<div id="hashTagSelectedWrapper" style="display: block;">
+   <form name="configuration" action ="<?php echo BASE_URL ?>/admin/myaccount/ajaxconfiguration" class="right grid" id="configuration" enctype="multipart/form-data" method="post">
+      <ul>
+         <li >
+            <div class="hashUrsrDetails">
+               <h2>
+                  Log in theme settings
+                  <a class="hasTagDetails" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
+               </h2>
+               <div  class="listing" style="display:none">
+                  <div class="formRow signinBgRow">
+                     <label class="label">Log in background image</label>
+                     <div class="field">
+                       
+
+                <div class="overdropRel">
+                       <div id="loginBgUpload" class="dropzone">
+                           <div class="fallback">
+                              <input name="file" type="file" multiple />
+                          </div>
+                       </div>                       
+                <!--    <span class="orSpan">Or</span>
+                 <div id="signBgImg" class="dropDown  pull-left">
+                    <a class="btn dropDownTarget" href="#"><i class="fa fa-plus fa-lg"></i> Choose default image(s)</a>
+                    <div class="dropDownList right">
+                         <ul class="bgListing" data-type="signBg">
+                            <li><a href="#" data-name="1.jpg"><img src="<?php echo BASE_URL .'/adminraw/img/signinbackground/1.jpg'; ?>" class="imgStyle"></a></li>
+                            <li><a href="#" data-name="2.jpg"><img src="<?php echo BASE_URL .'/adminraw/img/signinbackground/2.jpg'; ?>" class="imgStyle"></a></li>
+                            <li><a href="#" data-name="3.jpg"><img src="<?php echo BASE_URL .'/adminraw/img/signinbackground/3.jpg'; ?>" class="imgStyle"></a></li>
+                            <li><a href="#" data-name="4.jpg"><img src="<?php echo BASE_URL .'/adminraw/img/signinbackground/4.jpg'; ?>" class="imgStyle"></a></li>
+                            <li><a href="#" data-name="5.jpg"><img src="<?php echo BASE_URL .'/adminraw/img/signinbackground/5.jpg'; ?>" class="imgStyle"></a></li>
+                            <li><a href="#" data-name="6.jpg"><img src="<?php echo BASE_URL .'/adminraw/img/signinbackground/6.jpg'; ?>" class="imgStyle"></a></li>
+                            <li><a href="#" data-name="7.jpg"><img src="<?php echo BASE_URL .'/adminraw/img/signinbackground/7.jpg'; ?>" class="imgStyle"></a></li>
+                            <li><a href="#" data-name="8.jpg"><img src="<?php echo BASE_URL .'/adminraw/img/signinbackground/8.jpg'; ?>" class="imgStyle"></a></li>
+                            <li><a href="#" data-name="9.jpg"><img src="<?php echo BASE_URL .'/adminraw/img/signinbackground/9.jpg'; ?>" class="imgStyle"></a></li>
+                        </ul> 
+                        <div class="formRow btnGroups">
+                         
+                          <a href="#" class="btn" id="signinBgReset">Reset</a>  
+                        </div>
+                    </div>
+                  </div>           -->
+                      <div class="clearfix"></div>
+                </div>  
+
+                        <?php if($this->getThemeConfiguration['loginbackgroundimage']!='')
+                        { 
+                         
+                        $variableData = explode(',', $this->getThemeConfiguration['loginbackgroundimage']); 
+                        foreach ($variableData as $valuedata) {  ?>
+                        <div class="acntImgThumb">
+                           <div id="newpic" class="proPic loginbackgroundimage">
+                              <img  src="<?php echo BASE_URL .'/img/'.$valuedata; ?>" class="imgStyle ">
+                              <a href="javascript:void(0);"  rel="dbTip" title="Clicking this link will only remove this image from the preview. Save modifications from the preview to remove it from the platform." image-name="<?php echo $valuedata; ?>" type="loginbackgroundimage" class="removeimage removeCompare">x</a>                     
+                           </div>
+                        </div>
+                        <?php } } ?>
+                        <div id="hiddengroundimage">
+                          <?php 
+                          if(count($variableData) > 0) {
+                          foreach ($variableData as $key => $value) { ?>
+                          <input type="hidden" name="hiddenloginbackgroundimage[]" value="<?php echo $value; ?>" class="hiddenloginbackgroundimage">   
+                         <?php } } ?>
+                         </div> 
+                        <div class="clearfix"></div>
+
+                     </div>
+                  </div>
+                  <div class="formRow">
+                     <label class="label">Log in logo</label>
+                     <div class="field appendType">
+                        <input type="text" readonly="" name="" class="uploadType">
+                        <a href="javascript:void(0);" class="btn btn-black">Browse<input type="file" name="signinlogo" class="fileType">
+                        </a>
+            
+                        <div class="clearfix"></div>
+                         <?php if($this->getThemeConfiguration['SigninImage']!='') { ?>
+                        <div class="acntImgThumb">
+                           <div id="newpic" class="proPic loginlogoimage">
+                              <img  src="<?php echo BASE_URL .'/img/'.$this->getThemeConfiguration['SigninImage']; ?>" class="imgStyle ">
+                              <a href="javascript:void(0);"  rel="dbTip" title="Clicking this link will only remove this image from the preview. Save modifications from the preview to remove it from the platform." type="loginlogoimage" class="removeimage removeCompare">x</a>
+                           </div>
+                             <?php } ?>
+                           <input type="hidden" name="hiddenSigninImage" value="<?php echo $this->getThemeConfiguration['SigninImage']; ?>" id="hiddenSigninImage">
+                        </div>
+                        <div class="clearfix"></div>
+                     </div>
+                  </div>
+                  <div class="formRow">
+                     <label class="label">Log in background colour</label> 
+                     <div class="field colorPickerWrapper">
+                        <input type="text" name="backgroundsignColor" style="background:<?php echo $this->getThemeConfiguration['SigninColor']; ?>" class="" readonly id="bacgroColor" value="<?php echo $this->getThemeConfiguration['SigninColor']; ?>">
+                        <button type="button" class="colpicker backgroundsignColor"><i></i></button>
+                        <div class="clearfix"></div>
+                     </div>
+                  </div>
+                  <div class="formRow">
+                     <label class="label">Highlight links </label> 
+                     <div class="field">
+                        <div class="clearfix changeintheam">
+                       <label>
+                        <input type="checkbox" name="hightlightlink" id="hightlightlink" value="1" <?php if($this->getThemeConfiguration['hightlightlink']==1) echo 'checked=checked'; ?> >
+                        <label for="hightlightlink"></label>Yes
+                        </label>
+                        </div>
+                        <div class="clearfix">This enables you to highlight Create account, Forgotten password?, Log in socially, Terms & Conditions, Privacy Policy, About and Feedback.</div>
+                     </div>
+                  </div>
+                  <div class="formRow">
+                     <!-- <label class="label">Log in text</label>
+                     <div class="field">
+                        <textarea  name="SigninText" id="SigninText"  placeholder="Please enter the signin text"><?php echo stripcslashes($this->getThemeConfiguration['SigninText']); ?></textarea>  
+                     </div> -->
+                     <div class="field">
+                        <input type="image" name="submitsign" value="Preview &amp; Save" class="btn btn-green SigninPupPreview">
+                     </div>
+                  </div>
+         </li>
+         <li>
+           <div class="hashUrsrDetails">
+             <h2>
+              Platform theme settings
+             <a class="hasTagDetails" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
+             </h2>
+           <div style="display: none;"  class="listing" >
+             <div class="formRow">
+               <label class="label">Platform logo</label>
+               <div class="field appendType">
+               <input type="text" readonly="" name="" class="uploadType">
+               <a href="javascript:void(0);" class="btn btn-black">Browse<input type="file" name="sitelogo" class="fileType"></a><input type="hidden" name="hiddensitelogo" value="<?php echo $this->getThemeConfiguration['SiteLogo']; ?>" id="hiddensitelogo">
+               <div class="clearfix"></div>
+               <div class="acntImgThumb">
+                 <div id="newpic" class="proPic sitelogoimage">
+                 <img  src="<?php echo BASE_URL .'/img/'.$this->getThemeConfiguration['SiteLogo']; ?>" class="imgStyle ">
+                 <a href="javascript:void(0);" rel="dbTip" title="Clicking this link will only remove this image from the preview. Save modifications from the preview to remove it from the platform." type="sitelogo" class="removeimage removeCompare">x</a>
+                 </div>
+               </div>
+               <div class="clearfix"></div>
+               </div>
+             </div>
+
+             <div class="formRow">
+               <label class="label">Favicon logo</label>
+               <div class="field appendType">
+               <input type="text" readonly="" name="" class="uploadType faviconeupload" value="<?php echo $this->getThemeConfiguration['FaviconLogo']; ?>" >
+               <a href="javascript:void(0);" class="btn btn-black">Browse<input type="file" name="faviconlogo" class="fileType"></a><input type="hidden" name="hiddenfaviconlogo" value="<?php echo $this->getThemeConfiguration['FaviconLogo']; ?>" id="hiddenfaviconlogo">
+               <div class="clearfix"></div>
+               <div class="acntImgThumb">
+                 <div id="newpic" class="proPic faviconlogoimage">
+                 <img  src="<?php echo BASE_URL .'/images/'.$this->getThemeConfiguration['FaviconLogo']; ?>" class="imgStyle ">
+                 <a href="javascript:void(0);" rel="dbTip" title="Clicking this link will only remove this image from the preview. Save modifications from the preview to remove it from the platform." type="faviconlogo" class="removeimage removeCompare">x</a>
+                 </div>
+               </div>
+               <div class="clearfix"></div>
+               </div>
+             </div>
+               <div class="formRow">
+               <div class="field"><input type="submit" class="btn btn-green" value="Preview & save" name="submit" /></div>
+               </div>     
+           </div>
+           </div>
+         </li> 
+         <li>
+            <div class="hashUrsrDetails" id="platformInterfaceWrp">
+              <h2>
+                Functionality theme settings 
+                <a class="hasTagDetails" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
+              </h2>
+               <div class="listing" style="display:none">
+
+                <div id="toolboxPlatform">
+                    <h2 class="titleEditingType"><span>Body container</span> <i class="fa pull-right fa-minus"></i></h2>
+                  <!--   <h3><span>‘Close’, ‘More’ & ‘Post’ buttons</span></h3> -->
+                   
+                    <ul>
+                       <div class="conclusion">Click each button in window (right) to change and save . </div>
+                      <li id="BgImageRow">
+                        <div  class="dropzone" id="BgImage" >
+                          <div class="fallback">
+                            <input type="file" name="file" value="Browse" />
+                          </div>
+                        </div>
+                      </li>
+                        <li id="fillColorsRow">
+                            <input type="checkbox" id="fillColorGradiantInput"  checked>
+                            <div class="tabTool">
+                              <label for="fillColorGradiantInput"  id="gradientFill">Gradient</label>
+                              <label for="fillColorGradiantInput" id="solidFill">Solid</label>
+                            </div>
+                            <h4> 
+                              <span>Fill colors</span>
+                              <a href="javascript:void(0);" class="colorFill" date-type="start" ></a>
+                              <a href="javascript:void(0);" class="colorFill" date-type="end"></a>
+                            </h4>
+                        </li>
+                        <li id="borderColorsRow">
+                            <h4><span>Border color</span> <a href="javascript:void(0);" class="colorFill" date-type="borderColor"></a></h4>
+                        </li>
+                         <li id="fontColorsRow">
+                            <h4><span>Font color</span> <a href="javascript:void(0);" class="colorFill" date-type="buttonTextColor"></a></h4>
+                        </li>
+
+                         <li id="borderWidthRow">
+                            <h4>Border width</h4>
+                            <input type="range"  data-type="borderWidth" value="0" min="0" max="10">
+                        </li>
+                        <li id="borderRadiusRow">
+                            <h4>Border radius</h4>
+                            <input type="range" data-type="radius" value="0" min="0" max="20">
+                        </li>
+                        <li id="chooseTexture" class="chooseTexture">
+                            <input type="checkbox" name="" id="txture" value="">
+                            <label for="txture">Background texture</label>
+                            <div>
+                               <ul>
+                                  <li><a href="#" rel="dbTip" title="no texture" class="noTexture"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/0.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/1.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/2.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/3.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/4.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/5.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/6.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/7.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/8.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/9.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/10.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/11.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/12.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/13.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/14.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/15.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/16.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/17.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/18.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/19.jpg"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/20.jpg"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/21.jpg"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/22.jpg"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/23.jpg"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/24.jpg"></a></li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li><a href="#" class="btn btn-yellow btn-mini" id="resestToDefault">Reset</a></li>
+                    </ul>
+                </div>
+                <iframe id="platformInterface" src="<?php echo BASE_URL; ?>/admin/myaccount/platforminterface" ></iframe>
+               </div>
+            </div>
+         </li>
+      </ul>
+      </div>
+   </form>
+   </div>
+   <!--end tab content-->
+</div>
+<!--End Container-->
+

@@ -1,0 +1,518 @@
+<?php 
+
+include "headscript.phtml"; 
+
+if($dbeecontrollers != 'index' && $dbeecontrollers != 'error' && $dbeecontrollers != 'findex') // start of checking controllers
+{
+	?>
+	<body socialActive="<?php echo $this->Social_Block; ?>" style="<?php echo $styleColor; ?>">
+	
+	<!-- <body socialActive="<?php echo $this->Social_Block; ?>"  > -->
+	    <input type="checkbox" id="footerClick" style="display:none">
+
+	<div id="fullScreenBg"  style="<?php echo $style; ?>"></div>
+	<div id="pageLoader"><i class="fa fa-spinner fa-spin fa-3x"></i></div>
+
+	<textarea name="siteHeadTitle" id="siteHeadTitle" style="display:none"><?php echo ($dbtittle=='') ? 'DB_CSP ' : substr(strip_tags($dbtittle),0,30); ?></textarea>
+	<input type="hidden" name="expertText" value="<?php echo $this->expertText; ?>" id="expertText" />
+	<input type="hidden" name="plateform_scoring" value="<?php echo $this->plateform_scoring; ?>" id="plateform_scoring" />
+	<input type="hidden" name="groupbg" value="<?php echo $this->groupbg; ?>" id="groupbg" />
+	<input type="hidden" name="twitter_token_secret" value="<?php echo $this->twitter_token_secret; ?>" id="twitter_token_secret" />
+	<input type="hidden" name="facebookid" value="<?php echo $this->facebookid; ?>" id="facebookid" />
+	<input type="hidden" name="linkedin_token_secret" value="<?php echo $this->linkedin_token_secret; ?>" id="linkedin_token_secret" />
+	<?php $sideProfilePic ='<div class="profilePicLeftBar">';
+				$userprofile = $checkImage->checkImgExist($usersdata[0]['ProfilePic'],'userpics','default-avatar.jpg');
+				$sideProfilePic .='<img src="'.IMGPATH.'/users/small/'.$userprofile.'" width="48" height="48"  border="0">
+				<div class="profilePics">
+					<div class="oneline">'.$myclientdetails->customDecoding($usersdata[0]['Name']).'</div>
+					<a href="javascript:void(0)" onclick="gologout()">Logout</a>
+				</div>
+			</div>'
+	?>
+	<div class="dbspacial" style="display:none">
+	<input id="spacial" class="dbspacial" type="checkbox" checked="checked" value="6" name="dbspacial[]">
+	<input class="dbliveBroadcast" type="hidden" value="15" name="dbliveBroadcast">
+	</div>
+	<div class="servey" style="display:none">
+	<input id="servey" class="servey" type="checkbox" checked="checked" value="7" name="servey[]">
+	</div>
+		<div id="successMsg" class="messageview success" style="display:none"></div>
+		<div id="errorMsg" class="messageview error" style="display:none"></div>
+		<div id="warningMsg" class="messageWarningview " style="display:none">
+			<div id="warningMsgContent" class="pageCenter"> </div>
+		</div>
+		<div id="overlay"></div>
+	<div class="ac_results" id="notiListing">
+	<h2 class="ntlTopBar">Notifications <span style="float:right"><a href="<?php echo URL; ?>/notification" style="font-weight:normal">View all</a></span></h2>
+	<ul id="actNotification"></ul>
+	
+	<span class="closeNoti"> </span>
+	</div>
+
+	<div class="ac_resultsMsg" id="notiListingMsg">
+		<h2 class="ntMsgTopBar">Messages <span style="float:right"><a href="<?php echo URL; ?>/message" style="font-weight:normal">View all </a></span> <span style="float:right" id="send_msgtop"><a href="#" style="font-weight:normal;margin-right:10px" class="btn btn-yellow btn-mini"> Compose message</a></span></h2>
+		<ul id="actNotificationMsg"></ul>
+		
+		<span class="closeNotiMsg"> </span>
+	</div>
+	<?php if ($_SERVER['SERVER_NAME'] != 'localhost') { ?>
+
+	<div id="fb-root"></div>
+	<script>
+	var localTick = false;
+	<?php if($this->Social_Block==0) {  ?>
+	window.fbAsyncInit = function() {
+	    // init the FB JS SDK
+	    FB.init({
+	     	appId      : '<?php echo facebookAppid; ?>',                        // App ID from the app dashboard
+	      	channelUrl : '//<?php echo facebookDomain; ?>/channel', // Channel file for x-domain comms
+			status: true, 
+		    oauth: true, // enable oauth 2.0
+		    xfbml: true,
+		    cookie: true,
+		    frictionlessRequests: true
+	    });
+
+	  };
+
+	  // Load the SDK asynchronously
+	  (function(d, s, id){
+	     var js, fjs = d.getElementsByTagName(s)[0];
+	     if (d.getElementById(id)) {return;}
+	     js = d.createElement(s); js.id = id;
+	     js.src = "//connect.facebook.net/en_US/all.js";
+	     fjs.parentNode.insertBefore(js, fjs);
+	   }(document, 'script', 'facebook-jssdk'));
+	<?php } ?>
+	  var _gaq = _gaq || [];
+	  _gaq.push(['_setAccount', 'UA-28197067-1']);
+	  _gaq.push(['_trackPageview']);
+	 
+	  (function() {
+	    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	  })(); 
+	</script>
+		<?php }
+		$groupowner=true;
+		$restrictpost=false;
+		$status_group_joining = 3;
+		$_redirector = Zend_Controller_Action_HelperBroker::getStaticHelper('redirector');
+
+		if($dbeecontrollers=='group' && $data['UserID']) {
+			$res_group = new Application_Model_Groups();
+			$restgrouplist = $res_group->calgroup($this->group);
+
+			if($restgrouplist[0]['GroupPrivacy']==4 && $data['UserID']=='')
+			{
+				 $this->redirector('index', 'index');
+				return; //Never reached!
+			}
+			if($data['UserID']!=$restgrouplist[0]['User']) $groupowner=false;
+
+			if(!$groupowner) {
+				if($restgrouplist[0]['GroupPrivacy']==2 || $restgrouplist[0]['GroupPrivacy']==3 || $restgrouplist[0]['GroupPrivacy']==4) {
+					$status_group_joining = $res_group->checkGroupMemberJoinStatus($this->group,$data['UserID']);
+				}
+				
+				if($restgrouplist[0]['GroupRes']==1) {
+					$restrictpost=true;
+				}
+				if($status_group_joining==0 && !$groupowner)
+				{
+					//$this->_redirect('/');
+					//$_redirector->gotoUrl('/');
+				}
+			}
+		}
+		if($dbeecontrollers=='groupdetails' && $status_group_joining==0 && !$groupowner) {								
+				
+					//$_redirector->gotoUrl('/');
+									
+		}
+		?>
+		<!--Start header from here-->
+		<?php if(isset($data['UserID'])) { 		
+		$groupowner=true;
+		$restrictpost=false;
+		$status_group_joining = 3;
+		$openPost=1;
+		if($dbeecontrollers=='group' && $data['UserID']) {
+		$res_group = new Application_Model_Groups();
+		$restgrouplist = $res_group->calgroup($this->group);
+		if($data['UserID']!=$restgrouplist[0]['User']) $groupowner=false;								
+		if(!$groupowner) {
+			if($restgrouplist[0]['GroupPrivacy']==2 || $restgrouplist[0]['GroupPrivacy']==3) {
+				
+				$status_group_joining = $res_group->checkGroupMemberJoinStatus($this->group,$data['UserID']);
+			}
+			
+			if($restgrouplist[0]['GroupRes']==1) {
+				$restrictpost=true;
+			}
+		}
+		}
+
+		if($status_group_joining==0 && !$groupowner)
+		{
+		$openPost=0;
+
+		}							
+		else if($restrictpost) {
+			$openPost=0;
+		}  ?>
+		
+		<div id="header">
+			<!--Start Top menu from here-->
+			<div id="topMenu">
+				<div class="pageCenter">
+					<?php //if(ismobile!=0){ ?>
+					<ul class="mobileDevicesHeader">
+						<?php  if($data['UserID']){ ?> 		
+					    	<li><a href="javascript:void(0)" title="Profile" class="pull-left mSideBar"><i class="fa fa-bars"></i></a></li>				    	
+							<li id="notificationsTop">
+							<a href="javascript:void(0);" title="Notifications" > 
+								<i class="fa fa-bell fa-2x"></i>
+								<span class="balloonBox " id="actnotifications-top-wrapper" style="display:none"><i id="actnotifications-top"></i></span>
+							</a>
+						 </li>				
+							
+							<li class="headerSearch">
+								<form name="searchform" id="searchform" method="post" action="<? echo BASE_URL;?><? URL?>/myhome/search">
+									<input type="text" id="searchword" name="searchword" class="textfieldSearch"  value="" placeholder="search keyword or user">
+									<i class="fa fa-search"></i>
+									<input type="hidden" name="searchtype" id="searchtype">
+									<input type="hidden" name="searchid" id="searchid">									
+								</form>
+								<div style="float:left;" class="search-go" onclick="javascript:document.searchform.submit();"></div>
+							</li>
+							
+					    	<li class="startDbGeader">
+							<div class="btn popOver checkingaction" data-groupid="<?php echo $this->session_data['groupid']; ?>" controlName="<?php echo strtolower($dbeecontrollers)?>" id="startdbHeaderBtn"  data-title="db link" rel="dbtext" usertype="<?php echo $this->session_data['usertype'];?>" data-AdminApprove="<?php if($this->session_data['UserID']!=adminID){echo $this->allow_admin_post_live; } else { echo'0';} ?>" data-IsLeagueOn="<?php echo $this->IsLeagueOn; ?>" data-allow_user_create_polls="<?php echo $this->allow_user_create_polls; ?>" currentholder="off">
+							<i class="fa fa-pencil-square-o fa-2x createPostIcon"></i> <span>Create Post</span>
+							</div>
+						</li>
+						<?php } ?>
+					    <?php  if($this->session_data['role']!=3 && $this->session_data['role']!=100 &&!empty($this->session_data)) {  ?> 
+						<li class="goTobackAdminMobile"><a href="<?php echo adminURL; ?>">Back to admin</a></li>
+						<?php } ?>
+					</ul>
+					<?php// } ?>
+					
+					<?php //if(ismobile==0){ ?>
+					<ul class="headerMenu">
+					<?php if($data['UserID']){ ?> 
+						<input type="hidden" name="Logintype" id="Logintype" value="<?php echo $data['Socialtype']; ?>" >	
+						<li id="homePageBtn" <?php if($dbeecontrollers == 'myhome' && $dbeecontrollersaction == 'index' ){ ?> class="active" <?php } ?>><a href="<?php echo URL; ?>/myhome" title="Live Stream" ><i class="fa fa-home fa-2x"></i></a></li>
+						<li <?php if($dbeecontrollers == 'dashboarduser' && $dbeecontrollersaction == 'index' ){ ?> class="active" <?php } ?>><a href="<?php echo URL; ?>/user/<?php echo $myclientdetails->customDecoding($usersdata[0]['Username']);?>" title="My Dashboard" data-user="<?php echo $myclientdetails->customDecoding($usersdata[0]['Username']);?>" id="ProfileLink"><i class="fa fa-user fa-2x"></i> <span class="showMobilelable"> Profile </span></a></li>
+						<li id="notificationsTop">
+							<a href="javascript:void(0);" title="Notifications" > 
+								<i class="fa fa-bell fa-2x"></i> <span class="showMobilelable"> Notifications </span>
+								<span class="balloonBox " id="actnotifications-top-wrapper" style="display:none"><i id="actnotifications-top" ></i></span>
+								
+							</a>
+
+						</li>
+						<li class="topmessageMenu" id="topmessageMenu">
+							<a href="javascript:void(0);" title="Message" class="stng"><i class="fa fa-envelope"></i> <span class="showMobilelable">Message</span></a>
+							<span class="balloonBox" id="actnotifications-msg-top-wrapper" style="display:none"><i id="actnotifications-msg-top" ></i></span>
+							
+						</li>
+						<li class="topSettingMenu">
+							<a href="javascript:void(0);" title="Settings" class="stng"><i class="fa fa-cog fa-2x"></i> <span class="showMobilelable">Settings</span></a>
+							<ul>
+								<?php if($this->session_data['role']!=3 && $this->session_data['role']!=100 &&!empty($this->session_data)) { ?> 
+									<li class="goToAdminMobile"><a href="<?php echo adminURL; ?>">Back to admin</a></li>
+								<?php } ?>						
+								<li><a href="javascript:void(0);" id="account_setting" >My account</a></li>
+								<li class="myNotificationPage">
+									<a href="javascript:void(0);" id="my_notification" >My email notifications</a>
+								</li>
+								<li class="takeAtourOpen">
+									<a href="<?php echo URL; ?>/user/<?php echo $myclientdetails->customDecoding($usersdata[0]['Username']);?>?=taketour">Take a tour</a>
+								</li>
+								<li class="submenuLogout"><a href="javascript:void(0)" onclick="gologout()">Log out</a></li>
+							</ul>
+						</li>
+						<li class="headerSearch">
+							<div id="searchBox" >
+								<form name="searchform" id="searchform" method="post" action="<? echo BASE_URL;?>/myhome/search">
+									<input type="text" id="searchword" name="searchword" class="textfieldSearch searchwordani"  value="" placeholder="search keyword or user">
+									<i class="fa fa-search"></i>
+									<input type="hidden" name="searchtype" id="searchtype">
+									<input type="hidden" name="searchid" id="searchid">									
+								</form>
+								<div style="float:left;" class="search-go" onclick="javascript:document.searchform.submit();"></div>
+							</div>
+							<div class="headerSearchres"></div>
+						</li>
+						<li class="startDbGeader">
+							<div class="btn popOver checkingaction" data-groupid="<?php echo $this->session_data['groupid']; ?>" controlName="<?php echo strtolower($dbeecontrollers)?>" id="startdbHeaderBtn"  data-title="db link" rel="dbtext" usertype="<?php echo $this->session_data['usertype'];?>" data-AdminApprove="<?php if($this->session_data['UserID']!=adminID){echo $this->allow_admin_post_live; } else { echo'0';} ?>" data-IsLeagueOn="<?php echo $this->IsLeagueOn; ?>" data-allow_user_create_polls="<?php echo $this->allow_user_create_polls; ?>" currentholder="off">
+							<span>Create Post</span>
+							</div>
+						</li>
+					
+
+						<?php } ?>		
+					</ul>
+					<?php //} ?>
+			<input type="hidden" name="Social_Content_Block" value="<?php echo $this->Social_Content_Block; ?>"  id="Social_Content_Block">
+					
+					<input type="hidden" id="openPostDb" value="<? echo $openPost; ?>">					
+					
+				</div>
+			</div>
+			<span class="closeNavations"> </span>	
+			<!--End Top menu from here-->
+		</div>
+		<?php } ?>
+		<!--End header from here-->
+
+	<?php if(count($AllowTC) < 1 ){
+	echo '<input type="hidden" id="oracleTrm" value="'.nl2br($this->login_terms).'">';
+	} ?>
+	<input type="hidden" id="curr-notification-count">
+	<input type="hidden" id="notifications-top-hidden" value="<?=($_COOKIE['newdbcount-ghst']=='') ? '0' : $_COOKIE['newdbcount-ghst'];?>">
+	<input type="hidden" id="chkmention-hidden" value="<?=($_COOKIE['newmencount-ghst']=='') ? '0' : $_COOKIE['newmencount-ghst'];?>">
+	<input type="hidden" id="notifications-top-score-hidden" value="<?=($_COOKIE['newdbcountscore-ghst']=='') ? '0' : $_COOKIE['newdbcountscore-ghst'];?>">
+	<input type="hidden" id="notifications-top-comment-hidden" value="<?=($_COOKIE['newcommentcount-ghst']=='') ? '0' : $_COOKIE['newcommentcount-ghst'];?>">
+	<input type="hidden" id="notifications-top-msg-hidden" value="<?=($_COOKIE['newmsgcount-ghst']=='') ? '0' : $_COOKIE['newmsgcount-ghst'];?>">
+	<input type="hidden" id="notifications-top-grpinvite-hidden" value="<?=($_COOKIE['newgrpinvitecount-ghst']=='') ? '0' : $_COOKIE['newgrpinvitecount-ghst'];?>">
+	<input type="hidden" id="notifications-top-grpreq-hidden" value="<?=($_COOKIE['newgrpreqcount-ghst']=='') ? '0' : $_COOKIE['newgrpreqcount-ghst'];?>">
+
+	<input type="hidden" id="follownotify-hidden" value="<?=($_COOKIE['followingcount-ghst']=='') ? '0' : $_COOKIE['followingcount-ghst'];?>">
+	<input type="hidden" id="redbee-hidden" value="<?=($_COOKIE['redbeecount-ghst']=='') ? '0' : $_COOKIE['redbeecount-ghst'];?>">
+	<input type="hidden" id="league_idhidden" value="">
+	<div id="ghstpopup"><div id="ghstpopup-text"></div></div>	
+	<?php if($data['UserID']==''){
+		$classs = 'rockSign';
+	}
+	if(isset($data['UserID']) ) { ?>
+		<div id="mySideMenu" class="fixedMySideBar">
+			<!-- <a href="javascript:void(0)" class="pull-left" data-id="mySideMenuBtn"> <i class="fa fa-bars"></i> My side menu</a> -->
+			<div class="menuLinksTablink">
+				<ul>
+					<li>
+						<a href="<?php echo URL; ?>/myhome" title="Live Stream" >
+							<i class="fa fa-home fa-2x"></i> 
+							<span class="showMobilelable"> Home </span>
+						</a>
+					</li>
+					<li>
+						<a href="<?php echo URL; ?>/user/<?php echo $myclientdetails->customDecoding($usersdata[0]['Username']);?>" title="My Dashboard" id="ProfileLink">
+							<i class="fa fa-user fa-2x"></i>
+							<span class="showMobilelable"> Profile </span>
+						</a>
+					</li>
+					<li class="topmessageMenu" id="topmessageMenu">
+						<a href="javascript:void(0);" title="Message" class="stng">
+							<strong class="moMessage">
+								<i class="fa fa-envelope"></i> 
+								<span class="balloonBox" id="actnotifications-msg-top-wrapper" style="display:none"><i id="actnotifications-msg-top" ></i></span>
+							</strong>
+							<span class="showMobilelable">Message</span>
+						</a>
+						<!-- <ul>			
+							<li><a href="<?php echo BASE_URL; ?>/message">My messages</a></li>
+							<li class="myNotificationPage">
+								<a href="javascript:void(0);"  id="send_msgtop" >New message</a>
+							</li>
+							
+						</ul> -->
+					</li>
+						<li class="topSettingMenu ">
+							<a href="javascript:void(0);" title="Settings" class="stng"><i class="fa fa-cog fa-2x"></i> <span class="showMobilelable">Settings</span></a>
+							<ul>
+								<?php if($this->session_data['role']!=3 && $this->session_data['role']!=100 &&!empty($this->session_data)) { ?> 
+									<li class="goToAdminMobile"><a href="<?php echo adminURL; ?>">Back to admin</a></li>
+								<?php } ?>						
+								<li><a href="javascript:void(0);" id="account_setting" >My account</a></li>
+								<li class="myNotificationPage">
+									<a href="javascript:void(0);" id="my_notification" >My email notifications</a>
+								</li>
+								<li class="takeAtourOpen">
+									<a href="<?php echo URL; ?>/user/<?php echo $myclientdetails->customDecoding($usersdata[0]['Username']);?>?=taketour">Take a tour</a>
+								</li>
+							</ul>
+						</li>
+						<li class="active"><a href="javascript:void(0)" data-id="myRighSideBtn" class="pull-right"><i class="fa fa-arrow-right"></i></a></li>
+				</ul>
+			</div>
+		</div>	
+	<?php }?>
+
+		<!--Start Page Container from here-->
+		
+		<div id="pageContainer">
+
+			<div class="pageCenter <?php echo $classs; ?>" id="pageCenterCont">
+               
+				<?php  
+				if($this->session_data['role']!=3 && $this->session_data['role']!=100 &&!empty($this->session_data)) {
+				       //echo $this->session_data['role'];die('---------'); 
+                       $Roledetailsval = new Admin_Model_Reporting();
+                       $AllRolesdetailslist = $Roledetailsval->getRolesDetails($this->session_data['role']);
+                       $modulefirst = $AllRolesdetailslist[0]['module'];
+                       $controllerfirst = $AllRolesdetailslist[0]['controller']; 
+                       $actionfirst = $AllRolesdetailslist[0]['action'];
+                       if($this->session_data['role']!=1){
+                       $urlrole = "/".$modulefirst."/".$controllerfirst."/".$actionfirst;
+                       }
+                       else{
+                        $urlrole ="/admin/index";
+                       }
+					?> 
+				<a href="<?php echo BASE_URL.$urlrole; ?>/" class="goToAdmin">Back to admin</a>
+				<?php } ?>
+				<a href="#" id="scrollTop" class="scrollTop"></a>
+				<?php $st = ''; if($this->configuration->headerposition=='fullwidth') { $st="fullBannerActive"; } ?>
+				
+				<div id="postHeader" class="hasBackground <?php echo $st; ?>">
+					<div class="brandLogo">
+						<?php 
+						
+						$action=Zend_Controller_Front::getInstance()->getRequest()->getActionName();
+						if($data['UserID']==''){  
+							
+							$LogoImage = '<img src="'.BASE_URL.'/img/'.$this->configuration->SiteLogo.'" />';
+
+							echo $LogoImage;
+						}
+						?>
+				    </div>
+				    
+					<?php  
+					echo '<input type="hidden" id="usersindb" value="'.count($dbinleague).'">';
+					if(count($dbinleague) >0 && $data['UserID']!=''){   
+						echo '<input type="hidden" id="leaguename" value="'.$dbinleague[0]['Title'].'"><input type="hidden" id="leaguedbpartid" value="'.$dbinleague[0]['LID'].'">'; 
+					?>
+				  	
+					<?php } ?>
+					<?php $dbeecontrollers = Zend_Controller_Front::getInstance()->getRequest()->getControllerName();	if($dbeecontrollers!='dbeedetail' && $dbeecontrollers!='notification' && $dbeecontrollers!='message' && $dbeecontrollersaction != 'serchresult' && $dbeecontrollersaction != 'hashtag') { 						
+                        $userprofile = $checkImage->checkImgExist($userinfo['ProfilePic'],'userpics','default-avatar.jpg');
+						if($dbeecontrollers!='Urlerror'){
+						?>		
+						<div class="userWelcomeMsg">
+							<!-- <img src="<?php echo URL .'/timthumb.php?src=/userpics/'.$userprofile.'&q=100&w=59&h=55' ?>"  border="0"> -->
+							<!-- <span>Hi <b><?php echo $myclientdetails->customDecoding($userinfo['Name']); ?></b>, what would you like to talk about?</span> -->						</div>
+						<?php
+                            }
+						 }else{ ?>
+						<div class="userWelcomeMsg">
+						</div>
+					<?php }
+					$logintype = Zend_Controller_Front::getInstance()->getRequest()->getParam('type');
+					if($data['UserID']){
+						if($dbeecontrollers == 'myhome' && $dbeecontrollersaction != 'serchresult' && $dbeecontrollersaction != 'hashtag')
+						{  
+							?>
+
+							<?php
+						} 
+					} else if(isset($_GET) && ($_GET['type']!='' && $_GET['type']!='dbee') || ($_GET['sptype']!='' && $_GET['sptype']!='dbee')) { 
+						$type = ($_GET['type'])?$_GET['type']:$_GET['sptype'];
+					?>
+						<div class="plzSignin">	
+							<div class="please-signin">
+								<a href="javascript:void(0);" type="<?php echo $type; ?>" class="Loginpopup" >
+									Please sign in to have your say... <i class="fa fa-sign-in fa-lg"></i>
+								</a>
+							</div>
+							<!-- <div style="float:left"><a href="javascript:void(0);" type="<?php echo $type; ?>" class="Loginpopup" ><div class="btn btn-yellow popOver"  style="top:-10px;">Sign In</div></a></div> -->
+						</div>
+					<?php
+					}else if(isset($logintype) && $logintype!='' && $logintype!='dbee') { ?>
+
+					<div class="plzSignin">	
+						<div class="please-signin">
+							<a href="javascript:void(0);" type="<?php echo $type; ?>" class="Loginpopup" >
+								Please sign in to have your say... <i class="fa fa-sign-in fa-lg"></i>
+							</a>
+						</div>
+						<!-- <div style="float:left"><a href="javascript:void(0);" type="<?php echo $logintype; ?>" class="Loginpopup" ><div class="btn btn-yellow popOver"  style="top:-10px;">Sign In</div></a></div> -->
+					</div>
+
+					<?php } else {
+					?>
+					   
+					   <div class="plzSignin">	
+							<div class="please-signin">
+								<a href="<?php echo URL; ?>">
+									Please sign in to have your say... <i class="fa fa-sign-in fa-lg"></i>
+								</a>
+							</div>
+							<!-- <div style="float:left"><a href="<?php echo URL; ?>"><div class="btn btn-yellow popOver"  style="top:-10px;">Sign In</div></a></div> -->
+						</div>
+
+					<?php } ?>
+					<div class="clear"></div>	
+									
+				</div>
+				
+	<?php 
+} 
+
+// End of checking controllers
+
+echo '<input type="hidden" id="usergloabtype" value="'.$data['usertype'].'">';
+echo '<input type="hidden" id="snc" value="">';
+//echo  $this->tsrss.'tss rss';
+  ?>
+<?php 
+
+if($this->ShowWarningPopup == "YES") { ?>
+<script> 
+	$(document).ready(function(){
+
+		var SpAcceptPopup = '<div style="margin-top:5px; text-align:center" class="ajaxsocialblock" ><?php echo $this->ShowWarningPopupContent; ?></div>\
+            <div style="margin-top:5px; text-align:center" >\
+              <a href="javascript:void(0);" class=" btn btn-yellow"  id="ShowWarningPopup" >OK</a>\
+            </div>';
+      $messageWarning(SpAcceptPopup);
+    });
+</script>
+<?php } 
+if(isset($this->session_name_space->ForceLogout) && $this->session_name_space->ForceLogout == "logout") { ?>
+<script>
+	$(document).ready(function(){
+		showForceLogout();
+		setTimeout("window.parent.location='/myhome/logout'",3000);	
+	});
+</script>
+<?php } 
+
+if($usersdata[0]['newfeatures']==1) {  	?>
+
+	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+	<meta http-equiv="Pragma" content="no-cache" />
+	<meta http-equiv="Expires" content="Thu, 19 Nov 1981 08:52:00 GMT" />
+
+
+	<meta http-equiv='cache-control' content='no-cache'>
+	<meta http-equiv='expires' content='Thu, 19 Nov 1981 08:52:00 GMT'>
+	<meta http-equiv='pragma' content='no-cache'>
+
+	<script language="javascript" type="text/javascript">
+		$().ready(function() {               	
+			$.dbeePopup('<span style="color:#fff;font-size:16px;padding-top:45px;display:inline-block">We have recently upgraded your platform with some new features. Please log back in to refresh your session.</span>',{closeBtnHide:true, otherBtn: '<a href="javascript:void(0)"  class="btn btn-yellow pull-right" onclick="acceptNewFeatures(\'<?php echo $data['UserID'] ?>\')">Log me out and update my session</a>'});
+		});   
+	</script>
+<?php } ?>
+
+<input type="hidden" name="mentionpostuser" id="mentionpostuser">
+<!-- check accept reject popup -->
+<!-- starting of main page  -->
+
+
+<div id="pageContent" page-type="homepage">	
+
+<?php 
+
+include "leftnavbar.phtml";
+if(ismobile==0){
+	if($dbeecontrollers=='myhome' || $dbeecontrollers=='profile' || $dbeecontrollers=='Dashboarduser' || $dbeecontrollers=='dashboarduser' || $dbeecontrollers=='Group' || $dbeecontrollers=='dbleagues' || $dbeecontrollers=='message' || $dbeecontrollersaction=='main'){	
+		echo $leftSideBar;
+	} 
+}
+else{ echo $leftSideBar; }

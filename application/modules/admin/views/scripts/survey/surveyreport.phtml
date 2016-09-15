@@ -1,0 +1,226 @@
+<script>
+$(function(){
+	$('body').on('click','.surveyReportLeftTitle a.btn-mini', function(){
+		
+		var DbeeID = '';
+		var gaobj = $(this);
+		var DbeeID = $('#dbeeid').val();
+		$( "#detailsDialog" ).remove();
+	 	var htmlLightbox = '<div id="detailsDialog"  title="Platform users"><div id="grouplist"></div>\
+	 	 	<div id="userInfoContainer"></div>\
+							</div>';
+		var checkHtml = '<label class="surveychkall">\
+							<input type="checkbox" value="1" id="grpchkall" class="goupuser" name="commentduring" >\
+							<label for="grpchkall"></label>\
+							Select all\
+						</label>';
+
+		var caseval = $('a.btn-green.filterclass').attr('data-case');
+
+								
+	    $('body').append(htmlLightbox);
+	    $( "#detailsDialog" ).dialog({
+	        dialogClass:'detailsDialog',             
+	        width:800,
+	        height:500,  
+	        title:'Add users to admin user set',
+	        open:function(){                
+	            $fluidDialog();
+	             $("#datacollect").html('');      
+	             $('#userInfoContainer').append('<div class="loaderOverlay2"></div>'); 
+	            
+	              // $('.ui-dialog-buttonset').before(htmlCheckAll);
+	         	$.ajax({
+			        type : "POST",
+			        dataType : 'json',
+			        data:{'DbeeID':DbeeID,'caseval':caseval},
+			        url : BASE_URL + '/admin/dashboard/surveygroupuserlist',		      
+			        success : function(response) 
+			        {    $('.loaderOverlay2').remove();
+		                  $('#detailsDialog #userInfoContainer').html(response.content);
+		                  $('#detailsDialog #grouplist').html(response.grouplist+checkHtml);
+					}
+
+			    });
+	        }
+		});
+		
+	});
+	
+})
+
+$('body').on('click','#AllCorrectAnsUser', function(){
+  var dbeeid=<?=$this->surveyDetails['DbeeID']?>;
+    $.ajax({
+        url: BASE_URL+'/admin/survey/allcorrectansuser',
+        type: 'POST',
+        data:  {"dbeeid":dbeeid},
+        beforeSend:function(){              
+            //$('#filtercorrectanswer').append('<i class="fa fa-spin fa-spinner"></i>'); 
+         },
+        success: function(responce)
+        {
+           //$('.fa-spinner').remove();
+           $('.filterclass').removeClass('btn-green').addClass('btn-gray');
+           $('#AllCorrectAnsUser').addClass('btn-green');
+           $('#filtercorrectanswer').html(responce.content);
+          if(responce.count==0)
+          {
+          	$('.adduserset').addClass("disabled");
+          	$('.adduserset').removeClass("btn-mini");
+          	$('.adduserset').css({"font-size": "12px", "font-size": "12px", "padding": "5px"});
+         }
+          else
+          {
+          	$('.adduserset').removeClass("disabled");
+          	$('.adduserset').addClass("btn-mini");
+          }
+           $("#filtercorrectanswer li:first").trigger("click");
+        }
+      });
+ });
+
+$('body').on('click','#AtLeastOneCorrect', function(){
+    var dbeeid=<?=$this->surveyDetails['DbeeID']?>;
+    $.ajax({
+        url: BASE_URL+'/admin/survey/atleastonecorrect',
+        type: 'POST',
+        data:  {"dbeeid":dbeeid},
+        beforeSend:function(){              
+            //$('#filtercorrectanswer').append('<i class="fa fa-spin fa-spinner"></i>');
+         },
+        success: function(responce)
+        {
+          //$('.fa-spinner').remove();
+          $('.filterclass').removeClass('btn-green').addClass('btn-gray');
+          $('#AtLeastOneCorrect').addClass('btn-green');
+          $('#filtercorrectanswer').html(responce.content);
+           if(responce.count==0)
+          {
+          	$('.adduserset').addClass("disabled");
+          	$('.adduserset').removeClass("btn-mini");
+          	$('.adduserset').css({"font-size": "12px", "font-size": "12px", "padding": "5px"});
+          	
+          }
+          else
+          {
+          	$('.adduserset').removeClass("disabled");
+          	$('.adduserset').addClass("btn-mini");
+          }
+
+          $("#filtercorrectanswer li:first").trigger("click");
+        }
+      });
+ });
+
+$('body').on('click','#AllSurveyUser', function(){
+	var dbeeid=<?=$this->surveyDetails['DbeeID']?>;
+     $.ajax({
+        url: BASE_URL+'/admin/survey/allsurveyuser',
+        type: 'POST',
+        data:  {"dbeeid":dbeeid},
+        beforeSend:function(){              
+            //$('#filtercorrectanswer').append('<i class="fa fa-spin fa-spinner"></i>');
+         }, 
+        success: function(responce)
+        {
+          //$('.fa-spinner').remove();
+          $('.filterclass').removeClass('btn-green').addClass('btn-gray');
+          $('#AllSurveyUser').addClass('btn-green');
+          $('#filtercorrectanswer').html(responce.content);
+          if(responce.count==0)
+          {
+          	$('.adduserset').addClass("disabled");
+          	$('.adduserset').removeClass("btn-mini");
+          	$('.adduserset').css({"font-size": "12px", "font-size": "12px", "padding": "5px"});
+          	
+          }
+          else
+          {
+          	$('.adduserset').removeClass("disabled");
+          	$('.adduserset').addClass("btn-mini");
+          }
+
+          $("#filtercorrectanswer li:first").trigger("click");
+
+        }
+      });
+ });
+
+</script>
+
+<h1 class="pageTitle dbeeViewAll">Survey report 
+  <a href="<?php echo BASE_URL ;  ?>/admin/survey" class="btn btn-black pull-right">Back</a>
+ </h1>
+
+<div class="clearfix"></div>
+<div id="surveyDetailsPage">
+<div style="position:relative" class="surveryWrpTitle">
+<ul class="listStyle1" >
+	<li data-id="<?php echo $this->dbeeid; ?>">
+<input type="hidden" name="dbeeid" id="dbeeid" value="<?php echo $this->dbeeid; ?>">
+		<div class="surveyDetailsTitle" >
+			<?php echo $this->surveyDetails['surveyTitle']; ?>
+		</div>
+		<?php if($this->surveyDetails["surveyPdf"]!=''){ ?>
+			<div class="listBtnsWrp">
+				<a href="<?php echo BASE_URL ?>home/dashboard/downloadpdf/filepdf/<?php echo $this->surveyDetails["surveyPdf"]; ?>"  class="btn btn-black btn-mini">View PDF</a>
+			</div>
+		<?php } ?>
+	</li>
+</ul>
+
+</div>
+<?php 
+$obj = new Admin_Model_Deshboard(); 
+
+$result = $this->dashboard->surveyuserdetails($this->surveyDetails['DbeeID']); 
+if(!empty($result))
+{
+?>
+<div class="surveyLeftPanel questionRow">
+	<div class="surveyReportLeftTitle">Users who took this survey	
+		<a class="pull-right btn btn-mini btn-yellow adduserset" style="margin-top:-6px;" surveyid="6" href="#">
+		Add to user set
+		</a>
+	</div>
+
+ <ul>
+ <div style="margin:10px 0 5px 0;">
+ <div class="surveyTabOver">
+      <a class="btn-green filterclass" data-case="1" id="AllSurveyUser" href="javascript:void(0);">All users </a> 
+      <?php if($this->totalCorrectAns > 0) { ?>
+		  <a class="btn-gray filterclass" data-case="2" id="AllCorrectAnsUser" href="javascript:void(0);">All correct</a> 
+		  <a class="btn-gray filterclass" data-case="3" id="AtLeastOneCorrect" href="javascript:void(0);">At least one correct</a>
+      <?php } ?>
+</div>
+ <input type="hidden" name="userIDval" id="userIDval" value=""> 	
+ <input type="hidden" name="username" id="username" value=""> 
+ <div id="filtercorrectanswer">	
+<?php 
+
+	foreach ($result as $value) 
+	{
+		echo '<li class="questionName" data-id="'.$value['UserID'].'" data-username="'.$this->myclientdetails->customDecoding($value['Name']).' '.$this->myclientdetails->customDecoding($value['lname']).'" rel="dbTip" title="Click to see results for this user">
+		  			<div class="userimage">
+						<img src="'.IMGPATH.'/users/small/'.$value['ProfilePic'].'" width="32" height="32" border="0"/>
+					</div>
+					<strong>'.$this->myclientdetails->customDecoding($value['Name']).' '.$this->myclientdetails->customDecoding($value['lname']).'</strong>
+		  		</li>';
+	}
+
+?>
+</div>
+</ul>
+</div>
+<div id="surveyresultuser"  class="surveyRightPanel"></div>
+<div id="surveyresult"  class="surveyRightPanel"></div>
+</div>
+<?php  } else
+		echo '<div class="nosurveyresults" ><span class="notfound">No one has taken this survey yet</span></div>'; ?>
+
+
+
+
+
+

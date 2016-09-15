@@ -1,0 +1,181 @@
+<script type="text/javascript">
+$(function(){
+
+})
+</script>
+<?php
+        $jsonEmailtemplateval = $this->emailTemplatejson;
+        $myImgurl = BASE_URL.'/adminraw/img/bgs/';
+        $logoImgurl = BASE_URL.'/adminraw/img/emailbgimage/';
+		$defaultemailtemplateval = Array(
+                                    'fontColor' => 'cccccc',
+                                    'background' => 'e8e9eb', 
+                                    'bodycontentfontColor' =>'cccccc',
+                                    'bodycontentbacgroColor' =>'e8e9eb',
+                                    'bodycontenttxture' =>'',
+                                    'headerfontColor' =>'333',
+                                    'headerbacgroColor' =>'fff',
+                                    'headertxture' =>'',
+                                    'contentbodyfontColor' => '333',
+                                    'contentbodybacgroColor' => 'fff',
+                                    'contentbodytxture' =>'',
+                                    'bannerfreshimg' =>BASE_URL.'/adminraw/img/emailbgimage/dblogo-black.png',
+                                    'footerfontColor' => '333',
+                                    'footerbacgroColor' => 'd3d3d3',
+                                    'footertxture' => '',
+                                    'footerMsgval' => 'powered by db corporate social platforms'
+                                   );
+        
+?>
+<h1 class="pageTitle">Email templates</h1>
+
+  <div class="bannerCheck " mahvalue="">
+			<label><input type="radio" value="0" class="bannerTypeMethod" id="bannerTypeMethod" name="bannerTypeMethod" checked="checked" >
+				<label for="bannerTypeMethod"></label>Design
+			</label >
+			<label><input type="radio" value="1" class="bannerTypeMethod" id="bannerTypeMethod2"  name="bannerTypeMethod">
+				<label for="bannerTypeMethod2"></label> Email body
+			</label>
+  </div>
+ 
+				<!-- <div class="fromnamefield">
+					<div class="selectAreaModify">From</div>
+					<input type="text" value="<?php echo FromName;?>" class="fromname" id="fromname"  name="fromname">
+				</div>  -->          
+				<div id="pageContainer" style="clear:both">					
+					<!--Container -->
+					<div class="appearanceWrapper">
+						<div class="apperanceHeader">
+							<div class="col2">
+								<div class="selectAreaModify">Current selection: <span id="currselection" style="color:#999">Design</span></div>
+								<div class="msgfortemp">Click an area on template below to modify. You can change the header, the main body section, the footer and the overall background.</div>
+                            </div>
+                            <div class="col2">
+                            	<span class="btn btn-green pull-right" id="resetTemplate" style="margin-left:5px; display:none">Reset</span>
+					            <a href="#" class="btn btn-green pull-right" id="saveTemplate">Save</a>	        																		           														
+								<div class="emailtemplate pull-right" style="display:none">
+									<div class="fieldInput">
+											<select name="emailtemplateSelect" class="selectoptEmailtemp">
+											    <?php  foreach($this->emailTemplate as $key => $etempval){?>
+													<option value="<?php  echo $etempval['id'];?>" id="<?php echo $etempval['id'];?>" caseid="<?php echo $etempval['case'];?>"><?php echo htmlentities($etempval['keyword']);?></option>
+												<?php  } ?>	
+											</select>											
+									</div>
+									
+					            </div>
+
+				            <div class="sidetemplate pull-right" style="display:none; margin-right: 5px;">
+								<div class="sideInput">
+									<select name="sideSelect" class="sidetemp">
+										<option value="admin" id="adminside">Emails sent from admin area</option>
+										<option value="front" id="frontside">Emails sent from platform</option>
+									</select>											
+								</div>
+				            </div>
+				            <div class="subjectedit formedit" for="subjectEnter">
+								<label>From </label>
+								<input  id="subjectEnter" value="<?php echo FromName;?>" class="fromnameval">
+								
+							</div>
+
+							</div>
+							<div class="clearfix"></div>
+						</div>
+						<div class="apperanceContainer" >
+							<div id="toolBoxEditor" draggable="true">
+								<div class="fieldRow">
+									<h2 class="titleEditingType"><span>Body</span> <i class="fa fa-minus pull-right"></i></h2>									
+								</div>
+								<div class="toolboxMainContainer">
+								<div class="fieldRow">
+								<div class="formRow">
+									<label>Select logo / banner</label>
+									<div class="uploadBannerLogo" >
+									<form  class="dropzone" id="myBanner" enctype="multipart/form-data">
+										<div class="fallback">
+											<input type="file" name="file" value="Browse" />
+										</div>
+									</form>
+
+						
+									</div>
+									
+								</div>
+								</div>
+								<form id="mainForm">
+								<div class="fieldRow" id="footerNotes">
+									<label>Footer notes</label>	
+									<div class="colorPickerWrapper">
+										<input type="text">
+									
+									</div>									
+								</div>	
+								<div class="fieldRow" id="fontcol">
+									<label>Font colour</label>
+									
+									<div class="colorPickerWrapper">
+										<input style="background:<?php echo $jsonEmailtemplateval['fontColor'];?>" type="text" name="fontColor" class="fontcolorclass" id="fontColor"readonly value="<?php if($jsonEmailtemplateval['fontColor']){echo $jsonEmailtemplateval['fontColor'];}else{echo $defaultemailtemplateval['fontColor'];}?>">
+										<button type="button" class="colpicker" id="fontColor_colpicker"><i> </i></button>
+									</div>									
+								</div>
+								<div class="fieldRow">
+									<label>Background colour</label>	
+									<div class="colorPickerWrapper">
+										<input style="background:<?php echo $jsonEmailtemplateval['background'];?>" type="text" name="background" class="bacgroColor" readonly id="bacgroColor" value="<?php if($jsonEmailtemplateval['background']){echo $jsonEmailtemplateval['background'];}else{echo $defaultemailtemplateval['background'];}?>">
+										<button type="button" class="colpicker"><i> </i></button>
+									</div>									
+								</div>
+								<div class="fieldRow chooseTexture">
+									<input type="checkbox" name="" id="txture" value="value="<?php if($jsonEmailtemplateval['background']){echo $jsonEmailtemplateval['background'];}else{echo $defaultemailtemplateval['background'];}?>"">
+									<label for="txture">Background texture</label>
+									<div>
+										<ul>
+											<li><a href="#" rel="dbTip" title="no texture" class="noTexture"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/0.png"></a></li>
+											<li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/1.png"></a></li>
+											<li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/2.png"></a></li>
+											<li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/3.png"></a></li>
+											<li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/4.png"></a></li>
+											<li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/5.png"></a></li>
+											<li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/6.png"></a></li>
+											<li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/7.png"></a></li>
+											<li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/8.png"></a></li>
+											<li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/9.png"></a></li>
+											<li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/10.png"></a></li>
+											<li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/11.png"></a></li>
+											<li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/12.png"></a></li>
+											<li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/13.png"></a></li>
+											<li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/14.png"></a></li>
+											<li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/15.png"></a></li>
+											<li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/16.png"></a></li>
+											<li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/17.png"></a></li>
+											<li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/18.png"></a></li>
+											<li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/19.jpg"></a></li>
+											<li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/20.jpg"></a></li>
+											<li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/21.jpg"></a></li>
+											<li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/22.jpg"></a></li>
+											<li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/23.jpg"></a></li>
+											<li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/24.jpg"></a></li>
+										</ul>
+							<div>
+	<input id="bodycontentfontColor" type="hidden" name="bodycontentfontColor" value="<?php if($jsonEmailtemplateval['bodycontentfontColor']){echo $jsonEmailtemplateval['bodycontentfontColor'];}else{echo $defaultemailtemplateval['bodycontentfontColor'];}?>"><input id="bodycontentbacgroColor" type="hidden" name="bodycontentbacgroColor" value="<?php if($jsonEmailtemplateval['bodycontentbacgroColor']){echo $jsonEmailtemplateval['bodycontentbacgroColor'];}else{echo $defaultemailtemplateval['bodycontentbacgroColor'];}?>"><input id="bodycontentTxture" type="hidden" name="bodycontenttxture" value="<?php if($jsonEmailtemplateval['bodycontenttxture']){echo $jsonEmailtemplateval['bodycontenttxture'];}else{echo $defaultemailtemplateval['bodycontenttxture'];}?>">
+
+	<input id="headerfontColor" type="hidden" name="headerfontColor" value="<?php if($jsonEmailtemplateval['headerfontColor']){echo $jsonEmailtemplateval['headerfontColor'];}else{echo $defaultemailtemplateval['headerfontColor'];}?>"><input id="headerbacgroColor" type="hidden" name="headerbacgroColor" value="<?php if($jsonEmailtemplateval['headerbacgroColor']){echo $jsonEmailtemplateval['headerbacgroColor'];}else{echo $defaultemailtemplateval['headerbacgroColor'];}?>"><input id="headerTxture" type="hidden" name="headertxture" value="<?php if($jsonEmailtemplateval['headertxture']){echo $jsonEmailtemplateval['headertxture'];}else{echo $defaultemailtemplateval['headertxture'];}?>"> 
+
+    <input id="contentbodyfontColor" type="hidden" name="contentbodyfontColor" value="<?php if($jsonEmailtemplateval['contentbodyfontColor']){echo $jsonEmailtemplateval['contentbodyfontColor'];}else{echo $defaultemailtemplateval['contentbodyfontColor'];}?>"><input id="contentbodybacgroColor" type="hidden" name="contentbodybacgroColor" value="<?php if($jsonEmailtemplateval['contentbodybacgroColor']){echo $jsonEmailtemplateval['contentbodybacgroColor'];}else{echo $defaultemailtemplateval['contentbodybacgroColor'];}?>"><input id="contentbodyTxture" type="hidden" name="contentbodytxture" value="<?php if($jsonEmailtemplateval['contentbodytxture']){echo $jsonEmailtemplateval['contentbodytxture'];}else{echo $defaultemailtemplateval['contentbodytxture'];}?>">
+
+    <input id="bannerfreshimg" type="hidden" name="bannerfreshimg" value="<?php if($jsonEmailtemplateval['bannerfreshimg']){echo $jsonEmailtemplateval['bannerfreshimg'];}else{echo $defaultemailtemplateval['bannerfreshimg'];}?>">
+
+	<input id="footerfontColor" type="hidden" name="footerfontColor" value="<?php if($jsonEmailtemplateval['footerfontColor']){echo $jsonEmailtemplateval['footerfontColor'];}else{echo $defaultemailtemplateval['footerfontColor'];}?>"><input id="footerbacgroColor" type="hidden" name="footerbacgroColor" value="<?php if($jsonEmailtemplateval['footerbacgroColor']){echo $jsonEmailtemplateval['footerbacgroColor'];}else{echo $defaultemailtemplateval['footerbacgroColor'];}?>"><input id="footerTxture" type="hidden" name="footertxture" value="<?php if($jsonEmailtemplateval['footertxture']){echo $jsonEmailtemplateval['footertxture'];}else{echo $defaultemailtemplateval['footertxture'];}?>">
+	<div id='areatyperet' value="<?php echo $this->areatype?>" style="display:none"></div>
+							</div>
+									</div>									
+								</div>
+							    </form>
+							</div>
+							</div>
+						<iframe src="<?php echo BASE_URL;?>/admin/emailtempsetting/emailtemplete" id="editIframe"  width="100%" allowfullscreen="true" ></iframe>
+						</div>
+					
+					
+					</div>
+				</div>

@@ -1,0 +1,50 @@
+<?php
+$request = $this->request;
+?>
+
+<?php	if($request['emailverification']=='true')
+	{ ?>
+		<script>
+		$(function(){
+			$dbConfirm({content:'Your email address successfully changed', yes:false,error:false,delay:5000});
+		});
+		</script>
+<?php }?>
+<?php	if($request['emailverification']=='false')
+	{ ?>
+		<script>
+		$(function(){
+			$dbConfirm({content:'Sorry this email address is already registered with another user. ', yes:false,error:false,delay:5000});
+		});
+		</script>
+<?php }?>
+
+<?php	if($request['emailverification']=='xfalse')
+	{ ?>
+		<script>
+		$(function(){
+			$dbConfirm({content:'Invalid!  ', yes:false,error:false,delay:5000});
+		});
+		</script>
+<?php }
+
+?>
+<?php	if($request['emailverification']=='invalid')
+	{ ?>
+		<script>
+		$(function(){
+			$dbConfirm({content:'Invalid! ', yes:false,error:false,delay:5000});
+		});
+		</script>
+<?php }
+
+?>
+<script>
+		$(function(){
+			setTimeout(function(){ window.location.href=BASE_URL; }, 5000);
+
+			
+			//window.location.href=BASE_URL;
+		});
+	
+</script>

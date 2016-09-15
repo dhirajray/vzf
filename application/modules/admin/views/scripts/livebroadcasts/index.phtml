@@ -1,0 +1,796 @@
+<?php         
+   $this->title = "Add YouTube Live Streaming";
+   $this->headTitle($this->title);
+    $domainAPIData = $this->myclientdetails->getRowMasterfromtable('domainAPI',array('google_email','google_password'));
+    
+   ?>
+<script type="text/javascript" src="<?php echo BASE_URL."/adminraw/js/angular.min.js";?>"></script>
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+<script type="text/javascript">
+$('document').ready(function(){     
+$('div #searchContainer').show();
+
+});
+</script>
+
+<script type="text/javascript">
+$('document').ready(function(){
+   $("#date_text").datepicker();
+});
+</script>
+<?php if($this->invite=='facebook'){ ?>
+<script type="text/javascript">
+  $('document').ready(function(){
+    facebookUser(<?php echo $this->postID; ?>,'<?php echo $this->type; ?>');
+  });
+</script>
+<?php } ?>
+
+<?php if($this->invite=='twitter'){  ?>
+<script type="text/javascript">
+  $('document').ready(function(){
+  twitterUser(<?php echo $this->postID; ?>,'<?php echo $this->type; ?>');
+    });
+</script>
+<?php } ?>
+
+<?php if($this->invite=='linkedin'){ ?>
+<script type="text/javascript">
+  $('document').ready(function(){
+    linkedinUser(<?php echo $this->postID; ?>,'<?php echo $this->type; ?>');
+  });
+</script>
+<?php } ?>
+
+<script type="text/javascript">
+$('document').ready(function(){
+  $("#date_text").datepicker();
+});
+
+$(function(){
+$('body').on('click','.reqtojoinuser',function(e){   
+    e.preventDefault();
+    e.stopPropagation();
+    var DbeeID = $(this).attr('dbid');
+    var type = $(this).attr('type');
+    $('#detailsDialog').remove();
+        var htmlLightbox = '<div id="detailsDialog"  title="Users who have requested to join">\
+            <div id="datacollect" style="float:none"></div>\
+            <div id="userInfoContainer"></div>\
+        </div>';
+        $('body').append(htmlLightbox);
+        $( "#detailsDialog" ).dialog({
+      dialogClass:'detailsDialogBox',             
+      width:800,
+      height:500,             
+      open:function(event, ui){
+        $fluidDialog();
+        $("#datacollect").html('');      
+        $('.ui-dialog-content').append('<div class="loaderOverlay2"></div>'); 
+          $.ajax({
+            type : "POST",
+            dataType : 'json',
+            url : BASE_URL + '/admin/dashboard/attendiesuserlist1',
+            data : {'id':DbeeID,'type':type},
+            success : function(response) {
+              $('.loaderOverlay2').remove();
+              $('#userInfoContainer').html(response.content);
+            }
+          });
+      },
+      buttons: {                     
+        "Accept Request": function() 
+        {   
+          var dbeeID = $('#dbeeid').val();            
+          var attenusr = [];
+          var thisEl = $(this);
+          $('input:checkbox[name=attendeduser]').each(function(){    
+            if($(this).is(':checked'))
+            attenusr.push($(this).val());
+          });
+          
+          if(attenusr.length=='')
+            $messageError('Please select a user');
+          
+          var ateeenuserstring = attenusr.join();
+          if(attenusr.length==0)
+            return false;
+              
+          $.ajax({
+            type : "POST",
+            dataType : 'json',
+            data:{'ateeenuserstring':attenusr,'dbeeID':dbeeID},
+            url : BASE_URL + '/admin/social/updatejoinrequser',                       
+            success : function(response) {dbeeID
+              $messageSuccess(response.message);
+              thisEl.dialog( "close" );
+              if(localTick == false)
+                socket.emit('chkactivitynotification', true,clientID);
+              window.location.reload();
+            }
+          });
+        }
+      },
+      close : function(event, ui) { 
+        var scrollTop = $('html').css('overflow', 'auto').attr('data-scrollTop') || 0;
+        if( scrollTop ) $('html').scrollTop( scrollTop ).attr('data-scrollTop','');
+      }
+  });
+
+
+});
+
+$('body').on('click','.attendiesuser',function(e){   
+  e.preventDefault();
+  e.stopPropagation();
+  var DbeeID = $(this).attr('dbid');
+  var type = $(this).attr('type');
+
+  $('#detailsDialog').remove();
+  //var dbid = $('#dbid').val();
+    var htmlLightbox = '<div id="detailsDialog"  title="Attendees">\
+                                        <div class="srcUsrWrapper">\
+                                        </div>\
+                                                        <div id="datacollect" style="float:none"></div>\
+                                                        <div id="userInfoContainer"></div>\
+                                                    </div>';
+        $('body').append(htmlLightbox);
+
+          $( "#detailsDialog" ).dialog({
+            dialogClass:'detailsDialogBox',             
+            width:800,
+            height:500,             
+            open:function(event, ui){                             
+          $('html').attr('dbid', $(document).scrollTop()).css('overflow', 'hidden');
+          $(this).dialog('option','position',{ my: 'center', at: 'center', of: window });                         
+                   $fluidDialog();
+        $("#datacollect").html('');      
+        $('.ui-dialog-content').append('<div class="loaderOverlay2"></div>');
+          $.ajax({
+            type : "POST",
+            dataType : 'json',
+            url : BASE_URL + '/admin/dashboard/attendiesuserlist',
+            data : {'id':DbeeID,'type':type},         
+            success : function(response) {
+              $('.loaderOverlay2').remove();  
+              $('.ui-dialog-title').after(response.content2);           
+              $('#userInfoContainer').html(response.content);
+
+              $('#attendisListTarget').click(function(){
+                status = $(this).is(":checked");
+                $.ajax({
+                  type : "POST",
+                  dataType : 'json',
+                  url : BASE_URL + '/admin/dashboard/hideattendieslist',
+                  data : {'dbeeID':DbeeID,'status':status},         
+                  success : function(response) {
+                    $messageSuccess(response.message);
+                  }
+                });
+              });
+
+            }
+          });
+            },
+            close : function(event, ui) { 
+                var scrollTop = $('html').css('overflow', 'auto').attr('data-scrollTop') || 0;
+                if( scrollTop ) $('html').scrollTop( scrollTop ).attr('data-scrollTop','');
+            }
+      });
+});
+
+
+
+
+
+
+$("#startdate" ).datetimepicker({dateFormat:'yy-mm-dd', minDate:0});
+$("#enddate" ).datetimepicker({dateFormat:'yy-mm-dd', minDate:0});
+$('#livebroadcast').submit(function() {
+        formdata = $('form#livebroadcast').serialize();
+
+        title = $('#title').val();
+        
+       
+        var discription = $('#discription').val();
+      
+       if (title == '')
+       { 
+         $messageError('Live broadcast title cannot be empty');
+         return false;
+       }
+       
+       if (discription == '')
+       { 
+         $messageError('Live broadcast discription cannot be empty');
+         return false;
+       }
+        var startdate = $('#startdate').val();        
+        if (startdate == '')
+        { 
+            $messageError('Live broadcast start date cannot be empty');
+            return false;
+        }
+      var enddate = $('#enddate').val();        
+        if (enddate == '')
+        { 
+            $messageError('Live broadcast end date cannot be empty');
+            return false;
+        }
+        
+       var thisEl  =   $(this);
+       var url     =   BASE_URL+'/admin/livebroadcasts/insert';
+       var redirectUrl     =   BASE_URL+'/admin/livebroadcasts/';
+       postdata    =   formdata+'&task=add';
+       //$messageSuccess('insert successfully');
+
+        $.ajax({                                      
+              url: url,                  
+              data: postdata,                        
+              method: 'POST', 
+              type:'json', 
+              beforeSend: function(){  
+              },
+              success: function(data)    
+              {            
+               
+                if(data=='400'){
+                      $messageError("Please set 'Start Time' to at least 10 minutes from the current time.");
+                      return false;                        
+                   
+                  }else{
+                      $('#title').val('');
+                      $('#description').val('');
+                      $('#startdate').val('');
+                      $('#enddate').val('');               
+                      $('#livebroadcastsubmit').val(' Save ');
+                      $messageSuccess('Video broadcast added successfully');
+                      location.href = redirectUrl;
+                  }
+              }
+        }); 
+        return false;
+    });
+
+
+$('.deletebroadcast').click(function(){  
+       var thisEl          =  $(this);
+       var VidId           =  thisEl.attr('data-id');
+       data                =  'TaskRequest=delete&VidId=' + VidId;
+       var url             =   BASE_URL+'/admin/livebroadcasts/delete';
+       var redirectUrl     =   BASE_URL+'/admin/livebroadcasts/';      
+       //$messageSuccess('Delete successfully');
+       msg ='Are you sure you want to delete this Live video broadcast?';
+       $('#dialogConfirmSetting').remove();
+       $('body').append('<div id="dialogConfirmSetting">'+msg+'</div>');
+
+      $( "#dialogConfirmSetting" ).dialog({
+      resizable: false,
+      title:'Please confirm',
+      modal: true,            
+      buttons: {
+      "Yes": function() {
+      $( this ).dialog( "close" );
+
+        $.ajax({                                      
+              url: url,                  
+              data: data,                        
+              method: 'POST', 
+              type:'json',
+              success: function(data) {            
+                $('#title').val('');
+                $('#description').val('');
+                $('#startdate').val('');
+                $('#enddate').val('');               
+                $('#livebroadcastsubmit').val(' Save ');
+                //$('#searchContainer').css('display','none');                    
+                $messageSuccess('Video broadcast deleted successfully');
+                location.href = redirectUrl;
+              }
+        }); 
+        return false;
+
+      }
+      }
+    });
+    });
+
+    $('body').on('click', '.StartBroadcast', function(){  
+       var thisEl          =  $(this);
+       var VidId           =  thisEl.attr('data-video-id'); 
+       var dbeeID          =  thisEl.attr('data-dbeeID'); 
+       var dburl           =  thisEl.attr('data-dburl');    
+       var url             =   BASE_URL+'/admin/livebroadcasts/startbroadcast';
+       var redirectUrl     =   BASE_URL+'/dbee/'+dburl;       
+       
+       msg ='Click "Confirm" to start your video broadcast post now. You will be taken directly to the post page and will automatically become its Expert / Speaker.';
+       $('#dialogConfirmSetting').remove();
+       $('body').append('<div id="dialogConfirmSetting">'+msg+'</div>');
+
+      $( "#dialogConfirmSetting" ).dialog({
+      resizable: false,
+      title:'Please confirm',
+      modal: true,            
+      buttons: {
+      "Confirm": function() {
+        $( this ).dialog( "close" );
+
+          $.ajax({                                      
+                url: url,                  
+                data : {'dbeeID':dbeeID,'VidId':VidId},                          
+                method: 'POST', 
+                type:'json',
+                success: function(data) {            
+                  $('#title').val('');
+                  $('#description').val('');
+                  $('#startdate').val('');
+                  $('#enddate').val('');               
+                  $('#livebroadcastsubmit').val(' Save '); 
+                  if(data.status=='success')
+                  {               
+                   location.href = redirectUrl;
+                  }
+                  else
+                  {
+                    $messageSuccess('some thing was wrong');
+                  }
+                }
+          }); 
+          return false;
+        }
+       }
+      });
+    });
+
+
+});
+
+
+
+</script>
+
+
+<h1 class="pageTitle dbeeViewAll" >Live video broadcasts <a href="#" class="btn btn-yellow btn-large openSearchBlock resetform">Create live video broadcast</a></h1>
+<div  id="searchWrapper" class="spSdbsSearchBox liveVideoBroadcastsWrp">
+   
+      <div id="searchContainer"> 
+         <div id="exp_condition" class="expenddcondition1" >            
+            <div class="whiteBox addConditionWrapper"> 
+                  <form name="livebroadcast" id="livebroadcast">
+                           <div class="searchField"> 
+                              <label class="label">Title</label>
+                              <div class="fieldInput"><input type="text" id="title" name="title"></div>
+                           </div>
+                           <div class="searchField"> 
+                              <label class="label">Description </label>
+                          <div class="fieldInput"><textarea  class="textarea"  name="description" id="description" ></textarea></div>
+                           </div>
+                         
+                           <div class="searchField"> 
+                              <label class="label">Start date / time </label>
+                              <div class="fieldInput"><input type="text" id="startdate" name="startdate" ></div>
+                              
+                           </div>
+                           <div class="searchField"> 
+                              <label class="label">End date / time </label>
+                              <div class="fieldInput"><input type="text" id="enddate" name="enddate" ></div>
+                              
+                           </div>
+                          <div class="searchField"> 
+                              <label class="label">Time zone </label>
+                              <div class="fieldInput"> <select name="timezone" id="timezone">       
+                                 <option value="-12.0">(GMT -12:00) Eniwetok, Kwajalein</option>
+                                 <option value="-11.0">(GMT -11:00) Midway Island, Samoa</option>
+                                 <option value="-10.0">(GMT -10:00) Hawaii</option>
+                                 <option value="-9.0">(GMT -9:00) Alaska</option>
+                                 <option value="-8.0">(GMT -8:00) Pacific Time (US &amp; Canada)</option>
+                                 <option value="-7.0">(GMT -7:00) Mountain Time (US &amp; Canada)</option>
+                                 <option value="-6.0">(GMT -6:00) Central Time (US &amp; Canada), Mexico City</option>
+                                 <option value="-5.0">(GMT -5:00) Eastern Time (US &amp; Canada), Bogota, Lima</option>
+                                  <option value="-4.0">(GMT -4:00) Atlantic Time (Canada), Caracas, La Paz</option>
+                                 <option value="-3.5">(GMT -3:30) Newfoundland</option>
+                                   <option value="-3.0">(GMT -3:00) Brazil, Buenos Aires, Georgetown</option>
+                                 <option value="-2.0">(GMT -2:00) Mid-Atlantic</option>
+                                 <option value="-1.0">(GMT -1:00 hour) Azores, Cape Verde Islands</option>
+                                 <option value="0.0" selected="selected">(GMT) Western Europe Time, London, Lisbon, Casablanca</option>
+                                 <option value="1.0">(GMT +1:00 hour) Brussels, Copenhagen, Madrid, Paris</option>
+                                 <option value="2.0">(GMT +2:00) Kaliningrad, South Africa</option>
+                                 <option value="3.0">(GMT +3:00) Baghdad, Riyadh, Moscow, St. Petersburg</option>
+                                 <option value="3.5">(GMT +3:30) Tehran</option>
+                                 <option value="4.0">(GMT +4:00) Abu Dhabi, Muscat, Baku, Tbilisi</option>
+                                 <option value="4.5">(GMT +4:30) Kabul</option>
+                                 <option value="5.0">(GMT +5:00) Ekaterinburg, Islamabad, Karachi, Tashkent</option>
+                                 <option value="4.5">(GMT +5:30) Bombay, Calcutta, Madras, New Delhi</option>
+                                 <option value="5.7">(GMT +5:45) Kathmandu</option>
+                                 <option value="6.0">(GMT +6:00) Almaty, Dhaka, Colombo</option>
+                                 <option value="7.0">(GMT +7:00) Bangkok, Hanoi, Jakarta</option>
+                                 <option value="8.0">(GMT +8:00) Beijing, Perth, Singapore, Hong Kong</option>
+                                 <option value="9.0">(GMT +9:00) Tokyo, Seoul, Osaka,  </option>
+                                 <option value="9.5">(GMT +9:30) Adelaide, Darwin</option>
+                                 <option value="10.0">(GMT +10:00) Eastern Australia, Guam, Vladivostok</option>
+                                 <option value="11.0">(GMT +11:00) Magadan, Solomon Islands, New Caledonia</option>
+                                 <option value="12.0">(GMT +12:00) Auckland, Wellington, Fiji, Kamchatka</option>
+                                 
+                                 <?php //endforeach;?>                                    
+                                 </select><span class="timeZoneNote"> Please select the timezone of the person who will be broadcasting live.</span>
+                               </div>                              
+                           </div>
+
+                    <?php if(count($this->eventlist) >0) {  ?>
+                        <div class="searchField" id="eventfield">
+                        <label class="label">Select Event </label>
+                        <div class="fieldInput">
+                          
+                           <select name="selectEventList" id="selectEventList" class="selectEvent">
+                            <?php
+                            if($eventid==""){
+                                echo '<option value="0">Select Event</option>';
+                              }
+                               foreach($this->eventlist as $event){                         
+
+                              echo'<option value="'.$event['id'].'">'.$event['title'].'</option>';
+                               } 
+                           echo'</select>';                         
+                          ?>
+                        </div>
+                     </div> 
+                 <?php } ?>
+
+                          <div class="searchField"> 
+                              <label class="label">Privacy</label>
+                              <div class="fieldInput">
+                                <select name="eventtype" id="eventtype">
+                                  <option value='0'>Public</option>                                 
+                                  <option value='2'>Private</option>
+                                </select>
+                              </div>
+                            </div>
+                                  
+
+                           <div class="searchField"> 
+                              <label class="label">&nbsp;</label>
+                              <div class="fieldInput">                                 
+                                 <input type="submit" id="livebroadcastsubmit" class="addbutton btn btn-green btn-medium pull-left" value="Save"> 
+                                 &nbsp;
+                                 <input type="submit" id="" class="btn btn-medium openSearchBlock resetform" value="Close" style=""> 
+                              </div>
+                           </div>
+                     <div class="clearfix"></div>
+                     
+
+                  </div>
+                  <div class="clearfix"></div>
+               </form>
+         </div>
+
+
+         <div class="clearfix"></div>
+      </div>
+
+      <div class="clearfix"></div>
+   
+</div>
+
+
+<div class="box-body " id="spcialDBbody">
+   <div id="listingTotalResults" style="float:right;margin: 10px 35px 0 0;"></div>
+<?php
+
+function convertDateFromISO8601ToRFC2822($date) {
+
+        preg_match('/(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+).(\d+)Z/',
+
+            $date, $time_matches);
+
+        list($x, $year, $month, $day, $hour, $minute, $second) =
+
+            $time_matches;
+
+        $timestamp = gmmktime($hour, $minute, $second, $month, $day, $year);
+
+        return gmdate('r', $timestamp);
+
+    }
+
+require_once 'Google/Google/autoload.php';
+require_once 'Google/Google/Client.php';
+require_once 'Google/Google/Service/YouTube.php';
+
+$htmlBody='';
+$OAUTH2_CLIENT_ID = $this->google_client_id;
+$OAUTH2_CLIENT_SECRET = $this->google_client_secret;
+$client = new Google_Client();
+$client->setClientId($OAUTH2_CLIENT_ID);
+$client->setClientSecret($OAUTH2_CLIENT_SECRET);
+$client->setAccessType('offline');
+$client->setScopes('https://www.googleapis.com/auth/youtube');
+$client->setRedirectUri($this->redirect_uri);
+// Define an object that will be used to make all API requests.
+$youtube = new Google_Service_YouTube($client);
+
+if (isset($_GET['code'])) {
+  if (strval($_SESSION['state']) !== strval($_GET['state'])) {
+    die('The session state did not match.');
+  }
+
+  $client->authenticate($_GET['code']);
+  $_SESSION['token'] = $client->getAccessToken();
+  header('Location: '.BASE_URL.'/admin/livebroadcasts/');
+}
+
+/*echo"<pre>";
+print_r($_SESSION);
+echo"</pre>";*/
+
+if (isset($_SESSION['token'])) {
+
+  $client->setAccessToken($_SESSION['token']);
+  ?>
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $("#livebroadcastsubmit").prop("disabled", false);
+    $("#livebroadcastsubmit").removeClass('disabled');
+    $(".openSearchBlock").show();
+    $("#searchWrapper").show();
+  });
+  </script>
+  <?php
+
+}
+else
+{
+  ?>
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $("#livebroadcastsubmit").prop("disabled", true);
+    $("#livebroadcastsubmit").addClass('disabled');
+    $(".openSearchBlock").hide();
+    $("#searchWrapper").hide();
+
+  });
+  </script>
+  <?php
+}
+
+/*if (isset($_REQUEST['logoutgoogle'])) {
+    unset($_SESSION['token']);
+    $client->revokeToken();
+}*/
+
+
+if($client->isAccessTokenExpired()) {
+  ?>
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $("#livebroadcastsubmit").prop("disabled", true);
+    $("#livebroadcastsubmit").addClass('disabled');
+    $(".openSearchBlock").hide();
+    $("#searchWrapper").hide();
+
+  });
+  </script>
+  <?php
+  if (isset($_SESSION['token'])) {
+
+    $state = mt_rand();
+    $client->setState($state);
+    $_SESSION['state'] = $state; 
+
+    $authUrl1 = $client->createAuthUrl();
+   
+    $htmlBody1 ='
+    <p style="font-size:15px;">Your Google session has timed out, please log back in using the details given below.</p>
+    <br>
+    <p align="left" style="font-size:14px;"><span style="display: inline-block; width: 100%; line-height:15px; background: #CCC; padding: 10px; margin-bottom: 10px;">Email: <span style="font-weight:bold">'.$domainAPIData['google_email'].'</span><br><br>Password: <span style="font-weight:bold">'.$domainAPIData['google_password'].'</span><br><br>Please provide these login credentials to any third party whom you wish to broadcast live.<br><span style="font-weight: bold; font-style: italic; display: inline-block; margin: 15px 0px 0px 0px;">Please note they will need to log out of any current Google session.</span></span><span style="float:left;"><a href="'.$authUrl1.'" class="btn btn-yellow">Authorise live broadcasts</a></span><p>
+  ';
+  echo $htmlBody1;
+ }
+}
+
+ 
+
+if ($client->getAccessToken()) {
+  try {
+    // Execute an API request that lists broadcasts owned by the user who
+    // authorized the request.
+    $broadcastsResponse = $youtube->liveBroadcasts->listLiveBroadcasts(
+        'id,snippet,status',
+        array(
+            'mine' => 'true','maxResults' => 50,
+        ));
+    //echo"<pre>";
+    //print_r($broadcastsResponse['items']);
+    //echo"</pre>"; 
+    $htmlBody .= "<div id='spcialDBbody' class='box-body'><ul class='listing scoredList' id='searchresulthide'>";
+    $i=1;
+    foreach ($broadcastsResponse['items'] as $broadcastItem) {
+
+      $wherearr = array('Type' => 15, 'VidID' =>$broadcastItem['id']);
+      $liveDbee  = $this->myclientdetails->getRowMasterfromtable('tblDbees', array('DbeeID','Type','Text','Vid','VidDesc','VidID','eventzone','eventstart','liveeventend','eventtype','dburl'),$wherearr);
+      
+    if($liveDbee['DbeeID']!="")
+    {
+
+      $aa=str_replace('.000Z', '', $broadcastItem['snippet']['scheduledStartTime']);      
+      $aa=str_replace('T', ' ', $aa); 
+      //$sttime = gmdate('r', strtotime($aa));
+      $sttime = convertDateFromISO8601ToRFC2822($broadcastItem['snippet']['scheduledStartTime']);
+
+      $date = new DateTime($broadcastItem['snippet']['scheduledStartTime']);
+      $sttimenew=$date->format('Y-m-d H:i:s');
+      $sttimenew1 =date('Y-m-d H:i:s',strtotime('+5 hour +30 minutes',strtotime($sttimenew)));
+
+      $sttime = explode('+', $sttime);
+
+      $bb=str_replace('.000Z', '', $broadcastItem['snippet']['scheduledEndTime']);      
+      $bb=str_replace('T', ' ', $bb); 
+     // $endtime = gmdate('r', strtotime($bb));
+
+      $where = array('act_typeId'=>$liveDbee['DbeeID'],'act_type'=>39,'act_message'=>50);
+      $result = $this->myclientdetails->getAllMasterfromtable('tblactivity',array('act_typeId','act_ownerid'),$where);
+
+      $where2 = array('dbid'=>$liveDbee['DbeeID'],'status'=>1);
+      $result2 = $this->myclientdetails->getAllMasterfromtable('tblexpert',array('userid'),$where2); 
+ 
+      if($broadcastItem['status']['lifeCycleStatus']=='complete')
+      {
+        $buttonplay='<div style="color:#f00;margin-top:10px; margin-bottom:10px; font-size:16px;">Live Broadcast Finished</div>';
+      }
+      else
+      {
+          $buttonplay='<div class="pull-left" id="startbtnhangout'.$liveDbee['DbeeID'].'" style="margin-right:10px; margin-bottom:10px;">';
+          
+          if(count($result) < 1 && count($result2) < 1)
+          {
+
+           // $buttonplay.='<button data-token="'.$broadcastItem['id'].'" data-video-id="'.$broadcastItem['id'].'" onclick=";return false;" type="button" class="yt-uix-button yt-uix-button-size-small yt-uix-button-default start-hangouts-on-air vm-video-info-button-control btn btn-yellow btn-mini"><span class="yt-uix-button-content">Start Broadcast</span></button>';
+
+            $buttonplay.='<a href="javascript:void(0);" data-video-id="'.$broadcastItem['id'].'" data-dbeeID="'.$liveDbee['DbeeID'].'" data-dburl="'.$liveDbee['dburl'].'" class="btn btn-yellow btn-mini StartBroadcast">Broadcast myself</a>';
+         }else
+         {
+           $buttonplay.='<a href="javascript:void(0);" data-video-id="'.$broadcastItem['id'].'" data-dbeeID="'.$liveDbee['DbeeID'].'" data-dburl="'.$liveDbee['dburl'].'" class="btn btn-yellow btn-mini disabled" disabled="disabled" >Broadcast myself</a>';
+         }
+
+          $buttonplay.='</div>';
+      }
+
+      if($liveDbee['eventtype']==0)
+      {
+           $descDisplay=' <div class="dbSocialRt pull-left">
+                                                
+                    <div class="spcPeopleIcon" id="inviteexpertbtn'.$liveDbee['DbeeID'].'">';
+
+          if(count($result2) < 1)
+          {
+              if(count($result) > 0)
+              {
+                 $common = new Admin_Model_Common();
+                 $where3 = array('UserID'=>$result[0]['act_ownerid']);
+                 $result3 = $this->myclientdetails->getRowMasterfromtable('tblUsers',array('full_name','ProfilePic'),$where3); 
+                 $full_name=$this->myclientdetails->customDecoding($result3['full_name']);
+                 $valuepic = $common->checkImgExist($result3['ProfilePic'],'userpics','default-avatar.jpg');
+
+                 $descDisplay  .=  '<span style="color:#ff0000">Invitation sent</span> &nbsp;<a href="javascript:void(0);" data-id="'.$liveDbee['DbeeID'].'" data-name="'.$full_name.'" id="ViewInvite'.$liveDbee['DbeeID'].'" data-pic="'.$valuepic.'" class="btn btn-mini btn-yellow ViewInvite">View/Cancel Invite</a>&nbsp;&nbsp; <a href="javascript:void(0);" data-id="'.$liveDbee['DbeeID'].'" id="CancelInvite'.$liveDbee['DbeeID'].'" data-title="'.$liveDbee['Text'].'" class="btn btn-mini btn-yellow CancelInvite" style="display:none;">Cancel Invite</a>';
+              }
+              else
+              {
+                if($broadcastItem['status']['lifeCycleStatus']!='complete') {
+                    $descDisplay  .=  '<span>or</span> <a href="javascript:void(0);" style="margin-left:10px"  data-uniqueValue ="'.$liveDbee['DbeeID'].'" class="btn btn-mini btn-yellow socialfriends" data-for ="ForExpert" data-type="InviteExpert" data-title="'.$liveDbee['Text'].'" >Invite someone else</a>';
+                  }
+              }
+          }
+
+            $descDisplay  .=  '</div>';
+      }  
+
+      if($liveDbee['eventtype']==2)
+      {  
+          $descDisplay=' <div class="dbSocialRt scoreIcon">
+                              <div class="spdbltbox">
+                  <div class="inPeople scoreLabel"> Invite from</div>
+                    <div class="spcPeopleIcon" >';
+              if($this->facebookLogined==false)
+                $descDisplay .='<a href="'.BASE_URL.'/admin/social/facebook?postid='.$liveDbee['DbeeID'].'&type=attendies" class="dbfbIcon"><span class="fa fa-facebook-square"></span></a>';
+              else
+                $descDisplay .='<a href="javascript:void(0);" data-uniqueValue ="'.$liveDbee['DbeeID'].'" class="dbfbIcon socialfriends" data-title="'.$liveDbee['Text'].'" data-for ="attendies" data-type="facebook" ><span class="fa fa-facebook-square"></span></a>';
+
+              if($this->twitterLogined==false)
+                $descDisplay  .=  '<a href="'.BASE_URL.'/admin/social/twitter?postid='.$liveDbee['DbeeID'].'&type=attendies" class="dbtwitterIcon"><span class="fa fa-twitter-square"></span></a>';
+              else
+                $descDisplay  .=  '<a href="javascript:void(0);"  data-uniqueValue ="'.$liveDbee['DbeeID'].'" class="dbtwitterIcon socialfriends" data-title="'.$liveDbee['Text'].'" data-for ="attendies" data-type="twitter" ><span class="fa fa-twitter-square"></span></a>';
+              
+              if($this->linkedinLogined==false)
+                $descDisplay  .=  '<a href="'.BASE_URL.'/admin/social/linkedin?postid='.$liveDbee['DbeeID'].'&type=attendies" class="dblinkedinIcon"><span class="fa fa-linkedin-square"></span></a>';
+              else
+                $descDisplay  .=  '<a href="javascript:void(0);" data-uniqueValue ="'.$liveDbee['DbeeID'].'" class="dblinkedinIcon socialfriends" data-title="'.$liveDbee['Text'].'" data-for ="attendies" data-type="linkedin"><span class="fa fa-linkedin-square"></span></a>';
+
+                $descDisplay  .=  '<a href="javascript:void(0);" data-uniqueValue ="'.$liveDbee['DbeeID'].'" class="dbsocialIcon socialfriends" data-for ="attendies" data-type="dbee" data-title="'.$liveDbee['Text'].'" ></a>
+                </div></div>';
+      }
+
+      $endtime = convertDateFromISO8601ToRFC2822($broadcastItem['snippet']['scheduledEndTime']);
+      $endtime = explode('+', $endtime);
+      $date = new DateTime($broadcastItem['snippet']['scheduledEndTime']);
+      $endtimenew = $date->format('Y-m-d H:i:s');
+      $endtimenew1 =date('Y-m-d H:i:s',strtotime('+5 hour +30 minutes',strtotime($endtimenew)));
+      $htmlBody .= sprintf('<li><div class="dataListWrapper"> 
+        <div class="dataListbox">
+          <div class="scoredData">
+            <div class="dbPost"><h2> %s </h2>   <span class="pull-right deletecmm" style="margin-right:10px; margin-top:-25px"><a title="Delete" class="btn-full btn btn-danger btn-mini deletebroadcast" href="javascript:void(0);" data-id="'.$broadcastItem['id'].'">Delete</a></span><div style="margin-top:10px;"><strong>Start date: '.$sttimenew1.' <span style="color:#f00"><br><br></span> End date: '.$endtimenew1.'</strong></div></div></div><div class="buttonsWrpSp">'.$buttonplay.' '.$descDisplay.'</div></div></div></li>', $broadcastItem['snippet']['title']);
+      $i++;
+  }
+
+    }
+    $htmlBody .= '</ul></div>';
+
+
+
+
+  } catch (Google_ServiceException $e) {
+    $htmlBody .= sprintf('<p>A service error occurred: <code>%s</code></p>',
+        htmlspecialchars($e->getMessage()));
+  } catch (Google_Exception $e) {
+      if($client->isAccessTokenExpired()) {
+        // do nothing
+      }
+      else
+      {
+         
+        if ($e->getCode() == 403) {
+        // Apply exponential backoff.
+        //usleep((1 << $n) * 1000000 + rand(0, 1000000));
+          ?>
+          <script type="text/javascript">
+           $(document).ready(function(){
+              $("#livebroadcastsubmit").prop("disabled", true);
+              $("#livebroadcastsubmit").addClass('disabled');
+              $(".openSearchBlock").hide();
+              $("#searchWrapper").hide();
+              $('.dbeeViewAll').after('<p class="message error" style="font-size:16px">You seem to be logged into Google with a different account. To authenticate again, please log out of the admin panel and log back in. <a href="<?=BASE_URL?>/admin/logout" title="Log out" class="btn btn-mini">Log out</a></p>');
+
+            });
+          </script>
+          <?php
+        } else {
+        // Other error, re-throw.
+         //throw;
+         $htmlBody .= sprintf('<p>An client error occurred: <code>%s</code></p>',
+         htmlspecialchars($e->getMessage()));
+        }
+
+        
+      }
+  }
+
+  $_SESSION['token'] = $client->getAccessToken();
+} else {
+  // If the user hasn't authorized the app, initiate the OAuth flow
+  $state = mt_rand();
+  $client->setState($state);
+  $_SESSION['state'] = $state; 
+
+  $authUrl = $client->createAuthUrl();
+ 
+  $htmlBody ='
+  <p style="font-size:15px;">Please click the authorisation link below to continue.</p>
+  <br>
+  <p align="left" style="font-size:14px;"><span style="display: inline-block; width: 100%; line-height:15px; background: #CCC; padding: 10px; margin-bottom: 10px;">Please use the following details.<br><br>Email: <span style="font-weight:bold">'.$domainAPIData['google_email'].'</span><br><br>Password: <span style="font-weight:bold">'.$domainAPIData['google_password'].'</span><br><br>Please provide these login credentials to any third party whom you wish to broadcast live.<br><span style="font-weight: bold; font-style: italic; display: inline-block; margin: 15px 0px 0px 0px;">Please note they will need to log out of any current Google session.</span></span><span style="float:left;"><a href="'.$authUrl.'" class="btn btn-yellow">Authorise live broadcasts</a></span><p>
+';
+}
+echo $htmlBody;
+?>
+
+</div>
+<div id="player-api" class="player-width player-height off-screen-target player-api" tabIndex="-1"></div>
+ <script>var ytspf = ytspf || {};ytspf.enabled = true;ytspf.config = {'experimental-parse-extract': true,'reload-identifier': 'spfreload'};ytspf.config['cache-max'] = 30;ytspf.config['navigate-limit'] = 60;ytspf.config['navigate-lifetime'] = 64800000;
+ </script>
+<script type="text/javascript" src="<?php echo BASE_URL."/adminraw/js/yt-core.js";?>"></script>
+<script>yt.setConfig({"VM_BULK_ACTIONS_ENABLED":true,"OWNER_PICKER_REDIRECT_URL":"\/my_videos","DELEGATED_SESSION_ID":null,"HOA_BASE_URI":"\/\/plus.google.com","HL_LOCALE":"en_US","IS_READONLY":false,"CREATOR_CONTEXT":"U","SESSION_INDEX":0});
+</script> 
+<script type="text/javascript" src="<?php echo BASE_URL."/adminraw/js/videomanager.js";?>"></script>
+<script type="text/javascript" src="<?php echo BASE_URL."/adminraw/js/myliveevents.js";?>"></script>
+<script>yt.setMsg({'LIVE_WATCHING_NOW': {"case1": "1 watching now", "case0": "0 watching now", "other": "# watching now"}});yt.pubsub.subscribe('init', function() {yt.www.livestreaming.ConcurrentViewers(30000);new yt.www.livestreaming.eventmanager.MyLiveEvents();}); 
+</script>
+<script>
+yt.setConfig({'EVENT_ID': "t6JlVf7oJ9Dt-AWnroLoDQ",'PAGE_NAME': "my_live_events",'LOGGED_IN': true,'SESSION_INDEX': 0,'PARENT_TRACKING_PARAMS': "",'FORMATS_FILE_SIZE_JS': ["%s B","%s KB","%s MB","%s GB","%s TB"],'DELEGATED_SESSION_ID': null,'ONE_PICK_URL': "",'UNIVERSAL_HOVERCARDS': true,'VISITOR_DATA': "CgtJdGpObElETlBDWQ%3D%3D",'GOOGLEPLUS_HOST': "https:\/\/plus.google.com",'PAGEFRAME_JS': "",'JS_COMMON_MODULE': "",'PAGE_FRAME_DELAYLOADED_CSS': "",'GUIDE_DELAY_LOAD': true,'GUIDE_DELAYLOADED_CSS': "\/\/s.ytimg.com\/yts\/cssbin\/www-guide-vfl50N2pm.css",'PREFETCH_CSS_RESOURCES' : ["",''         ],'PREFETCH_JS_RESOURCES': ["",''         ],'PREFETCH_LINKS': false,'PREFETCH_LINKS_MAX': 1,'PREFETCH_AUTOPLAY': false,'PREFETCH_AUTOPLAY_TIME': 0,'PREFETCH_AUTONAV': false,'PREBUFFER_MAX': 1,'PREBUFFER_LINKS': false,'PREBUFFER_AUTOPLAY': false,'PREBUFFER_AUTONAV': false,'WATCH_LATER_BUTTON': "\n\n  \u003cbutton class=\"yt-uix-button yt-uix-button-size-small yt-uix-button-default yt-uix-button-empty yt-uix-button-has-icon no-icon-markup addto-button video-actions spf-nolink hide-until-delayloaded addto-watch-later-button yt-uix-tooltip\" type=\"button\" onclick=\";return false;\" role=\"button\" title=\"Watch Later\" data-video-ids=\"__VIDEO_ID__\"\u003e\u003c\/button\u003e\n",'SAFETY_MODE_PENDING': false,'LOCAL_DATE_TIME_CONFIG': {"formatShortTime":"h:mm a","shortWeekdays":["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],"shortMonths":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"months":["January","February","March","April","May","June","July","August","September","October","November","December"],"formatLongDate":"MMMM d, yyyy h:mm a","formatShortDate":"MMM d, yyyy","formatWeekdayShortTime":"EE h:mm a","firstDayOfWeek":0,"dateFormats":["MMMM d, yyyy h:mm a","MMMM d, yyyy","MMM d, yyyy","MMM d, yyyy"],"amPms":["AM","PM"],"firstWeekCutoffDay":3,"formatLongDateOnly":"MMMM d, yyyy","weekendRange":[6,5],"weekdays":["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]},'PAGE_CL': 94449315,'PAGE_BUILD_TIMESTAMP': "",'VARIANTS_CHECKSUM': "384759dd7f74e0f5c46e6b6a7d98cd5a",'EXP_WEBFONT_ENABLED': true,'CLIENT_PROTOCOL': "h2",'CLIENT_TRANSPORT': "tcp",'MDX_ENABLE_CASTV2': true,'MDX_ENABLE_QUEUE': true,'SANDBAR_ENABLED': true,'SANDBAR_LOCALE': "en-US",'FEEDBACK_BUCKET_ID': "Account",'FEEDBACK_LOCALE_LANGUAGE': "en",'FEEDBACK_LOCALE_EXTRAS': {"logged_in":true,"is_partner":false,"accept_language":"en-US,en;q=0.5","experiments":"","guide_subs":"NA","is_branded":false}}); 
+</script>

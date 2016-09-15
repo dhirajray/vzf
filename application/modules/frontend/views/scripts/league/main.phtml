@@ -1,0 +1,133 @@
+<?php 
+	$commonmodel_obj      = new Application_Model_Commonfunctionality();
+?>
+<script>
+$(function() {
+	fetchadvert();
+	if(hash=='#create'){$('.leaguescreatemain li:eq(1) a').trigger('click');}
+	else if(hash=='#members'){$('.leaguescreatemain li:eq(2) a').trigger('click');}
+	else{$('.leaguescreatemain li:first a').trigger('click');}
+	
+	$('body').on('click','#mainActDect',function(event) {
+			accountSetttingPopup('scoring');
+		});
+		
+		
+
+		
+});
+</script>
+
+<input type="hidden" id="dbeeuser" value="<?php echo $this->user ?>">
+
+	<div id="leftListing">
+		<div id="dbee-feeds">
+		<div class="dashboarprofleWrp" style="height:auto">
+			<div class="middleDescriptionBox">
+				<h2>Hi <?php echo $this->myclientdetails->customDecoding($this->session_data['Name']); ?>, welcome to your leagues :-)</h2>
+				<!-- <p>All users posts and comments can be scored from 5 options...</p>
+				<div class="scrptnRow">
+					<div>Score option</div>
+					<div>League</div>
+				</div>
+				<div class="scrptnRow" style="background:#f8b53a;">
+					<div>
+						<span><i>Love</i> - carries 5 points</span><br>
+						<span><i>Like</i> - carries 1 point</span>
+					</div>
+					<div class="lg">Loved</div>
+				</div>
+				<div class="scrptnRow" style="background:#9d9d9c;">
+					<div>
+						<span><i>Food for thought</i> - carries 1 point</span>
+					</div>
+					<div class="lg">Philosophers</div>
+				</div>
+				<div class="scrptnRow" style="background:#bdbdbd;">
+					<div>
+						<span><i>Dislike</i> - carries 1 point</span><br>
+						<span><i>Hate</i> - carries 1 point</span>
+					</div>
+					<div class="lg">Rogues</div>
+				</div>
+				<p>But i dont want to be scored! <br>
+No problem, you can turn off the ability to be scored and placed into the leagues <a href="#" class="underline" id="mainActDect">here</a></p> -->
+               
+               <p>By creating your own leagues you can monitor which users are the most influential within your posts.  Creating a league couldn't be easier:  simply name your league, select a closing date when you would like your league to close and link your selected posts. All scores within your selected posts will be tracked by the league and update all users who are involved in your posts as to their positions. </p>
+				<div class="scrptnRow">
+					<div><h3 style="margin-left: -20px;">Note: </h3></div>
+				</div>
+				<div class="scrptnRow" style="background:#9d9d9c;">
+					<div>
+						<span>1. When the closing date elapses the league closes, the posts remain live but the league wont track the scores from this point.</span><br>
+						
+					</div>
+				</div>
+				<div class="scrptnRow" style="background:#9d9d9c;">
+					<div>
+						<span>2. You can create a new league and add the same post again however only new scores will be tracked.</span><br>
+						
+					</div>
+				</div>
+                <div class="scrptnRow" style="background:#9d9d9c;">
+					<div>
+						<span>3. You need to add more than 1 post to a league.</span><br>
+						
+					</div>
+				</div>
+
+
+			</div>
+			<div class="pstBriefFt"><a href="javascript:void(0);" class="dontShowMeAgain" data-close="Why do I need to create my own leagues?">OK, got it :-)</a></div>
+			</div>
+			
+			<div id="leaguesTypes">
+			<div class="leaguescreatemain">
+				<ul class="tabLinks">
+					<li><a class="league-myleague active" href="javascript:void(0);">my leagues</a></li>
+					<li><a class="onpage-createleague " href="javascript:void(0);">create league</a></li>
+					<li><a class="leagueMembers" href="javascript:void(0);">member of leagues</a></li>					
+				
+				</ul>
+			</div>
+
+			<div class="pull-right leaguesPostSortTime">
+				<a href="#" class="leaguesPstSorting"><i class="sprite menuIcon"></i> post Sorting</a>
+			</div>
+		</div>
+   
+	<div id="leaguesListsContainer" >
+		<div id="lg_content_data" style="background: none repeat scroll 0 0 #fff;" > </div>
+		<div id="lg_content_button" style="background: none repeat scroll 0 0 #fff;"> </div>
+	</div>
+	
+		</div>
+
+
+	</div>	
+	
+
+<div id="rightListing" class="rssFeedRightContainer">
+	<?php echo $commonmodel_obj->displaybroadcastdbs();  ?>
+</div>
+<div class="clearfix"> </div>
+
+
+
+
+<!-- SCRIPT FOR FADE POPUP -->
+
+<div id="redb-popup" class="popup_block"><?php echo POST_NAME;?> successfully posted on your profile</div>
+
+
+<script type="text/javascript">
+
+var $=jQuery.noConflict();
+
+$(document).ready(function(){
+
+	fadepopup();
+
+});
+
+</script>

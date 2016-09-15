@@ -1,0 +1,99 @@
+@keyframes selectedOption {
+  from{background: #333; }
+  to{background: #a4c35b; box-shadow: none;  color: #fff}
+}
+@-webkit-keyframes selectedOption {
+  from{background: #333; }
+  to{background: #a4c35b; box-shadow: none; color: #fff}
+}
+
+@keyframes selectedOptionIcon {
+  from{right: -50px;}
+  to{right: 10px;}
+}
+@-webkit-keyframes selectedOptionIcon {
+  from{right: -50px;}
+  to{right: 10px;}
+}
+@keyframes saveOption{
+  from{transform:translateY(-20px);   opacity: 0;  }
+  to{transform:translateY(0);opacity: 1; }
+}
+@keyframes saveOptionReverse{
+  from{transform:translateY(0); opacity: 1;  }
+  to{transform:translateY(-20px); opacity: 0; }
+}
+@keyframes toolOption{
+  from{transform:scale(0.5) translateY(100%); display: block;   opacity: 0;  }
+  to{transform:scale(1) translateY(0px); display: block; opacity: 1; }
+}
+
+
+.widgetsDataWrp{display: none; min-height:inherit; }
+.widgetsDataWrp.active{display: block;}
+.widgetsDataWrp li{padding: 0px;}
+.widgetsDataWrp li label{display: inline-block; width: 100%; padding: 10px 10px; cursor: pointer;}
+.widgetsDataWrp li label:empty{display: none;}
+.widgetsDataWrp li:before{display: none; content: ''}
+.widgetsDataWrp li input[type="checkbox"] + label{border:none; height: auto; top: 0px; margin-right: 0px; overflow: hidden;}
+.widgetsDataWrp li input[type="checkbox"] + label:after{content: "\f00c";    left: inherit; font-family: 'FontAwesome'; position: absolute;  right: -50px; top:7px; font-size: 14px; transition:all 0.2s; }
+.widgetsDataWrp li input[type="checkbox"]:checked + label{animation:selectedOption 2s ease forwards;} 
+.widgetsDataWrp li input[type="checkbox"]:checked + label::after{ right: 10px;} 
+.widgetsDataWrp .ksfolderlist{ height: 400px; position: relative;}
+.widgetsDataWrp .ksfolderlist ul{overflow: auto; display: block; height: 90%; height: calc(100% - 33px); height: -webkit-calc(100% - 33px); padding-bottom: 20px;}
+.show_more_main{padding: 10px; text-align: center; background: #ccc; position: absolute; bottom: 0px; width: 100%;}
+.restAllBox{float: right; font-size: 29px;text-decoration: none; position: relative; top: -5px;}
+.restAllBox:hover{text-decoration: none;}
+.widgetsDataWrp .kcSidebarHeader{position: relative; padding: 15px 10px;}
+.widgetsDataWrp .kcSidebarHeader .inputSrc{position: absolute; left: 52px; right: 15px; top: 10px; }
+.restAllBox{display: none;}
+.widgetsDataWrp.activeSearchW  .inputSrc{right: 50px;  }
+.widgetsDataWrp.activeSearchW  .restAllBox{display: inline-block; }
+.widgetsDataWrp .kcSidebarHeader .inputSrc input{width: 100%; min-width: 100% }
+.widgetsPreviewWrp{position: relative;width: 73%; margin-left: 27%; }
+#widgetsPreview{width: 100%; background: transparent; height: 390px; transition:all 0.2s;}
+.widgetToolWrp{background: #e8e8e8;box-shadow:  0 2px 2px rgba(0,0,0,0.2); position: relative; padding:0px 0px; height: 50px; width: 100%; border-radius: 5px; margin-bottom: 10px; display: inline-block; width: 100%}
+.widgetToolWrp > ul > li:first-child , .widgetToolWrp > ul > li:last-child,.widgetToolWrp ul li.saveWidgets { padding:15px; }
+.widgetsDataWrp  .groupbox > li:last-child { margin-bottom: 40px;}
+.widgetToolWrp > ul > li{float: left; padding:8px 10px; }
+.widgetToolWrp ul li.saveWidgets, .widgetToolWrp ul li.getEmbedCode{float: right;}
+.widgetToolWrp > ul > li > a:not(.btn){font-size: 20px; text-decoration: none; color: #333}
+.selectWidgetFromOption{position: absolute; text-align: center; left: 150px; right: 260px; }
+.selectWidgetFromOption div{text-align: left;}
+
+.getEmbedCode{float: right;}
+.wdSaveWrpInt{background: #fff; position: absolute; left: 0px; right: 0px; height: 100%; display: none; }
+.wdSaveWrpInt.removeActive{display: block; animation:saveOptionReverse 0.8s ease forwards ;  }
+.wdSaveWrpInt.active{display: block; animation:saveOption 0.5s ease forwards; }
+
+.wdSaveWrpInt .svInt{left: 0px; right: 148px; position: absolute; }
+.wdSaveWrpInt input{border-radius: 0px; border:none; font-size: 21px;padding: 13px 27px; width: 100%; color: #333}
+.wdSaveWrpInt input[type="text"]:focus{border:none; box-shadow: none;}
+.wdSaveWrpInt a{padding: 16px 24px; font-size: 18px; text-decoration: none; float: right;}
+.wdSaveWrpInt a[data-action="close"]{background: #333; color: #fff}
+.wdSaveWrpInt a[data-action="save"]{background: #a4c35b; color: #fff}
+.activeEmbed.wdSaveWrpInt .svInt{right: 62px}
+.themeWidgetsWrp{background: #fff; position: absolute; width: 250px; top: 60px; bottom: 0px;  border-radius: 5px; border:1px solid #ccc; display: none;}
+.themeWidgetsWrp ul{ margin-bottom: 10px;}
+.themeWidgetsWrp li{display: inline-block; width: 100%; padding:6px 10px;}
+.themeWidgetsWrp li:last-child{border-bottom: 0px solid #ccc}
+.themeWidgetsWrp h3{font-size: 14px; padding: 10px; background:#e4e4e4; font-weight: bold; border-bottom: 1px solid #fff;}
+.themeWidgetsWrp h4{font-size: 12px; font-weight: bold; color: #333; margin-bottom: 5px;}
+.themeWidgetsWrp h4 span{margin-top: 7px; display: inline-block;}
+.themeWidgetsWrp input{border-radius: 0px; width: 100%; border:none; font-size: 18px; padding: 5px 0px 0px 0px; margin-top: 5px; color: #999 }
+.themeWidgetsWrp input[type="text"]{padding: 0px 0px; margin-top: 0px;}
+.themeWidgetsWrp input[type="text"]:focus{box-shadow: none; border:none;}
+.widgetsPreviewWrp.activeToolBar  #widgetsPreview{width: calc(100% - 260px); margin-left: 260px;}
+.themeWidgetsWrp  .colorFill {width: 25px; height: 25px;}
+.themeWidgetsWrp ul{display: none;}
+.themeWidgetsWrp h3 {cursor: pointer;}
+.themeWidgetsWrp h3 i{float: right; font-size: 10px;  transition:all 0.5s;}
+.themeWidgetsWrp h3.active {background: #333; color: #fff}
+.themeWidgetsWrp h3.active {background: #333; color: #fff}
+.themeWidgetsWrp h3.active i{transform:rotate(180deg);}
+.themeWidgetsWrp h3.active + ul{display: block; animation:toolOption 0.5s ease forwards; } 
+.widgetsPreviewWrp.activeToolBar .themeWidgetsWrp{display: block;}
+.getEmbedCode{display: none;}
+.saveTemplateStatus .getEmbedCode{display: inline-block;}
+.selectWidgetFromOption .options li {position: relative; }
+.selectWidgetFromOption .options li a{  top: 9px; }

@@ -1,0 +1,254 @@
+<?php 
+
+$common_obj = new Application_Model_Commonfunctionality();
+$return ='';
+			
+			
+			$return .= '<div id="create-league-wrapper" class="maindb-wrapper-border">
+			<form name="create" id="create">
+	
+			<div class="postTypeContent" id="passform">
+			<div class="formRow">
+			<div class="formField">
+			<input type="text" id="league-name" class="textfield">
+			<i class="optionalText">league name </i>
+			</div>
+			</div>
+			<div class="formRow">
+			<div class="formField">
+			<input type="text" id="enddate" class="textfield" value="">
+			<i class="optionalText"><span class="sprite dateIcon"></span> closing date </i>
+			</div>
+			</div>
+			<div class="formRow">
+			<div class="formField">
+			<textarea id="league-desc" class="textareafield"></textarea>
+			<i class="optionalText">description</i>
+			</div>
+			</div>			
+			<div class="formRow" id="group-other-textbox" style="display:none;">
+			<div class="formField">
+			<input type="text" class="textfield" id="group-type-other">
+			<i class="optionalText">specify</i>
+			</div>
+			</div>				
+			</form>
+			</div>
+			</div>
+			<div id="createleague-step2" style="display:none; z-index:100;">
+			<div style="font-size:14px; margin-bottom:10px;">'.$this->sowhidelink.'</div>
+			<div class="clearfix"> </div>
+			<div class="dblistLp">
+			<ul class="formField"> ';
+			$counter = 1;
+			$i       = 1;
+			$pic = '';
+			$curdate = date('Y-m-d');
+			$alreadyAddedcount=0;
+			$totaldbeetoadd =1;
+			
+			if(count($this->dbeelist)>0){
+			$return .="<li><div style='margin-bottom:10px;font-size:14px'>Select posts to add in league</div></li>";
+			foreach ($this->dbeelist as $row):
+				$pic = '';
+				$text = '';
+				$dbeetypeclass = '';
+				$dbeelevalclass='';
+				$stype = '';
+				$stype = $row['Type'];		
+				$alreadyAdded = '';	
+				$alreadyAddedClass = '';		
+				
+				
+				if($common_obj->dbeeleaguexit($row['DbeeID'],$curdate)>0)
+				{
+				$alreadyAddedcount++;	
+				$dbeelevalclass ='';
+				}else{
+					$alreadyAdded ='';
+					$alreadyAddedClass = '';	
+					$dbeelevalclass ='<input type="checkbox" name="league-db" id="league-db"  value="' . $row['DbeeID'] . '">';
+				}
+				if($stype==1){
+					$text = htmlspecialchars_decode(html_entity_decode(htmlentities($this->escape(strip_tags($row['Text'])))));	
+					//$pic = '<div class="imglpWraper"><img src="'.BASE_URL_IMAGES.'/timthumb.php?src=/imageposts/testleague.png&q=100&w=25&h=25" border="0" /></div>';			
+					$dbeetypeclass ="listingTypeText";
+				}	
+				else if($stype==2){
+					$LinkPic = $common_obj->checkImgExist($row['LinkPic'],'results','default-avatar.jpg');
+					$text = htmlspecialchars_decode(html_entity_decode(htmlentities($this->escape(strip_tags($row['UserLinkDesc'])))));					
+					$pic = '<div class="imglpWraper"><img src="'.BASE_URL_IMAGES.'/timthumb.php?src=/results/'.$LinkPic.'&q=100&w=45&h=45" border="0" /></div>';
+					$dbeetypeclass ="listingTypeLink";
+				}
+				else if($stype==3){
+					$Pic = $common_obj->checkImgExist($row['Pic'],'results','default-avatar.jpg');
+					$text = htmlspecialchars_decode(html_entity_decode(htmlentities($this->escape(strip_tags($row['PicDesc'])))));					
+					$dbeetypeclass ="listingTypePix";
+					$pic = '<div class="imglpWraper"><img src="'.IMGPATH.'/imageposts/small/'.htmlentities($Pic).'" width="45" border="0" /></div>';
+				}
+				else if($stype==4){
+					$text = htmlspecialchars_decode(html_entity_decode(htmlentities($this->escape(strip_tags($row['VidDesc'])))));				
+					$dbeetypeclass ="listingTypeMedia";
+					$pic = '<div class="imglpWraper"><img src="https://i.ytimg.com/vi/'.$row['VidID'].'/0.jpg"  width="45" height="45" border="0" /></div>';
+					
+				}
+				else if($stype==5){
+					$text = htmlspecialchars_decode(html_entity_decode(htmlentities($this->escape(strip_tags($row['PollText'])))));		
+					$pic = '<div class="imglpWraper"><img src="'.IMGPATH.'/imageposts/small/poll_legue.png&q=100&w=25&h=25" border="0" /></div>';
+					$dbeetypeclass ="listingTypePoll";
+				}
+			
+				$width = '100%;';
+				
+				$return .='<li class="'.$dbeetypeclass.' '.$alreadyAddedClass.'">
+					'.$alreadyAdded.'
+					<label class="labelCheckbox">
+						'.$dbeelevalclass.'
+						<div class="follower-box">
+							'.$pic.'
+							<div class="lplistText">
+								<span>' . substr($text,0,100) . '</span>
+							</div>
+						</div>
+					</label>
+					</li>';	
+				$counter++;
+				endforeach;
+				
+			}else{
+				$hidenext = 1;
+				$return .="<li style='text-align:center'><div class='noFound' align='center' style='margin-top:50px; margin-bottom:50px;'>No posts available to create new league.</div></li>";
+				$totaldbeetoadd =0;
+			}
+			$return .='</ul>'; // End of formfield
+
+			// for unavailable dbs
+			$return .='<ul class="formField_hide" style="display:none"> ';
+		
+			$return .="<li><div style='margin-bottom:10px;font-size:14px'>These posts already belong to a league</div></li>";
+			if(($this->hidedbeelist)>0){
+				foreach ($this->hidedbeelist as $row):
+				$pic = '';
+				$text = '';
+				$dbeetypeclass = '';
+				$dbeelevalclass='';
+				$stype = '';
+				$stype = $row['Type'];
+				$alreadyAdded = '';
+				$alreadyAddedClass = '';
+				
+				
+				if($common_obj->dbeeleaguexit($row['DbeeID'],$curdate)>0)
+				{
+					$alreadyAddedcount++;
+					$dbeelevalclass ='';
+				}else{
+					$alreadyAdded ='';
+					$alreadyAddedClass = '';
+					$dbeelevalclass ='<input type="checkbox" name="league-db" id="league-db"  value="' . $row['DbeeID'] . '">';
+				}
+				
+				if($stype==1){
+					$text = htmlspecialchars_decode(html_entity_decode(htmlentities($this->escape(strip_tags($row['Text'])))));
+				
+					$dbeetypeclass ="listingTypeText";
+				}
+				else if($stype==2){
+					$text = htmlspecialchars_decode(html_entity_decode(htmlentities($this->escape(strip_tags($row['UserLinkDesc'])))));
+					$pic = '<div class="imglpWraper"><img src="'.BASE_URL_IMAGES.'/timthumb.php?src=/results/'.$row['LinkPic'].'&q=100&w=75&h=75" border="0" /></div>';
+					$dbeetypeclass ="listingTypeLink";
+				}
+				else if($stype==3){
+					$text = htmlspecialchars_decode(html_entity_decode(htmlentities($this->escape(strip_tags($row['PicDesc'])))));
+					$dbeetypeclass ="listingTypePix";
+					$pic = '<div class="imglpWraper"><img src="'.IMGPATH.'/imageposts/small/'.htmlentities($row['Pic']).'" width="75" border="0" /></div>';
+				}
+				else if($stype==4){
+					$text = htmlspecialchars_decode(html_entity_decode(htmlentities($this->escape(strip_tags($row['VidDesc'])))));
+					$dbeetypeclass ="listingTypeMedia";
+					$pic = '<div class="imglpWraper"><img src="https://i.ytimg.com/vi/'.$row['VidID'].'/0.jpg"  width="75" height="75" border="0" /></div>';
+				
+				}
+				else if($stype==5){
+					$text = htmlspecialchars_decode(html_entity_decode(htmlentities($this->escape(strip_tags($row['PollText'])))));
+					$pic = '<div class="imglpWraper"><img src="'.IMGPATH.'/imageposts/small/deffalt.poll.jpg" border="0" /></div>';
+					$dbeetypeclass ="listingTypePoll";
+				}
+				
+				$width = '100%;';
+				$return .='<li class="'.$dbeetypeclass.' '.$alreadyAddedClass.'">
+				'.$alreadyAdded.'
+				<label class="labelCheckbox" >
+				'.$dbeelevalclass.'
+				<div class="follower-box">
+				'.$pic.'
+				<div class="lplistText">
+				<span>' . substr($text,0,100) . '</span>
+				</div>
+				</div>
+				</label>
+				</li>';
+				$counter++;
+				endforeach;
+			}
+			// End of unavailable
+			$return .= '<input type="hidden" id="alreadyAddedcount" value="'.$alreadyAddedcount.'"></div>
+			</ul></div>
+			<div id="createleague-step3" style="display:none; z-index:100;">
+			<div style="font-size:13px; line-height: 20px; margin-bottom:10px;">Invite people you are following and people who are following you, and search for new people to invite to your league.</div>
+			<div class="clearfix"> </div>
+			<ul id="invitetabs" class="tabHeader tabLinks">
+			<li><a href="#" rel="followers-list" class="active">Followers</a></li>
+			<li><a href="#" rel="following-list">Following</a></li>
+			<li><a href="#" rel="search-list">Search</a></li>
+			</ul>
+	
+			<div class="tabcontainer tabContainerWrapper" style="padding:10px;">
+				<div class="postTypeContent" id="passform">
+			<div id="followers-list" class="tabcontent" style="display:block"></div>
+			<div id="following-list" class="tabcontent"></div>
+			<div id="search-list" class="tabcontent">
+						<div class="formRow singleRow">
+							<div class="formField">
+			<div style="float:left; font-size:14px;">Search users to invite to league</div>
+			<div id="searchUserBox" style="float:right">
+			<form name="searchleagueUsers" id="searchleagueUsers" action="#"  onSubmit="searchleague(event);return false;">
+			<div class="inputAppend">
+			<input type="text" id="keyword" class="textfieldSearch" style="border:1px solid #B2B2B2;min-width:0"  value="" placeholder="search users to invite">
+			<button type="submit" class="btn btn-yellow" ><i class="searchIconWhite"></i></button>
+			</div>
+			</form>
+			</div>
+							</div>
+						</div>
+						<div id="search-invite-list" class="formRow" style="display:none">
+							<div class="formField"></div>
+						</div>
+			<br style="clear:both; font-size:1px">
+			</div>
+			</div>
+			</div>
+			<input type="hidden" id="groupid" value="" />
+			<input type="hidden" id="total-followers" value="" />
+			<input type="hidden" id="total-following" value="" />
+			<input type="hidden" id="total-search" value="">
+			<input type="hidden" id="total-users-toinvite" value="" />
+			<input type="hidden" id="total-users-toinvite-social" value="" />
+			<input type="hidden" id="from" value="">
+			<input type="hidden" id="alreadyAddedcount" value="'.$alreadyAddedcount.'">
+			</div>
+			<div id="league-selected-div" style="display:none;">
+			<div id="invitetoleague-header" style="float:left; font-size:13px; line-height:19px; margin-bottom:10px;">Invite people you are following and people who are following you, and search for new people to invite to your league.</div>
+			<div class="next-line"></div>
+			<div class="maindb-wrapper-border" style="padding:10px;">
+			<div id="league-users-label" style="font-size:12px; margin-bottom:10px;">Users selected by you to invite to league.</div>
+			<div class="next-line"></div>
+			<div id="league-invite-selected"></div>
+			<div class="next-line"></div>
+			<div style="float:right; margin-top:35px;"><a href="javascript:void(0);" onClick="backtoselectionleague();">back to selection</a></div>
+			<br style="clear:both; font-size:1px">
+			</div>
+			</div>
+			
+			<div id="invite-message"></div></div>';
+echo $return.'~#~'.$end.'~#~'.$totaldbeetoadd;

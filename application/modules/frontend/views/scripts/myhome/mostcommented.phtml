@@ -1,0 +1,182 @@
+<?php 
+
+$commonbynew 	=	new Application_Model_Commonfunctionality();
+
+    $IDs = '';   
+
+       $startnew =$this->startnew;
+
+        if($this->dbeealldbees > 0) {
+
+        	 $k=1;        
+
+        	 if(strlen($row->Text)>250) $dots='...'; else $dots='';
+
+         if($k=='1' && $initial=='1') setcookie("CookiePostDate", $row->PostDate, time()+3600);
+
+
+
+         foreach ($this->dbeealldbees as $row) :
+
+         	$CommentsNum	=	0;
+			$commentago 	= 	'';
+			$agodk			=	'';
+
+         $agodk = $commonbynew->agohelper($this->escape($row['PostDate']));
+
+         $userrow = $this->usrall($row['User']);
+
+         $CommentsNum = $commonbynew->commentcount($row['DbeeID']);		    		 
+
+         $ActiveUsersLabel = $commonbynew->usercnt($row['DbeeID']). " active users";          
+
+         $IDs .= $row['DbeeID'].',';
+
+         $dbeeicon = $this->dbeeicon($CommentsNum,$row['Type']); $dbstate = $dbeeicon[0]; $dbstatetitle = $dbeeicon[1];
+
+
+
+         if($CommentsNum>0) $commentago = $commonbynew->agohelper($this->escape($row['LastActivity']));   
+
+
+         $type = $this->escape($row['Type']);
+
+         $favid = $this->escape($row['DbeeID']);
+
+         if($row['TwitterTag']!='' && $this->Social_Content_Block!='block') $twittertag='<span class="twitterlistingHas"><i class="sprite twlistingHasIcon"></i>'.$this->escape($row['TwitterTag']).'</span>';
+         else $twittertag='';
+
+		 if($row['RssFeed']!='') $rssfeed='<div class="dbRssWrapper dbRssWrapperFeed dbRssWrapperMtop" style="display:block">'.$row['RssFeed'].'</div>';
+
+         else $rssfeed='';
+
+         $userStatus=$userrow['Status'];
+
+         if($userStatus==1) $profileLinkStart='<a href="'.BASE_URL.'/user/'.$userrow['UserID'].'"  class="psUserName">';
+
+         else $profileLinkStart='<a href="javascript:void(0)" class="profile-deactivated psUserName" title="'.DEACTIVE_ALT.'" onclick="return false;">';
+		$GroupDB=false;
+		$GroupText='';
+		if($row['GroupID']!=0 && $row['GroupID']!='') {
+			$GroupDB=true;
+			$GroupText=$this->grouphelper($row['GroupID']);
+		}
+             if($type =='1') {
+
+             	$dotstext 	= substr($this->escape($row['Text']),0,250).$dots;
+
+			$return		.=	$commonbynew->text_displaydbs($userrow['ProfilePic'], $profileLinkStart, $this->escape($userrow['Name']), $agodk, $commentago, $CommentsNum,$dotstext,$favid,$twittertag, $ActiveUsersLabel, $row['User'],$HideUserLabel,$deletepost, $from='mostcomment',$rssfeed,$dbstate,$dbstatetitle,$GroupText,$row['GroupID'],$row['ReDBUsers'],$row['dburl']);
+	   }
+       elseif($type =='2') {  
+       			$link = $this->escape($row['Link']);
+				if($this->escape($row['UserLinkDesc'])!='') $LinkInfo=substr($this->escape($row['UserLinkDesc']),0,200); else $LinkInfo='';
+
+				if(strlen($this->escape($row['UserLinkDesc']))>200) $dots='...'; else $dots='';
+
+				$dotstext 	= $LinkInfo.$dots;
+
+				$return		.=	$commonbynew->link_displaydbs($userrow['ProfilePic'], $profileLinkStart, $this->escape($userrow['Name']), $agodk, $commentago, $CommentsNum,$dotstext,$favid,$twittertag, $ActiveUsersLabel, $row['User'], $this->escape($row['LinkTitle']),$this->escape($row['LinkDesc']), $snlink,$link,$HideUserLabel,$deletepost, $from='mostcomment',$dbstate,$dbstatetitle,$GroupText,$row['GroupID'],$row['ReDBUsers'],$row['dburl']);
+			}
+
+			elseif($type =='3') {
+
+				if($this->escape($this->escape($row['PicDesc']))!='') $PicDesc=substr($this->escape($row['PicDesc']),0,250); else $PicDesc='';
+
+				if(strlen($this->escape($row['PicDesc']))>100) $dots='...'; else $dots='';
+
+				$dotstext 	= $PicDesc.$dots;
+
+				$return		.=	$commonbynew->pix_displaydbs($userrow['ProfilePic'], $profileLinkStart, $this->escape($userrow['Name']), $agodk, $commentago, $CommentsNum,$dotstext,$favid,$twittertag, $ActiveUsersLabel, $row['User'], $row['Pic'],$HideUserLabel,$deletepost, $from='mostcomment',$dbstate,$dbstatetitle,$GroupText,$row['GroupID'],$row['ReDBUsers'],$row['dburl']);
+			}
+
+			elseif($type =='4') {
+
+				if($this->escape($row['Vid'])!='') {
+
+					$mediaicon='<div class="icon-youtube" style="margin:-2px 20px 0 -30px;; height:30px;"></div>';
+
+					if($this->escape($row['VidSite'])=='Youtube')
+
+						$VideoThumbnail='<img src="http://i.ytimg.com/vi/'.$this->escape($row['VidID']).'/0.jpg"   width="200" height="150" border="0" />';
+
+					elseif($this->escape($row['VidSite'])=='Vimeo')
+
+					{
+
+						$url = 'http://vimeo.com/api/v2/video/'.$this->escape($row['VidID']).'.php';
+
+						$contents = @file_get_contents($url);
+
+						$thumb = @unserialize(trim($contents));
+
+			
+
+						$VideoThumbnail="<img src=".$thumb[0][thumbnail_small]."   width='200' height='150'>";
+
+					}
+
+					elseif($this->escape($row['VidSite'])=='Dailymotion')
+
+						$VideoThumbnail='<img src="http://www.dailymotion.com/thumbnail/video/'.$this->escape($row['VidID']).'"  width="200" height="150" border="0" />';
+
+				} elseif($this->escape($row['Audio'])!='') {
+
+					$VideoThumbnail='<img src="images/soundcloud.png"   width="200" height="150">';
+
+					$mediaicon='<div class="icon-soundcloud" style="margin:3px 20px 0 -30px; height:30px;"></div>';
+
+				}
+
+		
+
+				if(strlen($this->escape($row['VidDesc']))>350) $dots='...'; else $dots='';
+
+				$dotstext 	= substr($this->escape($row['VidDesc']),0,400).$dots;
+
+				$return		.=	$commonbynew->media_displaydbs($userrow['ProfilePic'], $profileLinkStart, $this->escape($userrow['Name']), $agodk, $commentago, $CommentsNum,$dotstext,$favid,$twittertag, $ActiveUsersLabel, $row['User'], $VideoThumbnail,$HideUserLabel,$deletepost, $from='mostcomment',$dbstate,$dbstatetitle,$GroupText,$row['GroupID'],$row['ReDBUsers'],$row['dburl']);
+			}
+
+			elseif($type =='5') {
+
+				$stats = $this->Pollhelper($row['DbeeID']);
+
+				$dotstext 	= substr($this->escape($row['PollText']),0,250).$dots;
+
+				$return		.=	$commonbynew->poll_displaydbs($userrow['ProfilePic'], $profileLinkStart, $this->escape($userrow['Name']), $agodk, $commentago, $countvotepoll,$dotstext,$favid,$twittertag, $ActiveUsersLabel, $row['User'],$stats,$HideUserLabel,$deletepost, $from='mostcomment',$dbstate,$dbstatetitle,$GroupText,$row['GroupID'],$row['ReDBUsers'],$row['dburl']);
+			}
+
+			$k++;
+
+        
+
+			 endforeach; 
+
+			 
+
+			 }
+
+			 else {
+
+			 
+
+			 	$seemorelabel='- no more category to show -';
+
+			 }
+
+			 $IDs=substr($IDs,0,-1);
+
+			
+
+			
+
+			 	$return.='<div id="see-more-feeds'.$startnew.'"><div id="more-feeds-loader" style="cursor:pointer; color:#333333; text-align:center;" onclick="javascript:seemorefeeds('.$startnew.',15);">'.$seemorelabel.'</div></div>';
+
+			
+
+			//echo $return.'~#~'.$end.'~#~'.$IDs.'~#~'.$startnew;
+
+			echo $return.'~#~'.$end.'~#~'.$follow.'~#~'.$startnew.'~#~'.$IDs.'~#~'.$TotalDbees.'~#~'.$startnew;
+
+			 ?>
+
+    

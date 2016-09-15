@@ -1,0 +1,296 @@
+<?php    
+
+$this->title = "Video broadcasts";
+$this->headTitle($this->title);
+$cmnObj= new Admin_Model_Common();
+
+$domainAPIData = $this->myclientdetails->getRowMasterfromtable('domainAPI',array('google_email','google_password'));
+?>
+
+<?php if(Zend_Controller_Front::getInstance()->getRequest()->getParam('task')=='create'){?>	
+<script type="text/javascript">
+$('document').ready(function(){		
+ $('div #searchContainer').show();
+});
+</script>
+<?php } ?>
+<?php if($this->invite=='facebook'){ ?>
+<script type="text/javascript">
+	$('document').ready(function(){
+		facebookUser(<?php echo $this->postID; ?>,'<?php echo $this->type; ?>');
+	});
+</script>
+<?php } ?>
+<?php if($this->invite=='twitter'){  ?>
+<script type="text/javascript">
+	$('document').ready(function(){
+	twitterUser(<?php echo $this->postID; ?>,'<?php echo $this->type; ?>');
+		});
+</script>
+<?php } ?>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.4/jstz.min.js">
+</script>
+<script charset="ISO-8859-1" src="//fast.wistia.com/assets/external/E-v1.js" async></script>
+<script type="text/javascript">
+$('document').ready(function(){
+	var tz = jstz.determine(); // Determines the time zone of the browser client
+	//console.log(tz);
+    var timezone = tz.name(); //'Asia/Kolhata' for Indian Time.
+    //alert(timezone);
+    $('#timezoneevent').val(timezone);
+	$("#date_text").datepicker();
+});
+</script>
+<h1 class="pageTitle dbeeViewAll" >Video broadcasts
+<?php if($this->youtubeStatus==0){ ?>
+<a href="javascript:void(0);" class="btn btn-yellow btn-large openSearchBlock resetform">Create video broadcast</a>
+<?php }?>
+</h1>
+<?php if($this->youtubeLogin==0){ ?>
+  <div style="background:rgba(0,0,0,0.9); color:; display:none;" class="overlay" id="mesageNotfiOverlay">
+    <div class="videoPopShdbox"> 
+	  <p style="font-size:15px;">Please click the authorisation link below to continue.</p><br/>
+	  <p align="center" style="font-size:14px;"><span style="display: inline-block; width: 100%; line-height:15px; background: #CCC; padding: 10px; margin-bottom: 10px;">Please use the following details.<br><br>Email: <span style="font-weight:bold"><?=$domainAPIData['google_email']?></span><br><br>Password: <span style="font-weight:bold"><?=$domainAPIData['google_password']?></span><br><span style="font-weight: bold; font-style: italic; display: inline-block; margin: 15px 0px 0px 0px;">Please note you will need to log out of any current Google session.</span></span><span><a href="<?php echo $this->authUrl; ?>" class="btn btn-yellow">Authorise broadcasts</a></span><span style="margin: 15px 11px 10px;"><a href="#" class="btn btn-min closeAuth">Close</a></span>
+	  </p>
+    </div>
+</div>
+ <?php }?>
+<?php  if($this->youtubeStatus==0){ ?>
+<div  id="searchWrapper" class="spSdbsSearchBox">
+		<?php if($_SESSION['message']==1 || $_SESSION['message']==2){ echo '<div class="youtubeConnected">'.$this->messageYoutube.'</div>'; $_SESSION['message'] = $_SESSION['message']+1;} ?>
+		<div id="searchContainer">	
+			<div id="exp_condition" class="expenddcondition1" >				
+				<div class="whiteBox addConditionWrapper">
+					<div class="row postBntsRow">
+	               </div>
+						<form name="specialdb" id="specialdb">
+								<input type="hidden" name="youtubeLogin" value="<?php echo $this->youtubeLogin; ?>" id="youtubeLogin" />
+									<div class="searchField"> 
+										<label class="label">Video type </label>
+										<div class="fieldInput">
+											<select name="videotype" id="videotype">
+												<option value='0'>Select video type </option>
+												<option value='1'>Youtube video</option>
+												<option value='2'>Upload video</option>
+											</select>
+										</div>
+									</div>									 
+									<div class="uploadBVideo uploadVideoTemp searchField"></div>
+									<div class="searchField"> 
+										<label class="label">Description </label>
+										<div class="fieldInput"><textarea style="width: calc(100% - 140px); -webkit-width: calc(100% - 140px); float:left; margin-right:5px" class="textarea"  name="yt_des" id="yt_des" ></textarea></div>
+									</div>
+									<div class="searchField"> 
+										<label class="label">Start date / time </label>
+										<div class="fieldInput"><input type="text" style="width:225px; float:left; margin-right:5px" id="eventstart" name="eventstart" ></div>
+										<input type="hidden" id="timezoneevent" name="timezoneevent" />
+									</div>
+									<div class="searchField"> 
+										<label class="label">Broadcast type </label>
+										<div class="fieldInput">
+											<select name="eventtype" id="eventtype">
+												<option value='0'>Public</option>
+												<option value='1'>Request</option>
+												<option value='2'>Private</option>
+											</select>
+										</div>
+									</div>
+									 <div class="searchField"> 
+									 <label class="label"> </label>
+										<div class="fieldInput">
+										<label>
+										<input name="commentduring" class="goupuser" id="commentduring" value="1" type="checkbox"><label for="commentduring"></label>Enable comments during broadcast (if unchecked, users will only be able to comment once the video broadcast has finished)</span></label>
+										</div>
+									</div>
+									<div class="searchField"> 
+										<label class="label">&nbsp;</label>
+										<div class="fieldInput">
+											<input id="DbeeID" name="DbeeID" type="hidden" value="">
+											<input type="submit" id="specialdbsubmit" class="addbutton btn btn-green btn-medium pull-left" value="Save"> 
+											&nbsp;
+											<input type="submit" id="" class="btn btn-medium openSearchBlock resetform" value="Close" style=""> 
+										</div>
+									</div>
+							<div class="clearfix"></div>
+						</div>
+						<div class="clearfix"></div>
+					</form>
+			</div>
+			<div class="clearfix"></div>
+		</div>
+
+		<div class="clearfix"></div>
+	
+</div>
+<div class="box-body " id="spcialDBbody">
+	<div id="listingTotalResults" style="float:right;margin: 10px 35px 0 0;"></div>
+	<ul class="listing scoredList scoreListFullView" id="searchresulthide">
+		<?php  
+		if (count($this->spdbs)){ ?>
+		<?php foreach($this->spdbs as $spdb => $liveDbee) :  ?>
+		<li>
+			<?php $dash_obj = new Admin_Model_Deshboard();
+			$descDisplay = '';
+			if($this->escape($liveDbee['Type'])==6) 
+			{ 
+				if($liveDbee['Active']==0)
+					$checked = 'checked="checked"';
+				else
+					$checked = '';
+
+				$dbtype	=	$cmnObj->getspecialdbType_CM($liveDbee['eventtype']).' Event ';
+				$dbtypeIcon	=	'<div class="pstype typeVideo"></div>';
+				$dbVid			=	$liveDbee['Vid'];
+				$dbVidDesc		=	$liveDbee['VidDesc'];				
+				$descDisplay	.=	'<div class="dbPicText">';
+				if($liveDbee['VidSite']=='youtube')
+				{
+					$descDisplay .=	'<div class="dbPic" ><a href="#"><img width="140" height="100" border="0" src="https://i.ytimg.com/vi/'.$dbVid.'/0.jpg"></a></div>';
+					$note = '';
+				}else{
+					$descDisplay .=	'<div class="dbPic" ><div class="wistia_embed wistia_async_'.$dbVid.'" style="width:140px;height:100px;">&nbsp;</div></div>';
+					$note = '';
+				}
+				
+				if(count($dash_obj->attendiesuser($liveDbee['DbeeID'],1))>0)
+				{
+					$countA = count($dash_obj->attendiesuser($liveDbee['DbeeID'],1));
+					if($countA==1)
+						$countAT = 'user';
+					else
+						$countAT = 'users';
+
+					$attendies = '<div class="spdbltbox"><strong><span>'.$countA.'</span> '.$countAT.' attending this event <a  href="javascript:void(0);" class="attendiesuser spdbltbox" dbid="'.$liveDbee['DbeeID'].'" type="1"> view</a></strong> </div>';
+					
+				}else
+					$attendies = '<div class="spdbltbox"><strong>No users attending this event</strong></div>';
+				
+				$countB = count($dash_obj->attendiesuser($liveDbee['DbeeID'],0));
+					if($countB==1)
+						$countBT = 'user';
+					else
+						$countBT = 'users';
+
+				if(count($dash_obj->attendiesuser($liveDbee['DbeeID'],0))>0){
+					
+					$reqtojoin = '<div class="spdbltbox"><strong><span>'.$countB.'</span> '.$countBT.' requested to join <a class="reqtojoinuser spdbltbox" dbid="'.$liveDbee['DbeeID'].'" type="0" href="javascript:void(0);"> View</a></strong></div>';
+				}else
+					$reqtojoin = '<div class="spdbltbox"><strong>No users requested to join</strong></div>';
+				
+				// show time 
+				$currentTime  = date('Y-m-d H:i:s');
+
+				$eventStartTimeInSecond = strtotime($liveDbee['eventstart']);
+				$serverTimeInSecond = strtotime($currentTime);
+				$videoDuration = ($eventStartTimeInSecond + $liveDbee['eventend']);
+
+                if ($serverTimeInSecond > $videoDuration)
+                	$expire = 'Event expired';
+                else{
+                	$t = $cmnObj->secondsToTime($videoDuration-$serverTimeInSecond);
+                	$expire = 'Event starts on ';
+                	if($t['h']!=0){
+	                    $expire .= $t['h']." hours, ";
+	                }
+	                if($t['h']==1){
+	                    $expire .= $t['h']." hour, ";
+	                }
+	                if($t['m']!=0){
+	                    $expire .= $t['m']." minutes, ";
+	                }
+	                if($t['m']==1){
+	                    $expire .= $t['m']." minute, ";
+	                }
+	                if($t['s']!=0){
+	                    $expire .= $t['s']." seconds, ";
+	                }
+	                if($t['s']==1){
+	                    $expire .= $t['s']." second, ";
+	                }
+                }
+                	
+                	
+                
+
+                if($liveDbee['Active']==1)
+                	$status = 0;
+                else
+                	$status = 1;
+                // show time
+
+				if($liveDbee['eventtype']==0) 
+					$descDisplay1 = 'Open video broadcast created '; 
+				if($liveDbee['eventtype']==1) 
+					$descDisplay1 = 'Request video broadcast created '; 
+				if($liveDbee['eventtype']==2)
+					$descDisplay1 = 'A private video broadcast created ';
+				$descDisplay	.=	'<div class="dbPicDesc '. $noPic.'">
+					<div class="spcDecptTxt">
+					  <div><h2>'.$descDisplay1.date('d M Y',strtotime($this->escape($liveDbee['PostDate']))).' | '.$expire.' </h2></div>
+					  '.$dbVidDesc.' 
+					  <div class="dbActBtnOver">
+					      <div class="dbActBtnLft">
+					         <span class="updateSpecialDbee btn btn-green btn-mini" videoid="'.$liveDbee['DbeeID'].'">Edit</span> 
+                             <a class="btn btn-green btn-mini" href="'.BASE_URL.'/dbee/'.$liveDbee['dburl'].'" videoid="'.$liveDbee['DbeeID'].'">View</a> 
+					       </div>
+					      <div class="dbActBtnRt">
+					          <div class="helponoff userActiveInactive updateDbeeUserStatus"> 
+									<!-- Note : user_id is dbee_id -->
+								   <input type="checkbox" id="switcherTarget_'.$liveDbee['DbeeID'].'" '.$checked.' user_id="'.$liveDbee['DbeeID'].'" status="'.$status.'"> 
+									 <label for="switcherTarget_'.$liveDbee['DbeeID'].'">
+										<div class="onHelp" on="Active" off="Inactive"></div>
+										<div class="onHelptext">
+											<span>Activate</span>
+											<span>Deactivate</span>
+										</div>
+									</label>
+								</div>
+					      </div>
+					  </div>
+					</div> 
+				</div>
+                 <!--Start social list-->
+				  <div class="spcSocialOvrList"> 	
+					   <div class="dbSocialLft">
+                               '.$attendies.'
+							<div class="spdbltbox">
+								'.$invitelink.'
+								'.$this->invitecnt($liveDbee['DbeeID']).'
+							</div>
+								'.$reqtojoin.'
+					     </div>
+					     <div class="dbSocialRt">
+                              <div class="spdbltbox">
+								  <div class="inPeople"> Invite from</div>
+								    <div class="spcPeopleIcon" >';
+							if($this->facebookLogined==false)
+								$descDisplay .='<a href="'.BASE_URL.'/admin/social/facebook?postid='.$liveDbee['DbeeID'].'&type=attendies" class="dbfbIcon"><span class="fa fa-facebook-square"></span></a>';
+							else
+								$descDisplay .='<a href="javascript:void(0);" data-uniqueValue ="'.$liveDbee['DbeeID'].'" class="dbfbIcon socialfriends" data-title="'.$liveDbee['Text'].'" data-for ="attendies" data-type="facebook" ><span class="fa fa-facebook-square"></span></a>';
+
+							if($this->twitterLogined==false)
+								$descDisplay	.=	'<a href="'.BASE_URL.'/admin/social/twitter?postid='.$liveDbee['DbeeID'].'&type=attendies" class="dbtwitterIcon"><span class="fa fa-twitter-square"></span></a>';
+							else
+								$descDisplay	.=	'<a href="javascript:void(0);"  data-uniqueValue ="'.$liveDbee['DbeeID'].'" class="dbtwitterIcon socialfriends" data-title="'.$liveDbee['Text'].'" data-for ="attendies" data-type="twitter" ><span class="fa fa-twitter-square"></span></a>';
+								$descDisplay	.=	'<a href="javascript:void(0);" data-uniqueValue ="'.$liveDbee['DbeeID'].'" class="dbsocialIcon socialfriends" data-for ="attendies" data-type="dbee" data-title="'.$liveDbee['Text'].'" ></a>
+							  </div></div>';
+							
+							 $descDisplay .=	'</div><span style="color:red;">'.$note.'</span></div>';
+							 unset($checked);
+							 unset($expire);
+			} ?>
+			<div class="dataListWrapper"> 
+				<div class="dataListbox">
+					<div class="scoredData">
+						<div class="dbPost"><?php echo $descDisplay;?></div>
+					</div>
+				</div>
+			</div>
+		</li>
+				<?php $rowchange++; endforeach; ?>
+		</ul>
+
+<?php }}  ?>
+
+		
+

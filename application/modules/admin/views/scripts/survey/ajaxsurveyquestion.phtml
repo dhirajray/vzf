@@ -1,0 +1,52 @@
+<?php 
+$counter = $this->deshboard->checkUserCompleteSurvey($this->dbeeid);
+if($counter==0) 
+ $questionsWrp = 'questionsWrp';
+else 
+$questionsWrp =''; 
+$where = array('Dbeeid'=>$this->dbeeid,'parentID'=>0);
+$orderBy = array('id'=>'ASC');
+$surveyDetails = $this->myclientdetails->getAllMasterfromtable('tblSurveyquestion',array('id','content'),$where,$orderBy);
+
+
+if(!empty($surveyDetails))
+{
+	foreach ($surveyDetails as $value) 
+	{ 
+		$abcd =array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+		echo '<div class="questionRow '.$questionsWrp.'">
+		<ul>
+		<li class="questionName" data-id="'.$value['id'].'"><span class="mark">Question</span> <strong>'.stripcslashes($value['content']).'</strong> 
+			<div class="editOption">
+	          <a class="plBtnGreen_" href="javascript:void(0);"><i class="fa fa-pencil"> </i></a>
+	          <a class="plBtnRed_" href="javascript:void(0);"><i class="fa fa-times"> </i></a>
+	        </div>
+         </li>';
+		$an=0;		
+		$result = $this->deshboard->surveyquestion($value['id']);
+		
+		foreach ($result as $data) {
+			if($data['correct_answer']==1)
+			{
+				$rightans='';
+				//$rightans='<span style class="mark mark-green">✔ Right Answer</span>';
+				$checked='checked="checked"';
+			}
+			else
+			{
+				$rightans='';
+				$checked='';
+			}
+			echo '<li data-id="'.$data['id'].'" data-parrentId="'.$value['id'].'"><label class="radio pull-left"><input id="rad_'.$data['id'].'"  type="radio" disabled="disabled" name="correct_answer_'.$value['id'].'" value="" '.$checked.' style="left-5px;"><label for="rad_'.$data['id'].'"></label></label><span class="mark mark-green">'.$abcd[$an].'</span> <strong>'.stripcslashes($data['content']).'</strong> '.$rightans.'<div class="editOption">
+                          <a class="plBtnGreen_" href="javascript:void(0);"><i class="fa fa-pencil"> </i></a>
+                          <a class="plBtnRed_" href="javascript:void(0);"><i class="fa fa-times"> </i></a>
+                        </div></li>';
+			$an++;
+		}
+		$an=0;
+		echo '</ul></div>';
+	}
+}else{
+		echo 'You did not add question';
+}
+?>

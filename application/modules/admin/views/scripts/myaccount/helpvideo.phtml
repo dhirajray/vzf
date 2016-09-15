@@ -1,0 +1,62 @@
+<script>
+
+      function htmlTab (dataType){
+        if(dataType=='userTut'){
+         var data =  dbTutorials[0].userTut;
+        }else{
+           var data =  dbTutorials[0].adminTut;
+        }
+        $.each(data, function(i, value){
+        $('#'+dataType+' .accountTabLink ul').append('<li><a href="javascript:void(0)">'+value.title+'</a></li> ');
+        $('#'+dataType+' .accountContainer').append('<div class="accountContent">\
+                   <iframe width="100%" height="400" src="//www.youtube.com/embed/'+value.video+'" frameborder="0" allowfullscreen></iframe>\
+              </div>');
+        });
+      }
+  $(function (){
+  
+     htmlTab('userTut');
+     htmlTab('adminTut');
+
+     $('body').on('click','.tutTab a',function(event) {
+      event.preventDefault();
+       var openTab = $(this).attr('href');
+       $(this).closest('ul').find('.active').removeClass('active');
+       $(this).closest('li').addClass('active');      
+       $('.videotutWrp').hide();
+       $(openTab+' .accountTabLink li:first').trigger('click');
+       $(openTab).show();
+    });
+  $('.tutTab li:first a').trigger('click');
+  });
+   
+</script>
+
+<?php if($this->statusShow = 'comming soon'){ ?>
+        <div id="pageContent" page-type="homepage" >
+           <div >&nbsp;</div> 
+          <div  id="pageContent">
+           <div class="emailVerified" style="margin-top: 80px; margin-left: 400px;"> 
+            <h2 style="color:#99ba3f; font-size: 60px;"> <i class="spirteVerified emailVerifiedIcon"> </i>Coming  Soon </h2>
+           </div>
+          </div> 
+        </div>
+<?php }else{ ?> 
+<h1 class="pageTitle">Videos help</h1>
+    <ul class="dbtab tutTab">
+      <li><a href="#userTut">Frontend</a></li>
+      <li><a href="#adminTut">Admin</a></li>
+    </ul>
+  <div class="videotutWrp" id="userTut">
+    <div class="accountTabLink">
+       <ul></ul>
+      </div>
+    <div class="accountContainer"> </div>
+  </div>
+  <div class="videotutWrp" id="adminTut">
+     <div class="accountTabLink">
+       <ul></ul>
+      </div>
+    <div class="accountContainer"> </div>
+  </div>
+ <?php } ?> 

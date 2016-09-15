@@ -1,0 +1,656 @@
+<!--this is page listing-->
+
+<div id="leftListing">
+
+	<ul id="my-dbees" class="">
+		<?php
+     
+		$sessionUserType = $_SESSION['Zend_Auth']['storage']['usertype'];
+		$limit='40';
+		$letters = range('a', 'z');
+		$alphabets=array();
+		$companyalphabets=array();
+		$user_type = $this->session_data['usertype'];
+		$filtertby=$this->filtertby;		
+			
+			$alphaquery="SELECT  SUBSTRING(Name, 1, 1) AS `firstletter`, SUBSTRING(company, 1, 1) AS `firstlettercom` FROM `tblUsers` WHERE (clientID = '".clientID."')  ";
+			if($this->userconfirmed==0)
+	        {
+	          $alphaquery.=" AND Status = 1";
+	        }
+	        if($this->admin_searchable_frontend==0)
+	        {
+	          $alphaquery.=" AND role != 1 AND usertype != 10";
+	        }
+	        if($sessionUserType==0)
+	        {
+	          $alphaquery.=" AND (usertype = 0 OR usertype = 6)"; 
+	        }
+	        if(isADMIN!=1) 
+            {
+              $alphaquery.=" AND hideuser != 1"; 
+            }
+	       
+	      	        
+
+	      	 //echo $alphaquery; die;
+			 $alphaRow=$this->myclientdetails->passSQLquery($alphaquery);
+			
+			foreach($alphaRow as $letterrow)
+			{
+			 
+				 if($letterrow['firstletter'] != null) {
+				 $alphabets[]=ucfirst($this->myclientdetails->customDecoding($letterrow['firstletter']));
+				}
+				if ($letterrow['firstlettercom'] != null) {
+				 $companyalphabets[]=ucfirst($this->myclientdetails->customDecoding($letterrow['firstlettercom']));
+				}
+
+		    }
+		   
+		    asort($alphabets);  
+		    asort($companyalphabets);
+		    $alphabets=array_unique($alphabets);
+		    $companyalphabets=array_unique($companyalphabets);
+			
+			$sessionUserType;
+         
+		
+		$searchMember = $this->myclientdetails->customEncoding($this->searchMember,'allusersAlphabat');
+		$filter = new Zend_Filter_StripTags();
+		$searchMember =$filter->filter(addslashes($this->searchMember));
+
+		$sort=array('UserID'=>'DESC');
+		$memberSortAlpha=0;
+		$companySortAlpha=0;
+
+		$totalSearchHtml ='';
+		$page=2;
+
+		$sortby = $this->myclientdetails->customEncoding($this->sortby,'allusersAlphabat');
+		$objuser =new Application_Model_DbUser();
+		//$filterdataarray = $objuser->filtermember($sessionUserType);
+		echo'<div id="middleWrpBox">';
+
+
+		if($this->lastId!="")
+		{
+
+			$IsSearchText = $this->IsSearchText;
+			$IsSearchText = $this->myclientdetails->customEncoding($IsSearchText,'allusersAlphabat');
+			$IsSortBy = $this->IsSortBy;
+			$IsSortBy = $this->myclientdetails->customEncoding($IsSortBy,'allusersAlphabat');
+			$SearchUser = $this->SearchUser;
+			$SearchUser = $this->myclientdetails->customEncoding($SearchUser,'allusersAlphabat');
+
+			$users = $this->User_Model->SearchMemberPaging($this->lastId,$SearchUser,$IsSortBy,$user_type,$this->userconfirmed,$filtertby,'',$this->admin_searchable_frontend);
+
+		}
+		else if($this->searchMember!="")
+		{
+
+			$activeclass='';
+			$activeclass_latest='active';
+			$memberSortAlpha=0;
+			$companySortAlpha=0;			
+			$activeclasscompany='';
+			
+			 $users = $this->User_Model->userDirectory($sortby,$searchMember,$user_type,$this->userconfirmed,$filtertby,'','',$this->admin_searchable_frontend);
+
+			echo'<input type="hidden" name="SearchUser" class="SearchUser" value="'.$this->myclientdetails->customDecoding($this->searchMember).'">';
+			echo'<input type="hidden" name="SearchMemberTextScroll" id="SearchMemberTextScroll" value="1">';
+		}
+		else if($this->sortby!="")
+		{
+			$activeclasscompany='';
+			$activeclass='active';
+			$activeclass_latest='';
+			$SearchUserTextXX = $this->SearchUserTextXX;
+			$SearchUserTextXX = $this->myclientdetails->customEncoding($SearchUserTextXX,'allusersAlphabat');
+			
+			$users = $this->User_Model->userDirectory($sortby,$SearchUserTextXX,$user_type,$this->userconfirmed,$filtertby,'','',$this->admin_searchable_frontend);
+			echo'<input type="hidden" name="SearchUser" class="SearchUser" value="'.$this->myclientdetails->customDecoding($SearchUserTextXX).'">';
+			echo'<input type="hidden" name="SortByScroll" id="SortByScroll" value="1">';
+			$display='block';
+			$memberSortAlpha=1;
+			$companySortAlpha=0;
+
+		}
+		else if($this->sortbycompany!="")
+		{
+					
+                    $activeclasscompany='active';
+                    $activeclass       ='';
+				    $activeclass_latest='';
+					$SearchUserTextXX = $this->_request->getPost('SearchUserTextXX');
+					$SearchUserTextXX = $this->myclientdetails->customEncoding($SearchUserTextXX,'allusersAlphabat');
+
+					$users = $this->User_Model->userDirectory($sortby,$SearchUserTextXX,$user_type,$this->userconfirmed,$filtertby,'',$sortbycompany,$this->admin_searchable_frontend);
+
+					$userscounter = $this->User_Model->userDirectoryCount($sortby,$SearchUserTextXX,$user_type,$this->userconfirmed,$filtertby,'',$sortbycompany,$this->admin_searchable_frontend);
+
+					
+					$display='block';
+					$companySortAlpha=1;
+					
+					$memberSortAlpha=0;
+
+					
+		}
+		else if($this->filtertby!="")
+		{
+			$activeclasscompany='';
+			$activeclass='';
+			$activeclass_latest='active';
+			$SearchUserTextXX = $this->SearchUserTextXX;
+			$SearchUserTextXX = $this->myclientdetails->customEncoding($SearchUserTextXX,'allusersAlphabat');
+			
+			$users = $this->User_Model->userDirectory($sortby,$SearchUserTextXX,$user_type,$this->userconfirmed,$filtertby,'','',$this->admin_searchable_frontend);
+			echo'<input type="hidden" name="SearchUser" class="SearchUser" value="'.$this->myclientdetails->customDecoding($SearchUserTextXX).'">';
+			echo'<input type="hidden" name="SortByScroll" id="SortByScroll" value="1">';
+			
+
+		}
+		else
+		{
+
+
+			$activeclass='';
+			$activeclass_latest='active';
+			$orderby = $this->orderby;
+			$activeclasscompany='';
+			$SearchUserTextXX = $this->SearchUserTextXX;
+
+			$SearchUserTextXX = $this->myclientdetails->customEncoding($SearchUserTextXX,'allusersAlphabat');
+
+			echo'<input type="hidden" name="SearchUser" class="SearchUser" value="'.$this->myclientdetails->customDecoding($SearchUserTextXX).'">';
+
+			if($this->orderby=="")
+			{
+				if($user_type==0)
+				{
+
+					
+
+                 	$normalquery="SELECT UserID,Name,lname,ProfilePic,Username,usertype,title,company,Email,Status,typename,Emailmakeprivate FROM tblUsers WHERE (clientID = '".clientID."')  ";
+         		   
+         		   if($this->userconfirmed==0)
+					{
+					  $normalquery.=" AND Status=1 AND usertype=0";
+					}
+					else
+					{							   
+					  $normalquery.=" AND (usertype = 0 OR usertype = 6)";
+					}
+
+					if($this->admin_searchable_frontend==0)
+			        {
+			          $normalquery.=" AND role != 1 AND usertype != 10";
+			        }
+			        if(isADMIN!=1) 
+		            {
+		              $normalquery.=" AND hideuser != 1"; 
+		            }
+
+			        $normalquery.= " ORDER BY UserID DESC LIMIT ".$limit;
+
+         		   $users=$this->myclientdetails->passSQLquery($normalquery);
+
+				}
+				else
+				{
+					$vipquery="SELECT UserID,Name,lname,ProfilePic,Username,usertype,title,company,Email,Status,typename,Emailmakeprivate FROM tblUsers WHERE (clientID = '".clientID."')  ";
+         		  
+         		   if($this->userconfirmed==0)
+					{
+					  $vipquery.=" AND Status=1";
+					}
+
+
+					if($this->admin_searchable_frontend==0)
+			        {
+			          $vipquery.=" AND role != 1 AND usertype != 10";
+			        }
+			        if(isADMIN!=1) 
+		            {
+		              $vipquery.=" AND hideuser != 1"; 
+		            }
+
+			        $vipquery.=" ORDER BY UserID DESC LIMIT ".$limit;
+
+			       
+
+         		   $users=$this->myclientdetails->passSQLquery($vipquery);
+				}
+			}
+			else
+			{
+				$users = $this->User_Model->SearchMember($SearchUserTextXX,$orderby,$user_type,$this->userconfirmed,$this->admin_searchable_frontend);
+				$display='none';
+			}
+		}
+
+		
+		$countquery="SELECT UserID,usertype,title,company,typename FROM `tblUsers` WHERE clientID = ".clientID." AND usertype != '10'";
+		
+		if($this->userconfirmed==0)
+		{
+		   $countquery.=" AND Status=1";
+		}
+		if($this->admin_searchable_frontend==0)
+	    {
+	       $countquery.=" AND role != 1 AND usertype != 10";
+	    }
+		if($sessionUserType==0)
+	    {
+	       $countquery.=" AND (usertype = 0 OR usertype =  6)"; 
+	    }
+	    if(isADMIN!=1) 
+        {
+          $vipquery.=" AND hideuser != 1"; 
+        }
+
+		$usercountarray=$this->myclientdetails->passSQLquery($countquery);
+
+		$totalSearchHtml='';
+
+
+
+
+		if($this->searchMember!="" || $this->SearchUserTextXX!="")
+		{
+			unset($alphabets);
+			unset($companyalphabets);			
+
+			$SearchUserTextXX = $this->SearchUserTextXX;
+			$SearchUserTextXX = $this->myclientdetails->customEncoding($SearchUserTextXX,'allusersAlphabat');
+
+			if($searchMember!="")
+				$users_xx = $this->User_Model->SearchMember($this->searchMember,'',$user_type,$this->userconfirmed,$this->admin_searchable_frontend);
+
+			if($SearchUserTextXX!="")
+				$users_xx = $this->User_Model->SearchMember($SearchUserTextXX,'',$user_type,$this->userconfirmed,$this->admin_searchable_frontend);
+
+			foreach($users_xx as $usr):
+			$substr=substr($usr['Name'],0,1);
+			$alphaRow=$this->myclientdetails->getRowHavingMasterfromtable('tblUsers',array('DISTINCT SUBSTRING(Name, 1, 1) AS firstletter'),array('firstletter'=>$substr),array('Name'=>'ASC'));
+
+			$substr2=substr($usr['company'],0,1);
+			$alphaRowcompany=$this->myclientdetails->getRowHavingMasterfromtable('tblUsers',array('DISTINCT SUBSTRING(company, 1, 1) AS firstlettercom'),array('firstlettercom'=>$substr2),array('company'=>'ASC'));
+			 if(in_array($alphaRowcompany, $letters)) {			 
+			 $companyalphabets[]=$alphaRowcompany;
+			 }
+			 $alphabets[]=$alphaRow;
+			endforeach;
+
+			
+
+			if(sizeof($alphabets)>0)
+			{
+				$alphabets = array_map("unserialize", array_unique(array_map("serialize", $alphabets)));
+			}
+
+			if(sizeof($companyalphabets)>0)
+			{
+				$companyalphabets = array_map("unserialize", array_unique(array_map("serialize", $companyalphabets)));
+			}
+		}		
+
+		
+		
+	 $alphabet=$alphabets;
+		
+	 $alphabet=array_values($alphabet);
+
+
+	$first=$alphabet[0];
+ 
+		// for comapny
+	 $companyalphabet=$companyalphabets;
+	 $companyalphabet=array_values($companyalphabet);
+	 $firstlettercompany=$companyalphabet[0];
+
+		if($this->IsSearchText!="1" || $this->sortby=="" || $this->searchMember=="")
+		{
+			echo'<input type="hidden" name="SearchMemberScroll" id="SearchMemberScroll" value="1">';
+			echo'<h3 class="pageTitle">&nbsp;'.count($usercountarray).' Users</h3>';
+			echo'<div class="searchHeaderAllUser">';
+			echo'<div class="srcUsrWrapper">
+			<div class="fa fa-search fa-lg searchIcon2"></div>
+			<input type="hidden" name="page" id="page" value="2">
+			<input type="text" name="searchMember" id="searchMember"  value="'.$this->myclientdetails->customDecoding($this->SearchUserTextXX).'">
+			'.$totalSearchHtml.'
+			</div>';
+
+			echo'<ul id="searchUserAllMenu">';
+			if(count($users)>0)
+			{
+				echo'<li class="newtUsers"><a href="javascript:void(0);" class="'.$activeclass_latest.'" id="allLatestUser" data-xx="noload">New users</a></li>
+
+				<li class="sortAlpha"><i class="sortTxt">Sort</i> <i class="spanAlphatxt">alphabetically</i>:<li>
+
+				<li><a href="javascript:void(0);" class="SortAlphabet '.$activeclass.'" data-xx="alphabetically" data-char="'.$first.'">By Name </a></li>
+				
+				<li><a href="javascript:void(0);" class="CompanySortAlphabet '.$activeclass.'" data-xx="comapnyalphabetically" data-charcomapny="'.$firstlettercompany.'">By Company</a></li>';
+
+			}
+			echo'<li id="softByPic"><a href="javascript:void(0);" class="fa fa-th-large"></a></li><li id="ThirdOption"><a href="javascript:void(0);"  data-xx="viewAll" >View all</a></li>
+			</ul>';
+
+			$style='';
+			
+			if(count($alphabet)>0)
+			{
+				if($memberSortAlpha==1)
+				{
+					echo'<span id="MemberSortAlphbet" data-char="'.$first.'" >';
+					echo'<ul>';
+
+					foreach($alphabet as $char):
+					if($this->sortby==$this->myclientdetails->customDecoding($char))
+						$style='active';
+					else
+						$style='';
+					echo'<li><a href="javascript:void(0);" class="SortAlphabet '.$style.'" data-char="'.$this->myclientdetails->customDecoding($char).'"  data-xx="alphabetically">'.ucfirst($this->myclientdetails->customDecoding($char)).'</a></li>';
+					endforeach;
+					echo'</ul>';
+					echo'</span>';
+				}
+			}
+
+
+			if(count($companyalphabet)>0)
+			{
+					if($companySortAlpha==1)
+				   {
+					echo'<span id="CompanySortAlphbet" data-char="'.$firstlettercompany.'" style="display:block;">';
+					echo'<ul>';
+
+					foreach($companyalphabet as $char):
+					if($this->sortbycompany==$this->myclientdetails->customDecoding($char['firstlettercom']))
+						$style='active';
+					else
+						$style='';
+					echo'<li><a href="javascript:void(0);" class="CompanySortAlphabet '.$style.'" data-charcomapny="'.$this->myclientdetails->customDecoding($char['firstlettercom']).'"  data-xx="comapnyalphabetically">'.ucfirst($this->myclientdetails->customDecoding($char['firstlettercom'])).'</a></li>';
+					endforeach;
+					echo'</ul>';
+					echo'</span>';
+				 }
+				
+			}
+
+		}
+		echo'</div>';
+		echo'<ul class="searchMemberList">';
+
+		if($this->lastId!="")
+			$return="";
+
+		if(count($users)>0)
+			$data['page'] = $this->lastId+1;
+		else
+			$data['page'] = $this->lastId;
+
+		$follwoing =  new Application_Model_Following();
+
+		$checkImage = new Application_Model_Commonfunctionality();
+
+		
+		
+		if(count($users)>0)
+		{
+
+
+			$counter=1;
+			foreach($users as $Row):
+			
+			//$type ='';
+			$userprofile1 = $checkImage->checkImgExist($Row['ProfilePic'],'userpics','default-avatar.jpg');
+			
+			/*if($Row['ProfilePic']!="")
+			{
+			 $userprofile1 = $Row['ProfilePic'];	
+		    }
+		    else
+		    {
+		      $userprofile1 = 'default-avatar.jpg';
+		    }*/
+
+			if((int)$Row['usertype']!=0)
+				//$type = $checkImage->checkuserTypetooltip($Row['usertype']);
+			$follwoing =  new Application_Model_Following();
+			$fcnt =$follwoing->chkfollowingcnt($Row['UserID'],$_SESSION['Zend_Auth']['storage']['UserID']);
+			$fellowtxt = ($fcnt['ID']>0)?'Unfollow':'Follow';
+
+			$conatctfcnt =$follwoing->CheckContactCount($_SESSION['Zend_Auth']['storage']['UserID'],$Row['UserID']);			
+
+			$contacttext = ($conatctfcnt['id']>0)?'Remove from Contacts':'Add to Contacts';
+
+			
+
+			echo'<li class="usrList" id="'.$Row['UserID'].'">';
+			if((int)$Row['Status']==1){					
+				echo'<a href="'.BASE_URL.'/user/'.$this->myclientdetails->customDecoding($Row['Username']).'"  class="userSrcProfilePic">
+					<img src="'.IMGPATH.'/users/medium/'.$userprofile1.'" border="0"  width="90" height="90"/>
+				</a>';
+				echo'<div class="userSrcProfileContainer">';
+		      }		      
+		      if((int)$Row['Status']==0){		      
+		      	echo'<div class="userSrcProfileContainer" style="margin-left:0px;">';
+		      }
+
+				echo'<h2 class="oneline">'.$this->myclientdetails->customDecoding($Row['Name']).' '.$this->myclientdetails->customDecoding($Row['lname']).' ';
+					if($Row['typename']!="")
+						{
+						 echo'('.$Row['typename'].')';
+						}
+						echo'</h2>';
+
+				if($this->myclientdetails->customDecoding($Row['title'])!=''){
+					echo '<h3 class="oneline">'.$this->myclientdetails->customDecoding($Row['title']).'</h3>';										
+				}
+
+				if($this->myclientdetails->customDecoding($Row['company'])!=''){
+					echo '<h3 class="oneline">'.$this->myclientdetails->customDecoding($Row['company']).'</h3>';
+				}
+				if($this->myclientdetails->customDecoding($Row['Email'])!='' && $Row['Emailmakeprivate']==0){
+					echo '<div class="srcEmailId oneline">'.$this->myclientdetails->customDecoding($Row['Email']).'</div>';
+				}
+				
+			echo '<div class="profileDashBtn">';
+
+			if($this->session_data['UserID']!=$Row['UserID'] && $Row['UserID']!=adminID){
+				echo'
+				<a class="btn btn-yellow fallowina btn-mini" onclick="javascript:followme('.$Row['UserID'].',this);" href="javascript:void(0);">
+				<div id="followme-label" class="followme'.$Row['UserID'].'" style="cursor: pointer;">'.$fellowtxt.'</div>
+				</a>';
+
+			/*if($this->addtocontact==1 || ($this->addtocontact==0 && $contacttext=='Remove from Contacts')){
+				echo'  <a class="btn btn-yellow fallowina btn-mini addtoconxx" onclick="javascript:addtocontact('.$Row['UserID'].',this,\''.$this->myclientdetails->customDecoding($Row['Name']).'\',\''.$fellowtxt.'\');" href="javascript:void(0);">
+					 <div id="contact-label" style="cursor: pointer;">'.$contacttext.'</div>
+					</a>';
+				}
+			
+
+			echo' <a class="btn messageina btn-mini" onclick="javascript:opensendmessage('.$Row['UserID'].', \''.$this->myclientdetails->customDecoding($Row['Name']).'\',this);" href="javascript:void(0)"><i class="fa fa-envelope-o"></i></a>
+					
+				';*/
+			} else { echo'&nbsp;&nbsp;';
+			}
+			echo'</div></div></li>';
+			
+			$counter++;
+			endforeach;
+			echo'<div id="last_msg_loaders" class="clear"></div>';
+			if($this->lastId=="")
+				echo'</ul>';
+			echo'<input type="hidden" name="TextUserCount" id="UserCount" value="'.count($users).'">';
+			//if($UserCount >= $limit && $this->lastId==2)
+			//{
+				
+					//echo'<div id="last_msg_loader" class="clear"></div>';
+			    
+			//}else{
+			//	echo'<div class="clear"></div>';
+			//}
+
+		}
+		else if($this->lastId=="")
+			echo'<div class="noFound" style="margin-top:50px;">No user found !.</div>';
+
+		if($this->lastId=="")
+			echo'</div></div>';
+
+		?>
+	</ul>
+	<div>
+
+<?php		
+
+		$usertypearray=array();
+		$jobtitlearray=array();
+		$companyarray=array();
+		
+		if(count($usercountarray)>0)
+		{
+			
+			foreach($usercountarray as $Row):
+			
+			$type ='';
+			$type=$Row['usertype'];
+			$usertypearray[$type]=$Row['typename'];
+			
+		    if($Row['title']!="")
+		    {
+			 $jobtitlearray[]=$this->myclientdetails->customDecoding(trim($Row['title']));
+		    }
+		    if($Row['company']!="")
+		    {
+			 $companyarray[]=$this->myclientdetails->customDecoding(trim($Row['company']));
+		    }
+		   
+		    
+		    endforeach;
+
+		 }
+
+		
+		 asort($usertypearray);
+		 asort($jobtitlearray);
+		 asort($companyarray);
+		 
+?>
+
+
+		<div id="rightListing">
+
+
+		<?php if((count($usertypearray) > 0) && ($sessionUserType!=0 && $sessionUserType!=6 )  ) { ?>
+			<div class="whiteBox scoringdisplay searchByThis">
+				<h2>Filter by user type &nbsp;&nbsp;			       				
+					<input type="text" id="usertype_text" name="usertype_text" value="" size="15" usertypelist="true" onkeyup="javascript:filterUserType(this, '.userTypeFilterList')">
+				</h2>
+				<div class="rboxContainer" id="dashboardpersonalinfo">
+					<ul class="dbfeedfilterbycat userTypeFilterList">
+						<?php
+							foreach (array_intersect_key($usertypearray, array_unique(array_map('strtolower', $usertypearray))) as $key => $value) {
+							if ($key != 0 && $key != 6  && $key != 10  && $value!="") {							 	
+						?>
+						<li class="usertype_text" title="<?php echo utf8_encode($value); ?>">
+							<label class="labelCheckbox" for="userType<?php echo $key; ?>">
+								<input data-xx="FilterUsers" id="userType<?php echo $key; ?>" class="FilterUsers" type="checkbox" data-filter='usertype' value="<?php echo utf8_encode($value); ?>@@@usertype" name="SearchByCompany[]">
+								<label class="checkbox" for="userType<?php echo $key; ?>"></label>
+								<div class="labelValueSd">
+									<div class="oneline"><?php echo utf8_encode($value); ?></div>
+								</div>							
+							</label>
+						</li>
+						<?php }
+					   } 
+					 ?>						
+					</ul>
+				</div>				
+			</div>
+			<?php } ?>
+
+		   
+		<?php if(count($companyarray) > 0) { ?>
+		   <div class="whiteBox scoringdisplay searchByThis" data-count="<?=count($companyarray);?>">
+				<h2>Filter by company &nbsp;&nbsp;<input type="text" id="usertype_text" name="usertype_text" value="" size="15" usertypelist="true"  onkeyup="javascript:filterUserType(this, '.companyFilterList')"></h2>
+				<div class="rboxContainer" id="dashboardpersonalinfo">
+					<ul class="dbfeedfilterbycat companyFilterList">
+						<?php
+						//if(count($companyarray) > 0) {
+							foreach (array_intersect_key($companyarray, array_unique(array_map('strtolower', $companyarray))) as $key => $value) {
+							if ($value != null) {							 	
+						?>
+						<li class="usertype_text" title="<?php echo utf8_encode($value); ?>">
+							<label class="labelCheckbox" for="company<?php echo $key; ?>"> 
+							<input data-xx="FilterUsers" class="FilterUsers" id="company<?php echo utf8_encode(htmlspecialchars($key,ENT_QUOTES)); ?>" data-filter='company' data-char="<?php echo utf8_encode($this->myclientdetails->customEncoding($value)); ?>"  type="checkbox" value="<?php echo utf8_encode($this->myclientdetails->customEncoding($value)); ?>@@@company" name="SearchByCompany[]">
+							<label class="checkbox" for="company<?php echo $key; ?>"></label>
+							<div class="labelValueSd">
+								<div class="oneline"><?php echo utf8_encode($value); ?></div>
+							</div>
+							</label>
+						</li>
+						<?php }
+					   } 
+					 ?>						
+					</ul>					
+				</div>				
+			</div>
+			<?php } ?>
+
+		<?php if(count($jobtitlearray) > 0) { ?>
+			<div class="whiteBox scoringdisplay searchByThis" data=usertype="<?=count($jobtitlearray);?>">
+				<h2>Filter by job title &nbsp;&nbsp;<input type="text" id="usertype_text" name="usertype_text" value=""  size="15" usertypelist="true"  onkeyup="javascript:filterUserType(this, '.jobTitleList')"></h2>
+				<div class="rboxContainer" id="dashboardpersonalinfo">
+					<ul class="dbfeedfilterbycat jobTitleList">
+						<?php							
+							foreach (array_unique($jobtitlearray) as $key => $value) {
+							if ($value != null) {							 	
+						?>
+						<li class="usertype_text" title="<?php echo utf8_encode($value); ?>">
+							<label class="labelCheckbox" for="job<?php echo $key; ?>"> 
+							<input data-xx="FilterUsers" id="job<?php echo $key; ?>" class="FilterUsers" data-filter='title' data-char="<?php echo utf8_encode($this->myclientdetails->customEncoding($value)); ?>"  type="checkbox" value="<?php echo utf8_encode($this->myclientdetails->customEncoding($value)); ?>@@@title" name="SearchByCompany[]">
+							<label class="checkbox" for="job<?php echo $key; ?>"></label>
+							<div class="labelValueSd">
+								<div class="oneline"><?php echo utf8_encode($value); ?></div>
+							</div>
+							</label>
+						</li>
+						<?php }
+					   } 
+					?>						
+					</ul>					
+				</div>				
+			</div>
+			<?php } 			?>
+
+			
+
+		</div></div>
+		<div class="clearfix"></div>
+
+		<?php
+		$redirection_name_space = new  Zend_Session_Namespace('User_Session');
+		if(isset($redirection_name_space->screen_name) && !empty($redirection_name_space->screen_name)){
+		if($_GET['invite']=='twitter'){
+		?>
+		<script type="text/javascript">
+		$(function(){
+		TwitterInviteFriendsprofile();fetchadvert();
+		});
+		</script>
+		<?php
+		}
+		} ?>
+		<script type="text/javascript">
+		$(function(){
+		fetchadvert('viewAll');
+		$('body').on('click','#softByPic a',function (){
+			$('html').toggleClass('softByPic');
+		});
+
+		});
+		</script>

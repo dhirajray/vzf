@@ -1,0 +1,54 @@
+<script type="text/javascript">var _kiq = _kiq || [];</script><script type="text/javascript"src="//s3.amazonaws.com/ki.js/47309/9A8.js" async="true"></script><div id="wrapper" style="text-align:center;background-color:#fff;"><div id="topWrapperIndex" class="topWrapperIndex">	<!----when session not created------>		<div class="top">        <div class="topLeft"><div class="signin-topbar-logo"></div></div>				<div class="topRight">			<div class="topRightLinksIndex" style="margin-right:0px;"><div class="loginBoxWrapper">				<form id="login-form" method="post" action="<?php echo $this->url(array('controller'=>'index', 'action'=>'login'),'default',true)?>" onsubmit="return checkLogin();">				<div style="padding:3px; margin-bottom:20px; float:left; margin-right:15px; margin-top:2px; color:#A4A4A4; font-weight:bold;">sign in</div>				<div style="padding:3px; margin-bottom:20px; float:left"><input id="loginemail" name="loginemail" type="text" class="textfieldLogin" onfocus="this.value=''; toggleloginclass('loginemail');" onblur="this.value=!this.value?'email':this.value; toggleloginclass('loginemail');" value=""></div>				<div id="loginpassdiv" style="padding:3px; margin-bottom:5px; float:left"><input id="loginpass" name="loginpass" type="text" class="textfieldLogin" onfocus="toggleLoginField('loginpass'); toggleloginclass('loginpass');" value=""></div>				<div style="float:left;"><input type="image" src="images/login.png" style="float:right; margin-top:2px;"></div>				<div class="next-line"></div>				<div style="float:left; margin-top:-17px; margin-left:60px;"><label><div style="float:left"><input type="checkbox" id="keeploggedin" name="keeploggedin" value="1"></div><div style="float:left; margin-top:1px; color:#A4A4A4">Keep me logged in</div></label></div><div style="float:left; margin-top:-17px; margin-left:70px;"><a href="javascript:void(0);" onclick="javascript:openforgotpass();"><font color="#A4A4A4">forgotten password?</font></a></div>								</form>			</div></div>		</div>	</div>		</div><input type="hidden" id="curr-notification-count">
+
+	<div id="LandingMiddle">
+
+		<div class="signin-middle-new">
+
+			<div class="signin-content">
+
+				<div class="signin-logo"></div>
+
+				<div class="next-line"></div>
+
+				<div style="font-size:14px; color:#333333; margin-bottom:30px; text-align:justify">dbee  is a real-time 'debate & rate' social network enabling you to share views on any subject, in open community or private groups. Create debate by posting opinions, photos, videos and links, score and be scored on posts, and rise or fall in the dbee leagues.  dbee: it's got everyone talking...</div>
+
+				<div class="next-line"></div>
+
+				<div class="signin-createaccount" onclick="javascript:opensignup()"></div>
+
+				<div class="next-line"></div>
+
+				<a href="#"><div class="signin-fbconnect" onClick="javascript:logface()"></div></a>
+
+			</div>
+
+		</div>
+
+	</div>
+
+</div>
+
+
+
+ <script>
+
+	function logface()
+
+	  {
+
+                 
+
+		  var url = "<?php echo $this->loginUrl; ?>";
+
+           //alert(url);
+
+		  newwindow = window.open(url,'','width=900,height=400,left=200,top=200',false);
+
+		 //return false;
+
+	  }
+
+ </script>
+
+<div id="footerIndex">	<div class="footerContent">		<div style="float:left; margin-top:60px;"><a href="javascript:void(0);" onclick="javascript:openterms();"><font color="#FFFFFF">Terms & Conditions</font></a> <font color="#FFFFFF">|</font> <a href="javascript:void(0);" onclick="javascript:openprivacy();"><font color="#FFFFFF">Privacy Policy</font></a> <font color="#FFFFFF">|</font> <a href="javascript:void(0);" onclick="javascript:openabout();"><font color="#FFFFFF">About</font></a> <font color="#FFFFFF">|</font> <a href="javascript:void(0);" onclick="javascript:openfeedback();"><font color="#FFFFFF">Feedback</font></a></div>		<div align="right" style="float:right; margin:30px 20px 0 0;">			<div style="padding-bottom:8px; border-bottom:1px solid #5B5B5B"><a href="https://twitter.com/#!/dbeeLIFE" target="_blank"><div class="footer-sigin-twitter"></div></a><a href="http://www.facebook.com/pages/dbee-LIFE/202074076532820" target="_blank"><div class="footer-sigin-fb"></div></a><div style="float:left; margin:2px 0 0 5px; overflow:hidden"><div class="fb-like" data-href="http://www.dbeelife.com" data-send="false" data-layout="button_count" data-width="100" data-show-faces="false"></div></div><br style="clear:both"></div>			<div style="float:left"><a href="http://www.myplanetlife.com" target="_blank"><div class="footerLogo"></div></a></div>		</div>	</div></div></body></html>
+

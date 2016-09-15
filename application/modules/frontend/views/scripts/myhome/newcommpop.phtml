@@ -1,0 +1,166 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Untitled Document</title>
+<? include "head.php"; ?>
+<style type="text/css">
+<!--
+body {
+	margin-left: 10px;
+	margin-top: 10px;
+	margin-right: 10px;
+	margin-bottom: 10px;
+	background-color: #FFFFFF;
+}
+-->
+</style>
+
+</head>
+<body>
+<div class="user-name" style="margin-bottom:10px;">comment notifications</div>
+<div id="nocomment-msg" align="center" style="margin:50px 0 0 0; color:#999999; font-size:16px; display:none;">No new comment.</div>
+<div class="next-line"></div>
+<div>
+<?	
+		foreach($this->comment as $TCRow):
+             
+			if($TCRow['Type']=='1')     $dbFormate=substr($TCRow['Text'],0,100);
+			elseif($TCRow['Type']=='2') $dbFormate=substr($TCRow['Link'],0,100);
+			elseif($TCRow['Type']=='3') $dbFormate=substr($TCRow['Pic'],0,100);
+			elseif($TCRow['Type']=='4') $dbFormate=substr($TCRow['Vid'],0,100);
+			
+			if($TCRow['Type']=='1') $dbText=substr($TCRow['Text'],0,100);
+			elseif($TCRow['Type']=='2') $dbText=substr($TCRow['LinkTitle'],0,100);
+			elseif($TCRow['Type']=='3') $dbText=substr($TCRow['PicDesc'],0,100);
+			elseif($TCRow['Type']=='4') $dbText=substr($TCRow['VidDesc'],0,100);
+			// FETCH DB OWNER DETAILS
+		
+
+
+?>
+
+			<div class="cmntnote-<?=$TCRow['DbeeID']?>">
+
+				<div class="newcommentnote" onclick="javascript:gotodb(<?=$TCRow['DbeeID']?>,<?=$TCRow['CommentID']?>)" title="go to post">
+
+					<div style="padding:5px;">
+
+					<?php
+						$ownerdetails=$this->usrall($TCRow['DbeeOwner']);
+						//echo'<pre>';print_r($ownerdetails);die;
+					?>
+
+						<div style="float:left; width:70px;"><img src="<?php echo BASE_URL ?>/show_thumbnails.php?ImgName=<?=$ownerdetails['ProfilePic'];?>&ImgLoc=userpics&Width=60&Height=60" border="0" /></div>
+
+						<div style="float:left;">
+
+							<div style="font-weight:bold">db creator: <?=$ownerdetails['Name'];?></div>
+
+							<!--<div style="margin-top:5px"><?=$dbText;?></div>-->
+                            <div style="margin-top:5px">
+							<?php if($TCRow['Type']=='1'){ ?>
+							                                                              <?=$dbFormate;?>
+							<?php } else if($TCRow['Type']=='2'){ 
+							     $LinkInfo=substr($dbFormate,0,200);
+							?>
+							               <?=$LinkInfo;?>
+							<?php } else if($TCRow['Type']=='3'){ ?>
+							<img src="<?php echo BASE_URL ?>/show_thumbnails.php?ImgName=<?=$dbFormate;?>&ImgLoc=imageposts&Width=60&Height=60" border="0" />
+							<div style="margin-top:5px"><?=$dbText;?></div>
+							<?php } else if($TCRow['Type']=='4'){ ?>
+				            <!--*************************************************-->
+							<?php
+							     if($this->escape($TCRow['Vid'])!='') {
+
+					$mediaicon='<div class="icon-youtube" style="margin:-2px 20px 0 -30px;; height:30px;"></div>';
+
+					if($this->escape($TCRow['VidSite'])=='Youtube')
+
+						$VideoThumbnail='<img src="http://i.ytimg.com/vi/'.$this->escape($TCRow['VidID']).'/0.jpg" width="120" height="100" border="0" />';
+
+					elseif($this->escape($TCRow['VidSite'])=='Vimeo')
+
+					{
+
+						$url = 'http://vimeo.com/api/v2/video/'.$this->escape($TCRow['VidID']).'.php';
+
+						$contents = @file_get_contents($url);
+
+						$thumb = @unserialize(trim($contents));
+
+			
+
+						$VideoThumbnail="<img src=".$thumb[0][thumbnail_small].">";
+
+					}
+
+					elseif($this->escape($TCRow['VidSite'])=='Dailymotion')
+
+						$VideoThumbnail='<img src="http://www.dailymotion.com/thumbnail/video/'.$this->escape($TCRow['VidID']).'" width="120" height="100" border="0" />';
+
+				} elseif($this->escape($TCRow['Audio'])!='') {
+
+					$VideoThumbnail='<img src="images/soundcloud.png">';
+
+					$mediaicon='<div class="icon-soundcloud" style="margin:3px 20px 0 -30px; height:30px;"></div>';
+
+				}
+				    echo $VideoThumbnail;
+				?>			
+							<!--*************************************************-->
+							 <div style="margin-top:5px"><?=$TCRow['VidDesc'];?></div>
+							 </div>
+							<?php } ?>
+							
+							
+						</div>
+
+					</div>
+
+					<div class="next-line"></div>
+                    <br>
+					<div style="padding:5px; margin-top:10px;">
+                        <?php
+						$userdetails=$this->usrall($TCRow['UserID']);
+						//echo'<pre>';print_r($ownerdetails);die;
+					    ?>
+						<div style="float:left; width:70px;"><img src="<?php echo BASE_URL ?>/show_thumbnails.php?ImgName=<?=$userdetails['ProfilePic'];?>&ImgLoc=userpics&Width=60&Height=60" border="0" /></div>
+
+						<div style="float:left; width:550px;">
+
+							<div style="font-weight:bold">NEW COMMENT</div>
+
+							<div style="margin-top:5px"><?=$TCRow['Comment'];?></div>
+
+						</div>
+
+						<br style="clear:both">
+
+					</div>
+
+				</div>
+
+				<div class="next-line"></div>
+
+				<div align="right" style="margin-top:10px; cursor:pointer;" onclick='javascript:commentnotify(<?=$TCRow['DbeeID']?>,2)'>[x stop notifications on this post]</div>
+
+				<div class="next-line"></div>
+
+				<div style="width:auto; height:1px; background-color:#CCC; margin:10px 0 10px 0"></div>
+
+			</div>
+
+<?
+
+		endforeach;
+
+	
+
+?>
+
+</div>
+
+</body>
+
+</html>

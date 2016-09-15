@@ -1,0 +1,235 @@
+<script type="text/javascript">
+$('document').ready(function(){
+	
+	$('body').on('click','#resurlsearch:not(.disabled)',function(e){	
+		e.preventDefault();	
+		e.stopPropagation();
+		var thisEl = $(this);
+		
+		
+		var searchurl = $('#searchres').val();		
+		var data = 'linkurl='+searchurl;
+		$(this).addClass('disabled');
+	      $.ajax({
+	         url:BASE_URL+"/admin/Restrictedurl/searchurl",
+	         data:data,
+	         dataType: "json",
+	         type :"POST",       
+	         success:function(response){
+	        	 console.log(response.content);
+	        	 $('.fa-spinner',thisEl).remove();
+	        	 thisEl.removeClass('disabled');
+	        	 $('.bscktoslist').css('display','block');
+	        	// $('.pagiNationsWrapperyy').css('display','none');
+	        	 $('#list-url').html(response.content); 
+	         }
+	      });
+	});
+
+	
+	$('body').on('click','.bscktoslist',function(e){	
+		e.preventDefault();	
+		e.stopPropagation();
+		var thisEl = $(this);
+		$('#searchres').val('');
+		//$('#resurlsearch:not(.disabled)').trigger('click');
+		 window.location.reload();
+	 });
+	$('body').on('click','#addlinkurl',function(e){	
+		e.preventDefault();	
+		var linkurl = $('#linkurl').val();		
+		var data = 'linkurl='+linkurl;	
+		var El = $(this);
+
+		
+		if(linkurl=='' || linkurl=='undefined'){
+			 $messageError('Please fill required field');
+			}	  
+		  var urlregex = new RegExp("^((http|https):\/\/)?(www[.])?([a-zA-Z0-9]|-)+([.][a-zA-Z0-9(-|\/|=|?)?]+)+$");
+		    if (urlregex.test(linkurl)) {
+		       
+		    }else{ $messageError('Oops, you have added an invalid URL'); return false;}
+	      $.ajax({
+	         url:BASE_URL+"/admin/Restrictedurl/addurl",
+	         data:data,
+	         dataType: "json",
+	         type :"POST",       
+	         success:function(response){
+	        	 $messageSuccess('URL added successfully');	 
+	        	 $('.dropDown').removeClass('on');       	
+	        	 $('#list-url').prepend(response.content); 
+	        	 $('#resurltotal').text(response.total); 
+	        	 //El.closest('input').value('');	        	 
+	        	 
+	        	 $('#resurlhide').css('display','block');
+
+	         }
+	      });
+	});
+
+	$('body').on('click','.deletelinkurl',function(){
+		var urlidli = $(this).closest('li');
+		var urlid = urlidli.attr('data-id');
+		
+		var data = 'urlid='+urlid;
+
+		var eli = $('this');
+		var deleteboxmsg = '<div id="detailsDialog" data-pop="deletelink">Are you sure you want to delete this URL?</div>';
+		$('#detailsDialog').remove();
+		$('body').append(deleteboxmsg);
+		$('#detailsDialog').dialog({
+			title: 'Please confirm',
+			modle: true,
+			dragable: false,
+			buttons: {
+				'Yes': function(){
+				
+					var data = 'linkurl='+urlid;		    
+				      $.ajax({
+				    	 url:BASE_URL+"/admin/Restrictedurl/deleteurl",
+				         data:data,
+				         dataType: "json",
+				         type :"POST",       
+				         success:function(response){				         	
+				        	 $messageSuccess('URL deleted successfully');
+				        	 $('#urlid_'+urlid).remove(); 
+				        	 $('#detailsDialog').remove();
+				        	 $('#urlidli').remove(); 
+				        	 $('#resurltotal').text(function(enc,data){				        	 	
+				        	 		return parseInt(data,10)-1;	     	 
+				        	
+				        	 });
+				        	  
+				        	 if($('#resurltotal').text()==0){
+				        	 	$('#resurlhide').css('display','none');
+				        	 }
+				         }
+				      });
+					}
+				}
+		
+		});	
+
+		
+		    
+	     
+		});
+
+$('body').on('mouseenter mouseleave', '#list-url li', function(e){
+    	
+         var fileopt = '<div class="kcRightAction">\
+                                    <a href="javascript:void(0);" class="kcSprite deletelinkurl"></a>\
+                                </div>';
+        e.stopPropagation()
+        if(e.type=="mouseenter"){
+            $(this).find('.kcRightAction').remove();
+            $(this).append(fileopt);
+            $(this).find('.kcRightAction').animate({right:'10px'})
+
+           
+            $( ".kcPdfDelete").bind('click', function(){
+				fileDelId	=	delId;
+				fileDelpath 	= 	fdelId;
+				
+				$( "#dialog_confirm_file_delete" ).dialog( "open" );
+			
+			});
+
+        }
+        else if(e.type=="mouseleave"){
+                $(this).find('.kcRightAction').animate({right:'-200px'},{
+                    duration:500,
+                    complete:function(){
+                     $(this).remove();
+                    }
+                });
+        }
+    });
+
+	var ttl = $('#resurltotal').text();
+
+	if(ttl == '0'){
+			$('#resurlhide').css('display','none');	
+	}
+	});
+
+</script>
+<?php         
+$this->title = "Restricted URL";
+$this->headTitle($this->title);
+?>
+<h1 class="pageTitle ">Restricted URLs</h1>
+<div class="pageSubeTitlevip">Add any URL you wish to be resticted when users share links on the platform.</div>
+
+<div class="userUpBar">
+						<div class="userSearchBox" >
+							<div class="appendType  pull-left">									
+									<input type="text" placeholder="Search URL" id="searchres" name="searchfield"> 
+									<button class="btn btn-black" id="resurlsearch" name="submit" >Search</button>									
+								<div class="clearfix"></div>
+							</div>
+						</div>
+						<div class="pull-right buttonRight">
+							<!--for message to user-->
+                        <div class="pull-left">
+								<a href="#" class="btn btn-black bscktoslist" style="display:none"><b> Back </b></a>
+						</div>
+						<div class="pull-left addNewURL">
+							<div class="dropDown btn-full pull-left">
+								<a href="#" class="btn btn-yellow dropDownTarget"><i class="fa fa-plus fa-lg"></i>&nbsp;Add new URL</a>
+								<div class="dropDownList right">									
+									<form method="POST" id="formnew"  action="#" >									
+										<div class="formRow">
+											<input type="text" name="linkurl" id="linkurl" value=""/>
+										</div>
+										<div class="spacer">&nbsp;</div>
+										<div class="formRow">
+										<button type="submit" name="addlinkurl" id="addlinkurl" value="addlinkurl" class="btn btn-green fluidBtn">
+											<i class="fa fa-plus fa-lg"></i> Add URL
+										</button>
+										</div>
+										
+										<div class="clearfix"></div>
+									</form>
+								</div>
+							</div>
+							
+						</div>
+						
+					</div>	
+				</div>			
+<div class="clearfix"></div>	
+
+<div id="resurlhide">
+<h2 class="pull-left" style="margin-bottom: 5px;">Total: <span id="resurltotal"><?php echo $this->totallink; ?></span></h2>
+	<div class="clearfix"></div>	
+<div class="top-hurl">
+<div class="hurl" >Restricted URLs</div>
+<?php if (count($this->totallink)){ ?>
+<ul id="list-url">
+					
+					<?php foreach($this->paginator as $url) :?>
+					<li id="urlid_<?php echo $url->ID;?>" data-id="<?php echo $url->ID;?>">								
+																
+										<?php if($this->escape($url->linkurl)) {?>
+										
+										<i class="fa fa-link"></i>											
+											<?php echo htmlentities($this->escape($url->linkurl));?>						
+																				
+										<?php } ?>
+					</li>	
+					<?php $rowchange++; endforeach; ?>
+			
+			<?php } else { ?>
+					<p class="dashBlockEmpty" style="position:relative; top:100px;">Record not found</p>
+			<?php } ?>		
+		
+</ul>
+
+<div class="pagiNationsWrapperyy"><?php 	
+	if(count($this->paginator))
+		 echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml');  ?>
+ </div>
+</div>
+</div>
+

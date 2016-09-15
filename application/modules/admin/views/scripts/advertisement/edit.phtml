@@ -1,0 +1,577 @@
+<script type="text/javascript" src="<?php echo BASE_URL; ?>/adminraw/js/jquery.tokeninput.js"></script>
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>/adminraw/css/token-input.css" type="text/css" />
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>/adminraw/css/token-input-facebook.css" type="text/css" />
+<?php 
+$resultRelation = $this->advertRelation->getRelationAdvert($this->id);
+$event = new Admin_Model_Event();
+foreach ($resultRelation as $value) 
+{
+
+  if($this->type==4) // specific user 
+  {
+    $result = $this->user_model->getUserByUserIDrow($value['relationID']); 
+    
+    $selectData['id'] = $result['UserID'];
+    $selectData['name'] = $this->myclientdetails->customDecoding($result['Name']);
+    $selectData['email'] = $this->myclientdetails->customDecoding($result['Email']);
+    $selectData['url'] = IMGPATH.'/users/medium/'.$result['ProfilePic'].'';
+  }
+  else if($this->type==3) // user group
+  {
+    $result = $this->user_group->userGroupbyid($value['relationID']);
+    $selectData['id'] = $result['ugid'];
+    $selectData['name'] = $result['ugname'];
+  }
+  else if($this->type==5) // specific post
+  {
+    $result = $this->deshboard->getDbeeByID($value['relationID']);
+
+    $selectData['id'] = $result['DbeeID'];
+    if ($result['type'] == '1')
+    $title = $result['Text'];
+    else if ($result['type'] == '2')
+    $title = $result['LinkTitle'];
+    else if ($result['type'] == '3')
+    $title = $result['PicDesc'];
+    else if ($result['type'] == '4')
+    $title = $result['VidDesc'];
+    else if ($result['type'] == '6')
+    $title = $result['VidDesc'];
+    else if ($result['type'] == '5')
+    $title = $result['PollText'];
+    $selectData['name'] = $title;
+
+  }
+  else if($this->type==2) // plateform group
+  {
+    $result = $this->group->getGroupByID($value['relationID']);
+    $selectData['id'] = $result['ID'];
+    $selectData['name'] = $result['GroupName'];
+  }
+  else if($this->type==6) // plateform group
+  {
+    $result = $this->group->getVIPGroupByID($value['relationID']);
+    $selectData['id'] = $result['ID'];
+    $selectData['name'] = $result['GroupName'];
+  }
+  else if($this->type==7) // plateform group
+  {
+    $result = $event->getEvent($value['relationID']);
+    $selectData['id'] = $result['id'];
+    $selectData['name'] = $result['title'];
+  }
+  $data[] = $selectData;
+ 
+}
+$encode = json_encode($data); 
+$globalsecuretoken = $_COOKIE['globalsecuretoken'];
+?>
+<script> 
+           $(document).ready(function() {            
+   
+            $.cookie("advertID", null, {
+                expires : 1,           //expires in 10 days
+                path    : '/', 
+                domain  : 'db-csp.com',
+                secure  : true
+            });
+   
+            $('body').on('click','.SaveOnly', function(){ 
+              $('#configuration').ajaxForm(function(response) { 
+                  OldadvertID = $('#advertID').val();
+                  $saveAds(response.advertID,OldadvertID);
+                });
+            });
+
+            $('body').on('click','.SavePreview', function()
+            {
+               $('#configuration').ajaxForm(function(response) { 
+
+                if(response.status=='success')
+                {
+                    $.cookie("advertID", response.advertID, {
+                      expires : 1,           //expires in 10 days
+                      path    : '/', 
+                      domain  : 'db-csp.com',
+                      secure  : true
+                    });
+
+                    var htmlLightbox = '<div id="detailsDialog"  title="Facebook Friends">\
+                    <div id="datacollect" style="float:none"></div>\
+                    <div id="userInfoContainer"></div>\
+                    </div>';
+                    var htmlPreview = '<div class="seeLargeView loader dashBlock">\
+                    <h2>\
+                    Preview\
+                    <a class="closePupPreview pull-right" href="javascript:void(0);">\
+                    <i class="fa fa-times"></i>\
+                    </a>\
+                    <a class="pull-right btn btn-green SavePupPreview" advertID-id="'+response.advertID+'" href="javascript:void(0);" style="margin-right:10px;">Save modification</a>\
+                    </h2>\
+                    <div><iframe id="previewFrontend" src="<?php echo BASE_URL ?>/securelogin/index/token/<?php echo $globalsecuretoken; ?>/key/<?php echo $globalsecuretoken; ?>" width="100%" height="100%"></iframe></div></div>';
+                    $('.seeLargeView').remove();
+                    $('body').append(htmlPreview);
+                    $('.overlayPopup').fadeIn();
+
+                     $('#previewFrontend').load(function() {
+                         $(this).closest('.seeLargeView').removeClass('loader');
+                      });
+
+                      var popHeight = $('.seeLargeView').height();
+                      $('.seeLargeView iframe').height(popHeight-50);
+
+                      $('body').on('click','.closePupPreview', function(){
+                         $('.overlayPopup, .seeLargeView').fadeOut();
+                         $.cookie("advertisement", 'hide', {
+                          expires : 1,           //expires in 10 days
+                          path    : '/', 
+                          domain  : 'db-csp.com',
+                          secure  : true
+                        });
+                     });
+
+
+                      $('body').on('click','.SavePupPreview', function(){
+
+                           $(this).removeClass();
+                           $('.overlayPopup, .seeLargeView').fadeOut();
+                            advertID = $(this).attr('advertID-id');
+                            OldadvertID = $('#advertID').val();
+                            $saveAds(advertID,OldadvertID);
+                    });
+                 }else
+                    $messageError(response.message);
+               });
+            });
+
+      $saveAds = function(advertID,OldadvertID){
+          type = $('#type').val();
+          $.ajax({
+              type : "POST",
+              dataType : 'json',
+              url : BASE_URL+'/admin/advertisement/publish',
+              cache : false,
+              data:{'advertID':advertID,'status':'publish','OldadvertID':OldadvertID,'type':type},
+              beforeSend : function() { 
+                $.cookie("advertID", null, {
+                  expires : 1,           //expires in 10 days
+                  path    : '/', 
+                  domain  : 'db-csp.com',
+                  secure  : false
+                });
+              },
+              success : function(response) {               
+                   $messageSuccess(response.message);
+                   window.location.href=BASE_URL+"/admin/advertisement";
+              }
+          });
+        }
+      
+      <?php if(count($this->headerResult)<=1) {?>
+        $('.Tophide').hide();
+      <?php } ?>
+      <?php if(count($this->rightResult)<=1) {?>
+        $('.Righthide').hide();
+      <?php } ?>
+      $('#slideShow').change(function(){
+          if(this.checked)
+              $('.RighthideTime').fadeIn('slow');
+          else
+              $('.RighthideTime').fadeOut('slow');
+      });
+      var topimage = 0;
+      var rightimage = 0;
+      var  msgTypeHtml ='';
+      var msgType = '<?php echo $this->type; ?>';
+
+      if(msgType==2)
+        hintText = 'type group name';
+      else if(msgType==3)
+        hintText = 'type user set name';
+      else if(msgType==4)
+        hintText = 'type user name';      
+      else if(msgType==5)
+        hintText = 'type post title';
+      else if(msgType==6)
+         hintText = 'type VIP Group name';
+      else if(msgType==7)
+         hintText = 'type event title';
+      else
+        hintText = 'test';
+      
+              $("#search").tokenInput(BASE_URL+"/admin/getjsonresult?type="+parseInt(msgType),{
+                 preventDuplicates: true,
+                 hintText: hintText,
+                 theme: "facebook",
+                 prePopulate: <?php echo $encode; ?>,
+                 resultsLimit: 10,
+                 resultsFormatter: function(item) 
+                 {
+                      if(msgType==4){
+                        return "<li>" + "<img src='" + item.url + "' title='" + item.name + "' height='25px' width='25px' />" + "<div style='display: inline-block; padding-left: 10px;'><div class='full_name'>" + item.name + "</div><div class='email'>" + item.email + "</div></div></li>";
+                      }else{
+                        return "<li><p>" + item.name + "</p></li>"
+                      }
+                  },
+                  tokenFormatter: function(item) {
+                    if(msgType==4)
+                    {
+                      return "<li><p><img src='" + item.url + "' title='" + item.name + "' height='25px' width='25px' />" + item.name + "</p></li>"
+                    }else{
+                        return "<li><p>" + item.name + "</p></li>"
+                    }
+                  }
+              });
+                     
+
+          $select('select');
+
+
+              var myDropzoneBannerval = new Dropzone("#mydeBanner",{
+                  url: BASE_URL+'/admin/advertisement/headerbanner',
+                  maxFiles: 5,
+                  addRemoveLinks: true,
+                  uploadMultiple:true,
+                  parallelUploads: 1,
+                  acceptedFiles: 'image/jpeg,image/png,image/gif',
+               });
+         
+              myDropzoneBannerval.on("error", function (file, serverFileName) {
+                  $messageError('Please upload only png, jpg, jpeg, gif file type/');
+              });
+              myDropzoneBannerval.on("maxfilesexceeded", function (file, serverFileName) {
+                  $messageError('You can upload only 5 file');
+              });     
+              myDropzoneBannerval.on("success", function (file, serverFileName) {
+                 $('.topbannerlink').append(serverFileName.fileLinkText);
+                  $('#saveform').show();
+                  topimage = 0;
+                  $('.headerImageArray').each(function(){
+                    topimage++;
+                  });
+
+                  if(topimage<=1)
+                    $('.Tophide').hide();
+                  else
+                    $('.Tophide').show();
+              });
+              myDropzoneBannerval.on("removedfile", function (file) {
+                topimage = 0;
+                v = $.parseJSON(file.xhr.response);
+                $('.headerImageArray').each(function(){ 
+                  if(v.filename==$(this).val()){
+                    $('div.formRow[data-image="'+v.filename+'"]').remove();
+                  }
+                });
+
+                $('.headerImageArray').each(function(){
+                  topimage++;
+                });
+
+                if(topimage<=1)
+                  $('.Tophide').hide();
+                else
+                  $('.Tophide').show();
+              });
+              var myDropzoneBannerval = new Dropzone("#myrightBanner",{
+                  url: BASE_URL+'/admin/advertisement/rightbanner',
+                  maxFiles: 5,
+                  addRemoveLinks: true,
+                  uploadMultiple:true,
+                  parallelUploads: 1,
+                  acceptedFiles: 'image/jpeg,image/png,image/gif',
+               });
+         
+              myDropzoneBannerval.on("error", function (file, serverFileName) {
+                  $messageError('Please upload only png, jpg, jpeg, gif file type');
+              });
+              myDropzoneBannerval.on("maxfilesexceeded", function (file, serverFileName) {
+                  $messageError('You can upload only 5 file');
+              });     
+              myDropzoneBannerval.on("success", function (file, serverFileName) {
+
+                  $('.rightLinkArray').append(serverFileName.fileLinkText);
+                  $('#saveform').show();
+                  
+                  rightimage = 0;
+                  $('.rightImageArray').each(function(){
+                    rightimage++;
+                  });
+
+                  if(rightimage<=1)
+                    $('.Righthide').hide();
+                  else{
+                    $('.Righthide').show();
+                    $("#slideShow").attr('checked', 'checked');
+                  }
+              });
+              myDropzoneBannerval.on("removedfile", function (file) {
+                
+                rightimage = 0;
+                v = $.parseJSON(file.xhr.response);
+                $('.rightImageArray').each(function(){ 
+                  if(v.filename==$(this).val()){
+                    $('div.formRow[data-image="'+v.filename+'"]').remove();
+                  }
+                });
+
+                $('.rightLinkArray').each(function(){
+                  rightimage++;
+                });
+
+                if(rightimage<=1)
+                  $('.Righthide').hide();
+                else{
+                  $('.Righthide').show();
+                }
+
+              });
+
+            $('body').on('click','.removeimages', function(){
+               var removeimageID = $(this).attr('id');
+               $('div[id="removeID_'+removeimageID+'"]').remove();
+               $('#dbTipWrapper').remove();
+               $('div.formRow').each(function(){
+                  if($(this).attr("data-image")==removeimageID)
+                     $(this).remove();
+               });
+                
+                // right image
+                rightimage = 0;
+                $('.rightLinkArray').each(function(){
+                  rightimage++;
+                });
+                if(rightimage<=1)
+                  $('.Righthide').hide();
+                else
+                  $('.Righthide').show();
+
+                // top image
+                topimage = 0;
+                $('.headerImageArray').each(function(){
+                  topimage++;
+                });
+
+                if(topimage<=1)
+                  $('.Tophide').hide();
+                else
+                  $('.Tophide').show();
+
+
+
+            });
+            
+   }); 
+</script>
+
+<h1 class="pageTitle ">Advertisement
+  <a class="btn btn-black pull-right"  href="<?php echo BASE_URL; ?>/admin/advertisement">Back</a>
+</h1>
+<div class="clearfix"></div>
+   <div id="messageWrapper" class="dbtabContainer advWrpMain"> 
+      <div class="dbTabContainerDiv">
+          <form name="configuration" action ="<?php echo BASE_URL; ?>/admin/advertisement/advertedit" class="right grid" id="configuration" enctype="multipart/form-data" method="post">
+            <input type ="hidden" value="edit" name="edit"> 
+            <input type ="hidden" id = "type" value="<?php echo $this->type; ?>" name="type"> 
+            <input type ="hidden" value="<?php echo $this->id; ?>" id="advertID" name="advertID"> 
+            <div id="allUsers" style="display:block;" class="dbtabContent">
+        <?php  if($this->type==2){ ?>
+        <div class="formRow grpNameWrapper">
+          <label class="label">User Group(s)</label>
+          <div class="fieldInput field">
+             <input type="text" id="search" name="search" />
+          </div>
+        </div>
+        <?php } ?>
+         <?php  if($this->type==6){ ?>
+        <div class="formRow grpNameWrapper">
+          <label class="label">VIP user Group(s)</label>
+          <div class="fieldInput field">
+             <input type="text" id="search" name="search" />
+          </div>
+        </div>
+        <?php } ?>
+         <?php  if($this->type==7){ ?>
+        <div class="formRow grpNameWrapper">
+          <label class="label">Event(s)</label>
+          <div class="fieldInput field">
+             <input type="text" id="search" name="search" />
+          </div>
+        </div>
+        <?php } ?>
+        <?php  if($this->type==3){ ?>
+        <div class="formRow grpNameWrapper">
+             <label class="label">User set(s)</label>
+              <div class="fieldInput field ">
+                 <input type="text" id="search" name="search" />
+              </div>
+        </div>
+        <?php } ?>
+        <?php  if($this->type==4){ ?>
+        <div class="formRow">
+            <label class="label">User(s)</label>
+             <div class="fieldInput field ">
+                <input type="text" id="search" name="search" />
+             </div>
+        </div>
+        <?php } ?> 
+        <?php  if($this->type==5){ ?>
+        <div class="formRow">
+            <label class="label">Post(s):</label>
+             <div class="fieldInput field ">
+                <input type="text" id="search" name="search" />
+             </div>
+        </div>
+        <?php } ?> 
+
+        <div class="createAdvContainer">
+          <div class="searchField grpNameWrapper advertismentContentWrp" >
+            <div class="hashUrsrDetails">
+			<div class="formRow">
+                     <label class="label">Ad title</label>
+                     <div class="field">
+                      <?php 
+                          if($this->headerResult['0']['advertTitle']!='')
+                            $title = $this->headerResult['0']['advertTitle'];
+                          else
+                            $title = $this->rightResult['0']['advertTitle'];
+                      ?>
+                        <input type="text" name="adstitle" value="<?php echo $title; ?>" >
+                        <input type="hidden" name="adsid" value="<?php echo $this->id; ?>" >
+                        <div class="clearfix"></div>
+                     </div>
+                  </div>
+               <h2>
+                  Top banner
+               </h2>
+               <div class="listing">
+                  <div class="formRow">
+                     <label class="label">Select banner images <span class="noteText">(Multiple allowed) <br> <br> <strong>Suggested size</strong> <br>1100px * 130px (Full width) <br> 500px * 95px (Right)  </span><i class="adTips"><a data-id="topBnrAd">Where will this display?</a></i></label>
+                     <div class="field appendType">
+                        <div id="mydeBanner" class="dropzone" >
+                           <div class="fallback">
+                              <input type="file" name="file"  />
+                           </div>
+                        </div>
+                        <?php  $headerCount = count($this->headerResult);
+                          for ($i=0;$i< $headerCount; $i++) { ?>
+                         <div class="acntImgThumb" id="removeID_<?php echo $this->headerResult[$i]['image']; ?>">
+                           <div id="newpic" class="proPic imageheaderBanner">
+                           <img  src="<?php echo BASE_URL .'/ads/'.$this->headerResult[$i]['image']; ?>" class="imgStyle ">
+                           <a href="javascript:void(0);" id="<?php echo $this->headerResult[$i]['image']; ?>" rel="dbTip" title="Clicking this link will only remove this image from the preview. Save modifications from the preview to remove it from the platform." type="headerBanner" class="removeimages removeCompare">x</a>              
+                           </div>
+                         </div>
+                        <?php } ?>
+                        <div class="clearfix"></div>
+                     </div>
+                  </div>
+                  <div class="formRow">
+                     <label class="label">Position</label>
+                     <div class="field ">
+                        <select name="layout" id="layout">
+                           <option value="fullwidth" <?php if($this->headerResult['0']['layout']=="full") echo 'selected'; ?> >Full width</option>
+                           <option value="right" <?php if($this->headerResult['0']['layout']=="half") echo 'selected'; ?>>Top right corner</option>
+                        </select>
+                     <div class="clearfix"></div>
+                     </div>
+                  </div>
+                  <div class="formRow Tophide">
+                     <label class="label">Display time</label>
+                     <div class="field">
+                        <input type="text" placeholder="No. of seconds" name="headerSpeed" value="<?php echo $this->headerResult['0']['speed']/1000; ?>" >
+                        <div class="clearfix"></div>
+                     </div>
+                  </div>
+                  <div class="topbannerlink" >
+                    <?php $headerCount = count($this->headerResult);
+                    for ($i=0;$i< $headerCount; $i++) { ?>
+                      <div class='formRow' data-image='<?php echo $this->headerResult[$i]['image']; ?>' ><input type='hidden' name='headerImageArray[]' class='headerImageArray' value='<?php echo $this->headerResult[$i]['image']; ?>'
+                      value='<?php echo $value; ?>' />
+                      <label class='label'>Image link</label>
+
+                      <div class="field">
+                      <input type='text' name='headerLinkArray[]' value='<?php echo $this->headerResult[$i]['link']; ?>' />
+                          <img style="margin-left:5px; vertical-align: middle;" src='<?php echo BASE_URL; ?>/ads/<?php echo $this->headerResult[$i]['image']; ?>' width='29' height = '29' />
+                           <div class="clearfix"></div>
+                            <span style="margin-top: 5px; display: inline-block;">Please ensure you have added http:// to the link URL</span>
+                        </div>
+                        </div>
+                    <?php } ?>
+               </div></div>
+            </div>
+            <div class="hashUrsrDetails">
+               <h2>
+                  Right side column
+               </h2>
+               <div class="listing">
+                  
+                  <div class="formRow">
+                    <label class="label">Select banner images <span class="noteText">(Multiple allowed) <br> <br> <strong>Suggested size</strong> <br> 260px * 206px</span><i class="adTips"><a data-id="rtBnrAd">Where will this display?</a></i></label>
+                     <div class="field appendType">
+                        <div id="myrightBanner" class="dropzone">
+                           <div class="fallback">
+                              <input type="file" name="file"  />
+                           </div>
+                        </div>
+                        <?php $rightCount = count($this->rightResult);
+                        for ($i=0;$i< $rightCount; $i++) {  ?>
+                         <div class="acntImgThumb" id="removeID_<?php echo $this->rightResult[$i]['image']; ?>">
+                         <div id="newpic" class="proPic imageheaderBanner">
+                         <img  src="<?php echo BASE_URL .'/ads/'.$this->rightResult[$i]['image']; ?>" class="imgStyle ">
+                         <a href="javascript:void(0);" id="<?php echo $this->rightResult[$i]['image']; ?>" rel="dbTip" title="Clicking this link will only remove this image from the preview. Save modifications from the preview to remove it from the platform." type="headerBanner" class="removeimages removeCompare">x</a>                       
+                         </div>
+                         </div>
+                        <?php } ?>
+                        <div class="clearfix"></div>
+                     </div>
+                  </div>
+                   
+                   <div class="formRow Righthide">
+                     <label class="label">Create slideshow</label>
+                     <div class="field">
+                        <label for="slideShow" style="display: inline-block; margin-top: 9px;"><input <?php if($this->rightResult['0']['slidershow']==1){ echo 'checked';} ?> type="checkbox" name="slideShow" id="slideShow" value="1"><label for="slideShow">  </label></label>
+                     </div>
+                     <div class="clearfix"></div>
+                  </div>
+
+                  <div class="formRow Righthide RighthideTime">
+                     <label class="label">Display time</label>
+                     <div class="field">
+                        <input type="text" placeholder="No. of seconds" name="rightSpeed" value=" <?php echo $this->rightResult['0']['speed']/1000; ?>" >
+                     </div>
+                      <div class="clearfix"></div>
+                  </div>
+                 
+                <div class="rightLinkArray">
+                  <?php $rightCount = count($this->rightResult);
+                    for ($i=0;$i< $rightCount; $i++) { ?>
+                    <div class='formRow' data-image='<?php echo $this->rightResult[$i]['image']; ?>' >
+                      <input type='hidden' name='rightImageArray[]' class='rightImageArray' value='<?php echo $this->rightResult[$i]['image']; ?>'
+                    value='<?php echo $value; ?>' />
+                      <label class='label'>Image link</label>
+                      <div class="field">
+                      <input type='text' name='rightLinkArray[]' value='<?php echo $this->rightResult[$i]['link']; ?>' />
+                          <img style="margin-left:5px; vertical-align: middle;" src='<?php echo BASE_URL; ?>/ads/<?php echo $this->rightResult[$i]['image']; ?>' width='29' height = '29'/>
+                           <div class="clearfix"></div>
+                             <span class="noteText"> Please ensure you have added http:// to the link URL<span>
+                        </div>
+                      </div>
+                  <?php } ?>
+               </div> 
+            </div>
+            <div class="formRow" >
+               <div class="field" style="margin-left:0px;">
+                  <button class="btn btn-green SaveOnly" data-id="login">Save</button>
+                  <button class="btn btn-green SavePreview" data-id="login">Preview & save</button>
+          <span class="noteText" style="margin-left:10px">For preview purposes only the ad will be displayed as a home page preview.</span>
+               </div>
+            </div>
+            </div>
+         </div> <div class="clearfix"> </div>
+            </div>
+         </form>
+      </div>
+   </div>
+
+<div class="tipBnrImg" id="dialogTopBnr"><img src="<?php echo BASE_URL; ?>/img/top-bnner.png"/></div>
+<div class="tipBnrImg" id="dialogRtBnr"><img src="<?php echo BASE_URL; ?>/img/right-bnner.png"/></div>

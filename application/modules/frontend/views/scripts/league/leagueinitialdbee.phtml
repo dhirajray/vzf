@@ -1,0 +1,26 @@
+<?php     
+$commonbynew 	=	new Application_Model_Commonfunctionality();
+
+$startnew 		= 	PAGE_NUM;
+$end 			=	5;
+
+if(count($this->leaguedbees) > 0) {
+	
+	$k=1;
+	foreach ($this->leaguedbees as $row) :
+		$IDs .= $row['DbeeID'].',';
+		$return.=$commonbynew->displayLayoutDbs($row,$this->Social_Content_Block,'all',$this->plateform_scoring,$this->adminpostscore);
+		$k++;
+	endforeach;
+ }
+ else {
+	$startnew=$start;
+	$return.='<div class="noFound"><strong>No posts found.</strong></div>';
+}
+$return.='<div id="see-more-feeds'.$startnew.'"><div id="more-feeds-loader" style="cursor:pointer; color:#333333; text-align:center;" onclick="javascript:seemorefeeds('.$startnew.',15);">'.$seemorelabel.'</div></div>';
+
+echo $return.'~#~'.$end.'~#~'.$IDs.'~#~'.$startnew;
+
+
+?>
+

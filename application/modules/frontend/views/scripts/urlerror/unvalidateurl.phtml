@@ -1,0 +1,19 @@
+<div id="pageContent" page-type="homepage">
+	<div class="pageCenter noLayoutWrapper" id="pageContent">
+		<?php
+		$redtourl = '/myhome/' ;
+		if($this->checkcontrolleraction=='errorinurl'){
+		?>
+		<script>
+           $('.hasBackground').remove(); 
+		</script>
+	   <script language="javascript" type="text/javascript">setTimeout("window.parent.location='<?php echo BASE_URL.$redtourl ?>'",3000);</script>
+		 <div class="emailVerified"> 
+		  <h2 style="color:#99ba3f"> <i class="spirteVerified emailVerifiedIcon"> </i>Controller 'OR' action name is wrong.</h2>
+		  <p>You will be redirected to your homepage in 5 seconds.  <a href="<?php echo BASE_URL.$redtourl  ?>" class="normallinks">Click here</a> if you are not automatically redirected.</p>
+		 </div>
+		<?php 
+		}		
+		?>
+	</div> 
+</div>	

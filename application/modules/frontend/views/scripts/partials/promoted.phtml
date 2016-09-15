@@ -1,0 +1,31 @@
+<?php if(count($this->userlist)){ ?>
+<div class="attendeesWrapper expertSlideshow">
+	<h3>Expert</h3>
+    <div class="popimgList flexslider">
+	    <ul class="slides">
+        <?php foreach ($this->userlist as $key => $value) {  ?>
+	      <li>
+	        <img src="<?php echo IMGPATH ?>/users/<?php echo $value['ProfilePic']; ?>">
+          <?php if($value['UserID']!=$this->userid) { ?>
+	        <div class="slideBgbtn">
+			  	<div class="btnLft"><a class="expertIcon"><i class="fa fa-user"></i></a><a class="expertIcon follow" expertid="<?php echo $value['UserID']; ?>" ><i class="fa fa-child"></i></a></div>
+			  	<div class="btnRt"><a href="javascript:void('0');" class="AskAnExpert" data-promoted ='true' expertid="<?php echo $value['UserID']; ?>">Ask a question</a></div>
+			     </div>
+         <?php } ?>
+	      </li>
+        <?php } ?>
+	    </ul>
+  </div>
+</div>
+<script type="text/javascript">
+  $(document).ready(function(){
+     $('.popimgList').flexslider({
+       animation:"slide", 
+       slideshow:false,       
+       smoothHeight:true,
+       useCSS:false,
+    }); 
+
+  });
+</script>
+<?php  } ?>

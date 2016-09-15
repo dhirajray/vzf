@@ -1,0 +1,159 @@
+<link  href="<?php echo BASE_URL."/adminraw/css/jquery.tagit.css"; ?>?v=<?php echo filemtime('/adminraw/css/jquery.tagit.css');?>" rel="stylesheet" type="text/css" media="all">
+<link  href="<?php echo BASE_URL."/adminraw/css/tagit.ui-zendesk.css"; ?>?v=<?php echo filemtime('/adminraw/css/tagit.ui-zendesk.css');?>" rel="stylesheet" type="text/css" media="all">
+<script type="text/javascript" src="<?php echo BASE_URL."/adminraw/js/tag-it.js"; ?>?v=<?php echo filemtime('/adminraw/js/tag-it.js');?>"></script>
+<script type="text/javascript" src="<?php echo BASE_URL."/adminraw/js/matching.js"; ?>?v=<?php echo filemtime('/adminraw/js/matching.js');?>"></script>
+
+
+<script>
+$("document").ready(function(){	
+$('body').on('click','.taginput',function(e){
+ 	
+    var closestFl = $(this).closest('li');
+    var totalCheckBox = $('#list-url').find('li input[type="checkbox"]:checked').size();
+    //alert(totalCheckBox);
+    if(totalCheckBox>0){                          
+      $('.dropDownTarget').removeClass('disabled');
+    }else{                         
+      $(' .dropDownTarget').addClass('disabled');
+      $('input[name="matmain"]').attr('checked',false);
+    }
+
+});
+
+$('body').on('click','#matchingWrapper li .tagusrsetd',function(e){
+	//$('.addToGrpWrap').removeClass('on');
+	//$('.addToGrpWrap').addClass('on');
+	var El = $(this);
+	var tag = El.attr('tag');
+	var title = El.attr('title');
+	var company = El.attr('company');		
+	var cli = El.closest('li');
+	var data = {'tag':tag,'title':title,'company':company}
+	
+
+var ulisttag = '<div id="dtaguserlist"  title="Platform users"><div id="tagusrContainer"></div></div>';
+  $('body').append(ulisttag);
+  $( "#dtaguserlist" ).dialog({                      
+      width:800,
+      height:500,  
+      title:'Users list',
+        close:function(){
+           $(this).dialog("close");
+          $("#dtaguserlist" ).remove();
+          },
+      open:function(){                
+          $fluidDialog();
+           //$("#datacollect").html('');      
+           $('#tagusrContainer').append('<div class="loaderOverlay2"></div>'); 
+        $.ajax({
+          type : "POST",
+          dataType : 'json',
+          data:{'tag':tag,'title':title,'company':company},
+          url:  BASE_URL+'/admin/usergroup/getuserlistbytag',        
+          success : function(response) {    
+            $('.loaderOverlay2').remove();
+            $('#dtaguserlist #tagusrContainer').html(response.content);                         
+          }
+        });
+      }
+});
+
+});
+
+$('body').on('click','input[name="matmain"]',function(){
+  
+if($('input[name="matmain"]').is(':checked')){  
+     $('#list-url').find('li input[type="checkbox"]').attr('checked', true);  
+     $('.dropDownTarget').removeClass('disabled'); 
+}else{
+    $('#list-url').find('li input[type="checkbox"]').attr('checked', false); 
+    $('.dropDownTarget').addClass('disabled');
+  }  
+
+});
+
+});
+
+
+
+</script>
+<h1 class="pageTitle">Matching users</h1>
+<div class="clearfix"></div>
+<div class="clearfix">
+
+
+  <?php   
+  if(count($this->paginator))
+     echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml');  ?>
+
+</div>
+<div class="clearfix"></div>
+
+<div class="matchtot">
+<div style="float:left" ><div class="ntotal" >Total: <span class="typetotal" total="<?php echo $this->totallink; ?>"><?php echo $this->totallink; ?></span>
+</div> </div>
+
+<div style="float:right" id="matchingheadbtn"><div  class="pull-right" >
+<?php 
+$defaultimagecheck = new Admin_Model_Common();
+echo $defaultimagecheck->addtogroupbutton2(); ?>
+
+</div></div>
+</div>
+
+<div id="matchingWrapper" >
+<!-- <ul class="dbtab">
+	<li class="active"><a href="#" forcontent="hascontent" type="1">#tag</a></li>
+	<li><a href="#" forcontent="titlecontent" type="2">title</a></li>
+	<li><a href="#" forcontent="companycontent" type="3">company</a></li>
+</ul> -->
+
+<div id="hascontent" class="whiteBoxdd">
+
+
+ <div id="scontentdd">
+
+
+<div class="top-hurl">
+
+<div id="list-url">
+<div id="mctag">
+
+<?php
+if (count($this->paginator)){  ?>
+					 
+					<ul>
+            <li class="matchingpre"><span><label title="Select all">
+            <input id="matchingsall" class="matmain" type="checkbox" value="all" name="matmain">
+            <label for="matchingsall"></label>
+            </label>Select all</span></li>
+					<?php foreach($this->paginator as $matchtag) :
+				
+					  $tagstr = '';
+					if($this->type=='tag'){						
+    				$tagstr .= '<li class="matching"><label><input id="tlallresult'.$i.'" class="taginput" type="checkbox" value="' .$matchtag['DbTag'].'" name="tag"><label for="tlallresult'.$i.'"></label></label><span class="matchname">#' .$matchtag['DbTag'].'</span> '.$matchtag['cnt'].' match  <a class="btn btn-green btn-mini pull-right tagusrsetd" cnt="'.$matchtag['cnt'].'" tag="' .$matchtag['DbTag'].'">
+                                View</a></li>';
+					}elseif($this->type=='tilte'){	
+						$tagstr .= '<li class="matching"><label><input id="tlallresult'.$i.'" class="taginput" type="checkbox" value="' .$matchtag['title'].'" name="title"><label for="tlallresult'.$i.'"></label></label><span class="matchname">' .$this->myclientdetails->customDecoding($matchtag['title']).'</span> '.$matchtag['cnt'].' users match <a class="btn btn-green btn-mini pull-right tagusrsetd" cnt="'.$matchtag['cnt'].'" title="'.$matchtag['title'].'">
+                                View</a></li>';						
+					}elseif($this->type=='company'){
+					
+    				$tagstr .= '<li class="matching"><label><input id="tlallresult'.$i.'" class="taginput" type="checkbox" value="' .$matchtag['company'].'" name="company"><label for="tlallresult'.$i.'"></label></label><span class="matchname">' .$this->myclientdetails->customDecoding($matchtag['company']).'</span> '.$matchtag['cnt'].' users match <a class="btn btn-green btn-mini pull-right tagusrsetd" cnt="'.$matchtag['cnt'].'" company="' .$matchtag['company'].'">
+                                View</a></li>';
+					}
+    				$i++;
+					echo $tagstr;
+					 $rowchange++; endforeach; ?>
+					
+		<?php } else { ?>
+		<p class="dashBlockEmpty" style="position:relative; top:100px;">Record not found</p>
+		<?php } ?>
+
+		</ul></div></div>
+</div>
+</div>
+
+</div>
+
+</div>
+<!-- SCRIPT FOR FADE POPUP -->

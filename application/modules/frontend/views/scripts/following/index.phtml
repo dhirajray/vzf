@@ -1,0 +1,44 @@
+<?php 
+
+$commonbynew 	=	new Application_Model_Commonfunctionality();
+
+
+$IDs 		= 	'';
+
+
+if(count($this->followingdbees) > 0)
+{
+$dbeeList = array();
+	$k=1;        
+
+	if(strlen($row->Text)>250) $dots='...'; else $dots='';
+
+	if($k=='1' && $initial=='1') setcookie("CookiePostDate", $row->PostDate, time()+3600);
+
+
+
+	foreach ($this->followingdbees as $row) :
+		$IDs .= $row['DbeeID'].',';
+		$return	.=	$commonbynew->displayLayoutDbs($row,$this->Social_Content_Block,'all',$this->plateform_scoring,$this->adminpostscore);
+		$k++;
+		$k++;
+		$dbeeList[] = $row['DbeeID'];
+	endforeach; 
+
+}
+else 
+{
+	if($this->dbeenotavailmsg==1) $nomsg = '<div class="noFound"><strong>- no more Following '.POST_NAME.'s to show -</strong></div>';
+	else 	$nomsg = '<div class="noFound"><strong>you don’t yet follow anyone</strong></div>';
+	$seemorelabel = $nomsg;
+ }
+
+$IDs=substr($IDs,0,-1);
+
+$startnew=$this->startnew;
+
+$return.='<div id="see-more-feeds'.$startnew.'"><div id="more-feeds-loader" style="cursor:pointer; color:#333333; text-align:center;" onclick="javascript:seemorefeeds('.$startnew.',15);">'.$seemorelabel.'</div></div>';
+
+
+echo $return.'~#~'.$this->end.'~#~'.$IDs.'~#~'.$startnew.'~#~'.implode(',', $dbeeList);
+?>

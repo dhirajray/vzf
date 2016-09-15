@@ -1,0 +1,37 @@
+<?php if(($this->_userid!=adminID && $this->attendiesList==0) || $this->userid==adminID) { 
+
+ ?>
+<div class="whiteBox attendeesWrapper active">
+<h2><?php echo (count($this->resultData)==1 ? count($this->resultData).' attendee' : count($this->resultData).' attendees'); ?>
+<?php if($this->userid && $this->userid==adminID) { ?>
+  <span style="padding-left: 40px;font-size: 13px;">Public</span><label class="switcher notiSettingBtn pull-right"  for="attendessOnOff">
+    <input type="checkbox" <?php echo $this->attendiesListStop; ?> id="attendessOnOff" onclick="javascript:stopshowAttendies(<?php echo $this->dbeeid; ?>);" >
+      <span class="switchOnOff">
+          <span class="switchOn"></span> 
+      </span>
+  </label>
+<?php } ?>
+</h2>
+  <div class="rboxContainer attendeesBox ps-container">
+    <ul class="slides">
+      <li>
+        <?php $k = 1;
+      foreach ($this->resultData as $res_value) { ?>
+      <?php if($this->usertype!=100 && $res_value['usertype']==100){?>
+        <a href="javascript:void(0);" title="<?php echo VIPUSER; ?>">
+        <img src="<?php echo IMGPATH.'/users/small/'.VIPUSERPIC; ?>" width="64" height="64">
+        </a>
+      <?php } else { ?>
+        <a href="/user/<?php echo $this->myclientdetails->customDecoding($res_value['Username']); ?>" title="<?php echo $this->myclientdetails->customDecoding($res_value['Name']); ?>">
+        <img src="<?php echo IMGPATH.'/users/small/'.$res_value['ProfilePic']; ?>" width="64" height="64">
+        </a>
+        <?php } ?>
+      <?php if ($k % 6 == 0) { ?>
+          </li><li>
+      <?php } ?>
+      <?php $k++; } ?>
+      </li>
+    </ul>
+  </div>
+</div>
+<?php } ?>

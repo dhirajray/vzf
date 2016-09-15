@@ -1,0 +1,188 @@
+<?php
+$postRec   =   $this->myclientdetails->passsqlquery('select * from tblpostreports where reporttype =2 AND userid='.$this->userid );
+?>
+
+<h1 class="pageTitle">
+		Saved reports
+		<div class="pull-right">
+			
+			<?php if(count($postRec)>0) { ?> 
+			<span style="float:right; margin-left:5px" class="btn btn-mini viewallscreenshots" userid="<?php echo $this->userid ?>" >View captured screenshots</span>
+			<?php } ?>  
+		</div>	
+</h1>
+
+<div id="pageContainer" style="clear:both" data-save="true">
+
+	<div class="kcSidebar" id="grpUser">
+		<div class="kcSidebarHeader">
+		<h2><i class="fa fa-pie-chart fa-lg grpIconLarge"></i> Reports</h2>
+		</div>
+		<div class="ksfolderlist">
+			<ul class="groupbox">
+			<?php 
+			if(count($this->data)>0){
+			foreach($this->data as $row): 
+				if(trim($row['groupname'])!='') {?>
+				<li id="id_<?php echo $this->escape($row['id']);?>" chartgroupid="<?php echo $this->escape($row['id']);?>"  groupname="<?php echo $this->escape($row['groupname']);?>"><?php echo $this->escape(trim($row['groupname']));?></li>
+			<?php } endforeach;
+				}else{
+				echo "<div class='notfound'>no reports saved yet</div>";
+				}
+			?>	
+			</ul>
+		
+		</div>
+	</div>
+	<div class="kcRightPanel savedChartsImage" id="grpRightListing">
+		<div class="kcRightHeader clearfix">
+			<div class="kcrightheaderTop clearfix">
+				<div class="pull-left cateName">
+
+				<i class="fa fa-folder-open fa-2x kcLargFolderGrp"></i> <span></span></div>
+				<div class="totalrec" style="float:right;display:none">
+					<span  class="btn btn-mini btn-green" onclick="capture();" >Capture screenshot and Save</span>
+				</div>
+			</div>			
+		</div>
+		<ul id="grpRightListinguL"></ul>
+	
+</div>
+
+	
+</div>
+
+<div id="chartgroupDialog" title="Edit chart"  style="display:none;">
+ 	<div id="beforecall"></div>
+	<form id="digForm">
+	<div class="formRow">	
+		<label class="label">Chart name</label>
+		<input type="text" name="ks_groupname" id="ks_groupname" class="fluid" />
+		<input type="hidden" name="ks_check" id="ks_check"   />
+	</div>
+	
+	</form>
+</div>
+
+<form method="POST" enctype="multipart/form-data" action="<?php echo BASE_URL ?>/admin/savedcharts/capturediv" id="myForm">
+	<input type="hidden" name="img_val" id="img_val" value="" />
+	<input type="hidden" name="postid" id="postid" value="999" />
+	<input type="hidden" name="caller" id="caller" value="savedcharts" />
+	<input type="hidden" name="cattitle" id="cattitle" value="savedcharts" />
+</form>
+
+<script type="text/javascript">
+	function save_chart() {
+   
+	    $('div[data-highcharts-chart]').each(function(){
+
+	    	var chart = $(this).highcharts();
+			var render_width = $(this).width();
+			var render_height = render_width * chart.chartHeight / chart.chartWidth
+	    	 var svg = chart.getSVG({
+	        exporting: {
+	            sourceWidth: chart.chartWidth,
+	            sourceHeight: chart.chartHeight
+	        }
+	    });
+	    // Create a canvas
+	    var canvas = document.createElement('canvas');
+	    canvas.height = render_height;
+	    canvas.width = render_width;
+	    $(this).after(canvas);	    
+		$(this).hide();
+	    
+
+	    // Create an image and draw the SVG onto the canvas
+	    var image = new Image;
+	    image.onload = function() {
+	        canvas.getContext('2d').drawImage(this, 0, 0, render_width, render_height);
+	    };
+	    image.src = "data:image/svg+xml;base64," + window.btoa(svg);
+
+
+	    });
+
+	    // Get the cart's SVG code
+	   
+	}
+	
+	function capture() {
+		var catname = $('.cateName').find('span').text();
+		$('#cattitle').val(catname);
+		
+		save_chart(); 
+		var sentimentsTemplate = '<div id="senti_result" class="leaguesPostPopUp"></div>';
+					
+		$('#senti_result').remove();
+
+
+		
+		
+		$('body').append(sentimentsTemplate);
+		var loaderHtml = '<div class="loaderShow">\
+				<span class="loaderImg"></span><br>\
+				</div>\
+		Please wait...';
+
+		$dbLoader({process:true,totalUpload:0, loaderHtml:loaderHtml});
+			$('#mesageNotfiOverlay .progressBar').animate({width: '90%'}, 3000,function(){
+				$('#mesageNotfiOverlay .progressBarWrp').attr('data-loaded', '90%');
+			});
+
+		setTimeout(  function() 
+  		{
+			//save_chart();
+			$('.savedChartsImage').html2canvas({
+				onrendered: function (canvas) {
+	                //Set hidden field's value to image data (base-64 string)
+					$('#img_val').val(canvas.toDataURL("image/png"));
+	                //Submit the form manually
+					document.getElementById("myForm").submit();
+				}
+			});
+		}, 1500);
+	}
+
+	$('body').on('click','.viewallscreenshots',function(){
+				
+				dbId 		=	$('#currentdbid').val();
+				
+				userid 		=	typeof($(this).attr('userid'))!='undefined' ? $(this).attr('userid') : '';
+
+				label       = 	'screen shot';
+			
+				url 		=	BASE_URL+"/admin/savedcharts/viewscreenshots";
+				postdata	=	'reporttype=2&userid='+userid;
+				
+				var thisEl = $(this);	
+						
+	          	$.ajax({
+					url: url,
+					data: postdata,
+					type:'post',
+					beforeSend: function(){ 
+					var htmlPopup = '<div id="sentiDialog" title="Saved reports" class="loader">\
+						<table class="table table-border table-hover table-stripe digForm" style="background:#F8F8F8"></table></div>';  
+					$('#sentiDialog').remove();
+					$('body').append(htmlPopup);
+					$( "#sentiDialog").dialog({
+						 width:600,
+						 height:430,
+						 open:function(){                
+					            $fluidDialog();
+					      }
+					});                  
+	                
+	                  },
+					success : function(result){
+						
+							//$( ".sentiDialoglabel").html("Post "+label);	
+							$('#sentiDialog').removeClass('loader')
+							$( ".digForm").html(result);	
+							return false;
+					},
+				});
+				return false;
+			});
+</script>	

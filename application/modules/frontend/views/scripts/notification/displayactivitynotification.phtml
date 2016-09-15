@@ -1,0 +1,386 @@
+<?
+require_once 'includes/globalfile.php'; //file for global variables
+$Activities= new Application_Model_Activities();
+$comm_obj = new Application_Model_Commonfunctionality();
+$myhome_obj = new Application_Model_Myhome();
+
+//print_r($data); die;
+$this->response->setHeader('Content-type', 'application/json', true);
+
+$highlight =  $this->highlight;
+$group = '';
+$row2 		= $this->row2;
+$totalrec = count($this->Total);	
+$start = ($this->start!=0)?$this->start:'';
+$startnew = $this->start+PAGE_NUM_LEAGE;
+//print_r($this->session_data);
+$countRetain = 0;
+
+if(count($row2)>0)
+{				
+	$notify='1'; 
+	$grpacept = $this->grpacept;
+
+	if(count($grpacept)>0){
+
+		$Activities->updateactivity(array('act_status'=>1),$grpacept[0]['act_id']);
+	}
+	$Activities->updateactivityofuser(array('act_status'=>1),$this->userid);
+	
+	foreach($row2 as $data)
+	{	
+		$countRetain++;
+
+		$highlightCSS = '';
+		$groupbtnac = '';
+		if($highlight >= $countRetain) $highlightCSS = 'highlightNotification';
+
+		if($countRetain>21) 
+			break;
+
+		$seedbeelink = '';
+		$group  = '';
+		$dbeeurl ='';
+		
+		$mydate = date('Y-m-d', strtotime($data['act_date']));
+		$seedatep = strtotime(substr($data['act_date'],0,10));
+	 	$notificationdatechk = strtotime($mydate);
+    
+		$notificationdate = '<h2>'.date('M d Y', strtotime($data['act_date'])).'</h2>';
+		$dbeeurl = $myhome_obj->getdburl($data['act_typeId']);
+
+		$adminAct   = '';
+
+//print_r($data);
+		
+		switch ($data['act_message']) 
+		{
+			
+			case '11':
+				$hashtag	= '#pqa';
+				$class	= 'class="notifyquestion"';
+				break;
+			case '12':
+				$hashtag	= '#myqa';
+				$class	= 'class="notifyquestion"';
+				break;
+			case '21':
+				$hashtag	= '#liveqa';
+				$class	= 'class="notifyquestion"';
+				break;
+			case '43':
+				$hashtag	= '#pqa';
+				$class	= 'class="notifyquestion"';
+				break;
+			case '20':
+				$hashtag	= '#myqa';
+				$class	= 'class="notifyquestion"';
+				break;
+			case '3':
+				$hashtag	= '';
+				break;
+			case '6':
+				$hashtag	= '#comment-block-'.$data['act_cmnt_id'];
+				break;
+			case '30':
+				$hashtag	= '#comment-block-'.$act_typeId['Text'];
+				break;
+			default:
+				$hashtag	= ''; 
+				$class	= '';
+				break;
+		}
+		
+		if($notificationdatechk2 > 	$notificationdatechk || $notify=='1')
+		{			
+			if($this->seedate != $seedatep){
+			$return.=$notificationdate;
+			 $seedatep = strtotime(substr($data['act_date'],0,10));			 
+			}
+		}				
+		$stype = $data['Type'];
+		$text ='';
+		$pic = '';
+		$dbeetypeclass = '';
+		
+		if($data['act_type']==1 || $data['act_type']==2 || $data['act_type']==31 || $data['act_type']==3 || $data['act_type']==40 || $data['act_type']==11)
+		{
+			$seedbeelink ='<a href="'.BASE_URL.'/dbee/'.$comm_obj->generateUrl($dbeeurl).''.$hashtag.'">';				
+			$text = ($data['act_type']==2 || $data['act_type']==3)?htmlspecialchars_decode(html_entity_decode(htmlentities($this->escape(strip_tags($data['Comment']))))):htmlspecialchars_decode(html_entity_decode(htmlentities($this->escape(strip_tags($data['Text'])))));
+			
+			if($data['act_type']==11)
+			{
+				$text = htmlspecialchars_decode(html_entity_decode(htmlentities($this->escape(strip_tags($data['qna'])))));
+				if($data['act_message']==45)
+				{
+					$where       = array(
+	                    'DbeeID' => $data['act_typeId']
+	                ); 
+				  	$dbeeRow  = $this->myclientdetails->getRowMasterfromtable('tblDbees', array('Text'), $where);
+					$text = htmlspecialchars_decode(html_entity_decode(htmlentities($this->escape(strip_tags($dbeeRow['Text'])))));
+				}
+				if($data['act_message']==51 || $data['act_message']==52)
+				{
+					$seedbeelink ='<a href="'.BASE_URL.'/user/'.$this->myclientdetails->customDecoding($data['Username']).'">';
+				}
+			}
+		}
+		else if($stype==5){
+			$seedbeelink ='<a href="'.BASE_URL.'/dbee/'.$comm_obj->generateUrl($dbeeurl).''.$hashtag.'">';	
+			if($this->type != 2)
+			$text = htmlspecialchars_decode(html_entity_decode(htmlentities($this->escape(strip_tags($data['PollText'])))));	
+		}
+		
+
+		$text1 = '<span>'.$text.'</span>';
+		$grouppic = '';
+		$accReject = '';
+		if(($data['act_type']==12 || $data['act_type']==13 ))
+		{			
+			$group = ' <a href="'.BASE_URL.'/group/groupdetails/group/'.$data['act_typeId'].'">'.$data['GroupName'].'</a>';
+			 
+			$checkImage = new Application_Model_Commonfunctionality();
+			if($data['GroupPrivacy']==4){ 
+				$image_url = BASE_URL_IMAGES;//$image_url = adminURL; Before this was applied
+				$groupimg = $checkImage->checkImgExist($data['GroupPic'],'grouppics','default-avatar.jpg','admin');
+			}else{
+				$groupimg = $checkImage->checkImgExist($data['GroupPic'],'grouppics','default-avatar.jpg','');
+				$image_url = BASE_URL_IMAGES;
+			}
+           
+			$grouppic = '<img src="'.IMGPATH.'/grouppics/medium/'.$groupimg.'" width="75" height="75" border="0" />';
+		
+			$seedbeelink ='<a href="'.BASE_URL.'/group/groupdetails/group/'.$data['act_typeId'].'">';
+			
+			$accReject ='<div id="acept_'.$data['ID'].'" class="notifyAccptBtn"><a href="javascript:void(0);" onclick="javascript:respondgroupinvite(1,'.$data['ID'].','.$data['GroupID'].','.$data['act_ownerid'].','.$data['act_userId'].','.$data['act_type'].')" class="acceptnotibutton btn btn-green btn-mini">Accept</a>
+			<a href="javascript:void(0);" onclick="javascript:respondgroupinvite(0,'.$data['ID'].','.$data['GroupID'].','.$data['act_ownerid'].','.$data['act_userId'].','.$data['act_type'].')" class="decinenotibutton btn btn-red btn-mini">Reject</a></div>';
+			$pic = '<div class="imglpWraper" style="margin-left:5px;margin-right:5px;">'.$grouppic.'</div>';			
+			$grouhideid = 'id =grpnote-'.$data['ID'];
+
+			$seedbeelink ='';
+			//echo $seedbeelink;exit;
+		
+		}
+		if($data['act_type']==36)
+		{	
+			$accReject ='<div class="notifyAccptBtn" ><a data-id="'.$data['act_typeId'].'" href="javascript:void(0);" class="acceptEventJoin btn-mini btn btn-green">Accept</a>
+				<a href="javascript:void(0);" data-id="'.$data['act_typeId'].'" class="rejectEventJoin btn btn-mini btn-red">Reject</a></div>';
+		}
+		if($data['act_type']==17)
+		{	
+			$accReject ='<div class="notifyAccptBtn" ><a data-type="accept" data-id="'.$data['act_typeId'].'" user-id ="'.$data['UserID'].'" data-act_id="'.$data['act_id'].'" href="javascript:void(0);" class="acceptRequestAccept btn-mini btn btn-green">Accept</a>
+				<a href="javascript:void(0);" data-id="'.$data['act_typeId'].'" user-id ="'.$data['UserID'].'"  data-type="reject" data-act_id="'.$data['act_id'].'" class="acceptRequestAccept btn btn-mini btn-red">Reject</a></div>';
+		}
+		if($data['act_type']==39)
+		{	
+			$accReject ='<div class="notifyAccptBtn expertNotify"><a data-id="'.$data['act_typeId'].'" href="javascript:void(0);" class="acceptExpertJoin btn-mini acceptnotibutton btn btn-green">Accept</a>
+			&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" data-id="'.$data['act_typeId'].'" class="rejectExpertJoin decinenotibutton btn btn-mini btn-red">Reject</a></div>';
+		}
+		if($data['act_type']==41)
+		{	
+			$accReject ='<div class="notifyAccptBtn AttendiesNotify" id="AttendiesNotify'.$data['act_typeId'].'"><a data-id="'.$data['act_typeId'].'" href="javascript:void(0);" class="acceptAttendiesJoin btn-mini acceptnotibutton btn btn-green">Accept</a>
+			&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" data-id="'.$data['act_typeId'].'" class="rejectAttendiesJoin decinenotibutton btn btn-mini btn-red">Reject</a></div>';
+		}
+		if($data['act_type']==14){
+	
+			$text1 = htmlspecialchars_decode(html_entity_decode(htmlentities($this->escape(strip_tags($data['Title'])))));
+			$seedbeelink ='<a href="'.BASE_URL.'/league/index/id/'.$data['LID'].'">';
+		}
+		$commonbynew 	= new Application_Model_Commonfunctionality();
+        $userpics = $commonbynew->checkImgExist($data['ProfilePic'],'userpics','default-avatar.jpg');
+		$userTypenal = $commonbynew->checkuserTypetooltip($data['usertype']);
+		
+		if($data['act_message']==30 || $data['act_message']==57 || $data['act_message']==26 || $data['act_message']==3 || $data['act_message']==55){
+			
+			$postRes	= $this->myclientdetails->getAllMasterfromtable('tblDbees',array('Text','dburl'),array('DbeeID'=>$data['act_typeId']));
+			
+			$text1 = htmlspecialchars_decode(html_entity_decode(htmlentities($this->escape(strip_tags($postRes[0]['Text'])))));
+			$seedbeelink ='<a href="'.BASE_URL.'/dbee/'.$comm_obj->generateUrl($this->escape(strip_tags($postRes[0]['dburl']))).'">';	
+		}
+		$groupnameinvite = '';
+		if($data['act_type']==35)
+		{
+			$text1 = htmlspecialchars_decode(html_entity_decode(htmlentities($this->escape(strip_tags($data['Text'])))));
+			$seedbeelink ='<a href="'.BASE_URL.'/dbee/'.$comm_obj->generateUrl($dbeeurl).''.$hashtag.'">';
+			
+			$groupnameinvite1 = ' <a href="'.BASE_URL.'/group/groupdetails/group/'.$data['act_typeId'].'">'.$data['GroupName'].'</a>';
+			$groupnameinvite =' <i>in group '. "'".$data['GroupName']."'".'</i>';  
+		}
+		if($data['act_type']==33){
+			$seedbeelink ='<a href="'.BASE_URL.'/dbee/'.$comm_obj->generateUrl($dbeeurl).''.$hashtag.'">';				 
+			 if($data['act_message']==36){
+
+			 	$where       = array(
+                        'CommentID' => $data['act_cmnt_id']
+                    );
+                   $commentRow  = $this->myclientdetails->getRowMasterfromtable('tblDbeeComments', array('Comment'), $where);
+
+				$text1 =htmlspecialchars_decode(html_entity_decode(htmlentities($this->escape(strip_tags($commentRow['Comment'])))));
+			  }
+			  else
+			  {
+			  	$where       = array(
+                        'DbeeID' => $data['act_typeId']
+                    ); 
+			  	$dbeeRow  = $this->myclientdetails->getRowMasterfromtable('tblDbees', array('Text'), $where);
+				$text1 = htmlspecialchars_decode(html_entity_decode(htmlentities($this->escape(strip_tags($dbeeRow['Text'])))));
+			 }				
+		} 
+ 		$appendScore = "";
+		if($data['act_type']==6){
+			$seedbeelink ='<a href="'.BASE_URL.'/dbee/'.$comm_obj->generateUrl($dbeeurl).''.$hashtag.'">';	
+			$commentRow  = '';
+			if($data['act_cmnt_id']!='' || $data['act_cmnt_id']!='0')
+			{
+
+			 	$where       = array('CommentID' => $data['act_cmnt_id'],'DbeeID'=>$data['act_typeId'] );
+                $commentRow  = $this->myclientdetails->getRowMasterfromtable('tblDbeeComments', array('Comment'), $where);
+                $appendScore = "r comment";
+				$text1 =htmlspecialchars_decode(html_entity_decode(htmlentities($this->escape(strip_tags($commentRow['Comment'])))));
+				$hashtag	= '#comment-block-'.$data['act_cmnt_id'];
+			 	if($commentRow['Comment']=='')
+			 	{
+			 		$hashtag	= '';
+					$where       = array('DbeeID' => $data['act_typeId'] );
+	                $dbeeRow  = $this->myclientdetails->getRowMasterfromtable('tblDbees', array('Text'), $where);
+	                $appendScore = "r post";
+					$text1 =  htmlspecialchars_decode(html_entity_decode(htmlentities($this->escape(strip_tags($dbeeRow['Text'])))));
+				}
+			}				
+		}
+		if($data['act_type']==4){
+			$seedbeelink ='<a href="'.BASE_URL.'/user/'.$this->myclientdetails->customDecoding($data['Username']).'">';	
+		}
+
+		if($data['act_type']==34){
+			$filename = $this->myclientdetails->getfilename($data['act_typeId']);
+			
+			$accReject ='<div class="notifyAccptBtn"><a href="'.BASE_URL.'/dashboarduser/downloadpdfuser/pdf/'.$filename['kc_file'].'/isf/'.$filename['is_front'].'/id/'.$data['act_typeId'].'" class="btn-mini btn btn-green">Accept</a>
+				<a href="javascript:void(0);"  actid="'.$data['id'].'" fileid="'.$data['act_typeId'].'" class="btn btn-mini btn-red btnsharereject" id="btnsharereject">Reject</a></div>';
+			
+		}
+
+		
+
+		if($data['act_message']==48){
+			
+			$postRes	= $this->myclientdetails->getAllMasterfromtable('tblchatgroups',array('name'),array('id'=>$data['act_typeId']));
+			$text1 = '<span style="font-style:italic">'. htmlspecialchars_decode(html_entity_decode(htmlentities($this->escape(strip_tags($postRes[0]['name']))))).'</span>';
+			//$seedbeelink ='<a href="'.BASE_URL.'/dbee/'.$comm_obj->generateUrl($this->escape(strip_tags($postRes[0]['dburl']))).'">';	
+		}
+
+		if($data['act_message']==49)
+		{	
+			$accReject ='<div class="notifyAccptBtn"><a class="btn btn-full btn-mini btn-green  viewDbeeApprove " href="javascript:void(0)" status="2" data-id="'.$data['act_typeId'].'" user_id="'.$data['act_userId'].'"> View & Approve </a>
+			</div>';
+		}
+
+		
+		if($data['act_message']==4)
+		{	
+	   		$follwoing 	=  	new Application_Model_Following();
+	   		$fcnt 		=	$follwoing->chkfollowingcnt($data['act_userId'], $data['act_ownerid']); 
+	   		$fellowtxt 	= 	($fcnt['ID']>0)?'Unfollow':'Follow';
+	   		if($fellowtxt=='Follow')
+			{	$accReject ='<div class="notifyAccptBtn "><a href="javascript:void(0);" followid="'.$data['act_userId'].'" class="btn btn-yellow fallowina btn-mini" onclick="javascript:followme('.$data['act_userId'].',this);" href="javascript:void(0)">
+			   	<div id="followme-label">'.$fellowtxt.'</div></a></div>';
+			}
+		}
+
+		if($data['act_type']==20)
+		{			
+			$groupbtnac = '<div class="btn btn-green btn-mini" style="margin-left:50px"><a href="'.BASE_URL.'/group/groupdetails/group/'.$data['act_typeId'].'"><span>Click here to go to group</span></a></div>';
+		}
+
+		$appendEventName="";
+
+		if($data['act_type']==47)
+		{	if($data['events']!="")	{	
+			$whereconev       = array('id' => $data['events'] );
+		    $eventRow  = $this->myclientdetails->getRowMasterfromtable('tblEvent', array('title'), $whereconev);
+			$appendEventName = "'".$eventRow['title']."'";
+		    }
+		}
+
+		$textn='<span>'.(strlen($text1)<=100 ? $text1 : substr($text1,0,100).'...').'</span>';
+		
+		if($data['act_type']==37 || $data['act_type']==38){
+			$return.=  '<div class=" '.$highlightCSS.' notiContainerList" '.$grouhideid.' >'.$seedbeelink.'<div class="dbeepic">'.$pic.'</div>
+					<div class="notiUserpics"><img src="'.IMGPATH.'/users/small/'.$userpics.'" border="0" /></div>
+					<div class="notiUserContaint"> '.$scoreType[$data['act_score_type']].''.$activityaMsg[$data['act_message']].''.$appendScore.$group.'<br /> '. $textn.'  </div>'.$accReject. '<div class="notificationDate">'.date('d M, Y', strtotime($data['act_date'])).'</div>'.'			
+					</div>
+					</div>';				
+				if($seedbeelink!='') $return.='</a>';
+			$return.= '</div>';
+		}
+		else{
+
+			if($data['act_type']==1 || $data['act_type']==2 || $data['act_type']==4 || $data['act_type']==6 || $data['act_type']==10 || $data['act_type']==12){
+				if($data['UserID']!='')
+				{
+					$wherecon       = array('UserID' => $data['UserID'] );
+
+		            $UserRow  = $this->myclientdetails->getRowMasterfromtable('tblUsers', array('usertype','hideuser'), $wherecon);
+
+
+		            if($UserRow['hideuser']==1)
+		            {
+		            	$userpics = HIDEUSERPIC;
+		            	$name     = HIDEUSER;
+		            }else
+		            {
+		            	$userpics = $userpics;
+		            	$name     = $this->myclientdetails->customDecoding($data['Name']).' '.$this->myclientdetails->customDecoding($data['lname']);
+		            }
+				}
+				
+
+
+			}else
+			{
+				$userpics = $userpics;
+				$name     = $this->myclientdetails->customDecoding($data['Name']).' '.$this->myclientdetails->customDecoding($data['lname']);
+			}
+
+			$textxx='';
+			if($data['act_type']==44)
+			{
+			 $seedbeelink ='<a href="'.BASE_URL.'/dbee/'.$comm_obj->generateUrl($dbeeurl).''.$hashtag.'">';
+			 $wherecon2       = array('DbeeID' => $data['act_typeId'] );
+			 $pollRow  = $this->myclientdetails->getRowMasterfromtable('tblDbees', array('PollText'), $wherecon2);
+			
+			 $textxx = ' <span>'.$pollRow['PollText'].'</span>';
+		    }
+
+			$return.=  '<div class=" '.$highlightCSS.' notiContainerList">'.$seedbeelink.'<div class="dbeepic">'.$pic.'</div>
+					<div class="notiUserpics"><img src="'.IMGPATH.'/users/small/'.$userpics.'" border="0" /></div>
+					<div class="notiUserContaint"> <strong> '.$name.'</strong> '.$scoreType[$data['act_score_type']].''.$activityaMsg[$data['act_message']].''.$appendScore.$groupnameinvite.$appendEventName.$group.$textxx.'<br /> '. $textn.$textrej.'  </div>'.$accReject.$downloadlink.$groupbtnac. '<div class="notificationDate">'.date('d M, Y', strtotime($data['act_date'])).'</div>'.'
+					</div>';
+			if($seedbeelink!='') $return.='</a>';
+			$return.= '</div>';
+		}
+		if($TotalNotifications!=$counter) $return.='<div class="div-separator" style="margin-left:10px"></div>';
+		else $return.='';					
+		
+		$notificationdatechk2 = strtotime($mydate);
+		$notify++;
+		
+		$notificationdate ='';	
+		$i++;
+		$bool==true;
+	}
+	
+	
+} else {
+	$return='<div align="center" class="notiContainerList" style="font-style: italic; text-align:center">You currently have no notifications</div>';
+	$startnew=$start;
+	
+}
+
+//$data['ResultArr'] = $return;
+
+//return $this->response->setBody(Zend_Json::encode($data));
+echo $return;
+//else echo $return.'~#~'.$startnew; 
+
+?>

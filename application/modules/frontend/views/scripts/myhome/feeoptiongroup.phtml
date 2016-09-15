@@ -1,0 +1,19 @@
+<?php 
+
+if($this->cookieuser==$this->user) $ProfileHolder=true;
+else $ProfileHolder=false;
+// CHECK IF PROFILE HOLDER
+
+// GROUP OWNER NAME
+$grpOwnerRow=$this->grpOwnerRow;
+$fName=explode(' ',$grpOwnerRow['Name']);
+// GROUP OWNER NAME
+
+if(!$ProfileHolder) $name=$fName[0]."'s"; else $name='My';
+if(eregi("chrome", $_SERVER['HTTP_USER_AGENT'])) $mtop='10px'; else $mtop='0';
+
+$return='<div class="displayby-wrapper"><div class="displayby-speecharrow"></div><div class="displayby-text-nonbold" style="margin:'.$mtop.' 0 10px 0;"><a href="javascript:loadmygroups('.$this->user.');">'.$name.' groups</a></div><div class="next-line"></div><div class="displayby-text-nonbold"><a href="javascript:loadmygroups('.$this->user.',1);">Member of groups</a></div>';
+$return.='<div style="clear:both"></div></div>';
+
+echo $return;
+?>

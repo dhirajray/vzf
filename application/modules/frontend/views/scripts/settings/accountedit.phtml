@@ -1,0 +1,202 @@
+<div >
+<?php
+$dataall  = $this->dataall;
+
+if(($dataall[0]['Socialtype']=='2' && $dataall[0]['Email']=='twitteruser@db-csp.com') || ($dataall[0]['Socialtype']=='4'  && $dataall[0]['Email']=='gplususer@db-csp.com'))
+{
+	$disable = '';
+}else{
+	$disable = 'disabled';
+}
+
+$return='';
+
+if($this->myclientdetails->customDecoding($dataall[0]['Gender'])=='Male'){$selectMale='selected="selected"';}
+elseif($this->myclientdetails->customDecoding($dataall[0]['Gender'])=='Female'){$selectFemale='selected="selected"';}
+elseif($this->myclientdetails->customDecoding($dataall[0]['Gender'])=='Transgender'){$selectTransgender='selected="selected"';}
+elseif($this->myclientdetails->customDecoding($dataall[0]['Gender'])=='Gender Fluid'){$selectGenderFluid='selected="selected"';}
+elseif($this->myclientdetails->customDecoding($dataall[0]['Gender'])=='No Response'){$selectNoResponse='selected="selected"';}
+
+	$BirthdayArr=explode('-',$dataall[0]['Birthdate']);
+	$year=$BirthdayArr[0];
+	$month=$BirthdayArr[1];
+	$day=$BirthdayArr[2];
+	$checked = '';
+	if($dataall[0]['DOBmakeprivate'] == 1)
+		$checked = 'checked';
+
+$return.='<div id="passform" class="postTypeContent">
+			<div class="formRow">
+				<div class="formField"><input type="text" id="fullname" class="textfield required" value="'.$this->myclientdetails->customDecoding($dataall[0]['Name']).'"><label class="optionalText" for="fullname">First name</label></div>
+			</div>
+			<div class="formRow">
+				<div class="formField"><input type="text" id="lname" class="textfield required" value="'.$this->myclientdetails->customDecoding($dataall[0]['lname']).'"> <label class="optionalText" for="lname">Last name</label></div>
+			</div>
+			<div class="formRow">
+				<div class="formField">'.$this->myclientdetails->customDecoding($dataall[0]['Username']).' <label class="optionalText" >Username</label></div>
+			</div>
+			<div class="formRow">
+				<div class="formField"><input type="text" id="title" class="textfield" value="'.$this->myclientdetails->customDecoding($dataall[0]['title']).'"> <label class="optionalText" for="title">Job title</label></div>
+			</div>
+			<div class="formRow">
+			<div class="formField"><input type="text" id="company" class="textfield" value="'.$this->myclientdetails->customDecoding($dataall[0]['company']).'"> <label class="optionalText" for="company">Company</label></div>
+			</div>
+			<div class="formRow">
+			<div class="formField"><input type="text" id="mobile" class="textfield" value="'.$this->myclientdetails->customDecoding($dataall[0]['Contacts']).'"> <label class="optionalText" for="mobile">Mobile</label></div>
+			</div>
+			<div class="formRow">
+				<div class="formField"><input type="hidden" id="oldemail"  value="'.$this->myclientdetails->customDecoding($dataall[0]['Email']).'" class="textfield" >';
+				if($dataall[0]['Socialtype']==2 && $this->myclientdetails->customDecoding($dataall[0]['Email'])=='twitteruser@db-csp.com')
+				{
+					$return.='<input type="email" id="email"  value="'.$this->myclientdetails->customDecoding($dataall[0]['Email']).'" class="textfield required" ><label class="optionalText" for="fullname">Email</label>';
+				}
+				else
+				{
+					$return.='<input type="text" id="email" disabled="disabled"  value="'.$this->myclientdetails->customDecoding($dataall[0]['Email']).'" class="textfield " ><label class="optionalText" for="email">Email</label>';
+				}
+
+				$return.='</div></div>';
+    //if($this->myclientdetails->customDecoding($dataall[0]['Gender'])!='No Response'){ 
+	$return.=  '<div class="formRow">
+					<div class="formField">
+						    <select id="gender" style="width:auto">
+								<option value="" >Select</option>
+								<option value="Male" '.$selectMale.'>Male</option>
+								<option value="Female" '.$selectFemale.'>Female</option>';
+								/*<option value="Transgender" '.$selectTransgender.'>Transgender</option>
+								<option value="Gender Fluid" '.$selectGenderFluid.'>Gender Fluid</option>*/
+								$return.=  '<option value="No Response" '.$selectNoResponse.'>Prefer not to say</option>							
+							</select>
+							<i style="float:auto; color:#cccccc ;font-size:10px;">This information is private</i>
+							<label class="optionalText" for="gender">gender</label>
+					</div>
+				</div>';
+     //}
+	$return.= '<div class="formRow">
+				<div class="formField">
+					<select id="birthday" style="margin-right:10px; margin-left:0px;"><option value="00">Day</option>';
+						
+						for($i=1;$i<=31;$i++) {
+
+							$return.='<option value="'.$i.'"';
+
+							if($i==$day) $return.=' selected="selected"';
+
+							$return.='>'.$i.'</option>';
+
+						}
+
+					$return.='</select>
+
+					<select id="birthmonth" style="margin-right:10px;">
+							
+							<option value="00">Month</option>';
+							
+							$return.='<option value="01"';
+
+							if($month=='01') $return.=' selected="selected"';
+
+							$return.='>jan</option>';
+							
+							$return.='<option value="02"';
+
+							if($month=='02') $return.=' selected="selected"';
+
+							$return.='>Feb</option>';
+							
+							$return.='<option value="03"';
+
+							if($month=='03') $return.=' selected="selected"';
+
+							$return.='>Mar</option>';
+							
+							$return.='<option value="04"';
+
+							if($month=='04') $return.=' selected="selected"';
+
+							$return.='>Apr</option>';
+							
+							$return.='<option value="05"';
+
+							if($month=='05') $return.=' selected="selected"';
+
+							$return.='>May</option>';
+							
+							$return.='<option value="06"';
+
+							if($month=='06') $return.=' selected="selected"';
+
+							$return.='>Jun</option>';
+							
+							$return.='<option value="07"';
+
+							if($month=='07') $return.=' selected="selected"';
+
+							$return.='>Jul</option>';
+							
+							$return.='<option value="08"';
+
+							if($month=='08') $return.=' selected="selected"';
+
+							$return.='>Aug</option>';
+							
+							$return.='<option value="09"';
+
+							if($month=='09') $return.=' selected="selected"';
+
+							$return.='>Sep</option>';
+							
+							$return.='<option value="10"';
+
+							if($month=='10') $return.=' selected="selected"';
+
+							$return.='>Oct</option>';
+							
+							$return.='<option value="11"';
+
+							if($month=='11') $return.=' selected="selected"';
+
+							$return.='>Nov</option>';
+							
+							$return.='<option value="12"';
+
+							if($month=='12') $return.=' selected="selected"';
+
+							$return.='>Dec</option>';
+
+
+					$return.='></select>
+
+					<select id="birthyear"><option value="0000">Year</option>';
+						
+						for($i=date('Y');$i>=1940;$i--) {
+
+							$return.='<option value="'.$i.'"';
+
+							if($i==$year) $return.=' selected="selected"';
+
+							$return.='>'.$i.'</option>';
+
+						}
+
+					$return.='</select> 
+					
+					<label class="optionalText" for="birthday">Birthday</label>
+					<div class="clearfix"></div>
+				</div>
+			</div>
+			<div class="formRow">
+				<div class="formField">
+					<a href="javascript:void(0);" onclick="javascript:opencloseaccount();">Deactivate my account</a>
+					<div id="signuploader" style="display:none; float:right; padding-top:20px; padding-left:10px;"><img src="images/ajaxloader.gif" border="0" /></div>
+					<div id="SignupErr">All fields mandatory</div><div style="float:left; "></div>
+				</div>
+			</div>			
+
+			</div>';
+
+echo $return.'~#~'.$month;
+
+?>
+
+</div>

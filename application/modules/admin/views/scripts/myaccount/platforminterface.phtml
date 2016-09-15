@@ -1,0 +1,363 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+  <script type="text/javascript" src="<?php echo BASE_URL."/adminraw/js/jquery-1.9.1.min.js"; ?>?v=<?php echo filemtime('/adminraw/js/jquery-1.9.1.min.js');?>"></script>
+  <script type="text/javascript" src="<?php echo BASE_URL."/adminraw/js/platforminterface.js"; ?>?v=<?php echo filemtime('/adminraw/js/platforminterface.js');?>"></script>
+  <link href="<?php echo BASE_URL."/adminraw/css/platform-interface.css";?>?v=<?php echo filemtime('/adminraw/css/platform-interface.css');?>" rel="stylesheet" type="text/css" media="all" />
+  <script type="text/javascript">
+    var parentWin = window.parent.document;
+    var BASE_URL = "<?php echo BASE_URL ?>";
+    var fillStart =  '';
+    var fillStop = '';
+    var borderWidth = 0;
+    var borderColor = '';
+    var borderRadius = 0;
+    var fontColor = '';
+    var backgroundTexture = '';
+    var backgroundUrl = '';
+    var backgroundImage = "false";
+    var currentJson;
+     <?php if($this->plateformInterface=='') {?>
+
+       var myDefaultJson = {"buttons":[{
+                                "fill":{
+                                  "startColor":"#9da6af",
+                                  "stopColor":"#b0bbc4"
+                                },
+                                "borderColor":"#a2a2a2",
+                                "borderWidth":"1",
+                                "borderRadius":"3",
+                                "color":"#ffffff"
+                              },
+                               {
+                                "fill":{
+                                  "startColor":"#faa80b",
+                                  "stopColor":"#f7b947"
+                                },
+                                "borderColor":"#d69d35",
+                                "borderWidth":"1",
+                                "borderRadius":"3",
+                                "color":"#ffffff"
+                              },
+                               {
+                                "fill":{
+                                  "startColor":"#35363a",
+                                  "stopColor":"#54575b"
+                                },
+                                "borderColor":"#a2a2a2",
+                                "borderWidth":"1",
+                                "borderRadius":"3",
+                                "color":"#ffffff"                             
+                            }],
+                            "body":{
+                              "fill":{
+                                  "startColor":"#E6E6E6",
+                                  "stopColor":"#E6E6E6"
+                                },
+                              "backgroundImage":"false",
+                              "backgroundTexture":""
+                            },
+                            "page":{
+                              "fill":{
+                                  "startColor":"#ffffff",
+                                  "stopColor":"#ffffff"
+                                }
+                            },
+                            "pageInner":{
+                              "fill":{
+                                  "startColor":"#E6E6E6",
+                                  "stopColor":"#E6E6E6"
+                                }
+                            },
+                            "header":{
+                              "fill":{
+                                  "startColor":"#494948",
+                                  "stopColor":"#323231"
+                                },                                
+                                "color":"#cccccc"
+                            },
+                            "leftSide":{
+                              "fill":{
+                                  "startColor":"#494948",
+                                  "stopColor":"#323231"
+                                },                               
+                                "color":"#cccccc"
+                            },
+                            "pageMiddle":{
+                              "fill":{
+                                  "startColor":"#ffffff",
+                                  "stopColor":"#ffffff"
+                                },                               
+                                "color":"#333333"
+                            },
+                            "rightSideTitle":{                           
+                                "fill":{
+                                    "startColor":"#494948",
+                                    "stopColor":"#323231"
+                                  },                                 
+                                  "color":"#ffffff"
+                              },
+                              "rightSideContent":{
+                                "fill":{
+                                    "startColor":"#ffffff",
+                                    "stopColor":"#ffffff"
+                                  },                                
+                                  "color":"#333333"
+                              }                 
+                           };
+                    <?php }else{ ?>
+                         var myDefaultJson = <?php echo $this->plateformInterface; ?>;
+                         //alert(myDefaultJson.toSource())
+                        
+                   <?php } ?> 
+
+  	$(function(){
+  		 
+
+        $jsonValues = function(element, dataType){
+         $('.colpick', parentWin).hide();
+        
+            if(dataType=='buttons'){
+              var dataButton = parseInt(element.attr('data-button'));    
+              currentJson = myDefaultJson[dataType][dataButton];
+            }else{
+              currentJson = myDefaultJson[dataType];
+            }
+       
+            if(typeof currentJson.fill.startColor !=='undefined') fillStart =  currentJson.fill.startColor;
+            if(typeof currentJson.fill.stopColor !=='undefined') fillStop = currentJson.fill.stopColor;
+            if(typeof currentJson.borderWidth !=='undefined') {
+               $('#borderWidthRow', parentWin).show();
+                borderWidth = currentJson.borderWidth;             
+              }
+              else{
+                 borderWidth = 0; 
+                $('#borderWidthRow', parentWin).hide();
+              }
+            if(typeof currentJson.borderColor !=='undefined') {
+              $('#borderColorsRow', parentWin).show();
+              borderColor = currentJson.borderColor;
+            }else{
+                $('#borderColorsRow', parentWin).hide();
+            }
+            if(typeof currentJson.borderRadius !=='undefined'){
+               $('#borderRadiusRow', parentWin).show();
+               borderRadius = currentJson.borderRadius;
+             }else{
+               $('#borderRadiusRow', parentWin).hide();
+                borderRadius = 0;
+             }
+            if(typeof currentJson.color !=='undefined') {
+              $('#fontColorsRow', parentWin).show();
+              fontColor = currentJson.color; 
+              }
+            else {
+              $('#fontColorsRow', parentWin).hide();
+            }
+            if(typeof currentJson.backgroundTexture !=='undefined') {
+                $('#chooseTexture, #BgImageRow', parentWin).show();
+                backgroundTexture = currentJson.backgroundTexture; 
+                backgroundUrl = 'url("'+backgroundTexture+'")'; 
+              }
+            else {
+                backgroundTexture ='';
+              $('#chooseTexture, #BgImageRow', parentWin).hide();
+            }
+            if(typeof currentJson.backgroundImage !=='undefined') {
+                backgroundImage = currentJson.backgroundImage; 
+              }
+            else {
+               
+            }
+         }
+
+         $('.editBlock').each(function(i){
+            var thisEl = $(this);
+            var dataType = thisEl.attr('data-type');
+              $jsonValues(thisEl, dataType);
+              if(dataType=='body'){
+                 $('body').css({background:'linear-gradient(0deg, '+fillStart+', '+fillStop+')'});                                
+                 if(backgroundImage=="true"){
+                     $(this).css({background:backgroundUrl, backgroundSize:'cover'});
+                   }else{
+                     $(this).css({background:backgroundUrl, backgroundSize:'initial'});
+                   }
+               }else{
+                 $(this).css({background:'linear-gradient(0deg, '+fillStart+', '+fillStop+')', borderColor:borderColor, color:fontColor, borderRadius:borderRadius+'px', borderWidth:borderWidth+'px'});
+               }
+             
+              $('.text',this).css({backgroundColor:fontColor});
+            });
+
+    			$('body').click(function(event) {
+    				$('.colpick', parentWin).hide();
+    			});
+
+
+         $loadValueParentWindow = function(element, dataType){
+             $jsonValues(element, dataType);
+             var title = $("[data-type="+dataType+"]").attr('data-title');
+            $('#toolboxPlatform .titleEditingType span', parentWin).text(title);
+    				$('input[data-type="borderWidth"]', parentWin).val(borderWidth);
+    				$('input[data-type="radius"]', parentWin).val(borderRadius);
+    				$('.colorFill[date-type="start"]', parentWin).css({background:fillStart});
+    				$('.colorFill[date-type="end"]', parentWin).css({background:fillStop});
+    				$('.colorFill[date-type="borderColor"]').css({background:borderColor});
+    				$('.colorFill[date-type="buttonTextColor"]', parentWin).css({background:fontColor});
+
+    				$('input[name="startColor"]').val(fillStart);
+    				$('input[name="endColor"]').val(fillStop);
+    				$('input[name="borderColor"]').val(borderColor);
+    				$('input[name="borderWidth"]').val(borderWidth);
+    				$('input[name="borderRadius"]').val(borderRadius);
+            $('input[name="color"]').val(fontColor);
+            $('input[name="contentbodyTxture"]').val(backgroundTexture);
+    				$('input[name="bodyBgImg"]').val(backgroundImage);
+           
+
+            if(dataType=='body'){
+                 $('body').css({background:'linear-gradient(0deg, '+fillStart+', '+fillStop+')'});
+                  $('.activeBlock .thisActive').css({background:backgroundUrl});
+                  if(backgroundImage=="true"){
+                    $('.activeBlock .thisActive').css({background:backgroundUrl, backgroundSize:'cover'});
+                   }else{
+                     $('.activeBlock .thisActive').css({background:backgroundUrl,backgroundSize:'initial'});
+                   }
+               }else{
+          	    $('.activeBlock .thisActive').css({background:'linear-gradient(0deg, '+fillStart+', '+fillStop+')', borderColor:borderColor, color:fontColor, borderRadius:borderRadius+'px', borderWidth:borderWidth+'px'});
+            }
+
+              $('.editBlock').removeClass('disabled');
+
+
+
+
+             }
+
+            
+
+			 $saveEditedValue = function (element, dataType){
+          $jsonValues(element, dataType);
+	        
+          if(typeof currentJson.fill.startColor !=='undefined')  
+	        currentJson.fill.startColor = $('input[name="startColor"]').val();
+          if(typeof currentJson.fill.stopColor !=='undefined')
+					currentJson.fill.stopColor = $('input[name="endColor"]').val();  
+          if(typeof currentJson.borderColor!=='undefined')
+					currentJson.borderColor = $('input[name="borderColor"]').val();        
+          if(typeof currentJson.borderWidth !=='undefined')
+					currentJson.borderWidth = $('input[name="borderWidth"]').val();
+          if(typeof currentJson.borderRadius!=='undefined')
+					currentJson.borderRadius = $('input[name="borderRadius"]').val();
+          if(typeof currentJson.color !=='undefined')
+					currentJson.color = $('input[name="color"]').val();
+         if(typeof currentJson.backgroundTexture !=='undefined')
+          currentJson.backgroundTexture = $('input[name="contentbodyTxture"]').val();
+        if(typeof currentJson.backgroundImage !=='undefined')
+          currentJson.backgroundImage = $('input[name="bodyBgImg"]').val();
+
+					var platforminterface = JSON.stringify(myDefaultJson);
+          $('.saveEditing').prepend('<i class="fa fa-spin fa-spinner"></i> ');
+          $.post('<?php echo BASE_URL?>/admin/myaccount/ajaxplateforminterface', {plateformInterface: platforminterface}, function(){
+            $('.saveEditing i').remove();
+             $('.closeEditing').click();
+          });
+			 }
+  			$('body').on('click','.editBlock:not(.disabled)', function(event) {
+      				event.preventDefault();
+      				event.stopPropagation();
+                           	
+             	 var thisEl = $(this);
+             	 var o = thisEl.offset();
+             	 var w = thisEl.width();
+             	 var h = thisEl.height();
+             	 var type = thisEl.attr('data-type');
+               $(this).addClass('thisActive');
+             	 var btns = '<div class="btnAction"><a href="javascript:void(0);" class="btn  saveEditing btn-green btn-mini">Save</a>\
+             	 			<a href="javascript:void(0);" class="btn btn-mini closeEditing">Cancel</a></div>';
+             	 thisEl.wrap('<div class="activeBlock" inner-type="'+type+'"></div>');
+               
+             	 $('body').addClass('onEditing');
+             	thisEl.closest('.activeBlock').append(btns);
+             	$loadValueParentWindow(thisEl, type);
+              $('.editBlock').addClass('disabled');
+             	 $('.closeEditing').click(function(e){
+                  e.preventDefault();
+                  e.stopPropagation();
+                  $('body').removeClass('onEditing');		  				    
+    		  				$('.btnAction').remove();
+    		  				$loadValueParentWindow(thisEl, type);
+    		  				$('.activeBlock .thisActive').unwrap();	
+                  thisEl.removeClass('thisActive');	  				
+		  		    });
+
+             	$('.saveEditing').click(function(evt){ 
+                    evt.preventDefault();
+                    evt.stopPropagation();
+             	  	 $saveEditedValue(thisEl,type);	
+		  		    });
+
+  			});
+
+  	});
+
+  </script>
+</head>
+<body >
+
+<input type="hidden" name="endColor">
+<input type="hidden" name="borderColor">
+<input type="hidden" name="borderWidth">
+<input type="hidden" name="borderRadius">
+<input type="hidden" name="color">
+<input type="hidden" name="startColor">
+<input type="hidden" name="contentbodyTxture">
+<input type="hidden" name="bodyBgImg">
+
+<div class="editBlock" data-type="body" data-title="Body"></div>
+  <div class="overlay"></div>
+	
+	<div id="mainLayout">
+		<div class="headerTop editBlock" data-type="header" data-title="Header"> Header</div>
+		<div id="pageCenterCont" class="editBlock" data-type="page" data-title="Page">
+			<div id="pageContent" class="editBlock" data-type="pageInner" data-title="Page container">
+				<div class="leftBar editBlock" data-type="leftSide" data-title="Left side">
+					<div class="text"></div>
+					<div class="text"></div>
+					<div class="text"></div>
+					<div class="text"></div>
+					<div class="text"></div>
+					<div class="text"></div>
+					<div class="text"></div> 
+					<div class="text"></div>
+					<div class="text"></div>
+					<div class="text"></div>
+					<div class="text"></div>
+					<div class="text"></div>
+				</div>
+				<div class="middleBar editBlock" data-type="pageMiddle" data-title="Page middel">
+					<a href="javascript:void(0)" class="btn editBlock"  data-type="buttons" data-button="0" data-title="Close button">Close</a>
+					<a href="javascript:void(0)" class="btn btn-yellow editBlock" data-type="buttons"  data-button="1" data-title="More">More</a>
+					<a href="javascript:void(0)" class="btn btn-black editBlock" data-type="buttons"  data-button="2" data-title="Post">Post</a>
+				</div>
+				<div class="rightBar">
+					<div class="whiteBox">
+						<h2 class="editBlock" data-type="rightSideTitle" data-title="Right Title"><div class="text"></div></h2>
+						<div class="rboxContainer editBlock" data-type="rightSideContent" data-title="Right container">
+							<div class="text"></div>
+							<div class="text"></div>
+							<div class="text"></div>
+							<div class="text"></div>
+							<div class="text"></div>
+							<div class="text"></div>
+							<div class="text"></div>
+							<div class="text"></div>
+						</div>				
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</body>
+</html>

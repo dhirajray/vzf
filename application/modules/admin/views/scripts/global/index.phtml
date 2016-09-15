@@ -1,0 +1,24 @@
+<h1 class="pageTitle">Global setting</h1>
+<div id="messageWrapper" >	
+		<div id="msgCntWraper"> </div>
+		<div id="userlistmsg"></div>
+		<div id="globalSettingListing" class="kcRightPanel">
+			<ul>
+				<li id="makePrivate">
+					<label class="label">Make platform private</label>
+					<div class="field">
+						<div class="helponoff" id="socialAction"> 
+							<input type="checkbox" id="socialTarget" <?php if($this->globalSettingVal==1){echo'checked="checked"';} ?> />
+							<label for="socialTarget">
+								<div class="onHelp"></div>
+								<div class="onHelptext">
+									<span>No</span>
+									<span>Yes</span>
+								</div>
+							</label>
+						</div>
+					</div>
+				</li>
+			</ul>
+		</div>
+</div>

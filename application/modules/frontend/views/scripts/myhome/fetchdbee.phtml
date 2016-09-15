@@ -1,0 +1,45 @@
+<?php 
+$commonbynew 	=	new Application_Model_Commonfunctionality();
+$startnew=$this->start;
+$startnew =$this->startnew;
+$dbeeList = array();
+if(count($this->dbeealldbees) > 0) 
+{
+	$k=1;
+	foreach ($this->dbeealldbees as $row) :
+
+		
+		if($k=='1'){setcookie("CookiePostDate", $row['PostDate'], time()+3600,'/'); setcookie("CookieLastActivity", $row['LastActivity'], time()+3600, '/');}
+		
+	
+		$slice = array();
+		if($row['TaggedUsers']!="")
+		{
+		 $slice=explode(',', $row['TaggedUsers']);
+	    }
+		
+		if(count($slice) > 0 && $this->session_data['UserID']!=$row['User'] && $row['PrivatePost']==1)
+		{
+			if(in_array($this->session_data['UserID'], $slice))
+	        {
+			  $return	.=	$commonbynew->displayLayoutDbs($row,$this->Social_Content_Block,'all',$this->plateform_scoring,$this->adminpostscore);
+		    }
+		}
+	    else
+	    {
+	     $return	.=	$commonbynew->displayLayoutDbs($row,$this->Social_Content_Block,'all',$this->plateform_scoring,$this->adminpostscore);
+	    }
+	    
+		$k++;
+		$dbeeList[] = $row['DbeeID'];
+		unset($slice);
+	endforeach;
+}
+else {
+	$startnew=$start;
+	$return.='<div><div class="userVisibilityHide"><span class="fa-stack fa-2x"><i class="fa fa-pencil fa-lg"></i></span><br>No more posts found.</div></div>';
+}
+$return.='<div id="see-more-feeds'.$startnew.'"><div id="more-feeds-loader" style="cursor:pointer; color:#333333; text-align:center;" onclick="">'.$seemorelabel.'</div></div>';
+echo $return.'~#~'.$end.'~#~'.$startnew.'~#~'.implode(',', $dbeeList);
+?>
+

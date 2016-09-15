@@ -1,0 +1,33 @@
+<?php
+$Name=$this->Row['Name'];
+$Gender=$this->Row['Gender'];
+if($Gender=='Male') $gendertag='him '; elseif($Gender=='Female') $gendertag='her '; else $gendertag='';
+
+if($this->sendmessage=='') { ?>
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/styles.css" type="text/css" />
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/whitebg.css" type="text/css" />
+<script type="text/javascript" src="<?php echo BASE_URL; ?>/js/jquery.min_1.4.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL; ?>/js/jquery.min_1.4.4.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL; ?>/js/jquery-latest.js"></script>
+
+<script type="text/javascript" src="<?php echo BASE_URL; ?>/js/browser_check.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL; ?>/js/functions.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL; ?>/js/jquery.min.js"></script>		     
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<div style="background-color:#fff;">
+<div class="popupheading">New Message</div>
+<div id="sendmessagepopup-content">
+  <div style="padding:10px; font-size:14px">
+	<div style="float:left; font-weight:bold; width:80px;">To:</div><div style="float:left;"><?=$Name?></div><div class="next-line"></div><div style="margin-top:10px; float:left; font-weight:bold; width:80px;">Message:</div><div style="margin-top:10px; float:left;"><textarea class="textarea-small" id="message-reply"></textarea><input type="hidden" id="hiddenuser" value="<?=$this->user?>"><input type="hidden" id="parent" value="0"></div></div>
+  <div class="next-line"></div>
+  <div class="button" style="margin:10px 0 10px 90px; float:left;" onclick="javascript:postmessage('popup');">send message</div><div id="signuploader" style="float:left; margin-left:15px; margin-top:10px; display:none"><img src="/images/ajaxloader.gif" border="0" /></div>
+  </div>
+  <div align="center" id="sendmessage-msg" style="font-family:Verdana, Arial, Helvetica, sans-serif; font-size:14px; color:#999999; margin-top:60px; display:none;">message sent to <b><?=$Name?></b></div>
+</div>
+<? } else { ?>
+  <div align="center" id="sendmessage-msg" style="font-family:Verdana, Arial, Helvetica, sans-serif; font-size:14px; padding:20px; color:#CC0000; margin-top:80px;"><?=$Name?> has blocked you from sending <?=$gendertag?>a message.</div>
+<? } ?>
+
+</div>
+</body>
+</html>

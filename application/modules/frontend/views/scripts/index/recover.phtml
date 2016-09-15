@@ -1,0 +1,79 @@
+<style type="text/css">
+#pageContent{background: #E6E6E6;}
+</style>
+<script src="<?php echo BASE_URL;?>/js/strength.js"></script>
+<script language="javascript" type="text/javascript">
+$(function() {
+
+	$('body').on('click','#checkresetcode',function(){				
+		var resetcode = $('#resetcode').val();					 
+		var user = $('#user').val();
+		$('#resetcode-error').html('');	
+		var thisEl  = $(this);
+		if(resetcode=='' || user=='')
+		{
+			$dbConfirm({content:'Please enter your reset code', yes:false,error:true});
+			return false;
+		}
+		$.ajax({
+			type : "POST",						
+			url : BASE_URL + '/index/checkresetcode',
+			data : {'resetcode':resetcode,"user": user},
+			beforeSend:function(){
+				$('.fa-spin', thisEl).remove();
+				thisEl.append('<i class="fa fa-spinner fa-spin"></i>');
+			},
+			success : function(GetResult) 
+			{
+			  var resultArr = GetResult.split('~');
+			  console.log(resultArr);
+			  $('.fa-spin', thisEl).remove();
+			  if (resultArr[0] == 1) 
+			  {
+				   $("#resetcode-wrapper").css('display','none');
+	               $("#resetpass-wrapper").css('display','block');					            
+	               $("#resetpass-wrapper").html(resultArr[1]);
+	               $(".recoverPassWrp").addClass('newPassWrp');
+	                $("#newpass").strength({
+	         	       strengthClass: "strength",
+	         	       strengthMeterClass: "strength_meter",
+	         	       strengthButtonClass: "button_strength",
+	         	       strengthButtonText: "Show Password",
+	         	       strengthButtonTextToggle: "Hide Password"
+	         	   });
+	            } else {
+	                $dbConfirm({content:'incorrect code entered!', yes:false,error:true});
+					return false;
+	            }							
+			}			
+			});
+		
+		});
+});
+</script>
+<body >
+<div id="wrapper" class="recoverPassWrp">
+	<div id="LandingMiddle">
+		<div>
+			<div class="brandLogo" ><img src="<?php echo BASE_URL.'/img/'.$this->configuration->SiteLogo;?>"></div>
+			<div class="next-line"></div>
+			<div class="recover-wrapper">
+				<div id="resetcode-wrapper">
+					<div class="recover-title">Enter password reset code</div>
+					<div align="center" style="padding:10px;">
+						<div class="recover-text" >Password reset code</div>
+						<div>
+						<input type="text" id="resetcode" class="textfield" style="border:1px solid #CCC;"></div>
+						<div class="next-line"></div>
+						<button class="btn btn-yellow btn-large" id="checkresetcode" style="margin:10px 0 10px 0;" >Continue</button>						
+						<div id="resetcode-error" style="margin-bottom:10px;"></div>
+					</div>
+				</div>
+				<div id="resetpass-wrapper" style="display:none; "></div>
+				<input type="hidden" id="user" value="<?php echo $this->id ; ?>">
+				<div align="center" id="resetpass-msg-wrapper" style="display:none">Your have successfully changed your password.<br /><br />
+				<a href="<?php echo BASE_URL ?>">Click here to go back to log in.</a></div>
+			</div>
+		</div>
+	</div>
+</div>

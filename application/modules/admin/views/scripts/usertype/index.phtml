@@ -1,0 +1,319 @@
+<script type="text/javascript">
+$('document').ready(function(){
+	$('body').on('click','#utypeedit',function(e){
+		e.stopPropagation();
+		var El = $(this);
+		var parent = $(this).closest("li");
+		
+		var type = $(this).attr('type');
+		
+		if(type=='edit'){
+			
+			var uid = $(this).closest('.utype').attr('data-id');
+			var uname = $(this).closest('.utype').attr('data-type');
+
+			$('#editusertypebox').remove();
+              $('body').append('<div id="editusertypebox"><div class="formRow">\
+			<input type="text" name="usertypename" id="usertypename" value="'+uname+'" laceholder="User Type" style="width:280px">\
+			<input type="hidden" name="usertypeid" id="usertypeid" value="'+uid+'"\
+			 laceholder="User Type" tyle="width:280px">\
+				</div><div class="formRow"> \
+			</div><div class="clearfix"></div></div>');
+
+
+			
+		$( "#editusertypebox" ).dialog({                   
+          width:300,
+          height:300,  
+          title:'Usertype update',
+          buttons: [{
+	       text: "Update type",
+	       click: function () {
+	         //alert('77777777777777');
+	         var utypename = $('#usertypename').val();
+	         var utypeid = $('#usertypeid').val();
+	         var data = {'usertype':utypename,'id':utypeid};
+	         $.ajax({
+	         url:BASE_URL+"/admin/usertype/updateusertype",
+	         data:data,
+	         dataType: "json",
+	         type :"POST",       
+	         success:function(response){ 
+	         	parent.html('<div class="utype" data-type="zend framework" data-id="17">\
+	     <i class="fa fa-user fa-lg" style="width: 20px; height: 20px;"></i>'+utypename+' \
+	     <div class="Rtlist"><a class="btn btn-green btn-mini utypeedit"\
+	      href="javascript:void(0);" edit">Edit</a><span class="sprt"> </span>\
+	      <a class="btn btn-danger btn-mini" href="javascript:void(0);"\
+	       userid="18104" gname="146" type="delete">Delete</a></div></div>');
+	         	$( "#editusertypebox" ).dialog('close');
+	        	
+	         }
+	      	});
+	         // ajax
+	       }
+	     
+	     }]
+            
+    });
+
+
+		}
+
+		
+	});
+
+
+
+
+
+
+
+	/* $('body').on('blur', '#usertypeupdate',function(e){
+		var usertype = $('#usertypeupdate').val();
+		var typeid = $('#updatetypeid').val();
+		 var data = {'usertype':usertype,'id':typeid};
+		 var thisEl = $(this);	
+	      $.ajax({
+	         url:BASE_URL+"/admin/usertype/updateusertype",
+	         data:data,
+	         dataType: "json",
+	         type :"POST",       
+	         success:function(response){
+		         if(response.error){    	 
+	        	 var rEl = thisEl.closest('li').find('.rowusertype');
+	        	 rEl.html('<i class="fa fa-user fa-lg" style="width: 20px; height: 20px;"></i>'+usertype); 
+	        	 rEl.attr('data-type',usertype);
+		         }else{
+		        	 $messageSuccess('User type updated successfully');
+		        	 var rEl = thisEl.closest('li').find('.rowusertype');
+		        	 rEl.html('<i class="fa fa-user fa-lg" style="width: 20px; height: 20px;"></i>'+usertype); 
+		        	 rEl.attr('data-type',usertype);
+	        	 }
+	         }
+	      });
+		}); */
+	$('body').on('click','#resurlsearch:not(.disabled)',function(e){	
+		e.preventDefault();	
+		e.stopPropagation();
+		var thisEl = $(this);
+		var searchurl = $('#searchres').val();		
+		var data = 'usertype='+searchurl;
+		$(this).addClass('disabled');
+	      $.ajax({
+	         url:BASE_URL+"/admin/usertype/searchurl",
+	         data:data,
+	         dataType: "json",
+	         type :"POST",       
+	         success:function(response){
+	        	 //console.log(response.content);
+	        	if(response.total>0){
+	        		$('#scontent').css('display','block');
+	 	        	 $('.fa-spinner',thisEl).remove();
+		        	 thisEl.removeClass('disabled');
+		        	 $('.bscktoslist').css('display','block');		        	 
+		        	 $('#list-url').html(response.content); 
+		        	 $('.typetotal').html(response.total); 
+		        	 $('.notfound').css('display','none');
+		        	}else{
+		        		$('#scontent').css('display','none');
+		        		$('#scontent').after('<div class="notfound">No record found</div>');
+		        		thisEl.removeClass('disabled');
+
+		        	}
+	         }
+	      });
+	});	
+	$('body').on('click','.bscktoslist',function(e){	
+		e.preventDefault();	
+		e.stopPropagation();
+		var thisEl = $(this);
+		$('#searchres').val('');
+		 window.location.reload();
+	 });
+	$('body').on('click','#addlinkurl',function(e){	
+		e.preventDefault();	
+		var usertype = $('#usertype').val();		
+			
+		if(usertype=='' || usertype=='undefined'){
+			 $messageError('User type name required');
+			 return false;
+			}		
+		    var data = {'usertype':usertype};			   
+	      $.ajax({
+	         url:BASE_URL+"/admin/usertype/addusertype",
+	         data:data,
+	         dataType: "json",
+	         type :"POST",       
+	         success:function(response){		       
+		         if(response.error==true){
+		        	 $messageError('Duplicate custom user type name. Please change');	        	 	 	        	 
+		         }else{
+		        	 $messageSuccess('Custom user type added successfully');
+		        	 $('#list-url').prepend(response.content);		        	 
+			     } 
+			     $('.dashBlockEmpty').hide();
+			     $('#usertype').val('');
+			     $('.dropDown').removeClass('on');
+			     var typetotal = $('.typetotal').attr('total');			     
+			     var newval = parseInt(typetotal)+1;
+			     $('.typetotal').html(newval);
+			     $('.typetotal').attr('total',newval );
+	         }
+	      });
+	});
+
+	$('body').on('click','#utypedelete',function(){		
+		var urlidli = $(this).closest('li');
+		var urlid = urlidli.attr('data-id');		
+		var data = 'urlid='+urlid;
+		var eli = $('this');
+		var deleteboxmsg = '<div id="detailsDialog" data-pop="Please confirm"><div class="dbDcenter">Are you sure you want to delete this usertype?</div></div>';
+		$('#detailsDialog').remove();
+		$('body').append(deleteboxmsg);
+		$('#detailsDialog').dialog({
+			width: 300,
+			title: 'Confirmation',
+			modle: true,
+			dragable: false,
+			buttons: {
+				'Yes': function(){					
+					var data = 'ID='+urlid;		    
+				      $.ajax({
+				    	 url:BASE_URL+"/admin/usertype/deleteusertype",
+				         data:data,
+				         dataType: "json",
+				         type :"POST",       
+				         success:function(response){
+				        	 $messageSuccess('Usertype deleted successfully');
+				        	 $('#urlid_'+urlid).remove(); 
+				        	 $('#detailsDialog').remove();
+				        	 var typetotal = $('.typetotal').attr('total');			     
+						     var newval = parseInt(typetotal)-1;
+						     $('.typetotal').html(newval);
+						     $('.typetotal').attr('total',newval );
+				         }
+				      });
+					}
+				}
+		
+		});		    
+	     
+		});
+
+
+/*
+$('body').on('mouseenter mouseleave', '#list-url li', function(e){
+    	
+         var fileopt = '<div class="kcRightAction" style="line-height:40px">\
+        	 <a href="javascript:void(0);" class="editiconusertype"><i class="fa fa-pencil fa-fw"></i></a> <a href="javascript:void(0);" class="deleteusertpe"><i class="fa fa-close fa-fw"></i></a></div>';
+        e.stopPropagation()
+        if(e.type=="mouseenter"){
+            $(this).find('.kcRightAction').remove();
+            $(this).append(fileopt);
+            $(this).find('.kcRightAction').animate({right:'10px'})
+
+           
+            $( ".Deleteutype").bind('click', function(){
+				fileDelId	=	delId;
+				fileDelpath 	= 	fdelId;
+				
+				$( "#dialog_confirm_file_delete" ).dialog( "open" );
+			
+			});
+
+        }
+        else if(e.type=="mouseleave"){
+                $(this).find('.kcRightAction').animate({right:'-200px'},{
+                    duration:500,
+                    complete:function(){
+                     $(this).remove();
+                    }
+                });
+        }
+    });*/
+})
+
+</script>
+<?php         
+$this->title = "User type";
+$this->headTitle($this->title);
+?>
+<h1 class="pageTitle ">VIP user types</h1>
+<div class="pageSubeTitlevip">Create unlimited numbers of VIP user types to enable you to appropriately categorise VIP users (eg. Speaker, Sponsor, Advertiser, Delegate, etc) <br /> *Default VIP user type, cannot be removed but can be edited</div>
+
+
+<div class="userUpBar">
+						<div class="userSearchBox" >
+							<div class="appendType  pull-left">									
+									<input type="text" placeholder="Custom user type search" id="searchres" name="searchfield"> 
+									<button class="btn btn-black" id="resurlsearch" name="submit" >Search</button>									
+								<div class="clearfix"></div>
+							</div>
+						</div>
+						<div class="pull-right buttonRight">
+							<!--for message to user-->
+                        <div class="pull-left">
+								<a href="#" class="btn btn-black bscktoslist" style="display:none"><b> Back </b></a>
+						</div>
+						
+						
+					</div>	
+				</div>			
+<div class="clearfix"></div>	
+<div class="pagiNationsWrapperyy"><?php 	
+	if(count($this->usertype))
+		 echo $this->paginationControl($this->usertype,'Sliding','/partials/my_pagination_control.phtml');  ?>
+ </div>
+ <div id="scontent">
+<h2 class="pull-left" style="margin-bottom: 5px;font-size:15px;">Total: <span class="typetotal" total="<?php echo $this->totallink; ?>"><?php echo $this->totallink; ?></span></h2>
+	<div class="clearfix"></div>	
+<div class="top-hurl">
+<div class="hurl" ><div class="pull-left" style="line-height:30px">Custom user types</div> 
+<div class="pull-right">
+							<div class="dropDown  pull-left">
+								
+								<a href="#" class="btn btn-green dropDownTarget" id="addurlbtn"><i class="fa fa-plus fa-lg"></i><b> Add new custom user type</b></a>
+								<div class="dropDownList right">									
+									<form method="POST" id="formnew"  action="#" >	
+									<div class="formRow">
+											<input type="text" name="usertype" id="usertype" value=""  placeholder="User Type" style="width:280px"/>
+										</div>									
+										<div class="formRow">
+										<button type="submit" name="addlinkurl" id="addlinkurl" value="addlinkurl" class="btn btn-green fluidBtn">
+											<i class="fa fa-plus fa-lg"></i> Add custom user type
+										</button>
+										</div>
+										
+										<div class="clearfix"></div>
+									</form>
+								</div>
+							</div>
+							
+							<div class="pull-right"><span class="orSpan">Or</span>
+								<a href="<?php echo BASE_URL?>/admin/vipuser" class="btn">Create custom user accounts </a></div>
+							
+</div></div>
+<ul id="list-url">
+
+					<?php if (count($this->usertype)){ 
+						foreach($this->usertype as $url) :
+					echo '<li id="urlid_'. $url->TypeID.'" data-id="'.$url->TypeID.'"><div class="utype" data-type="'. $url->TypeName.'" data-id="'. $url->TypeID.'" >';
+					if($this->escape($url->TypeName)) {									
+						echo '<i class="fa fa-user fa-lg" style="width: 20px; height: 20px;"></i>'.htmlentities($this->escape($url->TypeName)).'';
+					 
+              		}
+              			echo '<div class="Rtlist">';
+					if($url->usertype == '' && $url->defaultvip == 0){ 
+						echo '<a class="btn btn-danger btn-mini" href="javascript:void(0);" userid="'.$url->TypeID.'" id="utypedelete" gname="146" type="delete">Delete</a>';
+					} 
+						echo '<span class="sprt"> </span>
+							<a class="btn btn-green btn-mini "  href="javascript:void(0);" id="utypeedit" type="edit">&nbsp;&nbsp;Edit &nbsp;</a>		</div>
+					</div></li>';
+					
+				 $rowchange++; endforeach;
+					} else { 
+		echo '<p class="dashBlockEmpty" style="position:relative; top:100px;">Record not found</p>';
+		 } ?>
+</ul>
+</div>
+</div>

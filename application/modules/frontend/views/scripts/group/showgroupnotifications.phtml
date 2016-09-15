@@ -1,0 +1,79 @@
+<?php // echo $this->doctype() ?>
+<?
+$CurrDate=date('Y-m-d H:i:s');
+setcookie('currloginlastseengroup', $CurrDate, 0, '/');
+if(isset($_GET['initial'])) $initial=$_GET['initial'];
+elseif(isset($_POST['initial'])) $initial=$_POST['initial'];
+if($initial=='') $initial=0;
+if(isset($_GET['check'])) $check=$_GET['check'];
+elseif(isset($_POST['check'])) $check=$_POST['check'];
+if(isset($_GET['seemore'])) $seemore=$_GET['seemore'];
+elseif(isset($_POST['seemore'])) $seemore=$_POST['seemore'];
+if($seemore=='') $seemore=0;
+if(isset($_GET['start'])) $start=$_GET['start'];
+elseif(isset($_POST['start'])) $start=$_POST['start'];
+if($start=='') $start=0;
+if(isset($_GET['end'])) $end=$_GET['end'];
+elseif(isset($_POST['end'])) $end=$_POST['end'];
+if($end=='' || $end=='NaN') $end=$start+5;
+if(isset($_GET['group'])) $group=$_GET['group'];
+elseif(isset($_POST['group'])) $group=$_POST['group'];
+if($seemore=='1') setcookie("CookieFeedEndOnReload", $startnew, time()+3600);
+$return='';
+//$CheckDate=$_COOKIE['currloginlastseengroup'];
+/*****************************************************************************************************************/
+$cookieuser=$this->userid;
+
+// CALCUATE TOTAL GROUP NOTIFICATIONS IN DATABASE
+$TotalallNotifications = $this->groupmodelaccess->calalltotalgroupnatification($cookieuser);
+$result=$TotalallNotifications;
+$i=1;
+if(count($result)>0) {
+	if(isset($_GET['reload'])) $startnew=$end;
+	else $startnew=$start+5;
+	if(count($result)<5) {
+		$startnew=$start;
+		$seemorelabel='- no more '.POST_NAME.'s available to show -';
+	}
+	else $seemorelabel='see more';
+	foreach($result as $key => $row) {
+		// FETCH USER NAME
+		$userRow = $this->groupmodelaccess->caltotaluser($row['User']);
+		$userName=$userRow[0]['Name'];
+		$userPic=$userRow[0]['ProfilePic'];
+		// FETCH USER NAME
+		// FETCH OWNER NAME
+		$ownerRow = $this->groupmodelaccess->caltotaluser($row['Owner']);
+		$ownerName=$ownerRow[0]['Name'];
+		$ownerPic=$ownerRow[0]['ProfilePic'];
+		// FETCH OWNER NAME
+		// FETCH GROUP NAME
+		$groupRow = $this->groupmodelaccess->calgroup($row['GroupID']);
+		$GroupName=$groupRow[0]['GroupName'];
+		// FETCH GROUP NAME
+		 if($row['SentBy']=='Owner') {
+			$return.='<div id="grpnote-'.$row['ID'].'" class="grp-notification-feed"><div style="float:left; width:80px; height:80px;">
+            <img src="'.IMGPATH.'/users/small/'.$ownerPic.'" width="50" height="50" border="0" />
+			</div><div style="float:left; width:425px;"><div style="font-size:12px;"><a href="profile/index/id/'.$row['Owner'].'" target="_top"><b>'.$ownerName.'</b></a> has invited you to his group <b>'.$GroupName.'</b></div><div style="font-size:12px; color:#666; margin-top:10px;"><a href="javascript:void(0);" onclick="javascript:respondgroupinvite(1,'.$row['ID'].')">Accept</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" onclick="javascript:respondgroupinvite(0,'.$row['ID'].')">Reject</a></div></div><br style="clear:both; font-size:1px;" /></div>';
+		}
+		else {
+			$return.='<div id="grpnote-'.$row['ID'].'" class="grp-notification-feed"><div style="float:left; width:80px; height:80px;">
+            <img src="'.IMGPATH.'/users/small/'.$userPic.'" width="50" height="50" border="0" />
+			</div><div style="float:left; width:425px;"><div style="font-size:12px;"><a href="profile/index/id/'.$row['User'].'" target="_top"><b>'.$userName.'</b></a> wants to join your group <b>'.$GroupName.'</b></div><div style="font-size:12px; color:#666; margin-top:10px;"><a href="javascript:void(0);" onclick="javascript:respondgroupinvite(1,'.$row['ID'].')">Accept</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" onclick="javascript:respondgroupinvite(0,'.$row['ID'].')">Reject</a></div></div><br style="clear:both; font-size:1px;" /></div>';
+		}
+		$i++;
+	}
+}
+else {
+	$startnew=$start;
+	$return='<div align="center" class="no-record-msg" style="margin-top:50px; margin-bottom:50px;">No pending notifications.</div>';
+	$seemorelabel='- no more '.POST_NAME.'s available to show -';
+}
+if(isset($_GET['reload']))
+{	echo $return; }
+else
+{	
+    echo $return; 
+ }
+
+?>

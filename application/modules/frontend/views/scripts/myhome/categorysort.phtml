@@ -1,0 +1,31 @@
+<?php 
+
+$return='';
+
+$return='<div id="dbfeedfilterbycatWrp"><ul class="dbfeedfilterbycat">';
+
+$counter=1;
+
+foreach($this->cat as $dbcatRow):
+
+	if($counter%2==0){
+$return.='<li><label class="labelCheckbox" for="dbfeedfilterbycat'.$counter.'"><input type="checkbox" id="dbfeedfilterbycat'.$counter.'" name="dbfeedfilterbycat[]" value="'.$dbcatRow['CatID'].'"><label class="checkbox" for="dbfeedfilterbycat'.$counter.'"></label>'.$dbcatRow['CatName'].'</label></li>';
+		//$return.='<div class="" ><a href="javascript:dbfeedfilterbycat('.$dbcatRow['CatID'].')">'.$dbcatRow['CatName'].'</a></div>';		
+
+	}else{
+
+		$return.='<li><label class="labelCheckbox" for="dbfeedfilterbycat'.$counter.'"><input type="checkbox" id="dbfeedfilterbycat'.$counter.'" name="dbfeedfilterbycat[]" value="'.$dbcatRow['CatID'].'"><label class="checkbox" for="dbfeedfilterbycat'.$counter.'"></label>'.$dbcatRow['CatName'].'</label></li>';
+
+		//$return.='<div class="" ><a href="javascript:void(0)" onclick="javascript:dbfeedfilterbycat('.$dbcatRow['CatID'].');">'.$dbcatRow['CatName'].'</a></div>';
+
+	}
+
+	$counter++;
+
+endforeach;
+
+$return.='</ul></div><a id="postdbee-main"  href="javascript:void(0)" onclick=javascript:seeglobaldbeelist("nouserid",3,"","myhome","catetorylist","dbcat");return false; class="">search</a></div>';
+
+
+
+echo $return;

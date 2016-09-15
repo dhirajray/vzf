@@ -1,0 +1,85 @@
+<?php if($this->socialloginabilitydetail['allSocialstatus']==0 || $this->Social_Block==0) {?>
+            <div id="sideBarFeeds" class="">
+              <div class="socialfeedWidget notOpenFeed">
+                <a href="javascript:void(0)" data-type="facebook" class="sclIconsSide FacebookVisitor" ><i class="fa dbFacebookIcon fa-lg"></i></a>
+                <a href="javascript:void(0)"  data-type="twitter" class="sclIconsSide TwitterVisitor" ><i class="fa dbTwitterIcon fa-lg"></i></a>
+                <?php if($this->ShowRSS==1 && $this->tsrss==1)  { ?>
+                <a href="javascript:void(0)"  data-type="rss" class="sclIconsSide rssVisitor" ><i class="fa fa-rss fa-lg"></i></a>
+                <?php } ?>  
+              </div>
+            </div>
+            <?php }?>
+
+ <script type="text/javascript">
+$(window).load(function (){
+            setTimeout(function (){
+              $('html').removeClass('loadingPage');
+            }, 500);
+        });
+
+ </script>
+
+  <?php
+  $UserID = $this->session_data['UserID'];
+  $accept = 0;
+  $accCook = $_SESSION['CookieAcceptghost'];
+  if($UserID)
+  {
+    $usersdata  = $this->myclientdetails->getfieldsfromtable(array( 'CookieAccept'),'tblUsers','UserID',$UserID);
+
+    $accept = $usersdata[0]['CookieAccept'];
+
+    if($accept ==0 && $accCook!='')
+    {
+       ?>  
+        <script type="text/javascript">
+          acceptCookie(<?php echo $UserID ?>)
+        </script>
+
+       <?php
+    }
+
+  }   
+
+ 
+
+$accept = ($accept=='')?0:$accept;
+ //echo $accept .' AND '. $accCook; 
+  if( $accept ==0 && $accCook=='')
+  {
+
+  ?>
+
+  <div class="infoMessageFromBottom animated slideUpAnim">
+      <div class="_infoContent">
+          I understand the usage of cookies on this site. <a href="javascript:void(0)" onClick="javascript:openterms();">What is this?</a>
+          <a href="javascript:void(0);" class="btn btn-orange btn-mini" id="coockieaccept" user="<?php echo $UserID ?>" onclick="acceptCookie(<?php echo $UserID ?>)"  >Got it</a>
+      </div>
+      <!-- <div class="_infoBtn">
+        
+      </div> -->
+   </div>
+
+   <?php } 
+   else 
+   {
+      unset($_SESSION['CookieAcceptghost']);
+      // $_COOKIE['CookieAcceptghost'] = '';
+      // setcookie("CookieAcceptghost",'', time()-3600, '/'); 
+   
+   }
+  if($UserID)   {?>
+  
+   <div class="footerLinksWrp">
+       <a href="javascript:void(0);" class="" onClick="javascript:openterms();">Terms & Conditions</a>
+        <a href="javascript:void(0);" class="" onClick="javascript:opentermsofuse();">Terms Of Use</a>
+       <a href="javascript:void(0);" class="" onClick="javascript:openprivacy();"> Privacy Policy</a> 
+        <a href="javascript:void(0);" class="" onClick="javascript:opencookies();">Cookie policy</a> 
+       <!-- <a href="javascript:void(0);" class="" onClick="javascript:openabout();">About</a>  -->
+       <a href="javascript:void(0);" class="" onClick="javascript:openfeedback();">Feedback</a>
+       <label for="footerClick" id="arrowFtr"><i class="fa fa-chevron-up"></i><i class="fa fa-chevron-down"></i></label>
+   </div> 
+    <?php } 
+    echo'</body></html>';
+    
+    ?>

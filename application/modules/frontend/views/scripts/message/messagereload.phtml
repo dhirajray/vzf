@@ -1,0 +1,57 @@
+<?php 
+$user=$_POST['user'];
+$read=$_POST['read'];
+$mid=$_POST['mid'];
+$cookieuser=$_COOKIE['user'];
+$CurrDate=date('Y-m-d');
+$return='';
+$messagefeed='';
+$dates='';
+$checkImage = new Application_Model_Commonfunctionality();
+$this->myclientdetails = new Application_Model_Clientdetails();
+$pic1 = $checkImage->checkImgExist($userPic,'userpics','default-avatar.jpg');
+$messagefeed ='<img src="'.IMGPATH.'/users/medium/'.$pic1.'" width="90" height="90" border="0" /></div><div align="center" style="width:90px; margin-bottom:15px;"><b>'.$userName.'</b></div></div>';
+
+if(count($messages)>0) {
+	if(isset($_GET['reload'])) $startnew=$end;
+	else $startnew=$start+5;
+	if(count($messages)<5) {
+		$startnew=$start;
+		$seemorelabel='- no more message feed -';
+	}
+	else $seemorelabel='see more';
+	
+
+
+foreach($this->messages as $rowMsg):
+$messagefeed.='<img src="'.IMGPATH.'/users/medium/'.$pic1.'" width="90" height="90" border="0" /></div><div align="center" style="width:90px; margin-bottom:15px;"><b>'.$rowMsg->Name.'</b></div></div>';
+	  	$ago=$rowMsg->MessageDate;				
+		$userName=$rowMsg->Name;	
+		$userPic=$rowMsg->ProfilePic;
+		$checkImage = new Application_Model_Commonfunctionality();
+        $pic2 = $checkImage->checkImgExist($userPic,'userpics','default-avatar.jpg');
+		if($loginuser==$rowMsg->MessageFrom) // MESSAGE NOT SENT BY PROFILE HOLDER
+			$messagefeed.='<div><div style="float:left; width:60px; height:60px; margin-right:10px;">
+			<img src="'.IMGPATH.'/users/small/'.$pic2.'" width="50" height="50" border="0" /></div>
+		<div class="default-speechwrapper-lightgrey" style="float:left"><div class="default-speecharrow-lightgrey"></div>
+		<div class="msgTxtboxFeed"><b>'.$this->myclientdetails->customDecoding($userName).'</b><br />'.$rowMsg->Message.'</div>
+		<div style="float:right; width:auto; margin:-10px 10px 0 0; font-size:10px; color:#666">'.$ago.'</div>
+		</div><br style="clear:both"></div>';
+		else // MESSAGE SENT BY PROFILE HOLDER
+			$messagefeed.='<div><div class="default-speechwrapper-darkgrey" style="float:left">
+		<div class="msgTxtboxFeed"><b>Me</b><br />'.$rowMsg->Message.'</div>
+		<div style="float:left; width:auto; margin:10px 0 0 10px; font-size:10px; color:#666">'.$ago.'</div>
+		</div><div class="default-speecharrow-darkgrey-right"></div>
+		<div style="float:left; width:50px; height:50px; margin:-20px 0 0 20px;">
+		<img src="'.IMGPATH.'/users/small/'.$pic2.' width="50" height="50" border="0" /></div>
+		<br style="clear:both"></div>';
+		$i++;
+endforeach;
+}     
+else {
+	$messagefeed.='<div align="center" class="noFound" style="margin-top:140px;">message feed empty</div>';
+}
+$return=$messagefeed;
+echo $return;
+
+?>

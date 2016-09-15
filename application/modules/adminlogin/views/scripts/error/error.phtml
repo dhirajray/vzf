@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+  <title>db - Create Debate</title>
+
+<link rel="stylesheet" href="css/styles.css" type="text/css" />
+
+</head>
+
+<body  >
+
+  <?php 
+  if($this->code=='404')
+  { ?>   
+      <div id="pageContent" page-type="homepage" >
+         <div >&nbsp;</div> 
+        <div  id="pageContent">
+           <script language="javascript" type="text/javascript">
+             setTimeout("window.parent.location='<?php echo BASE_URL ?>'",3000);
+           </script>
+         <div class="emailVerified" style="margin-top: 80px; margin-left: 304px;"> 
+          <h2 style="color:#99ba3f"> <i class="spirteVerified emailVerifiedIcon"> </i>Controller 'OR' action name is wrong.</h2>
+          <br><br>
+          <p>You will be redirected to your homepage in 5 seconds.  <a href="https://clientdev.db-csp.com/myhome/" class="normallinks">Click here</a> if you are not automatically redirected.</p>
+         </div>
+        </div> 
+      </div>
+  <?php  } else { ?>
+      <div style="width:546px; margin-left:auto; margin-right:auto;"><img src="<?php echo BASE_URL ?>/images/img/brandLogo.png" width="546" height="375" /></div>
+      <div style="font-family:Verdana, Arial, Helvetica, sans-serif; font-size:14px; color:#000000; text-align:center; width:1000px; margin-left:auto; margin-right:auto;">
+        <p style="font-weight:bold; margin-bottom:10px"><strong>We are currently going through maintenance. Please check back in some time.</strong></p>
+        <p style="font-weight:bold; margin-bottom:10px"><strong>Thank you for your patience :-)</strong></p>
+        <!-- <p><a href="/">Click here to go back to home</a> </p> -->
+      </div>
+
+      <div id="error">
+          <p>
+              <ul class="errorList">
+                  <li>
+                      <h3><?php echo $this->message ?></h3> 
+                  </li>
+                  <li>
+                      <h4>Exception information:</h4>
+                      <p><?php echo $this->exception->getMessage() ?></p>
+                  </li>
+                  <li>
+                      <h4>Stack trace:</h4>
+                      <p><?php echo $this->exception->getTraceAsString() ?></p>
+                  </li>
+                  
+              </ul>
+          </p>
+      </div>
+<?php } ?>
+
+</body>
+
+</html>
+

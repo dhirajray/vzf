@@ -1,0 +1,19 @@
+<script language="javascript" type="text/javascript">window.parent.document.getElementById('changebutton').style.display='block';</script>
+<?php
+
+	
+		echo 'new picture preview<br /><img src="'.BASE_URL.'/show_thumbnails.php?ImgName='.$this->upload_image.'&ImgLoc=userpics&Width=130&Height=130" border="0" style="margin-top:5px;" /><input type="hidden" id="UserProfilePic" value="'.$this->upload_image.'">';
+		
+
+if($error) {
+echo '<img src="/php_ajax_image_upload/images/error.gif" width="16" height="16px" border="0" style="marin-bottom: -3px;" /> Error(s) Found: ';
+foreach($error as $value){
+echo $value.', ';
+}
+} else {
+//echo '<div style="margin-top:3px"><img src="../images/error_button.png" width="16" height="16px" border="0" style="marin-bottom: -3px; position:absolute" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Error!</div><div style="margin-top:5px">Please upload .jpeg/.gif only.</div>';
+
+//	<img src="'.BASE_URL.'/show_thumbnails.php?ImgName='.$this->upload_image.'&ImgLoc=userpics&Width=80&Height=80" border="0" />
+	echo '<input type="hidden" id="PostPix" value="'.$this->upload_image.'">';
+
+}

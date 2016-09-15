@@ -1,0 +1,164 @@
+<?php         
+	$this->title = "Surveys";
+	$this->headTitle($this->title);
+	$cmnObj= new Admin_Model_Common();
+
+?>
+
+<?php
+if($this->callPaging == 0)
+	{ ?>
+<script type="text/javascript">
+$('document').ready(function(){
+
+	<?php if(Zend_Controller_Front::getInstance()->getRequest()->getParam('task')=='create'){?>		
+		$('#searchContainer').show();
+		
+	<?php } ?>
+
+
+
+});
+</script>
+<h1 class="pageTitle dbeeViewAll" >Surveys
+<a href="javascript:void(0);" class="btn btn-yellow btn-large openSearchBlock" >Create survey</a>
+</h1>
+<div id="searchWrapper" class="spSdbsSearchBox">
+	<div id="searchContainer" style="margin-bottom:20px;">	
+		<div id="exp_condition" class="expenddcondition1" >				
+			<div class="whiteBox addConditionWrapper"> 
+				<form name="serverydb" id="serverydb"  action ="<?php echo BASE_URL;?>/admin/survey/createsurvey" method="POST" enctype="multipart/form-data">
+					
+					<div class="searchField"> 
+						<label class="label">Survey title</label>
+						<div class="fieldInput"><textarea class="textarea"  name="surveyTitle" id="surveyTitle" ></textarea></div>
+					</div>
+					<!-- <div class="searchField"> 
+						<label class="label">Survey PDF title </label>
+						<div class="fieldInput"><input type="text" name="pdftitle" class="uploadType"></div>
+					</div> -->
+					<div class="searchField" id="uploadpdf"> 
+						<label class="label">Upload a PDF </label>
+						<div class="fieldInput appendType">
+							<input type="text" readonly="" name="" class="uploadType">
+							<a href="javascript:void(0);" class="btn btn-black">Browse<input type="file" name="file" class="fileType"></a>
+							<span class="spanAltTxt">Use a PDF as an incentive for completing the survey</span>
+						</div>						
+					</div><span class="orSpan">Or</span>
+					<div class="searchField" id="addpdflink"> 
+						<label class="label">Add a URL </label>
+						<div class="fieldInput"><input type="text" id="pdflink" name="pdflink" class="uploadType" style="float:left;"> <span class="spanAltTxt">Alternatively, use a URL link as an incentive (eg. a voucher or discount code)</span></div>
+					</div>
+
+					<?php if(count($this->eventlist) >0) {  ?>
+					<div class="searchField" id="eventfield">
+                    <label class="label">Select Event </label>
+                    <div class="fieldInput">
+                       
+                       <select name="selectEventList" id="selectEventList" class="selectEvent">
+                        <?php
+                        if($eventid==""){
+                            echo '<option value="0">Select Event</option>';
+                          }
+                           foreach($this->eventlist as $event){                         
+
+                          echo'<option value="'.$event['id'].'">'.$event['title'].'</option>';
+                           } 
+                       echo'</select>';                       
+                      ?>
+                    </div>
+                 </div> 
+                 <?php } ?>
+
+					<div class="searchField"> 
+						<label class="label">&nbsp;</label>
+						<div class="fieldInput">
+							<button type="submit" id="specialdbsubmit" class="addbutton btn btn-green btn-medium pull-left" >Create</button>
+							&nbsp;
+							<input type="submit" id="" class="btn btn-medium openSearchBlock " value="Close" style=""> 
+						</div>
+					</div>
+				</form>
+				<div class="clearfix"></div>
+			</div>
+		</div>
+	</div>
+<?php } // End in case of paging ?>
+<div class="box-body " id="spcialDBbody">
+	<ul class="listStyle1" id="searchresulthide">
+		<?php  
+		if (count($this->spdbs)){ ?>
+		<?php foreach($this->spdbs as $spdb => $liveDbee) : ?>
+		<? if($liveDbee["Active"]==0) { $pubLabel='Publish'; $appendClass=''; } else { $pubLabel='UnPublish'; $appendClass='btn-danger'; } ?>
+		<li id="remove_<?php echo $liveDbee["DbeeID"]; ?>">
+			<?php 
+			$descDisplay = '';
+			if($this->escape($liveDbee['Type'])==7) 
+			{ 
+				
+				$surveyTitle = $liveDbee['surveyTitle'];
+				$descDisplay .=	'<div class="specialdbListDtleft">'.$surveyTitle.' </div>';		
+			} ?>
+
+			<div class="dataListWrapper"> 
+				<div class="dataListbox">
+					<div class="scoredListTitle">
+					 <!-- <a href="<?php echo BASE_URL ?>/dbee/<?php echo $liveDbee['dburl'] ?>">view</a>  -->
+					<div class="scoredPostDate">Posted on  - <?php echo date('d M Y',strtotime($this->escape($liveDbee['PostDate']))); ?></div>								
+					</div>
+					<div class="scoredData">
+						<div class="dbPost" style="margin-bottom:10px;"><?php 
+					$where = array('Dbeeid'=>$liveDbee["DbeeID"],'parentID'=>0);
+$surveyDetails = $this->myclientdetails->getAllMasterfromtable('tblSurveyquestion',array('id','content'),$where); echo $descDisplay;?>&nbsp;</div>
+					</div>
+					<?php 
+					$counter = $this->deshboard->checkUserCompleteSurvey($liveDbee["DbeeID"]);
+
+					if($liveDbee['Active']==0){
+					 echo '<span style="color:red;" id="'.$liveDbee['DbeeID'].'" >NOTE: This survey is not yet published.</span>'; } else{
+					 	 echo '<span style="color:red;display:none;" id="'.$liveDbee['DbeeID'].'" >NOTE: This survey is not yet published.</span>'; } ?>
+
+					 	 <br><span style="color:red; line-height:20px;" id="QuestionsCount<?php echo $liveDbee["DbeeID"]; ?>">Questions: <?php 
+echo count($surveyDetails); unset($surveyDetails); unset($where); ?></span>
+<?php
+					 	 if($counter!=0) {
+
+					 	 	echo '<br><span style="color:red; line-height:20px;">You cannot add more questions to a survey once it has been completed by any user.</span>'; 
+					 	 }
+
+					 	 ?>
+				</div>
+				<div class="listBtnsWrp">
+					<?php if($liveDbee["surveyPdf"]!=''){ ?>
+					<a href="<?php echo BASE_URL ?>/admin/dashboard/downloadpdf/filepdf/<?php echo $liveDbee["surveyPdf"]; ?>"  class="btn btn-black btn-mini">View PDF</a>
+					<?php } else if($liveDbee["surveyLink"]!=''){ ?>
+					<a href="<?php echo $cmnObj->addhttp($liveDbee["surveyLink"]); ?>" target="_blank"  class="btn btn-black btn-mini">Go to link</a>
+					<?php } ?>
+					<?php 
+
+					if($counter==0) {?>
+					<div class="addsurveyQuestion btn btn-green btn-mini" dbeeid="<?php echo $liveDbee['DbeeID']; ?>" id="addsurveyQuestion<?php echo $liveDbee['DbeeID']; ?>" count-id="<?php echo count($surveyDetails); ?>"  data-title="<?php echo $liveDbee['surveyTitle']; ?>" status="<?php echo $liveDbee["Active"]; ?>" >Add question</div>
+					<?php }else{ ?>
+					<!-- <div class="btn btn-green btn-mini disabled" rel="dbTip" title="You cannot add more questions to a survey once it has been completed by any user" dbeeid="<?php echo $liveDbee['DbeeID']; ?>" >Add question</div> -->
+					<?php } ?>
+					<a href="<?php echo BASE_URL .'/admin/survey/surveydetail/id/'.$liveDbee["DbeeID"].'/'.$liveDbee["dburl"];?>" class="btn btn-yellow btn-mini">Survey details</a>
+					<a href="<?php echo BASE_URL .'/admin/survey/surveyreport/id/'.$liveDbee["DbeeID"].'/'.$liveDbee["dburl"];?>" class="btn btn-yellow btn-mini">Survey report</a>
+					<a href="javascript:void('0');"  data-id="<?php echo $liveDbee["DbeeID"]; ?>" class="btn btn-danger btn-mini deletesurvey">Delete</a>
+					
+					<a href="javascript:void('0');" id="publish<?php echo $liveDbee["DbeeID"]; ?>"  status="<?php echo $liveDbee["Active"]; ?>"  data-id="<?php echo $liveDbee["DbeeID"]; ?>" class="btn btn-green btn-mini publishSurvey <?php echo $appendClass; ?>"><?php echo $pubLabel; ?></a>
+					
+				</div>
+			</div>
+		</li>
+				<?php $rowchange++; endforeach; ?>
+		</ul>
+<?php }  ?>
+		
+<?php if( count($this->spdbs) >= PAGE_NUM) { 
+
+?>
+<div id="vewpagebottom" style="text-align:center;padding: 20px 2%;font-weight:bold;font-size:16px;clear:both; cursor:pointer">
+				<a id="viewmoresurvey" offset="<?=$this->fft?>">View More </a></div>
+<?php } ?>
+
+

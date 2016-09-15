@@ -1,0 +1,318 @@
+<?php         
+$this->title = "Dashboard";
+$this->headTitle($this->title);
+$deshObj= new Admin_Model_Deshboard();
+$defaultimagecheck = new Admin_Model_Common();
+?>
+
+	
+<div id="boxes">
+	<div class="firstrow" style="float:left; width:950px;border:0px solid red">
+	<div class="giftbox">  
+		<div class="box">
+			<div class="dbee-feed-titlebar">
+				<div class="divTitle" id="div2">
+				<div class="headingLatest">Live dbees</div><div class="headingTotlal">Total : <?php echo $this->escape($deshObj->getTotalDbee());?></div>
+				<div class="viewall"><a href="<?php echo $this->url(array('controller'=>'dashboard','action'=>'dbees'));?>" />View all</a></div>
+				</div>
+			</div>
+			<div class="box-body">
+				<ul class="listing">
+					<?php if (count($this->liveDbeeData[0])){ ?>
+					<?php foreach($this->liveDbeeData as $liveDbee) : ?>
+					<li>
+						<?php 					
+						if($this->escape($liveDbee->type)==1) { 
+						$dbtype			=	'text db';
+						$descDisplay	=	'<div class="font12" style="float:left; width:350px;">'.substr($liveDbee->description,0,100).'</div>';
+						}
+						if($this->escape($liveDbee->type)==2) { 
+						$dbtype			=	'link db';
+						$dbLink			=	$liveDbee->Link;
+						$dbLinkTitle	=	$liveDbee->LinkTitle;
+						$dbLinkDesc		=	$liveDbee->LinkDesc;
+						$dbUserLinkDesc	=	!empty($liveDbee->UserLinkDesc) ? $liveDbee->UserLinkDesc : $liveDbee->LinkTitle;
+
+						$descDisplay	=	'<div>
+						<div class="font12">'.$dbUserLinkDesc.' - 
+						<a target="_blank" href="'.$dbLink.'">'.$dbLink.'</a>
+						</div>
+						</div>';
+						}
+						if($this->escape($liveDbee->type)==3) { 
+						$dbtype	=	'pix db';
+
+						$dbPic		=	$liveDbee->Pic;
+						$dbPicDesc	=	$liveDbee->PicDesc;
+                        $checkdbpic = $defaultimagecheck->checkImgExist($dbPic,'imageposts','default-avatar.jpg');
+						$descDisplay	=	'<div style="float:left; width:360px; ">
+						<div style="float:left;  width:auto; padding:3px; border:1px solid #CCCCCC;"><a href="#"><img src="'.IMGPATH.'/imageposts/small/'.$checkdbpic.'" width="90" border="0" /></a></div>
+						<div class="font12" style="float:left; margin-left:10px; width:245px;">'.substr($dbPicDesc,0,100).'</div></div>';
+						}
+						if($this->escape($liveDbee->type)==4) { 
+						$dbtype	=	'media db';
+
+						$dbtype			=	'link db<div class="icon-db-link"></div>';
+						$dbVid			=	$liveDbee->Vid;
+						$dbVidDesc		=	$liveDbee->VidDesc;
+						$dbLinkDesc		=	$liveDbee->LinkDesc;
+						$dbUserLinkDesc	=	!empty($liveDbee->UserLinkDesc) ? $liveDbee->UserLinkDesc : $liveDbee->LinkTitle;
+
+						$descDisplay	=	'<div style="float:left; width:360px; ">
+						<div style="float:left;  width:auto; padding:3px; border:1px solid #CCCCCC;"><img width="90" height="90" border="0" src="'.$dbVid.'"></div>
+						<div class="font12" style="float:left; width:245px;">'.substr($dbVidDesc,0,100).'</div></div>';
+						}
+						if($this->escape($liveDbee->type)==5) {  
+						$dbPollText			=	$liveDbee->PollText;
+						$dbtype	=	'polls';
+						$descDisplay	=	'<div class="font12" style="float:left; width:350px;">'.substr($dbPollText,0,100).'</div>';
+						}
+                         $liveDbeedbpic = $defaultimagecheck->checkImgExist($liveDbee->image,'userpics','default-avatar.jpg');
+						?>
+
+						<div style="width:450px;float:left;"  >
+							<div style="width:70px;float:left;padding:2	px;" class="box_image">
+								<div style="float:left"> 
+									<img src="<?php echo IMGPATH ?>/users/medium/<?php echo $liveDbeedbpic ?>" width="70" height="70" border="0" />
+								</div>
+							</div>
+							<div style="width:350px;float:left; margin-left:10px;">
+								<div class="" style="font-weight:bold"><a href="#"><?php echo $this->escape($liveDbee->username);?></a>
+									<span>has posted a </span>&nbsp;<?php echo $dbtype; ?>
+								</div>
+								<div class="details-gift">	
+									<div><?php echo $descDisplay;//$liveDbee->description;?>&nbsp;</div>
+								</div>
+								<div class="clear"></div>
+								<div><b>20 comments</b></div>
+							</div>
+						</div>	
+					</li>
+					<?php  endforeach; ?>
+					<?php } else { ?>
+						<p>Users Not Found!</p>
+					<?php } ?>
+				</ul>
+			</div>
+		</div>
+	</div> 
+	<!-- End of groups Div > -->
+	<!-- Start of comments Div > -->
+	<div class="giftbox">
+		<div class="box">
+			<div class="dbee-feed-titlebar">
+				<div class="divTitle" id="div2">
+					<div class="headingLatest">Live Groops</div><div class="headingTotlal">Total :  <?php echo $this->escape($deshObj->getTotalGroup());?></div>
+					<div class="viewall"><a href="<?php echo $this->url(array('controller'=>'dashboard','action'=>'groups'));?>" />View all</a></div>
+				</div>
+				
+			</div>
+			<div class="box-body">
+				<ul class="listing">
+					<?php if (count($this->liveGroupData[0])){ ?>
+					<?php foreach($this->liveGroupData as $liveGroup) : 
+                    $liveDbdbpic = $defaultimagecheck->checkImgExist($liveDbee->image,'userpics','default-avatar.jpg');
+					?>
+					<li>
+						
+
+						<div style="width:450px;float:left;"  >
+							<div style="width:70px;float:left;padding:2	px;" class="box_image">
+								<div style="float:left"> 
+				
+									<img  src="<?php echo IMGPATH ?>/users/medium/<?php echo $liveDbdbpic ?>" width="70" height="70" border="0" />
+								</div>
+							</div>
+							<div style="width:350px;float:left; margin-left:10px;">
+								<div class="" style="font-weight:normal">
+									<a href="#" style="font-weight:bold"><?php echo $this->escape($liveGroup->GroupName);?></a>
+									<br>
+									<span style="font-size:10px">created by&nbsp;<a href="#"><?php echo $this->escape($liveGroup->username); ?></a></span>
+								</div>
+								<div class="details-gift">
+								<?php if($this->escape($liveGroup->description)) {?>
+									<div style="float:left; width:350px;" class=""><?php echo htmlentities(substr($this->escape($liveGroup->description),0,100));?></div>
+								<?php } else {?>
+									<div style="float:left; width:350px;" class="">&nbsp;</div>
+								<?php } ?>
+								</div>
+								<div class="details-gift">	
+									<div><?php echo  $this->escape($liveGroup->TypeName);?>  created on  - <?php echo date('d M y',strtotime($this->escape($liveGroup->Gdate))); ?></div>
+								</div>
+								<div class="clear"></div>
+								
+							</div>
+						</div>	
+						
+
+					</li>
+					<?php  endforeach; ?>
+					<?php } else { ?>
+						<div class="dashBlockEmpty">Goups Not Created!</div>
+					<?php } ?>
+				</ul>
+			</div>
+		</div>
+	</div>
+	</div>
+	<!-- End of groups Div > -->
+	<!-- Start of comments Div > -->
+	
+	<div class="secondrow" style="float:left;margin:20px 0 40px 0px;width:950px;">
+	<div class="giftbox" >
+		<div class="box">
+			<div class="dbee-feed-titlebar">
+				<div class="divTitle" id="div2">
+					<div class="headingComment">Latest comments on  DBEE</div>
+					<div class="viewall"><a href="<?php echo $this->url(array('controller'=>'dashboard','action'=>'comments'));?>" />View all</a></div>
+				</div>
+			</div>
+			<div class="box-body">
+				<ul class="listing">
+					<?php if (count($this->latestCommentData[0])){ ?>
+					<?php foreach($this->latestCommentData as $latestComment) : ?>
+					<li>
+						<?php 	
+						$dbtype	='';		
+						if($this->escape($latestComment->type)==1) { 
+						//$dbtype			=	'text db';
+						$descDisplay	=	'<div class="font12" style="float:left; width:350px;">'.substr($latestComment->Comment,0,100).'</div>';
+						}
+						if($this->escape($latestComment->type)==2) { 
+						//$dbtype			=	'link db';
+						$dbLink			=	$latestComment->Link;
+						$dbLinkTitle	=	$latestComment->LinkTitle;
+						$dbLinkDesc		=	$latestComment->LinkDesc;
+						$dbUserLinkDesc	=	!empty($latestComment->UserLinkDesc) ? $latestComment->UserLinkDesc : $latestComment->LinkTitle;
+
+						$descDisplay	=	'<div style="padding:5px; margin-top:5px; margin-bottom:5px;">
+						<div class="font12">'.$dbUserLinkDesc.' - 
+						<a target="_blank" href="'.$dbLink.'">'.$dbLink.'</a>
+						</div>
+						<div class="font12" style="margin-top:10px;"></div></div>';
+						}
+						if($this->escape($latestComment->type)==3) { 
+					//	$dbtype	=	'pix db';
+
+						$dbPic		=	$latestComment->Pic;
+						$dbPicDesc	=	$latestComment->PicDesc;
+                        $dbeepic = $defaultimagecheck->checkImgExist($dbPic,'imageposts','default-avatar.jpg');
+						$descDisplay	=	'<div style="float:left; width:360px; ">
+						<div style="float:left;  width:auto; padding:3px; border:1px solid #CCCCCC;"><a href="#"><img src="'.IMGPATH.'/imageposts/small/'.$dbeepic.'" width="90" border="0" /></a></div>
+						<div class="font12" style="float:left; margin-left:10px; width:245px;">'.substr($dbPicDesc,0,100).'</div></div>';
+						}
+						if($this->escape($latestComment->type)==4) { 
+						//$dbtype	=	'media db';
+
+						$dbtype			=	'link db<div class="icon-db-link"></div>';
+						$dbVid			=	$latestComment->Vid;
+						$dbVidDesc		=	$latestComment->VidDesc;
+						$dbLinkDesc		=	$latestComment->LinkDesc;
+						$dbUserLinkDesc	=	!empty($latestComment->UserLinkDesc) ? $latestComment->UserLinkDesc : $latestComment->LinkTitle;
+
+						$descDisplay	=	'<div style="float:left; width:360px; ">
+						<div style="float:left;  width:auto; padding:3px; border:1px solid #CCCCCC;"><img width="90" height="90" border="0" src="'.$dbVid.'"></div>
+						<div class="font12" style="float:left; width:245px;">'.substr($dbUserLinkDesc,0,100).'</div></div>';
+						}
+						if($this->escape($latestComment->type)==5) {  
+						$dbPollText			=	$latestComment->PollText;
+						//$dbtype	=	'polls';
+						$descDisplay	=	'<div class="font12" style="float:left; width:350px;">'.substr($dbPollText,0,100).'</div>';
+						}
+                       $latestCommentpic = $defaultimagecheck->checkImgExist($latestComment->image,'userpics','default-avatar.jpg');
+						?>
+
+						<div style="width:450px;float:left;"  >
+							<div style="width:70px;float:left;padding:2	px;" class="box_image">
+								<div style="float:left"> 
+									
+								<img src="<?php echo IMGPATH ?>/users/medium/<?php echo $latestCommentpic ?>" width="70" height="70" border="0" />	
+								</div>
+							</div>
+							<div style="width:350px;float:left; margin-left:10px;">
+								<div class="" style="width:350px;font-weight:bold"><a href="#"><?php echo $this->escape($latestComment->username);?></a>
+									<span> has commented on  </span><?php echo $this->escape($latestComment->Ownername).'&rsquo;s - db'. $dbtype; ?>
+								</div>
+								<div class="details-gift">	
+									<div><?php echo $descDisplay;//$liveDbee->description;?>&nbsp;</div>
+								</div>
+								<div class="clear"></div> 
+								<div> commented on  - <?php echo date('d M Y',strtotime($this->escape($latestComment->CommentDate))); ?></div>
+							</div>
+						</div>	
+					</li>
+					<?php  endforeach; ?>
+					<?php } else { ?>
+						<p>Users Not Found!</p>
+					<?php } ?>
+				</ul>
+			</div>
+		</div>
+	</div>
+	
+	<div class="giftbox">  
+		<div class="box">
+			<div class="dbee-feed-titlebar">
+				<div class="divTitle" id="div2">
+					<div class="headingComment">Live Score Calculater</div>
+					<div class="viewall"><a href="<?php echo $this->url(array('controller'=>'dashboard','action'=>'scores'));?>" />View all</a></div>
+				</div>
+			</div>
+			<div class="box-body">
+				<ul class="listing">
+					<?php if (count($this->liveScoreData[0])){ ?>
+					<?php foreach($this->liveScoreData as $liveScore) : 
+					if($this->escape($liveScore->type)==1)
+					{
+						$dbtype	=	'db';
+					} else {
+						$dbtype	=	'comment';
+					}
+					if($this->escape($liveScore->Score)==1){
+						$scorediv	=	'<div  style="float:right;margin-right: 30px; " id="love-dbee"></div>';
+					} else if($this->escape($liveScore->Score)==2){
+						$scorediv	=	'<div  style="float:right;margin-right: 30px; " id="like-dbee"></div>';
+					} else if($this->escape($liveScore->Score)==3){
+						$scorediv	=	'<div  style="float:right;margin-right: 30px; " id="philosopher-dbee"></div>';
+					} else if($this->escape($liveScore->Score)==4){
+						$scorediv	=	'<div  style="float:right;margin-right: 30px; " id="dislike-dbee"></div>';
+					} else if($this->escape($liveScore->Score)==5){
+						$scorediv	=	'<div  style="float:right;margin-right: 30px;" id="hate-dbee"></div>';
+					}
+					$liveScoremdbpic = $defaultimagecheck->checkImgExist($liveScore->image,'userpics','default-avatar.jpg');
+					?>
+					<li>
+							<div style="width:450px;float:left;"  >
+							<div style="width:70px;float:left;padding:2	px;" class="box_image">
+								<div style="float:left"> 
+									
+							<img src="<?php echo IMGPATH ?>/users/medium/<?php echo $liveScoremdbpic ?>" width="70" height="70" border="0" />	
+								</div>
+							</div>
+							<div style="width:370px;float:left; margin-left:10px;">
+								<div class="" style="font-weight:bold"><a href="#"><?php echo $this->escape($liveScore->username);?></a>
+									<span>scored on  </span>&nbsp;<?php echo '<a href="#">'.$this->escape($liveScore->Ownername).'&rsquo;s</a> - '. $dbtype.'  '.$scorediv; ?>
+								</div>
+								<div class="details-gift">	
+									<div><?php //echo $descDisplay;//$liveDbee->description;?>&nbsp;</div>
+								</div>
+								<div class="clear"></div>
+								<div><b></b></div>
+							</div>
+						</div>	
+					
+					</li>
+					<?php  endforeach; ?>
+					<?php } else { ?>
+						<p>Users Not Found!</p>
+					<?php } ?>
+				</ul>
+			</div>
+		</div>
+	</div>
+	</div>
+	<br style="clear:both" />
+</div>
+				
+
+</div>

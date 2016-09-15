@@ -1,0 +1,313 @@
+<?php 
+$filterSaveChartHtml = $this->common_model->filterSaveChartHtml('','tracklogins');
+$deshboard		= new Admin_Model_Deshboard(); 
+$dateRange = DATE('F, Y');
+
+$monthArr = cal_info(0);
+$months = '';
+
+$months[date('m')] = date("F, Y", strtotime( date( 'Y-m-d' )));
+
+for ($i = 0; $i < 12; $i++) {
+	$dateVarKey = date("m", strtotime( date( 'Y-m-01' )." -$i months"));
+    $months[$dateVarKey] = date("F, Y", strtotime( date( 'Y-m-01' )." -$i months"));
+}
+//echo "<pre>"; print_r($months);
+
+//foreach ($monthArr['months'] as $key => $value) {
+foreach ($months as $key => $value) {
+	//$selected = (DATE('m')==$key)?"selected":'';
+	$months .= '<option monthRange="'.$value.'" value="'.$key.'" '.$selected.' >'.$value.'</option>';
+}
+
+?>
+
+
+<script>
+//loginUsersArr
+	//chartforemailproviders(<?php echo $this->providersdata ?>,'emailreportchart',"Email Providers Sources");
+
+	$("document").ready(function(){
+
+		//chartforbrowsersproviders(<?php echo $this->loginProvidersdata ?>,<?php echo $this->loginArrcategory?>,'loginsprovidercontainer',"<?php echo $dateRange ?>",'platform users ','No. of users ','eachdaylogins','loginUsers','logins','','',<?php echo $this->loginUsersArr ?>,'','Date');
+
+		//$('#changelogins').Click(function(){
+		$('body').on('change','#changelogins',function(){
+			var dateRange = $(this).attr('monthRange');
+			url     =   BASE_URL+"/admin/reporting/trackingvisitsfilter";
+			var selectedValue  = $(this).val();
+			var monthRange  = $('option[value="'+selectedValue+'"]' , this).text();
+			$.ajax({                                      
+			url: url,                  //the script to call to get data          
+			data: {'month':monthRange},                        //you can insert url argumnets here to pass to api.php
+			type:'post',
+			dataType: 'json', 
+			beforeSend:function(){
+			 
+			  $('#loginsprovidercontainer').html('');
+			   $loader();
+			},   //data format    
+			success: function(result)  //on recieve of reply
+			{   
+			    $removeLoader();	
+			    $('#loginUsers').html('');
+			    var go =  (JSON.parse(result['loginProvidersdata']) !=null)?1:0 ;
+			      
+		        if(go==1)
+		        {
+		        	chartforbrowsersproviders(JSON.parse(result['loginProvidersdata']),JSON.parse(result['loginArrcategory']),'loginsprovidercontainer'," "+monthRange,'platform users ','No. of users ','eachdaylogins','loginUsers','logins','','',JSON.parse(result['loginUsersArr']),'','Date');
+		        } 
+		        else
+		        {
+		        	$('#loginsprovidercontainer').html('No record found');
+		        }
+		        $('#loginUsers').html(result['monthRecord']);
+	
+			}
+			});
+		})
+
+		$('body').on('click','#dateRangelogins',function(){
+
+			var fromdate = $('#fromdate').val();
+			var todate = $('#todate').val();
+
+			//alert(fromdate+''+todate)
+			if(fromdate=='' || todate=='')
+			{
+				$messageError('Please select both start date and end date.');
+				return false;
+			}
+			var dateRange = $(this).attr('daterange');
+			url     =   BASE_URL+"/admin/reporting/trackingvisitsfilter";
+
+			$.ajax({                                      
+			url: url,                  //the script to call to get data          
+			data: {'fromdate':fromdate,'todate':todate,'month':''},                        //you can insert url argumnets here to pass to api.php
+			type:'post',
+			dataType: 'json', 
+			beforeSend:function(){
+			 
+			  $('#loginsprovidercontainer').html('');
+			   $loader();
+			},   //data format    
+			success: function(result)  //on recieve of reply
+			{   
+			    $removeLoader();			   
+		        $('#loginUsers').html('');
+		        var go =  (JSON.parse(result['loginProvidersdata']) !=null)?1:0 ;
+			      
+		        if(go==1)
+		        {
+		        	chartforbrowsersproviders(JSON.parse(result['loginProvidersdata']),JSON.parse(result['loginArrcategory']),'loginsprovidercontainer'," "+fromdate+" to "+todate,'platform users ','No. of users ','eachdaylogins','loginUsers','logins','','',JSON.parse(result['loginUsersArr']),'','Date');
+		        } 
+		        else
+		        {
+		        	$('#loginsprovidercontainer').html('No record found');
+		        }
+
+		        $('#loginUsers').html(result['monthRecord']);
+	
+			}
+			});
+		})
+		
+	});
+
+	 $('body').on('click','.filterSaveBtn',function(event) {
+	      event.preventDefault();
+	     
+	      var BASE_URL  = $("#BASE_URL").val();   
+	      var parentDas = $(this).closest('.reportCharts');
+	         
+	      var chart     =  parentDas.attr('calltype');
+	      var chartename = parentDas.find('input[name="chartvalue"]').val(); 
+	      var groupnm = parentDas.find('input[name="groupvalue"]').val(); 
+	      var groupname = typeof(groupnm)!= 'undefined' ? groupnm : '';
+	      var thisEl = $(this);
+	    
+	      if($(this).attr('data-group')=='true'){                     
+	         parentDas.find('#groupvalueid option:first').attr('selected', 'selected');
+	         $select( parentDas.find('#groupvalueid'));
+	      }
+
+	      //  if(chartename=='') var chartename = parentDas.find('input[name="chartvalue2"]').val();
+	    
+	      var groupid  =  typeof (parentDas.find('[name="groupvalueid"]').val() )!= 'undefined' ? parentDas.find('[name="groupvalueid"]').val() : '';
+
+	     	
+	     	var datefrom  = $('#fromdate').val(); 
+	        var dateto    = $('#todate').val(); 
+	        var dateW     = $('#changelogins').val(); 
+
+
+
+	        if(datefrom=='' )
+	        {
+	        	dateto    	= $('#changelogins option[value="'+dateW+'"]').attr('monthrange');
+	        	datefrom    = $('#changelogins option[value="'+dateW+'"]').attr('monthrange');
+
+	        }
+	        
+	        
+	      var selval = (parentDas.find('.filiterContainer select').val())
+	      var ranglimit = typeof (selval) != 'undefined' ? selval : '5';
+
+	      if(groupname=='' && groupid=='' ) 
+	      {
+	        $messageError('Please select or create a report'); return false;
+	      }
+	      /*if(chartename=='' ) 
+	      {
+	        $messageError('please mention chart name'); return false;
+	      }*/
+
+	      data  = "type="+ chart+"&groupname="+groupname+"&groupid="+groupid+"&chartename="+chartename+"&datefrom="+datefrom+"&dateto="+dateto+"&ranglimit="+ranglimit ;
+
+	      url   = BASE_URL+"/admin/index/savedcharts";
+	      $.ajax({                                      
+	          url: url,                  //the script to call to get data          
+	          data: data,                        //you can insert url argumnets here to pass to api.php
+	          method:'POST',
+	         // dataType: 'json',                //data format      
+	          success: function(data)          //on recieve of reply
+	          {
+	              data = data.split('~');
+	             if(data[0]==1) $messageSuccess(" Saved to 'Saved reports' within reports");
+	             else if(data[0]==403) $messageError('group name already exist, please try again');
+	             else  $messageError('some thing going wrong, please try again');
+	              if(thisEl.attr('data-group')=='true'){  
+
+	              var chartFirst = $('select[name="groupvalueid"]').size();
+	              //alert(chartFirst)
+	              if(chartFirst>0){
+	                $('select[name="groupvalueid"]').each(function(index, el) {
+	                  $('option:not(:first)',this).remove();
+	                  $('option:first',this).after(data[1]);
+	                  $select($(this));
+	                 
+	                });
+	              }
+	              else{   
+	                  var appendHtml = '<div class="formRow">\
+	                                     <select name="groupvalueid" id="groupvalueid">\
+	                                      <option value="">Select existing report</option>\
+	                                      '+data[1]+'\
+	                                     </select>\
+	                                    </div>';
+	                  $('.createdGrpDrp .clearfix').after(appendHtml);
+	                  $('.grpWrapperBox').append('<button style="display:block;" id="addgroupBtn" class="btn btn-green filterSaveBtn fluidBtn removeOr" type="button">  Save to existing report </button>');
+	                   $select('select[name="groupvalueid"]');
+	              } 
+
+	               parentDas.find('.cancelSaveFilter').trigger('click');  
+	                
+	                 parentDas.find('#groupvalueid option:last').attr('selected', 'selected');
+	                 $select( parentDas.find('#groupvalueid'));
+
+	                // $('select[name="groupvalueid"] option:not(:first)').remove();                
+	                // $('select[name="groupvalueid"] option:first').after(data[1]);
+	                 //parentDas.find('#groupvalueid option:last').attr('selected', 'selected');
+	                // $select($('select[name="groupvalueid"]'));
+	               
+	              }
+
+	             $('input[name="chartvalue"]').val('');
+	             $('input[name="chartvalue2"]').val('');
+	          }
+	      });
+	      return false;
+     })
+
+	</script>
+
+<h1 class="pageTitle ">User logins <div class="reportCharts"  calltype="userlogins"><?php echo $filterSaveChartHtml ?></div>
+</h1>
+<div class="clearfix"></div>
+
+<div class="tabContent" dataTab="email">
+	<div class="dashBlock_full" style="margin-bottom:15px;float:left" >
+		<h2 class="dragHandler">
+		     <div class="chartDtlLft">Click an area on chart to see details</div> 
+			<div class="trackCalrt">
+				<span class="fltrLabel">Filter</span>
+				<div class="trackInpOver"> 
+					 <div class="pickDataRw"><span>From</span><input type="text" name="frm" value="" id="fromdate" placeholder="Choose date" ></div>
+					 <div class="pickDataRw"><span>to</span><input type="text" name="frmto" value="" id="todate" placeholder="Choose date" ></div>
+					 <button class="btn btn-yellow filterSearchBtn" id="dateRangelogins" adattr="search">Go</button>
+				</div>
+                <span class="trackOr">OR</span>
+			   <div class="trackSelectdrop">
+				<select name="changelogins" id="changelogins" daterange ="<?php echo $dateRange ?>">
+					<?php
+						echo $months;
+					?>
+				</select>
+			  </div>
+
+			</div>
+
+			<div class="clearfix"></div>
+		</h2>
+		<div id="loginsprovidercontainer"></div>
+	</div>			
+	<div style="clear:both"></div>
+	
+</div>
+
+<div class="tabContent1">
+	<div id="loginUsers"></div>
+</div>
+
+<script type="text/javascript">
+
+$('document').ready(function(){
+	$('#changelogins').trigger('change');
+	var from = $('input[name="frm"]');
+	var  to = $('input[name="frmto"]');
+	from.datepicker({               	
+		changeMonth: true,
+		dateFormat: 'dd-mm-yy',
+		numberOfMonths: 1,
+		onClose: function( selectedDate ) {
+			to.datepicker( "option", "minDate", selectedDate );
+		}
+	});
+	to.datepicker({
+		changeMonth: true,
+		dateFormat: 'dd-mm-yy',
+		numberOfMonths: 1,
+		onClose: function( selectedDate ) {
+			from.datepicker( "option", "maxDate", selectedDate );
+		}
+	});
+
+	from.focus(function(event) {
+		$('#ui-datepicker-div').css('z-index', '99999');
+	});
+	to.focus(function(event) {
+		$('#ui-datepicker-div').css('z-index', '99999');
+    });
+    from.add(to).change(function () {
+        var dayFrom = from.datepicker('getDate');
+        var dayTo = to.datepicker('getDate');
+        if (dayFrom && dayTo) {
+            var days = calcDaysBetween(dayFrom, dayTo);
+            if(days>30){
+            	$messageError('Date should be in range of 30 days .');
+            	from.val('');
+            	to.val('');
+            }
+            
+        }
+    });
+
+    function calcDaysBetween(startDate, endDate) {
+        return (endDate - startDate) / (1000 * 60 * 60 * 24);
+    }
+	$('#loginsprovidercontainer').addClass('noRecord');
+    $(window).trigger('resize');
+	
+})
+
+</script>

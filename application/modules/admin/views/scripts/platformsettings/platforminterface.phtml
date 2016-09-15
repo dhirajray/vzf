@@ -1,0 +1,667 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+  <script type="text/javascript" src="<?php echo BASE_URL."/adminraw/js/jquery-1.9.1.min.js"; ?>"></script>
+  <script type="text/javascript" src="<?php echo BASE_URL."/adminraw/js/platforminterface.js"; ?>"></script>
+  <link href="<?php echo BASE_URL."/adminraw/css/platform-interface.css";?>" rel="stylesheet" type="text/css" media="all" />
+  <script type="text/javascript">
+    var parentWin = window.parent.document;
+    var BASE_URL = "<?php echo BASE_URL ?>";
+    var fillStart =  '';
+    var fillStop = '';
+    var borderWidth = 0;
+    var borderColor = '';
+    var borderRadius = 0;
+    var fontColor = '';
+    var hoverColor = '';
+    var iconColor = '';
+    var backgroundTexture = '';
+    var backgroundUrl = '';
+    var backgroundImage = "false";
+    var currentJson;
+    var platforminterface = {};
+     var myDefaultJson;
+    var resetThemeFlag = false;
+    var resetThemeFlagonSave = false;
+    var myPlatformTheme ={};
+    var deletedJson = {};
+    var activeType ='';
+    var resetBtnHtml ='<a href="javascript:void(0);" class="btn btn-yellow btn-mini resetTheme">Reset element</a>';
+    var isMobile = navigator.userAgent.match(/(iPad)|(iPhone)|(iPod)|(android)|(webOS)/i);
+   myPlatformTheme['default'] =    {"buttons":[{
+                                "fill":{
+                                  "startColor":"#9da6af",
+                                  "stopColor":"#b0bbc4"
+                                },
+                                "borderColor":"#a2a2a2",
+                                "borderWidth":"0",
+                                "borderRadius":"2",
+                                "color":"#ffffff"
+                              },
+                               {
+                                "fill":{
+                                  "startColor":"#faa80b",
+                                  "stopColor":"#f7b947"
+                                },
+                                "borderColor":"#d69d35",
+                                "borderWidth":"0",
+                                "borderRadius":"2",
+                                "color":"#ffffff"
+                              },
+                               {
+                                "fill":{
+                                  "startColor":"#35363a",
+                                  "stopColor":"#54575b"
+                                },
+                                "borderColor":"#a2a2a2",
+                                "borderWidth":"0",
+                                "borderRadius":"2",
+                                "color":"#ffffff"                             
+                            }],
+                            "body":{
+                              "fill":{
+                                  "startColor":"#E6E6E6",
+                                  "stopColor":"#E6E6E6"
+                                },
+                              "backgroundImage":"false",
+                              "backgroundTexture":""
+                            },
+                            "page":{
+                              "fill":{
+                                  "startColor":"#ffffff",
+                                  "stopColor":"#ffffff"
+                                }
+                            },
+                            "pageInner":{
+                              "fill":{
+                                  "startColor":"#E6E6E6",
+                                  "stopColor":"#E6E6E6"
+                                }
+                            },
+                            "header":{
+                              "fill":{
+                                  "startColor":"#323231",
+                                  "stopColor":"#494948"
+                                },                                
+                                "color":"#cccccc",
+                                "hoverFontColor":"#F9C10C"
+                            },
+                             "searchHeader":{
+                              "fill":{
+                                  "startColor":"#696969",
+                                  "stopColor":"#696969"
+                                },                                
+                                "color":"#A4A4A4"
+                              
+                            },
+                             "createPostBtn":{
+                              "fill":{
+                                  "startColor":"#323231",
+                                  "stopColor":"#494948"
+                                },                                
+                                "color":"#fff",
+                                "iconColor":"#F9C10C"
+                            },
+                            "leftSideActive":{
+                                "fill":{
+                                    "startColor":"#ffffff",
+                                    "stopColor":"#ffffff"
+                                  },                               
+                                  "color":"#333333"
+                            },
+                            "leftSideContent":{
+                              "fill":{
+                                  "startColor":"#ffffff",
+                                  "stopColor":"#ffffff"
+                                },                               
+                                "color":"#333333",
+                                "hoverFontColor":"#FAA80B"                                 
+                            },
+                            "pageMiddle":{
+                              "fill":{
+                                  "startColor":"#ffffff",
+                                  "stopColor":"#ffffff"
+                                },                               
+                                "color":"#333333"
+                            },
+                            "rightSideTitle":{                           
+                                "fill":{
+                                    "startColor":"#ffffff",
+                                    "stopColor":"#ffffff"
+                                  },                                 
+                                  "color":"#333333"
+                                 
+                              },
+                              "rightSideTitleActive":{                           
+                                "fill":{
+                                    "startColor":"#faa80b",
+                                    "stopColor":"#faa80b"
+                                  },                                 
+                                  "color":"#333333",
+                                   "active":"rightSideTitle"
+                              },
+                              "rightSideContent":{
+                                "fill":{
+                                    "startColor":"#ffffff",
+                                    "stopColor":"#ffffff"
+                                  },                                
+                                  "color":"#333333"
+                              }                 
+                           };
+                      myPlatformTheme['render'] =  JSON.parse(JSON.stringify(myPlatformTheme['default']));
+                      var pureDefaultJson   = myPlatformTheme['default'];
+                      var myDefaultJson   = myPlatformTheme['render'];
+                           
+
+                              <?php if($this->plateformInterface!='') {?>
+                         
+                            var myDefaultJsonSaved = <?php echo $this->plateformInterface; ?>;
+                             myPlatformTheme['modified'] =  myDefaultJsonSaved;
+                            platforminterface =  myPlatformTheme['modified'];
+                          $.each(myDefaultJsonSaved, function(index, val) { 
+                              myDefaultJson[index] = myDefaultJsonSaved[index];
+                          });
+                      
+                        
+                       <?php } ?> 
+
+                  
+  	$(function(){
+      if(isMobile!=null){
+        $('html').addClass('deviceOn');
+      } 
+  		  $activeState  = function(){
+          var btnAct = $('#activeElement a', parentWin);
+          if(btnAct.hasClass('active')==true && btnAct.hasClass('activeState')==true  && activeType==''){
+            $('input[name="active"]').attr('checked', false);
+            $('#activeElement a', parentWin).removeClass('active');
+            $('#activeElement a:first', parentWin).addClass('active');
+
+          }
+        }
+        $jsonValues = function(element, dataType, jsonVar){
+           var  newJsonValues; 
+
+            $activeState();
+
+            if(typeof jsonVar=='undefined'){
+              newJsonValues = myDefaultJson;
+            }else{
+              newJsonValues = jsonVar;
+              // console.log(jsonVar);
+             
+            }
+
+
+         $('.colpick', parentWin).hide();
+         
+            if(dataType=='buttons'){
+              var dataButton = parseInt(element.attr('data-button'));    
+              currentJson = newJsonValues[dataType][dataButton];
+            }
+            else{
+              currentJson = newJsonValues[dataType];
+            }
+
+            if(typeof currentJson.fill.startColor !=='undefined') fillStart =  currentJson.fill.startColor;
+            if(typeof currentJson.fill.stopColor !=='undefined') fillStop = currentJson.fill.stopColor;
+            if(typeof currentJson.borderWidth !=='undefined') {
+               $('#borderWidthRow', parentWin).show();
+                borderWidth = currentJson.borderWidth;             
+              }
+              else{
+                 borderWidth = 0; 
+                $('#borderWidthRow', parentWin).hide();
+              }
+            if(typeof currentJson.borderColor !=='undefined') {
+              $('#borderColorsRow', parentWin).show();
+              borderColor = currentJson.borderColor;
+            }else{
+                $('#borderColorsRow', parentWin).hide();
+            }
+            if(typeof currentJson.borderRadius !=='undefined'){
+               $('#borderRadiusRow', parentWin).show();
+               borderRadius = currentJson.borderRadius;
+             }else{
+               $('#borderRadiusRow', parentWin).hide();
+                borderRadius = 0;
+             }
+            if(typeof currentJson.color !=='undefined') {
+              $('#fontColorsRow', parentWin).show();
+              fontColor = currentJson.color; 
+              }
+            else {
+              $('#fontColorsRow', parentWin).hide();
+            }
+             if(typeof currentJson.iconColor !=='undefined') {
+              $('#iconColorRow', parentWin).show();
+              iconColor = currentJson.iconColor; 
+              }
+            else {
+              $('#iconColorRow', parentWin).hide();
+            }
+            
+            if(typeof currentJson.hoverFontColor !=='undefined') {
+              $('#hoverFontColorRow', parentWin).show();
+              hoverColor = currentJson.hoverFontColor; 
+              }
+            else {
+              $('#hoverFontColorRow', parentWin).hide();
+            }
+             if(typeof currentJson.active !=='undefined' || activeType!='') {
+               $('#activeElement', parentWin).show();
+              }
+            else {
+              $('#activeElement', parentWin).hide();
+            }
+            if(typeof currentJson.backgroundTexture !=='undefined') {
+                $('#chooseTexture, #BgImageRow', parentWin).show();
+                backgroundTexture = currentJson.backgroundTexture; 
+                backgroundUrl = 'url("'+backgroundTexture+'")'; 
+              }
+            else {
+                backgroundTexture ='';
+              $('#chooseTexture, #BgImageRow', parentWin).hide();
+            }
+            if(typeof currentJson.backgroundImage !=='undefined') {
+                backgroundImage = currentJson.backgroundImage; 
+              }
+            else {
+               
+            }
+         }
+
+         $('.editBlock').each(function(i){
+            var thisEl = $(this);
+            var dataType = thisEl.attr('data-type');
+              $jsonValues(thisEl, dataType);
+              if(dataType=='body'){
+                 $('body').css({background:'linear-gradient(0deg, '+fillStart+', '+fillStop+')'});                                
+                 if(backgroundImage=="true"){
+                     $(this).css({background:backgroundUrl, backgroundSize:'cover'});
+                   }else{
+                     $(this).css({background:backgroundUrl, backgroundSize:'initial'});
+                   }
+               }else if(dataType=='searchHeader'){
+                  $('input', this).css({background:'linear-gradient(0deg, '+fillStart+', '+fillStop+')',  color:fontColor});
+               }
+               else if(dataType=='createPostBtn'){
+                   $(this).css({background:'linear-gradient(0deg, '+fillStart+', '+fillStop+')',  color:fontColor});
+               }
+               else{
+                 $(this).css({background:'linear-gradient(0deg, '+fillStart+', '+fillStop+')', borderColor:borderColor, color:fontColor, borderRadius:borderRadius+'px', borderWidth:borderWidth+'px'});
+               }
+             
+              $('.text',this).css({backgroundColor:fontColor, color:fontColor});
+               $(' > .fontIcon', this).css({color:iconColor});
+
+            });
+
+    			$('body').click(function(event) {
+    				$('.colpick', parentWin).hide();
+    			});
+
+
+         $loadValueParentWindow = function(element, dataType, jsonVar){
+          // console.log(JSON.stringify(platforminterface[dataType]));
+
+             $jsonValues(element, dataType, jsonVar);
+
+           
+             var title = $("[data-type="+dataType+"]").attr('data-title');
+
+
+               if(fillStart==fillStop){
+                 if($('#fillColorGradiantInput', parentWin).is(':checked')==true){
+                  $('#solidFill', parentWin).trigger('click');
+                 }
+               }else{
+                 if($('#fillColorGradiantInput', parentWin).is(':checked')==false){
+                  $('#gradientFill', parentWin).trigger('click');
+                 }
+               }
+        
+            $('#toolboxPlatform .titleEditingType span', parentWin).text(title);
+
+            $('input[data-type="borderWidth"]', parentWin).val(borderWidth);
+    				$('#borderWidthRow h4 strong', parentWin).text(borderWidth+'px');
+
+            $('input[data-type="radius"]', parentWin).val(borderRadius);
+    				$('#borderRadiusRow h4 strong', parentWin).text(borderRadius+'px');
+
+    				$('.colorFill[date-type="start"]', parentWin).css({background:fillStart});
+    				$('.colorFill[date-type="end"]', parentWin).css({background:fillStop});
+    				$('.colorFill[date-type="borderColor"]', parentWin).css({background:borderColor});
+            $('.colorFill[date-type="buttonTextColor"]', parentWin).css({background:fontColor});
+            $('.colorFill[date-type="hoverFontColor"]', parentWin).css({background:hoverColor});
+    				$('.colorFill[date-type="iconColor"]', parentWin).css({background:iconColor});
+
+    				$('input[name="startColor"]').val(fillStart);
+    				$('input[name="endColor"]').val(fillStop);
+    				$('input[name="borderColor"]').val(borderColor);
+    				$('input[name="borderWidth"]').val(borderWidth);
+    				$('input[name="borderRadius"]').val(borderRadius);
+            $('input[name="color"]').val(fontColor);
+            $('input[name="contentbodyTxture"]').val(backgroundTexture);
+            $('input[name="bodyBgImg"]').val(backgroundImage);
+            $('input[name="hoverFontColor"]').val(hoverColor);
+    				$('input[name="iconColor"]').val(iconColor);
+            var activeBlock = element;
+            if(backgroundImage == 'false'){
+              
+              $('#closeImgFile', parentWin).trigger('click');
+             
+            }
+            if(dataType=='body'){
+                 $('body').css({background:'linear-gradient(0deg, '+fillStart+', '+fillStop+')'});
+                  activeBlock.css({background:backgroundUrl});
+                  if(backgroundImage=="true"){
+                   activeBlock.css({background:backgroundUrl, backgroundSize:'cover'});
+                   }else{
+                    activeBlock.css({background:backgroundUrl,backgroundSize:'initial'});
+                   }
+               }
+               else if(dataType=='searchHeader'){
+                  $('input', activeBlock).css({background:'linear-gradient(0deg, '+fillStart+', '+fillStop+')',  color:fontColor});
+               }else if(dataType=='createPostBtn'){
+                  activeBlock.css({background:'linear-gradient(0deg, '+fillStart+', '+fillStop+')',  color:fontColor});
+               }else{
+          	   activeBlock.css({background:'linear-gradient(0deg, '+fillStart+', '+fillStop+')', borderColor:borderColor, color:fontColor, borderRadius:borderRadius+'px', borderWidth:borderWidth+'px'});
+            }
+
+             $(' > .text, .iconsTop .text ', activeBlock).css({backgroundColor:fontColor, color:fontColor});
+             $(' > .fontIcon', activeBlock).css({color:iconColor});
+            $('.editBlock').removeClass('disabled');
+
+
+
+             }
+
+       
+
+			 $saveEditedValue = function (element, dataType){
+              if(activeType!='') dataType = activeType;
+             $jsonValues(element, dataType);
+              if(typeof currentJson.fill.startColor !=='undefined')  
+    	        currentJson.fill.startColor = $('input[name="startColor"]').val();
+              if(typeof currentJson.fill.stopColor !=='undefined')
+    					currentJson.fill.stopColor = $('input[name="endColor"]').val();  
+              if(typeof currentJson.borderColor!=='undefined')
+    					currentJson.borderColor = $('input[name="borderColor"]').val();        
+              if(typeof currentJson.borderWidth !=='undefined')
+    					currentJson.borderWidth = $('input[name="borderWidth"]').val();
+              if(typeof currentJson.borderRadius!=='undefined')
+    					currentJson.borderRadius = $('input[name="borderRadius"]').val();
+              if(typeof currentJson.color !=='undefined')
+              currentJson.color = $('input[name="color"]').val();  
+             if(typeof currentJson.hoverFontColor !=='undefined')
+    					currentJson.hoverFontColor = $('input[name="hoverFontColor"]').val();
+            if(typeof currentJson.iconColor !=='undefined')
+              currentJson.iconColor = $('input[name="iconColor"]').val();
+             if(typeof currentJson.backgroundTexture !=='undefined')
+              currentJson.backgroundTexture = $('input[name="contentbodyTxture"]').val();
+            if(typeof currentJson.backgroundImage !=='undefined')
+              currentJson.backgroundImage = $('input[name="bodyBgImg"]').val();
+           
+             if(dataType=='buttons'){
+                  var dataButton = parseInt(element.attr('data-button'));
+                  platforminterface[dataType] = myDefaultJson[dataType];
+                  //delete platforminterface[dataButton];            
+                  platforminterface[dataType][dataButton] = myDefaultJson[dataType][dataButton];
+
+                }else if(dataType=='activeMenu'){
+                  var lft = platforminterface["leftSide"];
+                  if(typeof lft=="undefined"){
+                    platforminterface['leftSide'] = {activeMenu:myDefaultJson['leftSide'][dataType]};
+                  }
+          
+                }
+                else{
+                  platforminterface[dataType]  = myDefaultJson[dataType];
+                }
+                //alert($.isEmptyObject(deletedJson))
+
+              if($.isEmptyObject(deletedJson)!=true){
+                   delete platforminterface[dataType];
+                    deletedJson ='';
+              }
+            /*console.log(platforminterface);
+            console.log(deletedJson);*/
+            resetThemeFlagonSave = false;
+            resetThemeFlag = false;            
+      
+
+       var platforminterfaceUp = JSON.stringify(platforminterface);
+
+          $('.saveEditing').prepend('<i class="fa fa-spin fa-spinner"></i> ');
+          $.post('<?php echo BASE_URL?>/admin/myaccount/ajaxplateforminterface', {plateformInterface: platforminterfaceUp}, function(){
+            $('.saveEditing i').remove();
+             $('.closeEditing').click();
+          });
+			 }
+
+     
+
+  			$('body').on('click','.editBlock:not(.disabled)', function(event) {
+      				event.preventDefault();
+      				event.stopPropagation();
+                           	
+             	 var thisEl = $(this);
+             	 var o = thisEl.offset();
+             	 var w = thisEl.width();
+             	 var h = thisEl.height();
+             	 var type = thisEl.attr('data-type');
+               var resetBtn  = '';
+                activeType  = '';
+                $('html').attr('data-type-active',type);
+               
+                $('#toolboxPlatform', parentWin).removeClass('bounceOutLeft');
+                $('#toolboxPlatform', parentWin).addClass('bounceInLeft');
+               if(resetThemeFlag==true){
+                    resetThemeFlagonSave = false;
+                  }
+                  
+                if(typeof platforminterface[type] !='undefined' ){ 
+                  resetBtn =resetBtnHtml;               
+                }else{
+                  resetThemeFlagonSave = false;
+                }
+
+               $(this).addClass('thisActive');
+             	 var btns = '<div class="btnAction animated bounceInDown"><a href="javascript:void(0);" class="btn  saveEditing btn-green btn-mini">Save</a>\
+                    <a href="javascript:void(0);" class="btn btn-mini closeEditing">Cancel</a>\
+             	 			'+resetBtn+'</div>';
+                  thisEl.wrap('<div class="activeBlock" inner-type="'+type+'"></div>');
+                  $('body').addClass('onEditing');
+                  thisEl.closest('.activeBlock').append(btns);  
+
+          
+            
+              if(resetThemeFlagonSave==true){
+                 $loadValueParentWindow(thisEl, type, pureDefaultJson);
+               }else{
+                 $loadValueParentWindow(thisEl, type);
+               }
+                 
+              $('.editBlock').addClass('disabled');
+
+             	 $('.closeEditing').click(function(e){
+                  e.preventDefault();
+                  e.stopPropagation();
+                  $('#toolboxPlatform', parentWin).removeClass('bounceInLeft').addClass('bounceOutLeft');
+                  $('body').removeClass('onEditing');		 
+                  $('html').removeAttr('data-type-active'); 
+                  $('html[data-type-active="body"] [data-type="body"]').show();				    
+    		  				$('.btnAction').remove();
+                    if(activeType!=''){
+                      type  = activeType;
+                    }
+
+                  if(resetThemeFlag==true ){
+                    resetThemeFlagonSave = false;
+                    resetThemeFlag = false;
+                    platforminterface[type] = deletedJson;
+                  }
+                 
+                 if(resetThemeFlagonSave==true ){
+    		  				  $loadValueParentWindow(thisEl, type, pureDefaultJson);
+                }else{
+                    $loadValueParentWindow(thisEl, type);                  
+                  }
+
+    		  				$('.activeBlock .thisActive').unwrap();	
+                  thisEl.removeClass('thisActive');
+		  		    });
+
+                
+
+             	$('.saveEditing').click(function(evt){
+                  evt.preventDefault();
+                  evt.stopPropagation(); 
+                  if($(this).hasClass('disabled')!=true){     
+                  $('html[data-type-active="body"] [data-type="body"]').show();
+                  $saveEditedValue(thisEl,type);
+                  }
+		  		    });
+
+
+
+  			});
+
+      $('body').on('click','.resetTheme', function(e){
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var thisEl  = $('.activeBlock .thisActive');
+                  var type = $('.activeBlock .thisActive').attr('data-type');
+                  $('html[data-type-active="body"] [data-type="body"]').show()
+                    if(activeType!='' ){
+                      type  = activeType;
+                    }
+
+                    if(resetThemeFlag==false){
+                        resetThemeFlagonSave = true;
+                        resetThemeFlag = true;
+                        deletedJson = platforminterface[type];
+                        delete platforminterface[type];
+                      
+                    }
+                     $loadValueParentWindow(thisEl, type, pureDefaultJson);
+         
+              });
+         $('input[name="active"]').change( function(event) {
+                  var thisEl  = $('.activeBlock .thisActive');
+                  var type = $('.activeBlock .thisActive').attr('data-type');
+
+
+
+                  if($(this).is(':checked')==true){
+                      activeType =   myDefaultJson[type].active;
+                      type = activeType;
+                  }else{
+                      activeType='';
+                    
+                  }
+                  if(typeof platforminterface[type] !=='undefined' ){ 
+                      $('.resetTheme').remove();  
+                      $('.btnAction').append(resetBtnHtml);  
+                    }else{
+                       $('.resetTheme').remove(); 
+                    }
+              // console.log(JSON.stringify(platforminterface[type]));
+                  $loadValueParentWindow(thisEl, type);
+
+
+
+                  
+              });
+     
+      
+        
+
+  	});
+
+  </script>
+</head>
+<body >
+
+<input type="hidden" name="endColor">
+<input type="hidden" name="borderColor">
+<input type="hidden" name="borderWidth">
+<input type="hidden" name="borderRadius">
+<input type="hidden" name="color">
+<input type="hidden" name="startColor">
+<input type="hidden" name="contentbodyTxture">
+<input type="hidden" name="bodyBgImg">
+<input type="hidden" name="hoverFontColor">
+<input type="hidden" name="iconColor">
+<input type="checkbox" name="active" style="display:none">
+
+
+
+<div class="editBlock" data-type="body" data-title="Body"></div>
+  <div class="overlay"></div>
+	
+	<div id="mainLayout">
+		<div class="headerTop editBlock" data-type="header" data-title="Header">
+        <div class="iconsTop">
+            <div class="fa fa-home text"></div>
+            <div class="fa fa-user text"></div>
+            <div class="fa fa-flag text" ></div>
+            <div class="fa fa-envelope text"></div>
+            <div class="fa fa-cog text"></div>
+        </div>
+        <div class="headerSearch editBlock" data-type="searchHeader" data-title="Search bar">
+          <input type="text" value="search keyword or user">
+        <!--   <i class="fa fa-search fontIcon"></i> -->
+        </div>
+        <div class="btn creatPost editBlock" data-type="createPostBtn" data-title="Create post">
+          <span>Create Post</span> <i class="fa fa-pencil-square-o fa-2x fontIcon createPostIcon"></i>
+        </div>
+    </div>
+		<div id="pageCenterCont" class="editBlock" data-type="page" data-title="Page">
+			<div id="pageContent" class="editBlock" data-type="pageInner" data-title="Page container">
+				<div class="leftBar" >
+          <!-- <div class="activeMenu editBlock" data-type="leftSideActive" data-title="Left active menu">
+            <div class="text act"></div>
+          </div> -->
+					<div class="editBlock" data-type="leftSideContent" data-title="Left side">
+              <div class="text"></div>
+              <div class="text"></div>
+              <div class="text"></div>
+              <div class="text"></div>
+              <div class="text"></div>
+              <div class="text"></div>
+              <div class="text"></div>
+              <div class="text"></div>
+              <div class="text"></div>
+              <div class="text"></div>
+              <div class="text"></div>
+              <div class="text"></div>
+          </div>
+				</div>
+				<div class="middleBar editBlock" data-type="pageMiddle" data-title="Page middel">
+					<a href="javascript:void(0)" class="btn editBlock"  data-type="buttons" data-button="0" data-title="Close button">Close</a>
+					<a href="javascript:void(0)" class="btn btn-yellow editBlock" data-type="buttons"  data-button="1" data-title="More">More</a>
+					<a href="javascript:void(0)" class="btn btn-black editBlock" data-type="buttons"  data-button="2" data-title="Post">Post</a>
+				</div>
+				<div class="rightBar">
+					<div class="whiteBox">
+						<h2 class="editBlock" data-type="rightSideTitleActive" data-title="Right Title"><div class="text"></div></h2>
+						<div class="rboxContainer editBlock" data-type="rightSideContent" data-title="Right container">
+							<div class="text"></div>
+							<div class="text"></div>
+							<div class="text"></div>
+							<div class="text"></div>
+							<div class="text"></div>
+							<div class="text"></div>
+							<div class="text"></div>
+							<div class="text"></div>
+						</div>				
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</body>
+</html>

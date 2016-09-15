@@ -1,0 +1,182 @@
+<?php         
+$this->title = "Comments";
+$this->headTitle($this->title);
+$deshObj= new Admin_Model_Deshboard();
+$defaultimagecheck = new Admin_Model_Common();
+?>
+
+<h1 class="pageTitle dbeeViewAll">Comments 	<!--<a href="#" class="btn btn-yellow btn-large" id="openSearchBlock"><i class="searchSprite searchIcon"></i> Search</a>--></h1>
+	
+<div  id="searchWrapper" style="display:none">
+	
+	<div id="searchContainer">	
+		<form id="search_form_cmnt" >	
+			<div id="exp_criteria"  class="pull-left "> 		
+				<div id="open_title" class="attributs searchField" >
+					
+					<div class="searchField">
+						<span>Comments Owner: </span> <input type="text" id="cmnt_owner" name="cmnt_owner" >
+					</div>
+
+					<div class="searchField">
+						<span>Commented User: </span> <input type="text" id="cmnt_by" name="cmnt_by" >
+					</div>
+					
+				</div>
+
+				<div id="open_title" class="attributs searchField" >					
+
+					<div class="searchField">Type :  
+						<select id="" name="cmnt_type">
+							<option value="">All</option>
+							<option value="1">Text</option>
+							<option value="2">Link</option>
+							<option value="3">Pix</option> 
+							<option value="4">Media</option> 
+							<option value="5">Polls</option> 
+						</select> 
+					</div>
+					
+				</div>
+				<div id="open_title" class="attributs searchField" >
+					
+					<div class="searchField">Date range : </div>
+					<div class="searchField">
+						<span>From : </span> <input type="text" id="created_from" name="created_from"  >
+					</div>
+					<div class="searchField">
+						<span>To : </span> <input type="text" id="created_to" name="created_to" >
+					</div>	
+				</div>
+			</div>
+			<div class="clearfix"></div>		
+			<div class="searchBottomBar clearfix">
+				<div id="search_button" class="searchbutton" > 
+					<button type="button" name="cmntsearch" id="cmntsearch" value="SEARCH" class="btn btn-yellow btn-large pull-right"><i class="searchSprite searchListIcon"></i> Search</button>
+				</div>
+			</div>			
+		</form>
+
+		<div class="clearfix"></div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+	
+<div class="box-body" id="box_body">
+	<div id="listingTotalResults" style="float:right;margin: 10px 35px 0 0;"></div>
+	<div id="beforecall" style=""></div>
+	<div class="clearfix"></div>
+	<div id="searchresultvis" style="display:none"></div>
+	<div id="showmore" style="display:none;text-align: center;">
+		<img src="<?php echo BASE_URL ?>/images/show.png" style="border:0" title="Show More" alt="Show More">
+	</div>
+	<?php if (count($this->paginator)) { echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml');  ?>
+			<div class="pageheadinusr" style="font-size:15px;">
+			<?php echo "Page ". $this->page." of ".$this->totalpage;?> 
+			</div>
+			<div class="pageheadinusrlft" style="font-size:15px;">
+			<?php echo $this->total." comments"?> 
+			</div><?php }?>
+		<ul class="listing scoredList" id="searchresulthide" >
+					<?php if (count($this->paginator)){ ?>
+					<?php foreach($this->paginator as $latestComment) : 
+                      //echo'<pre>';print_r($latestComment);die;
+					?>
+					<li>
+					<?php 
+					
+					    //$viewcmm = '<a href="'.BASE_URL.'/dbeedetail/home/id/'.$latestComment->DbeeID.'"> view </a>';//href="'.BASE_URL.'/dbee/'.$latestComment->CommentID.'"	
+					    $viewcmm = '<a class="btn btn-full btn-mini btn-yellow" target="_blank" href="'.BASE_URL.'/dbee/'.$latestComment->dburl.'" style="float:right"> View </a>';
+					    $deletecmm = '<a class="btn btn-full btn-danger btn-mini delcomm" target="_blank"  commid="'.$latestComment->CommentID.'" style="float:right"> Delete </a>';
+						$dbtype	='';	
+						$descDisplay	='';
+						if($this->escape($latestComment->type)==1) { 
+							$dbtype			=	'text db<div class="icon-db-text"></div>';
+							$descDisplay	=	'<div  class="dbTextPoll">'.$latestComment->Comment.'</div>';//substr($latestComment->Comment,0,100).'</div>';
+						}
+						if($this->escape($latestComment->LinkDesc)!='') { 
+							$dbtype			=	'link db<div class="icon-db-link"></div>';
+							$dbLink			=	$latestComment->Link;
+							$dbLinkTitle	=	$latestComment->LinkTitle;
+							$dbLinkDesc		=	$latestComment->LinkDesc;
+							$dbUserLinkDesc	=	!empty($latestComment->UserLinkDesc) ? $latestComment->UserLinkDesc : $latestComment->LinkTitle;
+
+							$descDisplay	=	'<div style="padding:5px; margin-top:5px; margin-bottom:5px; background-color:#DAD9D9;">
+							<div class="font12">'.$dbUserLinkDesc.' - 
+							  <a target="_blank" href="'.$dbLink.'">'.$dbLink.'</a>
+							</div>
+							<div class="font12" style="margin-top:10px;"></div></div>';
+							}
+							if($this->escape($latestComment->Pic)!='') { 
+							 $dbtype			=	'Image post<div class="icon-db-link"></div>';
+
+							$dbPic		=	$latestComment->Pic;
+							$dbPicDesc	=	$latestComment->PicDesc;
+
+							$descDisplay	.=	'<div class="dbPicText">';
+							$checkdbpic = $defaultimagecheck->checkImgExist($dbPic,'imageposts','default-avatar.jpg');
+							if($dbPic!='')
+							{
+								$descDisplay	.=	'<div class="dbPic" ><a href="#"><img src="'.IMGPATH.'/imageposts/small/'.$checkdbpic.'" width="90" border="0" /></a></div>';
+							}
+							
+							$descDisplay	.=	'<div class="dbPicDesc">'.$dbPicDesc.'</div></div>';
+						}
+						if($this->escape($latestComment->Pic)!='') { 
+							$dbtype	=	'media db<div class="icon-db-vidz"></div>';
+
+							$dbtype			=	'link db<div class="icon-db-link"></div>';
+							$dbVid			=	$latestComment->VidID;
+							$dbVidDesc		=	$latestComment->VidDesc;
+							$dbLinkDesc		=	$latestComment->LinkDesc;
+							$dbUserLinkDesc	=	!empty($latestComment->UserLinkDesc) ? $latestComment->UserLinkDesc : $latestComment->LinkTitle;
+
+							$descDisplay	.=	'<div class="dbPicText">';
+							if($dbVid!='')
+							{ 
+								$descDisplay	.=	'<div class="dbPic" ><a href="javascript:void(0)"><img width="90" height="60" border="0" src="https://i.ytimg.com/vi/'.$dbVid.'/0.jpg"></a></div>';
+							}
+							
+							$descDisplay	.=	'<div class="dbPicDesc">'.$dbVidDesc.'</div></div>';
+						}
+						if($this->escape($latestComment->type)==5) {  
+						$dbPollText			=	$latestComment->PollText;
+						$dbtype	=	'polls <div class="icon-db-poll"></div>';
+						$descDisplay	=	'<div  class="dbTextPoll">'.$dbPollText.'</div>';
+						}
+                        $checkcomuserpic = $defaultimagecheck->checkImgExist($latestComment->image,'userpics','default-avatar.jpg');
+						?>
+						
+
+							<div class="listUserPhoto">
+		<img src="<?php echo IMGPATH ?>/users/medium/<?php echo $checkcomuserpic ?>" width="70" height="70" border="0" class="recievedUsePic"/>
+								<!--End User profile pic  who scored someone -->
+							</div>
+							<div class="dataListWrapper">
+								<div class="dataListbox">
+									<div class="scoredListTitle" style="font-size:14px;">
+										<a href="javascript:void(0)" class="show_details_user" userid="<?php echo $this->escape($latestComment->UserID);?>"><?php echo $this->myclientdetails->customDecoding($this->escape($latestComment->username)).' '.$this->myclientdetails->customDecoding($this->escape($latestComment->lname));?></a>
+									 commented on  </span><a href="javascript:void(0)" class="show_details_user" userid="<?php echo $this->escape($latestComment->OwnerID);?>"><?php echo $this->myclientdetails->customDecoding($this->escape($latestComment->Ownername)).' '.$this->myclientdetails->customDecoding($this->escape($latestComment->Ownerlname)).'&rsquo;s </a>'; ?> post - <?php echo date('d M Y',strtotime($this->escape($latestComment->CommentDate))); ?>										
+									</div>
+									<div class="scoredData"><?php echo $descDisplay;?></div>
+									<div class="cmtview"><?php echo $viewcmm ?></div>
+									<div class="deletecmm"><?php echo $deletecmm ?></div>
+									
+								</div>
+								<!-- <div class="scoredPostDate">Commented on  - <?php //echo date('d M y',strtotime($this->escape($latestComment->CommentDate))); ?></div> -->
+							</div>			
+			
+					</li>
+					<?php $rowchange++; endforeach; ?>
+					
+	<?php } else { ?>
+	<p style="position:relative; top:100px;" class="dashBlockEmpty">no comments found</p>
+	<?php } ?>
+	</ul>
+</div>	
+
+<?php 
+	/*
+	 * Print the pagination of type
+	 */
+ echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml');  ?>

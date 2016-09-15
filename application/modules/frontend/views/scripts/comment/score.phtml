@@ -1,0 +1,87 @@
+<?php 
+
+$id = $this->id;
+
+$type = $this->type;
+
+$label = $this->label;
+
+?>
+
+<link rel="stylesheet" href="<?=$this->config->site->url;?>/css/styles.css" type="text/css" />
+
+<!-- BEGIN INCLUDE SCRIPTS TO CALL DHTML TOOLTIP -->
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+
+<script src="<?=$this->config->site->url;?>/js/functions.js"></script>
+
+<script src="<?=$this->config->site->url;?>/js/browser_check.js"></script>
+
+<!-- BEGIN INCLUDE SCRIPTS TO CALL DHTML TOOLTIP -->
+
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+
+<style type="text/css">
+
+<!--
+
+body {
+
+background-color: #FFFFFF;
+
+margin-left: 0px;
+
+margin-top: 0px;
+
+margin-right: 0px;
+
+margin-bottom: 0px;
+
+}
+
+.style3 {font-size: 12px;
+
+font-weight: bold;
+
+}
+
+-->
+
+</style>
+
+
+
+</head>
+
+
+
+<body>
+
+
+
+<div class="style3" style="padding:10px; background-color:#C2BEBC">Score this <?=$label;?></div>
+
+<div style="padding:10px;">
+
+<div class="score-comment" onclick="javascript:scoredbee(1,'love',<?=$type;?>,<?=$id;?>);"><div id="love-comment" tooltip="Love <?=$label;?>"></div><div style="float:left; margin-top:7px; margin-left:15px;">love <?=$label;?></div><br style="clear:both" /></div>
+
+<div class="next-line"></div>
+
+<div class="score-comment" onclick="javascript:scoredbee(2,'like',<?=$type;?>,<?=$id;?>);"><div id="like-comment" tooltip="Like <?=$label;?>"></div><div style="float:left; margin-top:7px; margin-left:15px;">like <?=$label;?></div><br style="clear:both" /></div>
+
+<div class="next-line"></div>
+
+<div class="score-comment" onclick="javascript:scoredbee(3,'philosopher',<?=$type;?>,<?=$id;?>);"><div id="philosopher-comment" tooltip="Food for thought <?=$label;?>"></div><div style="float:left; margin-top:7px; margin-left:15px;">food for thought <?=$label;?></div><br style="clear:both" /></div>
+
+<div class="next-line"></div>
+
+<div class="score-comment" onclick="javascript:scoredbee(4,'dislike',<?=$type;?>,<?=$id;?>);"><div id="dislike-comment" tooltip="Dislike <?=$label;?>"></div><div style="float:left; margin-top:7px; margin-left:15px;">dislike <?=$label;?></div><br style="clear:both" /></div>
+
+<div class="next-line"></div>
+
+<div class="score-comment" onclick="javascript:scoredbee(5,'hate',<?=$type;?>,<?=$id;?>);"><div id="hate-comment" tooltip="Hate <?=$label;?>"></div><div style="float:left; margin-top:7px; margin-left:15px;">hate <?=$label;?></div><br style="clear:both" /></div>
+
+</div>

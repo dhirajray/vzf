@@ -1,0 +1,27 @@
+<?php
+define('SALT_LENGTH', 9);
+function generateHash($plainText, $salt = null) {
+	if ($salt === null)	{
+		$salt = substr(md5(uniqid(rand(), true)), 0, SALT_LENGTH);
+	} else {
+		$salt = substr($salt, 0, SALT_LENGTH);
+	}
+	return $salt . sha1($salt . $plainText);
+}
+
+$SubmitMsg=0;
+$newpass=$this->newpass;
+$user=intval($this->user);
+// RESET PASS
+$hashpass=generateHash($newpass);
+$userdet = new Application_Model_DbUser();
+$Success = $userdet->resetpass($user,$hashpass);
+
+if($Success) {
+	$SubmitMsg=1;
+	$rand='';
+	$UserID=intval($this->user);
+	$Success1 = $userdet->resetpasscode($UserID,$rand);
+}
+echo trim($SubmitMsg);
+?>

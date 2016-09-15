@@ -1,0 +1,57 @@
+<?php
+
+$counter=1;
+
+
+
+$str = $this->search_results;
+
+
+
+foreach($str['results'] as $result ) :
+
+//echo'<pre>';print_r($result);die;
+
+//echo substr($result['created_at'],0,11);
+
+
+
+	$TwitternameArr=$result['from_user_name'];
+
+	$screen_name=$TwitternameArr[0];
+
+	$return.="<div><div style='float:left; width:55px;'><img src='".$result['profile_image_url']."' /></div><div style='float:left; width:145px;'><a href='https://twitter.com/". $result['from_user'] ."' target='_blank'>". $result['from_user_name']."</a><br />".$result['text']."</div></div><div style='clear:both'></div><div style='background-color:#E4E3E3; width:auto; height:1px; margin:8px 0 5px 0;'></div>";
+
+	
+
+	$return.="<div class='twitter-addtoreply-div' ".$this->divtitle.">";
+
+//	if($this->addtoreply)
+
+		$return.="<a href=\"javascript:addtoreply(".$counter.",'".$result['from_user_name']."')\" class='addtoreply'>add to ".POST_NAME." reply</a>";
+
+//	else
+
+	//	$return.="<a href='javascript:void(0);' class='addtoreply addtoreply-blocked'>add to db reply</a>";
+
+	$return.="</div>"; 
+
+	
+
+	$hiddenval="<div><div style='float:left; width:55px;'><img src='".$result['profile_image_url']."' /></div><div style='float:left; width:380px;'><a href='https://twitter.com/". $result['from_user'] ."' target='_blank'>". $result['from_user_name'] ."<a/><br />".$result['text']."</div><div style='float:right;'><a href='javascript:void(0);' onclick='javascript:removetweetfromnewcomment();'>remove</a></div></div>";
+
+	$hidden.="<input type='hidden' id='twitter-result-".$counter."' value=\"".str_replace('"','\'',$hiddenval)."\">";
+
+	$counter++;
+
+	
+
+endforeach;
+
+
+
+echo $return.'~#~'.$hidden.'~#~'.$q;
+
+
+
+?>

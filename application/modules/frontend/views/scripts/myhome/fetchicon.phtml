@@ -1,0 +1,11 @@
+<?php 
+
+$i=1;
+$k=1;
+$j=0;
+foreach($this->rssurl as $link):
+?>
+<a class="rss-icon-list" onclick="javascript:myfeeds('<?php echo $link['ID']; ?>','<?php echo $link['Logo']; ?>','<?php echo $link['Name']; ?>',<?php echo $k; ?>,<?php echo $k; ?>)" id="rss<?php echo $k; ?>">
+<?php echo $i; ?>
+</a>
+<?php $i++;$j++;$k++; endforeach; ?>

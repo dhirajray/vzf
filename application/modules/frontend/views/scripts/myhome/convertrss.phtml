@@ -1,0 +1,28 @@
+<?php 
+$count=1;
+if(is_object($this->feedLinks)){
+  foreach ($this->feedLinks as $item) {  	
+
+  	echo "<div class='rss-container '><div class='rsscontent'><div style='padding:4px 2px 4px 2px; font-weight:bold'>".$item->getDateModified()."</div>";
+
+ 	echo '<div style="padding:2px;font-weight:bold"><a href="'.$item->getLink().'" target="_blanck">'.$item->getTitle().'</a></div>';
+
+ 	echo "<div style='padding:4px 2px 8px 2px;'>".strip_tags($item->getDescription())."</div></div>";  	
+
+ 	echo "<div  class='rss-startdblink' ><a href='javascript:void(0)' class='startdbfromrss btn btn-yellow btn-mini' count='$count' >".POST_NAME." this</a></div></div>";
+
+ 	echo '<input id="rsshiddentitle'.$count.'" type="hidden" value="'.$item->getTitle().'">';
+
+ 	echo '<input id="rsshiddendesc'.$count.'" type="hidden" value="'.strip_tags($item->getDescription()).'">';
+
+	echo '<input id="rsshiddenlink'.$count.'" type="hidden" value="'.$item->getLink().'">';	
+
+ 	$count++;
+
+ }
+
+}else{
+	
+	echo "<div align='center' style='color:#ccc;margin-top:50px;font-size:20px'>No feed</div>";
+}
+?>

@@ -1,0 +1,328 @@
+
+<?php
+
+$dbeeObj	=	new Application_Model_Myhome();
+$commonbynew 	=	new Application_Model_Commonfunctionality();
+ $ProfileHolder =true;
+
+ $ProfileUserPic = $this->escape($this->row['ProfilePic']);
+
+ $ProfileHolderID = $this->escape($this->row['UserID']);
+
+ $sd=$this->follow;
+
+ $imgH =130;
+
+$loggedin=true;
+
+if(!isset($_COOKIE['user'])) $loggedin=false;
+
+if($loggedin) $userloggedin='1'; else $userloggedin='0';
+
+$return='';
+
+$profileuser=$this->userid;
+
+
+
+// CHECK IF PROFILE HOLDER
+
+$cookieuser=$this->cookieuser;
+
+if($cookieuser==$profileuser) $ProfileHolder=true;
+
+else $ProfileHolder=false;
+
+
+
+$row=$this->row;
+
+if(!$ProfileHolder && $loggedin) {
+
+if($sd['ID']>0)
+
+	 $follow=1;
+
+	else 
+
+	$follow=0;
+
+}
+
+else{ $follow=-1; $userloggedin = 0;}
+
+$imgW=145;
+
+$imgH=145;
+
+// CALCULATE PROFILE PIC DIMENTIONS
+
+	$fName=explode(' ',$row['Name']);
+
+	// CALCULATE USERS AGE
+
+	$age=  substr($this->agohelper($row['Birthdate']),0,-2);		
+
+	// SELECT TOTAL SCORES OF EACH KIND FOR THIS DBEE
+
+	$totalLove=$this->totalLove;
+
+	$totalLike=$this->totalLike;
+
+	$totalPhil=$this->totalPhil;
+
+	$totalDislike=$this->totalDislike;
+
+	$totalHate=$this->totalHate;
+
+	// SELECT TOTAL SCORES OF EACH KIND FOR THIS DBEE
+
+	$profile_highlighted = '';
+	
+
+	if( $_COOKIE['user'] == $this->userid) {
+		$followDiv='';
+		$mutualscoreDiv='';
+	}
+	else 
+	{
+		if($row['Status']==1) 
+		{
+			if($profileuser!=adminID)
+			$followDiv='<a href="javascript:void(0)"  class="poplight" onclick="javascript:followme('.$profileuser.',this);"id="follow-user" class="follow-user"><div id="followme-label" ></div></a>';
+		}
+		$mutualscoreDiv='<a  onclick="javascript:openmutualscores('.$profileuser.')" class="btn btn-yellow pull-right"> Mutual Scores</a>';
+		
+	}
+
+	$scoreDiv.='<div style="margin:0 5px 0 0;"><span id="loveTotalDB" style="float:left">'.$totalLove.'</span><span style="float:left; margin-left:-8px;"><img src="/images/scoring/heart.png"></span></div><div style="margin-left:50px;"><span id="likeTotalDB" style="float:left">'.$totalLike.'</span><span style="float:left; margin-left:-8px;"><img src="/images/scoring/thumbs-up.png"></span></div><div style="margin-left:50px;"><span id="philosopherTotalDB" style="float:left">'.$totalPhil.'</span><span style="float:left; margin-left:-8px;"><img src="/images/scoring/egg.png"></span></div><div style="margin-left:50px;"><span id="dislikeTotalDB" style="float:left">'.$totalDislike.'</span><span style="float:left; margin-left:-8px;"><img src="/images/scoring/thumbs-down.png"></span></div><div style="margin-left:50px;"><span id="hateTotalDB" style="float:left;">'.$totalHate.'</span><span style="float:left; margin-left:-8px;"><img src="/images/scoring/skull.png"></span></div>';
+
+	$scoreDivWrappper='<div id="maindb-scorewrapper" style="float:right; width:290px; margin-top:0;">'.$scoreDiv.'</div>';
+
+	// PROFILE PIC AND NAME
+    $checkImage = new Application_Model_Commonfunctionality();
+    $pic1 = $checkImage->checkImgExist($row['ProfilePic'],'userpics','default-avatar.jpg');
+	$profile_highlighted.='<div class="dbUserPic">
+	<div datapic-url="'.IMGPATH.'/users/'.$pic1.'" style="margin:0 0 5px 0; width:100%; height:'.$imgH.'px; background-position: center top; background-image:url('.IMGPATH.'/users/'.$pic1.'); background-repeat:no-repeat; background-size:contain"';
+
+	 if($ProfileHolder && $this->changelink==0)
+	 {
+	 	$profile_highlighted.=' onmouseover=\'javascript:document.getElementById("profilepic-edit").style.display="block";\' onmouseout=\'javascript:document.getElementById("profilepic-edit").style.display="none";\'';
+	 }
+
+
+	
+	  $userdetails=$this->userdetails;
+	
+		// MESSAGE ME
+		if(!$ProfileHolder)
+		{
+			if($this->blockuser==0 && $row['Status']==1)
+			{ 
+				$profile_message.='<a style="cursor:pointer" onclick="javascript:opensendmessage('.$profileuser.',\''.$fName[0].'\',this);" class="btn">Message </a>';
+			}
+		}
+			// SOCIAL ICONS
+			$profile_social = '';
+			if($userdetails[0]['SocialFB']!='' || $userdetails[0]['SocialTwitter']!='' || $userdetails[0]['SocialLinkedin']!='') $profile_social.='<div align="center" style="text-align:center; margin-top:10px;"><div style="margin-bottom:5px;"><img src="/img/findme.png"> </div>';
+			if($userdetails[0]['SocialFB']!='')
+				$profile_social.='<a href="'.$userdetails[0]['SocialFB'].'" target="_blank"><div class="profilesocial-fb" ></div></a>';
+			if($userdetails[0]['SocialTwitter']!='')
+				$profile_social.='<a href="'.$userdetails[0]['SocialTwitter'].'" target="_blank"><div class="profilesocial-twitter" ></div></a>';
+			if($userdetails[0]['SocialLinkedin']!='')
+				$profile_social.='<a href="'.$userdetails[0]['SocialLinkedin'].'" target="_blank"><div class="profilesocial-linkedin"></div></a>';
+			if($userdetails[0]['SocialFB']!='' || $userdetails[0]['SocialTwitter']!='' || $userdetails[0]['ocialLinkedin']!='')
+			   $profile_social.='</div>';
+			
+
+				$profile_highlighted.='><div id="profilepic-edit" class="profilepic-edit"><div class="pic-edit-action" >change picture</div></div></div>'.$profile_social.'</div>';
+
+		
+
+	// SELECT USER BIOGRAPHY
+	
+
+	$BioRow=$this->bio;
+
+	$bioInfo	=	'';
+	$title = '';
+
+
+	$cutage = str_replace('year','',$age);
+
+	if(strlen($cutage)==5) $cutage = str_replace('yea','',$age);
+ 
+     if($userdetails[0]['company'] || $userdetails[0]['title'])
+     {
+     	$title.='<li>';
+		if($userdetails[0]['company']) $title.='<span>company: </span>'.$this->myclientdetails->customDecoding($userdetails[0]['company']).' ';
+		if($userdetails[0]['title']) $title.='- <span>position: </span>'.($this->myclientdetails->customDecoding($userdetails[0]['title']));
+		$title.='</li>';
+     }
+
+	if($age!='' && $userdetails[0]['DOBmakeprivate'] == 0) $bioInfo.='<li><span>age : </span>'.$cutage.'</li>';
+	
+	if($location!='') $bioInfo.='<li><span>Location : </span>'.$location.'</li>';
+	if($BioRow) {
+		
+	/*	if($BioRow[0]['AboutMe']!='') $bioInfo.='<li><span>about me : </span>'.$BioRow[0]['AboutMe'].'</li>';
+		if($BioRow[0]['Occupation']!='') $bioInfo.='<li><span>occupation : </span>'.$BioRow[0]['Occupation'].'</li>';
+		if($BioRow[0]['PoliticalViews']!='') $bioInfo.='<li><span>political views : </span>'.$BioRow[0]['PoliticalViews'].'</li>';
+		if($BioRow[0]['RelegiousViews']!='') $bioInfo.='<li><span>religious views : </span>'.$BioRow[0]['RelegiousViews'].'</li>';
+		if($BioRow[0]['HobbiesInterests']!='') $bioInfo.='<li><span>hobbies & interests : </span>'.$BioRow[0]['HobbiesInterests'].'</li>';
+		if($BioRow[0]['LikesDislikes']!='') $bioInfo.='<li><span>likes & dislikes : </span>'.$BioRow[0]['LikesDislikes'].'</li>';*/
+		
+	}
+
+	//----- TOTAL FOLLOWING ---------//
+
+	$TotalFollowingRes = $this->TotalFollowingRes;
+
+	//----- TOTAL FOLLOWING ---------//
+
+	$FollowingSQL= $this->FollowingRow;
+
+	$showFollowingSQL = '';
+
+	if(count($FollowingSQL)>0) 
+	{
+
+		$showFollowingSQL.='<div style="margin:20px 0 20px 0;"><div class="medium-font-bold" style="float:left; margin-right:20px;"><b>Following '.count($TotalFollowingRes).' on post</b></div>';
+
+		if(count($TotalFollowingRes)>19)
+
+			$showFollowingSQL.='<div style="float:left; margin-right:20px;">|</div><div style="float:left"><a href="javascript:void(0);" onclick="javascript:OpenShadowbox(\'followers.php?user='.$profileuser.'&type=1\',\'\',\'325\',\'630\');">see all</a></div>';
+
+		$showFollowingSQL.='</div><div class="next-line"></div>';
+
+		$counter=1;
+
+		foreach($FollowingSQL as $FollowingRow) :			
+
+			$fStatus=$FollowingRow['Status'];
+
+			 $fLinkStart='<a href="/user/'.$FollowingRow['Username'].'">';
+
+			$showFollowingSQL.=$fLinkStart.'<div id="followinguser'.$counter.'" class="follower-box-profile" title="'.$FollowingRow['Name'].'">
+
+			<img src="'.BASE_URL_IMAGES.'/show_thumbnails.php?ImgName='.$FollowingRow['ProfilePic'].'&ImgLoc=userpics&Width=35&Height=35" border="0" /></div></a>';
+
+			if($counter%19==0) $showFollowingSQL.='<div class="next-line"></div>';
+
+			$counter++;
+
+		endforeach;
+
+		$showFollowingSQL.='<div class="next-line"></div>';
+
+	}
+
+
+
+	//----- TOTAL FOLLOWERS ---------//
+
+	$TotalFollowersRes=$this->TotalFollowersRes;
+
+	$showFollowersRes	=	'';
+
+	if(count($this->FollowersRes)>0) 
+	{	
+
+		$showFollowersRes.='<div style="margin:20px 0 20px 0;"><div class="medium-font-bold" style="float:left; margin-right:20px;"><b><span id="followercount">'.count($TotalFollowersRes).'</span> following '.$fName[0].' on post</b></div>';
+
+		if(count($TotalFollowersRes)>19)
+
+			$showFollowersRes.='<div style="float:left; margin-right:20px;">|</div><div style="float:left"><a href="javascript:void(0);" onclick="javascript:OpenShadowbox(\'followers.php?user='.$profileuser.'&type=2\',\'\',\'325\',\'630\');">see all</a></div>';
+
+		$showFollowersRes.='</div><div class="next-line"></div>';
+
+		$counter=1;
+
+		foreach($this->FollowersRes as $FollowersRow):			
+
+			$fStatus=$FollowersRow['Status'];
+
+			if($fStatus==1) $fLinkStart='<a href="/user/'.$FollowersRow['Username'].'">';
+
+
+
+			$showFollowersRes.=$fLinkStart.'<div class="follower-box-profile" title="'.$FollowersRow['Name'].'">
+
+			<img src="'.BASE_URL_IMAGES.'/show_thumbnails.php?ImgName='.$FollowersRow['ProfilePic'].'&ImgLoc=userpics&Width=35&Height=35" border="0" /></div></a>';
+
+			if($counter%19==0) $showFollowersRes.='<div class="next-line"></div>';
+
+			$counter++;
+
+		endforeach;
+
+	}
+
+	$twitter_connect_data = Zend_Json::decode($userdetails[0]['twitter_connect_data']);
+	
+	$facebook_connect_data = Zend_Json::decode($userdetails[0]['facebook_connect_data']);
+
+	$socialTwitter = '';
+	$socialFacebook = '';
+
+	if(!empty($twitter_connect_data) && $userdetails[0]['UserID']!=$this->session_data['UserID']){
+		$socialTwitter = '<a href="javascript:void(0);" class="twitterconnected TwitterVisitor" username="'.$userdetails[0]['Username'].'" id="'.$twitter_connect_data['screen_name'].'" ><i class="visitorSprite"></i> linked</a>';
+	}
+	if(!empty($facebook_connect_data) && $userdetails[0]['UserID']!=$this->session_data['UserID']){
+		$socialFacebook = '<a href="javascript:void(0);" class="facebookconnected FacebookVisitor" username="'.$userdetails[0]['Username'].'" id="'.$facebook_connect_data['facebookid'].'" ><i class="visitorSprite"></i> linked</a>';
+	}
+	$profile_highlighted.='<div class="dbDetailsBox">
+								<!--this is details top bar-->
+								<div class="dbDetailsTopBar">
+									'.$followDiv.' '.$profile_message.'
+									<div class="crSt">
+										<span>'. $dbeeObj->usersdbeecount($profileuser).'</span>
+										'.POST_NAME.'s
+									</div>
+									<div class="crSt">
+										<span>'.count($TotalFollowingRes).'</span>
+										following
+									</div>
+									<div class="crSt">
+										<span>'.count($TotalFollowersRes).'</span>
+										followers
+									</div>
+									'.$mutualscoreDiv.' '.$socialnetworklink.'
+								</div>
+								<!--End from here details top bar-->
+
+								<!-- db content bar-->
+								<div class="userPrDetailsWrapper">
+									<h2>'.$this->myclientdetails->customDecoding($row['Name']);
+									if($row['usertype'] != 0 && $row['usertype']!=6) 
+										$userTypenal = $commonbynew->checkuserType($row['usertype']);
+										$profile_highlighted.='<span style="color:#FF6600; font-weight:bold;font-size:11px;">'.$userTypenal.'</span> ';
+									$profile_highlighted.= $socialTwitter.'   '.$socialFacebook.' </h2>
+									<h3 style="margin-top:-10px">username <span style="color:#FF6600">@'.$this->myclientdetails->customDecoding($row['Username']).'</span>';
+									
+
+									if($_COOKIE['user'] == $this->userid) {
+									 $profile_highlighted.='<span id="changeusername" style="color:#ccc; cursor:pointer" username="'.$this->myclientdetails->customDecoding($row['Username']).'"> Edit</span>';
+									}
+									
+
+									 $profile_highlighted.='</h3>
+									<ul>
+										'.$title.'
+										'.$bioInfo.'
+									</ul>
+								</div>
+								<!--End from here db content -->
+								<!--#changeusername function is reside jsfornotification.js -->
+								</div>
+						</div>';
+	
+
+$return=$profile_highlighted.'~#~'.$follow.'~#~'.$userloggedin.'~#~'.$following.'~#~'.count($this->FollowingRes);
+
+
+
+echo $return;
+
+?>
+

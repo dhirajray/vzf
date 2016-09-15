@@ -1,0 +1,37 @@
+<?php 
+
+$return='<div class="displayby-wrapper" style="width:300px"><div class="displayby-speecharrow"></div>';
+
+$counter=1;
+
+foreach($this->cat as $dbcatRow):
+
+	if((eregi("chrome", $_SERVER['HTTP_USER_AGENT']) || eregi("MSIE", $_SERVER['HTTP_USER_AGENT'])) && $counter==1) $mtop='10px'; else $mtop='0';
+
+	
+
+	
+
+
+
+	if($counter%2==0){
+
+		$return.='<div class="displayby-text-right" style="margin:'.$mtop.' 0 10px 0;"><a href="javascript:dbfeedfilterbycat('.$dbcatRow['CatID'].')">'.$dbcatRow['CatName'].'</a></div>';
+
+		$return.='<div class="next-line"></div>';
+
+	}else{
+
+		$return.='<div class="displayby-text" style="margin:'.$mtop.' 15px 10px 0;"><a href="javascript:void(0)" onclick="javascript:dbfeedfilterbycat('.$dbcatRow['CatID'].');">'.$dbcatRow['CatName'].'</a></div>';
+
+	}
+
+	$counter++;
+
+endforeach;
+
+$return.='</div>';
+
+
+
+echo $return;

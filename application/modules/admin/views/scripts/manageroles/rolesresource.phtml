@@ -1,0 +1,183 @@
+<?php  
+$request = $this->request;       
+$this->title = "Roles & Permissions";
+$this->headTitle($this->title);
+?>
+<h1 class="pageTitle ">Roles & Permissions</h1>
+
+
+<div class="userUpBar">
+						<div class="pull-right buttonRight">	
+						    <!--for message to user-->
+							<div class="dropDown  pull-right" id="userAddNew">
+								<a href="#" class="btn dropDownTarget"><i class="fa fa-plus fa-lg"></i> Create role</a> 
+								<div class="dropDownList right">
+									<!-- <p class="validateTips " >Roles required</p> -->
+									<form class="right">
+										<div class="formRow">
+											<input type="text" id="roleInput" name="roleInput" placeholder="Role name"> 
+										</div>
+										<div class="formRow">
+												<input type="hidden"  id="calling" value="addadmin" />	
+												<button type="button" class="btn btn-green fluidBtn  pull-right addRoleBtn" id="addRoleBtn" style="margin-right:0px;"> 
+													<i class="fa fa-plus fa-lg"></i>  Add Role 
+												</button>
+										</div>
+									</form>
+
+								</div>
+							</div>							
+						</div>
+						<!-- <div class="pull-right buttonRight">	
+							<div class="dropDown  pull-left" id="userAddNew">
+								<a href="#" class="btn dropDownTarget"><i class="fa fa-plus fa-lg"></i> Delete role</a> 
+								<div class="dropDownList right">
+									<?php
+											  $roles = new Admin_Model_User();
+											  $selctAllRols = $roles->getselRolswithoutAdmin();
+									?>
+									<form class="right">
+										<div class="formRow">
+											<select name="rools" id="userRols">
+											<option value="selectrole" name="selectrole" selectrol="selectrole">select role</option>	
+											<?php foreach ($selctAllRols as $rolval):
+											?>	
+											<option value=<?php echo $rolval['role'];?> name="selectrols" selectrol=<?php echo $rolval['role_id']?>><?php echo $rolval['role'];?></option>
+											<?php endforeach; ?>	
+											</select>	
+										</div>
+										<div class="formRow">
+												<input type="hidden"  id="calling" value="deladmin" />	
+												<button type="button" class="btn btn-green fluidBtn  pull-right addRoleBtn" id="RoledelBtn" style="margin-right:0px;"> 
+													<i class="fa fa-plus fa-lg"></i>  Delete Role 
+												</button>
+										</div>
+									</form>
+
+								</div>
+							</div>							
+						</div> -->
+</div>	
+
+<div class="clearfix"></div>
+
+<div class="clearfix"><?php echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml'); ?></div>
+<div class="rpGraphTop clearfix">
+	<h2 class="pull-left">Total: <?php echo $this->totRoles; ?></h2>
+</div>
+<form name="userform" id="userform">   
+	<div class="responsiveTable">
+	<table class="table-border userListTable table table-hover table-stripe">
+		<thead>
+			<?php  if (count($this->paginator)){ ?>
+			<?php $rowchange	=	0; ?> 
+			<!-- <tr>
+			    <td colspan="8">
+			    	<div class="rpGraphTop clearfix">
+						<form action="#" method="post">
+							<div>
+								<div class="pull-left" style="font-weight:normal; line-height: 28px;">Roles list</div>
+							</div>
+						</form>
+					</div>
+				</td>
+			    
+			</tr> -->
+			<tr>
+			    <!-- <td style="width: 100px;">Select</td> -->
+			    <td>Roles</td> 
+			    <td>Action</td>
+			</tr>
+		</thead>
+		<tbody>
+			<?php foreach($this->paginator as $resourcedata) : ?>
+			<?php if($rowchange%2==1) {$color = '#CCC';} else {$color ='#FFF';} ?>
+			<tr resourceid="rolelist_<?php echo $this->escape($resourcedata['role_id']);?>" selectrescheck="No" id="rolelist_<?php echo $this->escape($resourcedata['role_id']);?>">
+			    <!-- <td class="rolescheck">
+					<label>
+					<input class="rolecheckboxt" type="checkbox" value="<?php echo $resourcedata['role'] ?>" parentid="<?php echo $resourcedata['role_id'] ?>">
+					<label for=""></label>
+					</label>
+				</td> -->
+			    <td>
+			    	<?php echo $this->escape($resourcedata['role']);?>
+			    </td>
+                <td style="width: 200px;">
+					<a class="btn btn-green btn-mini" href="<?php echo $this->url(array('controller'=>'manageroles','action'=>'manageroleresource','Roleid'=>$resourcedata['role_id']));?>">
+						<i class="fa fa-eye-open "></i>
+						Permissions
+					</a>
+					<span class="sprt"> </span>
+					<a class="btn btn-danger btn-mini deleteroleres" roleid="<?php echo $resourcedata['role_id'];?>" rolevalue="<?php echo $resourcedata['role'] ?>" action="openDialog">
+						<i class="fa fa-trash"></i>
+						Delete
+					</a
+					<span class="sprt"> </span>						
+			    </td>
+			</tr>
+
+			<?php $rowchange++; endforeach; ?>
+				<?php }?>
+		</tbody>
+	</table>
+</div>
+</form>
+
+
+<!-- <div class="rpGraphTop clearfix">
+	<h2 class="pull-left">Total: <?php echo $this->totResources; ?></h2>
+</div>
+<form name="userform" id="userform">   
+	<table class="table-border userListTable table table-hover table-stripe">
+		<thead>
+			<?php  if (count($this->paginator)){ ?>
+			<?php $rowchange	=	0; 
+			?> 
+			<tr>
+			    <td colspan="8">
+			    	<div class="rpGraphTop clearfix">
+			    		<?php if ($this->seachfield !='') { ?>
+			    		<a href="<?php echo BASE_URL ?>/admin/manageroles" class="btn btn-black pull-left">Back to main list</a>
+			    		<?php }?>
+						<form action="<?php echo BASE_URL ?>home/Reporting/getcsv" method="post">
+							<div>
+								<div class="pull-left" style="font-weight:normal; line-height: 28px;">Assigne resource to a role.</div>
+							</div>
+							<input type="hidden" name="calling" value="usersList">
+							<input type="hidden" name="filename" value="users list">
+
+							<input type="hidden" name="seachfieldChk" value="<?php echo $this->seachfield; ?>">
+							<input type="hidden" name="orderfieldChk" value="<?php echo $this->orderfield; ?>">
+							<input type="hidden" name="records" value=" <?php //echo htmlentities(json_encode($this->forcsvrec));   ?> ">
+						</form>
+					</div>
+				</td>
+			    
+			</tr>
+			<tr>
+			    <td style="width: 100px;">Select</td>
+			    <td>Assigned Resource</td> 
+			</tr>
+		</thead>
+		<tbody>
+			<?php foreach($this->paginator as $resourcedata) : ?>
+			<?php if($rowchange%2==1) {$color = '#CCC';} else {$color ='#FFF';} ?>
+			<tr resourceid="rolelist_<?php echo $this->escape($resourcedata['id']);?>" selectrescheck="No">
+			    <td class="rolescheck">
+					<label>
+					<input class="rolecheckboxt" type="checkbox" value="<?php echo $resourcedata['id'] ?>" parentid="<?php echo $resourcedata['parent_id'] ?>">
+					<label for=""></label>
+					</label>
+				</td>
+			    <td>
+			    	<?php echo $this->escape($resourcedata['resource']);?>
+			    </td><br></br>
+
+			</tr>
+
+			<?php $rowchange++; endforeach; ?>
+				<?php }?>
+		</tbody>
+	</table>
+</form> -->
+<?php echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml'); ?>

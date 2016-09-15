@@ -1,0 +1,1324 @@
+<link href="<?php echo BASE_URL ?>/adminraw/css/ui-lightness/jquery-ui-1.9.2.custom.min.css" media="screen" rel="stylesheet" type="text/css" >
+<link href="<?php echo BASE_URL ?>/adminraw/css/dbee.css" media="screen" rel="stylesheet" type="text/css" >
+<link href="<?php echo BASE_URL ?>/adminraw/js/flexslider/flexslider.css" media="screen" rel="stylesheet" type="text/css" >
+<link href="<?php echo BASE_URL ?>/adminraw/css/email-template.css" media="screen" rel="stylesheet" type="text/css" >
+<link href="<?php echo BASE_URL ?>/adminraw/js/colpick/colpick.css" media="screen" rel="stylesheet" type="text/css" >
+<link href="<?php echo BASE_URL ?>/adminraw/css/dropzone.css" media="screen" rel="stylesheet" type="text/css" >
+<link href="<?php echo BASE_URL ?>/adminraw/css/token-input-facebook.css" media="screen" rel="stylesheet" type="text/css" >
+<link href="<?php echo BASE_URL ?>/adminraw/js/select2/select2.css" media="screen" rel="stylesheet" type="text/css" ><script type="text/javascript" src="<?php echo BASE_URL ?>/adminraw/js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL ?>/adminraw/js/jquery-migrate-1.1.1.min.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL ?>/adminraw/js/jquery-ui-1.9.2.custom.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL ?>/adminraw/js/jquery.tokeninput.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL ?>/adminraw/js/jquery.ui.touch-punch.min.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL ?>/adminraw/js/flexslider/jquery.flexslider.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL ?>/adminraw/js/dropzone.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL ?>/adminraw/js/highstock.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL ?>/adminraw/js/exporting.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL ?>/adminraw/js/jquery.dd.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL ?>/adminraw/js/common.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL ?>/adminraw/js/dashboard.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL ?>/adminraw/js/jquery.cookie.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL ?>/adminraw/js/jquery.form.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL ?>/adminraw/js/charts.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL ?>/adminraw/js/search.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL ?>/adminraw/js/userfunctions.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL ?>/adminraw/js/reporting.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL ?>/adminraw/js/othersearch.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL ?>/adminraw/js/specialdbs.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL ?>/adminraw/js/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL ?>/adminraw/js/colpick/colpick.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL ?>/adminraw/js/banner.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL ?>/adminraw/js/globalsetting.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL ?>/adminraw/js/select2/select2.min.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL ?>/adminraw/js/jquery.tokeninput.js"></script>
+<link rel="stylesheet" href="<?php echo BASE_URL ?>/adminraw/css/token-input.css" type="text/css" />
+<script src="<?php echo BASE_URL ?>/adminraw/js/tagit/tag-it.js" type="text/javascript" charset="utf-8"></script>
+<link href="<?php echo BASE_URL ?>/adminraw/js/tagit/jquery.tagit.css" rel="stylesheet" type="text/css">
+<script type="text/javascript">
+	$('document').ready(function(){
+
+		 $('.showlovecomments').toggle(function(e){
+		 	e.preventDefault();
+		 	var thisEl = $(this);
+		 	var parent = $(this).closest('.commentexplore');
+	       parent.find(".hideRowsDetails").slideDown(
+	         function(){
+	            thisEl.html('<i class="fa fa-minus"></i>');
+	         }
+	       );
+	   },function(){
+	   		var parent = $(this).closest('.commentexplore');
+	   		var thisEl = $(this);
+	       parent.find(".hideRowsDetails").slideUp(
+	       function(){
+	             thisEl.html('<i class="fa fa-plus"></i>');
+	       }
+	       );
+	   });
+
+	 $('.scoredusersexpand').toggle(function(e){
+	 	e.preventDefault();
+	 	var thisEl = $(this);
+	 	var parent = $(this).closest('.scoreexplore');
+	   parent.find(".scoreddiv").slideDown(
+	     function(){
+	        thisEl.html('<i class="fa fa-minus"></i>');
+	     }
+	   );
+	   },function(){
+	   		var parent = $(this).closest('.scoreexplore');
+	   		var thisEl = $(this);
+	       parent.find(".scoreddiv").slideUp(
+	       function(){
+	             thisEl.html('<i class="fa fa-plus"></i>');
+	       }
+	       );
+	   });
+		
+	})
+
+</script>
+<script type="text/javascript">
+	function capture() {
+
+		$('.postreport').html2canvas({
+			onrendered: function (canvas) {
+                //Set hidden field's value to image data (base-64 string)
+				$('#img_val').val(canvas.toDataURL("image/png"));
+                //Submit the form manually
+				document.getElementById("myForm").submit();
+			}
+		});
+}
+</script>	
+
+<?php     
+$this->view->myclientdetails = $this->myclientdetails = new Application_Model_Clientdetails();
+
+$this->title = "Post Report";
+$this->headTitle($this->title);
+$layouts  = new Admin_Model_Layouts();
+$deshboardObj 	= new Admin_Model_Deshboard();
+$commonObj 		= new Admin_Model_Common(); 
+$reportObj 		= new Admin_Model_Reporting();  
+$polls          = new Admin_Model_Polloption();	 
+
+$scoreset =  $layouts->scoringFromDb(); // taking value from database
+$configurations = $deshboardObj->getConfigurations();
+$post_score_setting = json_decode($configurations['ScoreNames'],true);
+//$this->postid= 7223;
+$dbrecord 	=	$deshboardObj->getfieldsfromjointable(array('*'),'tblDbees','DbeeID',$this->postid,array('UserID','Name','lname','ProfilePic'),'tblUsers','User','UserID');
+
+$TotComments = $this->myclientdetails->getfieldsfromtable(array('DbeeID'),'tblDbeeComments','DbeeID',$this->postid);
+
+$TotalComments = count($TotComments);
+$allscors 	=	$deshboardObj->getfieldsfromjointable(array('scoretot' =>  new Zend_Db_Expr('count(tblScoring.Owner)')),'tblScoring','MainDB',$this->postid,array('UserID','Name','ProfilePic'),'tblUsers','Owner','UserID','UserID','scoretot');
+
+
+if($TotalComments>0)
+{
+	$allscors 	=	$deshboardObj->getfieldsfromjointable(array('scoretot' =>  new Zend_Db_Expr('count(tblScoring.Owner )')),'tblScoring','MainDB',$this->postid,array('UserID','Name','ProfilePic'),'tblUsers','Owner','UserID','UserID','scoretot');
+
+	$allmensn 	=	$deshboardObj->getfieldsfromjointable(array('mnsntot' =>  new Zend_Db_Expr('count(tblactivity.act_ownerid)')),'tblactivity','act_typeId',$this->postid,array('UserID','Name','ProfilePic'),'tblUsers','act_ownerid','UserID','act_ownerid','mnsntot','DESC','act_type','3');
+	//$allscors[] = array('scoretot' => 21, 'UserID' => '15321','Name' => 'Rajesh','ProfilePic' => '1386841049.jpg', );
+
+	$topinfluence = array();
+	if(count($allmensn) > 0){
+		foreach ($allmensn as $key => $value) {
+			$usersmatched = $deshboardObj->searchinmltarray($value['UserID'],$allscors) ;
+
+			if($usersmatched)
+			{
+				$topinfluence[$value['UserID']] = $value['mnsntot']+$usersmatched['scoretot'];
+				$topinfluenceval[$value['UserID']]['Name'] = $this->myclientdetails->customDecoding($value['Name']);
+				$topinfluenceval[$value['UserID']]['Pic'] = $value['ProfilePic'];
+			} 
+			else
+			{
+				$topinfluence[$value['UserID']] = $value['mnsntot'];
+				$topinfluenceval[$value['UserID']]['Name'] = $this->myclientdetails->customDecoding($value['Name']);
+				$topinfluenceval[$value['UserID']]['Pic'] = $value['ProfilePic'];
+			} 
+		}
+	}
+	if(count($allscors) > 0){
+		foreach ($allscors as $key => $value) {
+			$usersmatched = $deshboardObj->searchinmltarray($value['UserID'],$allmensn) ;
+
+			if($usersmatched)
+			{
+				$topinfluence[$value['UserID']] = $value['scoretot']+$usersmatched['mnsntot'];
+				$topinfluenceval[$value['UserID']]['Name'] = $this->myclientdetails->customDecoding($value['Name']);
+				$topinfluenceval[$value['UserID']]['Pic'] = $value['ProfilePic'];
+			} 
+			else
+			{
+				$topinfluence[$value['UserID']] = $value['scoretot'];
+				$topinfluenceval[$value['UserID']]['Name'] = $this->myclientdetails->customDecoding($value['Name']);
+				$topinfluenceval[$value['UserID']]['Pic'] = $value['ProfilePic'];
+			} 
+		}
+	}
+	if(count($topinfluence)>0){
+		$maxscore = max($topinfluence);
+
+		$topinfUsers = array_keys($topinfluence, max($topinfluence));
+	}	
+}
+	
+	
+		$savegroupcontent = $commonObj->addtogroupbutton(1);
+?>
+
+<form method="POST" enctype="multipart/form-data" action="<?php echo BASE_URL ?>/admin/savedcharts/capturediv" id="myForm">
+	<input type="hidden" name="img_val" id="img_val" value="" />
+</form>
+<input type="submit" value="Take Screenshot Of Div Below" onclick="capture();" class="screenCapture" />
+<div class="box-body postReportsWrp" id="box_body">	
+	<h1 class="pageTitle">Post report <a style="float:right" class="getpdf" href="<?php echo BASE_URL ?>/admin/dashboard/getpdf/postid/<?php echo $this->postidEncode ?>">get it</a> </h1>	
+	<div class="clearfix"></div>
+	<input type="hidden" name="dbeetype_edit" value="<?php echo $this->postid ?>" id="currentdbid" >
+	<?php
+	$totsentiofuser = $deshboardObj->totalsentiments($this->postid, 'user');
+   // echo $TotalComments.' - '.$totsentiofuser[0]['tot']; exit;
+   	?>
+	<!-- <div>
+		<div>Report for post : <?php echo BASE_URL.'/dbee/'. ($dbrecord[0]['dburl']); ?></div>
+	</div> -->
+	
+		<div  class="helponoff userActiveInactive updateDbeeUserStatus" style="display:none"> 
+			<!-- Note : user_id is dbee_id -->
+			<?php if($dbrecord[0]['Active']==1) { ?>
+					<input type="checkbox" id="switcherTarget_<?php echo $dbrecord[0]['DbeeID']; ?>" user_id="<?php echo $dbrecord[0]['DbeeID']; ?>"  status="0">
+			<?php }else{ ?>
+			<input type="checkbox" id="switcherTarget_<?php echo $dbrecord[0]['DbeeID']; ?>" checked="checked" user_id="<?php echo $dbrecord[0]['DbeeID']; ?>"  status="1"> 
+			<?php } ?>
+			<label for="switcherTarget_<?php echo $dbrecord[0]['DbeeID'] ?>">
+				<div class="onHelp" on="Active" off="Inactive"></div>
+				<div class="onHelptext">
+					<span>Activate</span>
+					<span>Deactivate</span>
+				</div>
+			</label>
+		</div>
+		<?php 
+			$descDisplay	='';
+			if($this->escape($dbrecord[0]['Type'])==1) { 
+				$dbtype			=	'Text';
+				$dbtypeIcon	=	'<div class="pstype typeText"></div>';
+				$descDisplay	=	'<div class="dbLinkDesc">'.$dbrecord[0]['Text'].'</div>';
+				//substr($liveDbee->description,0,100).'</div>';
+			}
+			if($this->escape($dbrecord[0]['Link'])!='') { 
+				$dbtype			=	'URL link';
+				$dbtypeIcon	=	'<div class="pstype typeLink"></div>';
+				$dbLink			=	$dbrecord[0]['Link'];
+				$dbLinkTitle	=	$dbrecord[0]['LinkTitle'];
+				$dbLinkDesc		=	$dbrecord[0]['LinkDesc'];
+				$descDisplay = '';
+				$dbUserLinkDesc	=	!empty($dbrecord[0]['Text']) ? $dbrecord[0]['Text'] : $dbrecord[0]['LinkTitle'];
+
+			$descDisplay	=	'<div class="dbLinkDesc">'.$dbUserLinkDesc.' - 
+			<a target="_blank" href="'.$dbLink.'">'.$dbLink.'</a></div>';
+			}
+			if($this->escape($dbrecord[0]['Pic'])!='') { 
+				$dbtype	=	'Image';
+				$dbtypeIcon	=	'<div class="pstype typePix"></div>';
+				$dbPic		=	$dbrecord[0]['Pic'];
+				$dbPicDesc	=	$dbrecord[0]['PicDesc'];
+				$descDisplay='';
+				$descDisplay	.='<div class="picAndVideoTxt '.$noPic.'">'.$dbrecord[0]['Text'].'</div>';			
+					if($dbPic!='')
+					{
+						$checkdbpic = $commonObj->checkImgExist($dbPic,'imageposts','default-avatar.jpg');
+						$descDisplay	.=	'<div class="dbPic">
+												<a href="javascript:void(0)">
+													<img src="'.IMGPATH.'/imageposts/small/'.$checkdbpic.'" width="90" border="0" />
+												</a>
+											</div>';
+					}else{
+
+						$noPic = 'noPix';
+					}
+				
+			}
+			if($this->escape($dbrecord[0]['VidID'])!='') 
+			{ 
+				$dbtype	=	'Video';
+				$dbtypeIcon	=	'<div class="pstype typeVideo"></div>';
+				$dbVid			=	$dbrecord[0]['VidID'];
+				$dbVidDesc		=	$dbrecord[0]['Text'];
+				$dbLinkDesc		=	$dbrecord[0]['LinkDesc'];
+				$dbUserLinkDesc	=	!empty($dbrecord[0]['UserLinkDesc']) ? $dbrecord[0]['UserLinkDesc'] : $dbrecord[0]['LinkTitle'];
+
+				$descDisplay	.='<div class="picAndVideoTxt '.$noPic.'">'.$dbVidDesc.'</div>';
+				$descDisplay	.=	'<div class="dbPicText">';
+				if($dbVid!='')
+				{
+					$descDisplay	.=	'<div class="dbPic" >
+					<a href="#"><img width="90" height="60" border="0" src="https://i.ytimg.com/vi/'.$dbVid.'/0.jpg"></a></div>';
+				}else{
+					$noPic = 'noPix';
+				}
+				
+				$descDisplay	.=	'</div>';//substr($dbVidDesc,0,100).'</div></div>';
+			
+			
+			}
+			if($this->escape($dbrecord[0]['VidID'])!='' && $this->escape($dbrecord[0]['Pic'])!='') 
+			{ 
+				$descDisplay ='';
+				$dbtype	=	'Video';
+				$dbtypeIcon	=	'<div class="pstype typeVideo"></div>';
+				$dbVid			=	$dbrecord[0]['VidID'];
+				$dbVidDesc		=	$dbrecord[0]['Text'];
+				$dbLinkDesc		=	$dbrecord[0]['LinkDesc'];
+				$dbUserLinkDesc	=	!empty($dbrecord[0]['UserLinkDesc']) ? $dbrecord[0]['UserLinkDesc'] : $dbrecord[0]['LinkTitle'];
+
+				$dbPic		=	$dbrecord[0]['Pic'];
+				$dbPicDesc	=	$dbrecord[0]['PicDesc'];
+				$descDisplay	.='<div class="picAndVideoTxt '.$noPic.'">'.$dbVidDesc.'</div>';
+
+					if($dbPic!='')
+					{
+						$checkdbpic = $commonObj->checkImgExist($dbPic,'imageposts','default-avatar.jpg');
+						$descDisplay	.=	'<div class="dbPic">
+												<a href="javascript:void(0)">
+													<img src="'.IMGPATH.'/imageposts/small/'.$checkdbpic.'" width="90" border="0" />
+												</a>
+											</div>';
+					}else{
+
+						$noPic = 'noPix';
+					}
+
+				
+				$descDisplay	.=	'';
+				if($dbVid!='')
+				{
+					$descDisplay	.=	'<div class="dbPic" >
+					<a href="#"><img width="90" height="60" border="0" src="https://i.ytimg.com/vi/'.$dbVid.'/0.jpg"></a></div>';
+				}else{
+					$noPic = 'noPix';
+				}
+				
+				$descDisplay	.=	'';//substr($dbVidDesc,0,100).'</div></div>';
+			
+			
+			}
+			if($this->escape($dbrecord[0]['Type'])==5) { 
+				$dbtype	=	'Poll'; 			
+				$dbtypeIcon	='<div class="pstype typePoll"></div>';				
+				$descDisplay	='<div class="dbTextPoll">'.$dbrecord[0]['PollText'].'</div>';//substr($dbPollText,0,100).'</div>';
+			}
+
+		   $liveDbeepic = $commonObj->checkImgExist($dbrecord[0]['image'],'userpics','default-avatar.jpg');
+		?>
+		<div class="postreport">
+			<div class="taglisting">
+				<div class="scoredListTitle">
+					<?php // echo $dbtypeIcon; ?> 
+					<span><strong>Type: </strong> <?php echo $dbtype; ?> </span> 
+					<span><strong>Category:</strong> 
+						<?php
+							if($dbrecord[0]['Cats']!='' && $dbrecord[0]['Cats']!='0' && $dbrecord[0]['Cats']!='undefined' ) 
+					        { 
+
+					            $getcatsname  =    $deshboardObj->getfieldsfromtableusingin(array('CatName'),'tblDbeeCats','CatID',trim($dbrecord[0]['Cats']) );
+
+					            $showcategories     =   '';
+					            $categoriestooltip  =   '';
+
+					            foreach ($getcatsname as $key => $value) 
+					            {
+					               if($key!=0)
+					               $showcategoriestooltip .= $value['CatName'] .', ';
+					               
+					            }  
+
+					            if(count($getcatsname) == 1)
+					            {
+					                $showcategories  =    ' '.$getcatsname[0]['CatName']  ;
+					            } else {
+					                $showcategories  =    ' '.$getcatsname[0]['CatName'] . ' and <strong rel="dbTip" title="'.trim($showcategoriestooltip,', ').'" style="color:#999">' .(count($getcatsname)-1) .' others </strong>';
+					            }  
+					        } 
+					        echo $showcategories;
+						?>
+					</span>		
+					<span><strong>Posted  on:</strong> <?php echo date('d M Y',strtotime($this->escape($dbrecord[0]['PostDate']))); ?></span>					
+				</div>
+				<div class="scoredListTitle pstCntntWrp">
+					<?php // echo $dbtypeIcon; ?> 
+					<span><strong>Content:</strong></span><div class="pstCntData"><?php echo $descDisplay; ?></div>						
+				</div>
+				<div class="scoredListTitle"><span><strong>Author:</strong> <a class="show_details_user" userid="<?php echo $this->escape($dbrecord[0]['UserID']);?>" href="javascript:void(0)"><?php echo $this->escape($this->myclientdetails->customDecoding($dbrecord[0]['Name'])).' '.$this->escape($this->myclientdetails->customDecoding($dbrecord[0]['lname']));?></a></span> </div>
+				
+				<?php
+				$totsenti 	=	$deshboardObj->totalsentiments($this->postid,'common');	
+				$sentiRes 	=	$totsenti[0]['sentiment_polarity'];
+
+				$sentiReposrt = '';
+
+				if($sentiRes == 'positive'){
+					$sentiReposrt =' <a href="javascript:void(0);" rel="" title="Positive" class="dbee-feed-titlebar-smallFont" style="font-weight:normal;">
+					<img class="" src="'.BASE_URL.'/timthumb.php?src=/img/positive.png&amp;q=100&amp;w=30&amp;h=30" style=" display:inline-block; width:30px; height:30px;   vertical-align: middle;"> 
+					 </a> Positive';
+				} else if($sentiRes == 'negative'){
+					$sentiReposrt =' <a href="javascript:void(0);"  rel="" title="Negative" class="dbee-feed-titlebar-smallFont" style="font-weight:normal;" > 
+					<img class="" src="'.BASE_URL.'/timthumb.php?src=/img/negative.png&amp;q=100&amp;w=30&amp;h=30" style=" display:inline-block; width:30px; height:30px;  vertical-align: middle;"> </a> Negative';
+				} else if($sentiRes == 'neutral'){
+					$sentiReposrt =' <a href="javascript:void(0);"  rel="" title="Neutral"  class="dbee-feed-titlebar-smallFont" style="font-weight:normal;" >
+					<img class="" src="'.BASE_URL.'/timthumb.php?src=/img/neutral.png&amp;q=100&amp;w=30&amp;h=30" style=" display:inline-block; width:30px; height:30px;  vertical-align: middle;"> 
+					</a> Neutral';
+				} 
+				
+				if($sentiRes!='')
+				{
+				?>
+				<div class="scoredListTitle"><strong>Post sentiment: </strong> <?php echo $sentiReposrt; ?></div>
+				<?php } ?>
+			</div>
+
+			<div class="taglisting postVisitorWrp">
+				<h2>Post visitors</h2>
+				<?php 
+				$visters = $reportObj->getPostVisiters($this->postid,'postreport');
+				
+				if(count($visters)>0)
+				{
+					$vists .= '<ul class="peopleListpost">';
+					foreach ($visters as $key => $value) {
+						$visPic = $commonObj->checkImgExist($value['ProfilePic'],'userpics','default-avatar.jpg');
+						//rel="dbTip" title="'.$this->myclientdetails->customDecoding($value['Name']).'"
+						$vists .=  '<li><a href="javascript:void(0);" class="show_details_user" userid="'.$value['UserID'].'" ><img src="'.IMGPATH.'/users/small/'.$visPic.'" width="60" height="60"></a><br>'.$this->myclientdetails->customDecoding($value['Name']).' '.$this->myclientdetails->customDecoding($value['lname']).'</li>';
+					}
+					$vists .='</ul>';
+				}
+				else
+				{
+					$notFoundScoredTweet= '<span class="notfound">No users visits to this post</span>';
+				}	
+				echo $vists.$notFoundScoredTweet;
+				?>		
+			</div>
+			<?php 
+				if($dbtype	==	'Poll')
+			{ ?>
+				<div class="taglisting PollChartWrap">
+					<?php 
+						echo $polls->Polldetailhelper($dbrecord); 
+
+						$fieldArr = $polls->getpolloptionvotePie($dbrecord[0]['DbeeID']);
+						foreach ($fieldArr as $key => $value) $Emailproviders[]	=	array('name'=> $value['OptionText'],'y'=> (int)$value['tvotes'],'sliced'=> false, 'selected'=> false);
+
+						$pollsProvidersdata = json_encode($Emailproviders);
+
+					?>
+					<script type="text/javascript">
+						chartofdbees(<?php echo $pollsProvidersdata ?>,'pollscontainer',"");
+					</script>
+					<div  id="pollscontainer"></div>
+				</div>
+				<div class="tableContentPoll ">
+					<h2>Voting  Details</h2>
+					<?php
+					$pollvoters = $polls->getpolloptionvoteusersPie($dbrecord[0]['DbeeID']);
+					?>
+					<div class="grpTopTabel"> 
+						<div id="selmsgrep" class="selmsgrep">Total: <?php echo count($pollvoters )?></div>
+			         <?php //echo $grouplist = $commonObj->addtogroupbutton(); ?>
+			        </div>  
+					<table class="table table-border">
+					   <?php if(count($pollvoters)>0) {?>
+						<thead>
+							<tr>
+								<th width="150" nowrap="nowrap">User</th>
+								<?php if($this->Is_PollComments_On==1){?>
+								<th>Comment</th>
+								<?php } ?>
+								<?php if($this->PollComments_On_Option!=4){?>
+								<th width="200">Vote</th>
+								<?php } ?>
+							</tr>
+						</thead>
+						<tbody>
+
+							<?php  
+
+							foreach ($pollvoters as $key => $value) 
+							{
+								$cmPic = $commonObj->checkImgExist($value['image'],'userpics','default-avatar.jpg');
+								?>
+								<tr>
+									<td class="userBoxTd">
+										
+										<img border="0" class="imgStyle" src="<?php echo IMGPATH.'/users/small/'.$cmPic; ?>" width="40" height="40">
+									  	<div class="userName">
+											<div class="oneline">
+											<?php echo $this->myclientdetails->customDecoding($value['username']).' '.$this->myclientdetails->customDecoding($value['lname']) ?>
+											</div>
+										</div>
+
+									</td>
+									<?php if($this->Is_PollComments_On==1){?>
+									<td><?php echo $value['comment'] ?></td>
+									<?php }?>
+
+									<?php if($this->PollComments_On_Option!=4){?>
+									<td><?php echo $value['OptionText'] ?></td>
+									<?php }?>
+								</tr>
+								<?php }?>
+						</tbody>
+						<?php } else { ?>
+						<thead>
+							<tr>
+								<th colspan="2">No record found</th>
+							</tr>
+						</thead>	
+						<?php } ?>
+
+					</table>
+				</div>
+			<?php 
+			}
+			if($dbtype	!=	'Poll')
+			{ ?>
+			<div class="taglisting TwitteCmntPostReport">
+				<h2>Twitter comments</h2>
+				<?php 
+				//$TwitterCnts =  $this->myclientdetails->getfieldsfromtable(array('TwitterComment'),'tblDbeeComments','DbeeID',$this->postid);
+				$TwitterCnts =  $this->myclientdetails->getfieldsfromjointable(array( 'CommentID','Comment','TwitterComment'),'tblDbeeComments',array('DbeeID'=>$this->postid),array('UserID','Name','ProfilePic'),'tblUsers','UserID','UserID');
+				
+				if(count($TwitterCnts)>0)
+				{
+					$tweets ='';
+					//$tweets .= '<ul class="peopleListpost">';
+					foreach ($TwitterCnts as $key => $val) {
+						
+						$twtCount =0;
+						if($val['TwitterComment']!='')
+						{
+							$twtCount ++; 
+							$cmPic = $commonObj->checkImgExist($val['ProfilePic'],'userpics','default-avatar.jpg');
+							$tweets .=  '<div class="comment-list" id="comment-block-461">
+                        <div class="cmntPrpic">
+                          <a class="cmntuserLink" title="" ><img border="0" src="'.IMGPATH.'/users/small/'.$cmPic.'" width="42" height="42"></a>
+                        </div>
+                        <div class="dbcomment-speechwrapper" id="dbcomment-speechwrapper">
+                        <div class="cmntPrpLnks"><strong>'.$this->myclientdetails->customDecoding($val['Name']) .'</strong>&nbsp;'.$val['Comment'] .'
+                        </div>
+                        <div class="next-line"></div><br style="clear:both">
+                        <div class="twitter-post-tag-comments" id="tweet-block-461">
+                          <i class="fa dbTwitterIcon fa-3x"></i>
+                          <div class="twitterCommentReplyBox">
+                              '.$val['TwitterComment'] .'                           
+                          </div><br style="clear:both">
+                        </div>
+                        <div class="next-line"></div>
+                        </div></div>';
+						}
+					}
+					//$tweets .='</ul>';
+				}
+				else
+				{
+					$notFoundScored= '<span class="notfound">No tweet added to comments</span>';
+				}	
+				if($twtCount==0) $notFoundScored= '<span class="notfound">No tweet added to comments</span>';
+				echo $tweets.$notFoundScored;
+				?>		
+			</div>
+			
+			<div class="taglisting">
+				<h2> Internal #tags</h2>
+				<?php 
+				if(trim($dbrecord[0]['DbTag'])!='')
+				{
+					$dbtags = explode(',', $this->escape($dbrecord[0]['DbTag']));
+					$tags = '<div>';
+					foreach ($dbtags as $key => $value) {
+						$tags .=  '<a class="hasTagCloud" href="'.BASE_URL.'/admin/reporting/hashtag/tag/'.$value.'" style="font-size: 17px;">'.$value.'</a>';
+					}
+					echo $tags .='</div>';
+				}else
+				{
+					echo '<span class="notfound">  No tags attached to this post</span>';
+				}
+				?>		
+			</div>
+
+				<div class="taglisting postReportSocial">
+					<h2>Social sharing	</h2>
+					
+					<?php 
+						$sharefbArr 	=	$deshboardObj->getfieldsfromjointable(array('sharetot' =>  new Zend_Db_Expr('sum(tblSocialShare.count )')),'tblSocialShare','dbeeid',$this->postid,array('UserID','Name','ProfilePic'),'tblUsers','user_id','UserID','user_id','','','sharetype','facebook');
+
+						echo $deshboardObj->whosharedon($sharefbArr, 'Facebook', 'ssfbIcon',$savegroupcontent);
+					?>
+					
+					<?php 
+						$sharetwArr 	=	$deshboardObj->getfieldsfromjointable(array('sharetot' =>  new Zend_Db_Expr('sum(tblSocialShare.count )')),'tblSocialShare','dbeeid',$this->postid,array('UserID','Name','ProfilePic'),'tblUsers','user_id','UserID','user_id','','','sharetype','twitter');
+
+						echo $deshboardObj->whosharedon($sharetwArr, 'Twitter' , 'sstwIcon',$savegroupcontent);
+					?>
+					
+					<?php 
+						$sharelkArr 	=	$deshboardObj->getfieldsfromjointable(array('sharetot' =>  new Zend_Db_Expr('sum(tblSocialShare.count )')),'tblSocialShare','dbeeid',$this->postid,array('UserID','Name','ProfilePic'),'tblUsers','user_id','UserID','user_id','','','sharetype','linkedin');
+
+						echo $deshboardObj->whosharedon($sharelkArr, 'LinkedIn',  'sslnIcon',$savegroupcontent);
+					?>
+				</div>	
+			<?php
+				if ($this->plateform_scoring==0){
+			 	?>
+				<div class="taglisting">
+					<h2 style="color:#ccc"><strong style="color:#111">Most influential user</strong> <!-- information based on user mentions and scores received --></h2>
+					<div class="clear"></div>
+					<?php 
+					
+
+					$influResult = '';
+					if(count($this->mostinfuser)>0)
+					{ ?>
+						<div class="ursImgInflu">
+							 <img class="imgStyle" src="<?php echo IMGPATH.'/users/'.$this->mostinfuser[0]['ProfilePic']; ?>" width="200" height="200"> 
+							
+						</div>
+						<div class="influenceDetailsWp">
+						<?php $influencesco = ($this->mostinfuser[0]['total']==1)?'influence score':'influence scores'; 
+						$influencesco1 = $this->mostinfuser[0]['total'].' '.$influencesco; ?>
+							<h3><a class="show_details_user" userid="<?php echo $topinfUsers[0];?>" href="javascript:void(0)"><?php echo $this->myclientdetails->customDecoding($this->mostinfuser[0]['Name']); ?> (<?php echo  $influencesco1;?>)</a>
+								
+
+							</h2>
+							
+							
+							<div class="clear"></div>
+							<a class="show_details_user viewUserAcnt" userid="<?php echo $this->mostinfuser[0]['UserId'];?>" href="javascript:void(0)">view users account <i></i> </a>
+							<div class="clear"></div>
+							
+						
+							<?php	
+							
+							echo '</div>';	
+
+					} else echo "<span class='notfound'>No results</span>";
+			?>
+				</div>	
+
+				<div class="taglisting">
+					<h2 style="color:#ccc"><strong style="color:#111">Most scored comments</strong></h2>
+					<?php 
+						$chkcomntrec = 0;
+						$cmntLvArr 	=	$deshboardObj->getfieldsfromjointable(array('commenttot' =>  new Zend_Db_Expr('count(tblScoring.ID)'),'ID','Type','Score','MainDB'),'tblScoring','MainDB',$this->postid,array('UserID','Name','ProfilePic'),'tblUsers','Owner','UserID','ID','commenttot','DESC','Score','1','Type','2');
+						if(count($cmntLvArr )>0) $chkcomntrec = '1';
+						
+						echo $deshboardObj->displayscorecomments($cmntLvArr,' '.strtolower($scoreset['Love']).'d',$post_score_setting[1]['ScoreIcon1']);
+
+						$cmntLkArr 	=	$deshboardObj->getfieldsfromjointable(array('commenttot' =>  new Zend_Db_Expr('count(tblScoring.ID)'),'ID','Type','Score'),'tblScoring','MainDB',$this->postid,array('UserID','Name','ProfilePic'),'tblUsers','Owner','UserID','ID','commenttot','DESC','Score','2','Type','2');
+						if(count($cmntLkArr )>0) $chkcomntrec = '1';
+
+						echo $deshboardObj->displayscorecomments($cmntLkArr,' '.strtolower($scoreset['Like']).'d',$post_score_setting[2]['ScoreIcon2']);
+
+						$cmntfotArr 	=	$deshboardObj->getfieldsfromjointable(array('commenttot' =>  new Zend_Db_Expr('count(tblScoring.ID)'),'ID','Type','Score'),'tblScoring','MainDB',$this->postid,array('UserID','Name','ProfilePic'),'tblUsers','Owner','UserID','ID','commenttot','DESC','Score','3','Type','2');
+						if(count($cmntfotArr )>0) $chkcomntrec = '1';
+
+
+						echo $deshboardObj->displayscorecomments($cmntDLkArr,' '.strtolower($scoreset['Dis Like']).'d',$post_score_setting[3]['ScoreIcon3']);
+
+
+						$cmnthtArr 	=	$deshboardObj->getfieldsfromjointable(array('commenttot' =>  new Zend_Db_Expr('count(tblScoring.ID)'),'ID','Type','Score'),'tblScoring','MainDB',$this->postid,array('UserID','Name','ProfilePic'),'tblUsers','Owner','UserID','ID','commenttot','DESC','Score','5','Type','2');
+						if(count($cmnthtArr )>0) $chkcomntrec = '1';
+
+						echo $deshboardObj->displayscorecomments($cmnthtArr,' '.strtolower($scoreset['Hate']).'d',$post_score_setting[4]['ScoreIcon4']);
+
+						if($chkcomntrec <1)
+						{
+							echo '<div class="explorecomments" ><span class="notfound">  None of the comments have been scored yet</span></div>';
+						}
+					?>	
+				</div>	
+				<div class="taglisting peopleActivities">
+					<div class="dataWrpCheckbox">
+
+					<?php 
+						$havescored = '';
+						$notFoundScored ='';
+						$havescrArr 	=	$deshboardObj->getfieldsfromjointable(array('scoretot' =>  new Zend_Db_Expr('count(tblScoring.UserID )')),'tblScoring','MainDB',$this->postid,array('UserID','Name','ProfilePic'),'tblUsers','UserID','UserID','UserID');
+
+						if(count($havescrArr)>0) $savetogroup = $savegroupcontent; else $savetogroup='';
+						$havescored = '';
+						$havescored .= '<h2> Users who have scored '. $savetogroup .'</h2>';
+						
+						
+						if(count($havescrArr)>0)
+						{
+							$havescored .= '<ul class="peopleListpost">';
+							foreach ($havescrArr as $key => $value) {
+								$mnext = '';
+								if($value['scoretot']>1) $mnext = ' scored '.$value['scoretot'].' times';
+								else $mnext = ' scored once';
+
+								$havescored .=  '<li><a href="javascript:void(0);" rel="dbTip" title="'.$this->myclientdetails->customDecoding($value['Name']).$mnext.'"><img src="'.IMGPATH.'/users/small/'.$value['ProfilePic'].'" width="40" height="40"></a><input type="checkbox" name="reportusers" value="'.$value['UserID'].'" checked="checked" class="groupcheck"></li>';
+							}
+							$havescored .='</ul>';
+						}
+						else
+						{
+							$notFoundScored= '<span class="notfound">No users scored this post</span>';
+						}	
+						echo $havescored.$notFoundScored;
+
+					?>	
+				</div>
+				<div class="dataWrpCheckbox">
+					
+					<?php 
+						$beenscrArr 	=	$deshboardObj->getfieldsfromjointable(array('scoretot' =>  new Zend_Db_Expr('count(tblScoring.Owner )')),'tblScoring','MainDB',$this->postid,array('UserID','Name','ProfilePic'),'tblUsers','Owner','UserID','Owner');
+
+						if(count($beenscrArr)>0) $savetogroup = $savegroupcontent; else $savetogroup='';
+						$beenscored = '';
+						$notFoundScored ='';
+						$beenscored = '<h2>Users who were scored'. $savetogroup .'</h2>';
+						
+
+						if(count($beenscrArr)>0)
+						{
+							$beenscored .= '<ul class="peopleListpost">';
+							foreach ($beenscrArr as $key => $value) {
+								$mnext = '';
+								if($value['scoretot']>1) $mnext = ' was scored '.$value['scoretot'].' times';
+								else $mnext = ' was scored once';
+								$beenscored .=  '<li><a href="javascript:void(0);" rel="dbTip" title="'.$this->myclientdetails->customDecoding($value['Name']).$mnext.'"><img  src="'.IMGPATH.'/users/small/'.$value['ProfilePic'].'" width="40" height="40"></a><input type="checkbox" name="reportusers" value="'.$value['UserID'].'" checked="checked" class="groupcheck"></li>';
+
+							}
+							$beenscored .='</ul>';
+						}
+						else
+						{
+							$notFoundScored ='<span class="notfound">No users have been scored</span>';
+						}		
+						echo $beenscored .$notFoundScored;
+					?>	
+					</div>
+					<h2>Matched scoring	</h2>
+					<?php 
+						$chkrecord = '0';
+						$lovescrArr 	=	$deshboardObj->getfieldsfromjointable(array('scoretot' =>  new Zend_Db_Expr('count(tblScoring.Owner )')),'tblScoring','MainDB',$this->postid,array('UserID','Name','ProfilePic'),'tblUsers','Owner','UserID','UserID','','','Score','1');
+						if(count($lovescrArr )>1) $chkrecord = '1';
+						
+						echo "<ul class='scoreSameList'>";
+						echo $deshboardObj->displaygroupscore($lovescrArr,$post_score_setting[1]['ScoreIcon1'],$savegroupcontent);
+					
+						
+						$likescrArr 	=	$deshboardObj->getfieldsfromjointable(array('scoretot' =>  new Zend_Db_Expr('count(tblScoring.Owner )')),'tblScoring','MainDB',$this->postid,array('UserID','Name','ProfilePic'),'tblUsers','Owner','UserID','UserID','','','Score','2');
+						if(count($likescrArr )>1) $chkrecord = '1';
+
+						echo $deshboardObj->displaygroupscore($likescrArr,$post_score_setting[2]['ScoreIcon2'],$savegroupcontent);
+
+						
+
+						$dislikescrArr 	=	$deshboardObj->getfieldsfromjointable(array('scoretot' =>  new Zend_Db_Expr('count(tblScoring.Owner )')),'tblScoring','MainDB',$this->postid,array('UserID','Name','ProfilePic'),'tblUsers','Owner','UserID','UserID','','','Score','4');
+						if(count($dislikescrArr )>1) $chkrecord = '1';
+
+						echo $deshboardObj->displaygroupscore($dislikescrArr,$post_score_setting[3]['ScoreIcon3'],$savegroupcontent);
+
+
+						$hatescrArr 	=	$deshboardObj->getfieldsfromjointable(array('scoretot' =>  new Zend_Db_Expr('count(tblScoring.Owner )')),'tblScoring','MainDB',$this->postid,array('UserID','Name','ProfilePic'),'tblUsers','Owner','UserID','UserID','','','Score','5');
+						if(count($hatescrArr )>1) $chkrecord = '1';
+
+						echo $deshboardObj->displaygroupscore($hatescrArr,$post_score_setting[4]['ScoreIcon4'],$savegroupcontent);
+						if($chkrecord <1)
+						{
+							echo '<li class=""><span class="notfound">No matched scoring found</span></li>';
+						}
+						
+						echo "<ul>";
+					?>	
+
+				</div>
+			<?php } ?>	
+				<div class="taglisting sentiMimentAnalysis">
+					<h2>Sentiment analysis by comments</h2>
+					
+					<?php  if (($TotalComments > $totsentiofuser[0]['tot']) && ($TotalComments > 0)) {	?>
+
+					    	 <a href="javascript:void(0);" id="fetchsentiments" dbid="<?php echo $this->postid ?>" class="btn pull-right btn-yellow" > Generate sentiment</a>
+							<div id="opensentiment"></div>
+					<?php } ?>
+					<div class="sentReptCol">
+					<?php
+
+						$notFound = '';
+
+					if($totsenti[0]['sentiment_polarity']!='')
+					{
+						$postmood = '';
+						$postmood .= '<div class="postmood"><span>Overall post mood is '.$totsenti[0]['sentiment_polarity'].' </span><span></span></div>';
+						//print_r($totsenti);exit;
+						foreach ($totsenti as $key => $value) {
+							if($value['sentiment_polarity'] == 'positive'){
+								$sentiRep =' <span class="sentiment-breakup"><img class="" src="'.BASE_URL.'/timthumb.php?src=/img/positive.png&amp;q=100&amp;w=30&amp;h=30" style=" display:inline-block; width:30px; height:30px;   vertical-align: middle;"></span>
+								 ';
+								 $sentimood = 'positive';
+							} else if($value['sentiment_polarity'] == 'negative'){
+								$sentiRep =' <span class="sentiment-breakup"><img class="" src="'.BASE_URL.'/timthumb.php?src=/img/negative.png&amp;q=100&amp;w=30&amp;h=30" style=" display:inline-block; width:30px; height:30px;  vertical-align: middle;"></span>';
+								$sentimood = 'negative';
+							} else if($value['sentiment_polarity'] == 'neutral'){
+								$sentiRep =' <span class="sentiment-breakup" ><img class="" src="'.BASE_URL.'/timthumb.php?src=/img/neutral.png&amp;q=100&amp;w=30&amp;h=30" style=" display:inline-block; vertical-align: middle;"></span>';
+								$sentimood = 'neutral';
+							} 
+							$postmood .= '<div class="postmood sentiment-breakup-more">'.$sentiRep.' <span>'.$value['tot'].' '.$value['sentiment_polarity'].'   </span> <a href="javascript:void(0)" class="senticomments" sentimood="'.$sentimood.'"> more</a></div>';
+						}
+						$postmood .= '</div>';
+						echo $postmood;
+						?>
+						<div class="sentReptCol">
+							<h2>Sentiment analysis by users
+
+
+							</h2>
+						<?php
+						$sentiscrArr 	=	$deshboardObj->getfieldsfromjointable(array('sentitot' =>  new Zend_Db_Expr('SUM(tblDbeeComments.sentiment_score )')),'tblDbeeComments','DbeeID',$this->postid,array('UserID','Name','ProfilePic'),'tblUsers','UserID','UserID','UserID','sentitot','DESC');
+
+						$userssenti = '';
+						$userssentipos = '';
+						$userssentineg = '';
+						$userssenti .= '<div class="postmoodWrp">';
+									
+						if(count($sentiscrArr)>0)
+						{
+							foreach ($sentiscrArr as $key => $value) {
+								if($value['sentitot']>0)
+								{
+									$userssentipos .=  '<a href="javascript:void(0)" rel="dbTip" title="'.$this->myclientdetails->customDecoding($value['Name']).'" class="senticomments" userid="'.$value['UserID'].'" username="'.$this->myclientdetails->customDecoding($value['Name']).'"><img  src="'.IMGPATH.'/users/small/'.$value['ProfilePic'].'" width="40" height="40"></a> <input type="checkbox" name="reportusers" value="'.$value['UserID'].'" checked="checked" class="groupcheck">';
+								}
+								else if($value['sentitot']<0)
+								{
+									$userssentineg .=  '<a  href="javascript:void(0)" rel="dbTip" title="'.$this->myclientdetails->customDecoding($value['Name']).'" class="senticomments" userid="'.$value['UserID'].'" username="'.$this->myclientdetails->customDecoding($value['Name']).'" ><img  src="'.IMGPATH.'/users/small/'.$value['ProfilePic'].'" width="40" height="40"></a><input type="checkbox" name="reportusers" value="'.$value['UserID'].'" checked="checked" class="groupcheck">';
+								}	
+								else 
+								{
+									$userssentimiddle .=  '<a  href="javascript:void(0)" rel="dbTip" title="'.$this->myclientdetails->customDecoding($value['Name']).'" class="senticomments" userid="'.$value['UserID'].'" username="'.$this->myclientdetails->customDecoding($value['Name']).'" ><img  src="'.IMGPATH.'/users/small/'.$value['ProfilePic'].'" width="40" height="40"></a><input type="checkbox" name="reportusers" value="'.$value['UserID'].'" checked="checked" class="groupcheck">';
+								}	
+								
+							}
+							if($userssentipos!=''){
+								$userssenti .='<div class="postmood dataWrpCheckbox"><strong> Users who were positive </strong>'.$userssentipos.$savegroupcontent.'</div>';
+							}
+							if($userssentineg!=''){
+								$userssenti .='<div class="postmood dataWrpCheckbox"><strong> Users who were negative </strong> '.$userssentineg.$savegroupcontent.' </div>';
+							}
+							if($userssentimiddle!=''){
+								$userssenti .='<div class="postmood dataWrpCheckbox"><strong> Users who were neutral </strong> '.$userssentimiddle.$savegroupcontent.' </div>';
+							}
+						}
+						else
+						{
+							$userssenti .='<span class="notfound" style="float:left;padding:10px 40px;">sentiment not generated yet</span>';
+						}
+
+
+						echo $userssenti.'</div>' ;
+
+					}
+					else
+					{
+						$notFound='<div class="notfound"> Sentiment not generated yet </div>';
+					}	
+					?>
+					</div>
+					<?php echo $notFound; ?>
+				</div>
+
+			<?php
+			if ($this->plateform_scoring==0){
+			 ?>	
+				<div class="taglisting">
+					<div class=" monthlySignup" >
+						<h2 class="dragHandler">Scoring frequency</h2>
+						<div class="totalStatusActivites">		
+						<ul>
+					    <?php 
+							
+							$nameArr = array();
+							$color = array("#2f7ed8", "#0d233a", "#8bbc21", "#9A9595");
+							foreach ($scoreset as $key => $value) {
+								echo '<li style="background:'.$color[$key].';float:left;clear: none;">'.$value.'</li>';
+								$nameArr[] = $value;
+							}
+							$scorSet = Zend_Json::encode($nameArr);
+
+							
+							?>
+					    </ul>
+					</div>
+						<div id="scorecontainer" class="dashContent"><div class="notfound">No scores found</div></div>
+
+					</div>
+				</div>
+			<?php } ?>	
+				<div class="taglisting">
+					<div class=" monthlySignup" >
+						<h2 class="dragHandler">Comment frequency </h2>		
+						<div id="commentcontainer" class="dashContent"><div class="notfound">No comments found</div></div>	
+					</div>
+				</div>
+			<?php  ?>
+		</div>
+
+</div>
+
+</div>
+<?php
+if($TotalComments>0)
+{ ?>
+	<script type="text/javascript">
+	
+		$(function(){
+
+			$('body').on('click', '.savedbGrpName',function(){
+
+				var parentEl = $(this).closest('.groupinsertWrapper');
+
+				var mainParentEl = $(this).closest('#hashTagSelectedWrapper');
+
+				var groupname  			= parentEl.find('input[name="filterName"]').val();
+				var groupdiscription  	= parentEl.find('#grpDescription').val();
+
+				var thisEl = $(this);
+				if(groupname=='') {
+				     $messageError("Group should not be empty");
+				     return false;
+				}            
+				 if(groupdiscription==''){
+				     $messageError("Group description should not be empty");
+				         return false;
+				}  
+
+			    $.ajax({
+			        type : "POST",
+			        dataType : 'json',
+			        url : BASE_URL + '/admin/usergroup/addgroup',
+			        data:{'groupname':groupname,'discription':groupdiscription,'ugcat':1},   
+			        success : function(response) {                                      
+						$messageSuccess("Users saved to group successfully");    
+
+						$('#groupuserinsert .noFound').remove();
+
+						thisEl.siblings('.cancelSaveFilter').click();  
+
+							parentEl.find('select option').removeAttr('selected');
+							parentEl.find('select option:first').after('<option value="'+response.content+'" selected="selected">'+groupname+'</option>');
+							$select(parentEl.find('select'));
+							parentEl.find('.dbreportgroupBtn').trigger('click');
+						
+			        },
+			        error : function(error) {
+			        	$messageError("Some problems have occured. Please try again later: "+ error);
+			        }
+			        
+			    });
+				return false;
+			});
+			
+			$('body').on('click','.dbreportgroupBtn',function(e){
+					e.stopPropagation();
+					e.preventDefault();
+					var parentEl = $(this).closest('.groupinsertWrapper');
+					var parentEl2 = $(this).closest('.dataWrpCheckbox');
+					var groupid  = parentEl.find('#grpselect option:selected').val();
+					  // alert(groupid);
+					
+
+					if(groupid==0){
+					 	$messageError("Please select a user set");
+					 	return false;
+					}
+				    var uid = [];
+				    chklen = $('input:checkbox[name=reportusers]', parentEl2).length;	
+				    $('input:checkbox[name=reportusers]', parentEl2).each(function() {
+				        if($(this).is(':checked')){             
+				             uid.push($(this).val());
+				        }            
+				    });
+
+				   // alert(chklen); return false;
+				  
+					$.ajax({
+					    type : "POST",
+					    dataType : 'json',
+					    url : BASE_URL + '/admin/usergroup/usersgroupstore',         
+					    timeout : 3000,            
+					    data : {'groupid': groupid,'uid': uid,'cat':'dbreport','chktypew':'false'},
+
+					    success : function(response) { 
+					       $('.dropDown').removeClass('on');
+					       $messageSuccess("Users saved to group successfully");                 
+					    },
+					    error : function(error) {
+					     $messageError("Some problems have occured. Please try again later: "+ error);
+					    }
+					    
+					});
+			});
+
+
+			$('body').on('click','.senticomments',function(){
+				
+				dbId 		=	$('#currentdbid').val();
+				senti 		=	typeof($(this).attr('sentimood'))!='undefined' ? $(this).attr('sentimood') : '';
+
+				userid 		=	typeof($(this).attr('userid'))!='undefined' ? $(this).attr('userid') : '';
+
+				label       = 	(senti!='') ? senti : $(this).attr('username');
+
+			
+				url 		=	BASE_URL+"/admin/dashboard/sentimentcomments";
+				postdata	=	'dbid='+dbId+'&senti='+senti+'&userid='+userid;
+				var thisEl = $(this);						
+				
+						
+	          	$.ajax({
+					url: url,
+					data: postdata,
+					type:'post',
+					beforeSend: function(){ 
+					var htmlPopup = '<div id="sentiDialog" title="Sentiment breakdown" class="loader">\
+									 	<div id="beforecall"></div>\
+									 	<h3 class="sentiDialoglabel"></h3>\
+										<ul id="digForm" ></ul></div>';  
+					$('#sentiDialog').remove();
+					$('body').append(htmlPopup);
+					$( "#sentiDialog").dialog({
+						 width:800,
+						 height:530,
+						 open:function(){                
+					            $fluidDialog();
+					      }
+					});                  
+	                
+	                  },
+					success : function(result){
+						
+						if(result == '404')
+						{
+							$messageError('something going wrong please try again..')
+							thisEl.dialog( "close" );
+							//return false;
+						}
+						if(result =='503')
+						{
+							$messageError('db sentiments already generated and associated with each comments..');
+							//thisEl.dialog( "close" );
+						}
+						else
+						{
+							$( ".sentiDialoglabel").html("Comments with <strong>"+label+"</strong> sentiment");	
+							$('#sentiDialog').removeClass('loader')
+							$( "#digForm").html(result);	
+							return false;
+						}
+					},
+				});
+				return false;
+			});
+				
+			$('body').on('click','#fetchsentiments',function(){
+				dbId 		=	$('#fetchsentiments').attr('dbid');
+				url 		=	BASE_URL+"/admin/dashboard/sentiments";
+
+
+
+					var sentimentsTemplate = '<div id="senti_result" class="leaguesPostPopUp"></div>';
+					
+					$('#senti_result').remove();
+					
+					$('body').append(sentimentsTemplate);
+					$(".ui-dialog-buttonpane, .ui-dialog-titlebar-close ").remove();
+					        	$('#senti_result').html('');
+					        	$('#senti_result').html('');	
+					        	
+			                   
+			                    
+								var thisEl =$(this);
+								//var grouprow = $("#single_"+chariId);							
+					          $.ajax({
+					
+									url: url,
+									data: 'dbid='+dbId,
+									type:'post',
+									beforeSend: function()
+									{
+										$('#senti_result').append('<div id="mesageNotfiOverlay" class="loaderOverlay3"> </div>')	;				        		
+						    			$('#mesageNotfiOverlay').html('<div class="msgNoticontent">\
+						    				<div class="loaderShow">\
+						    					<span class="loaderImg"></span><br>\
+						    					</div>\
+						    			Generating sentiment<br>\
+						    				<div class="progressBarWrp" style="margin-top:20px;" data-loaded=""><div class="progressBar" ></div></div>\
+						    			</div>');
+						    			$('#mesageNotfiOverlay .progressBar').animate({width: '90%'}, 3000,function(){$('#mesageNotfiOverlay .progressBarWrp').attr('data-loaded', '90%')});
+									},
+									success : function(result){
+										
+										if(result == '404')
+										{
+											$messageError('something going wrong please try again..')
+											thisEl.dialog( "close" );
+
+											//return false;
+										}
+										if(result =='503')
+										{
+											$messageError('db sentiments already generated and associated with each comments..');
+											thisEl.dialog( "close" );
+										}
+										else
+										{
+											$messageSuccess('db sentiments successfully generated and associated with each comments..')
+											window.location.href=result;
+											//return false;
+										}
+									},
+								});
+
+				
+				return false;
+			});
+		});
+
+		$(function() {
+			var seriesOptions = [],
+			yAxisOptions = [],
+			seriesCounter = 0,
+			names = ['COMMENTS'],
+			colors = Highcharts.getOptions().colors;
+
+			$.each(names, function(i, name) {
+
+				$.ajax({                                      
+					  url: BASE_URL+'/admin/index/callstockcharts',                  //the script to call to get data          
+					  data: { filename: name.toLowerCase(), dbId: <?php echo $this->postid ?> },                        //you can insert url argumnets here to pass to api.php
+					  method:'POST',
+					  cache  : true,
+					  async:false,
+					  dataType:'JSON',
+					 			
+					  success: function(datajs)          //on recieve of reply
+					  {
+					  		jondata = datajs.split('~');			  		
+					  		var keyval = '';
+
+					  		$.each(jondata, function(i, val) {
+					  			if(val!='')
+					  			{
+						  			keyvalsp = val.split(',');
+						  			keyval += '[Date.UTC('+keyvalsp[0]+',' +(keyvalsp[1]-1)+',' +keyvalsp[2]+'),'+ keyvalsp[3]+'],';
+						  		}
+					  		});
+					  		//console.log(keyval);
+					  		seriesdata = eval('['+keyval+']');
+					  		
+					  		seriesOptions[i] = {
+								name : name,
+					            data : seriesdata
+							};
+							seriesCounter++;
+
+							if (seriesCounter == names.length) {
+								createStockChart('#commentcontainer');
+							}
+					  }
+				});	  
+			});
+
+			function createStockChart(chartID) {
+
+			    $(chartID).highcharts('StockChart', {
+			        chart: {
+			        },
+
+			        rangeSelector: {
+			            inputEnabled: $(chartID).width() > 480,
+			            selected: 5
+			        },
+			        xAxis: {
+				      type: 'datetime'
+				    },
+
+			        yAxis: {
+			            labels: {
+			                formatter: function() {
+			                    return (this.value > 0 ? ' ' : '') + this.value + '';
+			                }
+			            },
+			            plotLines: [{
+			                value: 0,
+			                width: 2,
+			                color: 'silver'
+			            }]
+			        },
+			        
+			        plotOptions: {
+			            series: {
+			                compare: ''
+			            }
+			        },
+			        
+			        tooltip: {
+			        	//pointFormat: '<span style="color:{series.color}">PLATEFORM {series.name} </span>: <b>{point.y}</b> <br/>',
+			        	valueDecimals: 0,
+			            
+			            formatter: function() {
+			                var s = '<b>'+ Highcharts.dateFormat('%a, %b %e, %Y', this.x) +'</b>';
+			                
+			                $.each(this.points, function(i, point) {
+			                	if(point.series.name =='USERS') sname = 'total new user registrations';
+			                	else sname = ' total comments across post';
+			                    s += '<br/>'+ sname +': '+
+			                        point.y +'';
+			                });
+			                
+			                return s;
+			            },
+			            shared: true       
+			        },
+			        
+			        series: seriesOptions,
+
+			    }, chartDatepicker());
+			}// End of creatchart()
+		});		
+		
+		
+	</script>
+<?php } 
+
+	?>
+
+	<script type="text/javascript">
+	<?php
+		if(count($allscors) > 0) {  
+		?>
+			$(function() {
+				var seriesOptions = [],
+				yAxisOptions = [],
+				seriesCounter = 0,
+				names = <?php echo $scorSet?>, //['LOVE','LIKE','DISLIKE','HATE'],
+				colors = ["#2f7ed8", "#0d233a", "#8bbc21", "#9A9595"]//Highcharts.getOptions().colors;
+				//console.log(colors)
+				$.each(names, function(i, name) {
+
+					$.ajax({                                      
+						  url: BASE_URL+'/admin/index/callstockcharts',                  //the script to call to get data          
+						  data: { filename: name, dbId: <?php echo $this->postid ?>},                        //you can insert url argumnets here to pass to api.php
+						  method:'POST',
+						  cache  : true,
+						  async:false,
+						  dataType:'JSON',
+						 			
+						  success: function(datajs)          //on recieve of reply
+						  {
+						  		jondata = datajs.split('~');			  		
+						  		var keyval = '';
+
+						  		$.each(jondata, function(i, val) {
+						  			if(val!='')
+						  			{
+							  			keyvalsp = val.split(',');
+							  			keyval += '[Date.UTC('+keyvalsp[0]+',' +(keyvalsp[1]-1)+',' +keyvalsp[2]+'),'+ keyvalsp[3]+'],';
+							  		}
+						  		});
+						  		//console.log(keyval);
+						  		seriesdata = eval('['+keyval+']');
+						  		
+						  		seriesOptions[i] = {
+									name : name,
+						            data : seriesdata
+								};
+								seriesCounter++;
+
+								if (seriesCounter == names.length) {
+									createStockChart('#scorecontainer');
+								}
+						  }
+					});	  
+				});
+
+				function createStockChart(chartID) {
+
+				    $(chartID).highcharts('StockChart', {
+				        chart: {
+				        },
+
+				        rangeSelector: {
+				            inputEnabled: $(chartID).width() > 480,
+				            selected: 5
+				        },
+				        xAxis: {
+					      type: 'datetime'
+					    },
+
+				        yAxis: {
+				            labels: {
+				                formatter: function() {
+				                    return (this.value > 0 ? ' ' : '') + this.value + '';
+				                }
+				            },
+				            plotLines: [{
+				                value: 0,
+				                width: 2,
+				                color: 'silver'
+				            }]
+				        },
+				        
+				        plotOptions: {
+				            series: {
+				                compare: ''
+				            }
+				        },
+				        
+				        tooltip: {
+				        	//pointFormat: '<span style="color:{series.color}">PLATEFORM {series.name} </span>: <b>{point.y}</b> <br/>',
+				        	valueDecimals: 0,
+				            
+				            formatter: function() {
+				                var s = '<b>'+ Highcharts.dateFormat('%a, %b %e, %Y', this.x) +'</b>';
+				                
+				                $.each(this.points, function(i, point) {
+				                	if(point.series.name =='LOVE') sname = 'total loves';
+				                	if(point.series.name =='LIKE') sname = 'total likes';
+				                	/*if(point.series.name =='FOT') sname = 'total Food For Thoughts';*/
+				                	if(point.series.name =='DISLIKE') sname = 'total dislikes';
+				                	if(point.series.name =='HATE') sname = 'total hates';
+				                    s += '<br/>'+ point.series.name +': '+
+				                        point.y +'';
+				                });
+				                
+				                return s;
+				            },
+				            shared: true       
+				        },
+				        
+				        series: seriesOptions,
+
+				    }, chartDatepicker());
+				}// End of creatchart()
+
+				/*canvg(document.getElementById('canvas'), chart.getSVG())
+    
+				var canvas = document.getElementById("canvas");
+				var img = canvas.toDataURL("image/png");
+
+				document.write('<img src="'+img+'"/>');*/
+			});
+		<?php } ?>
+	</script>
+<?php
+
+}
+?>
+

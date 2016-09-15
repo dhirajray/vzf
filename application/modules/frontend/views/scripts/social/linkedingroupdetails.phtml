@@ -1,0 +1,481 @@
+<?php 
+
+$checkImage     = new Application_Model_Commonfunctionality();
+$userprofile = $checkImage->checkImgExist($this->session_data['ProfilePic'],'userpics','default-avatar.jpg'); 
+$userName = $this->myclientdetails->customDecoding($this->session_data['Name']); 
+
+?>
+
+<script type="text/javascript">
+var loginUserPic;
+var loginUserName ="<?php echo  $userName ?>";
+var totalPost = 0;
+forGrouplisting = false;
+
+ $(document).ready(function(){
+
+  $('body').on('click','#postBtnSubmitLinkedin:not(.disable)', function()
+  {
+      var thisBtn = $(this);
+     var title = $.trim($('#linkedinComment').val());
+
+     var descriptionMoreText = $('.cmntBntsWrapper textarea').val();
+     groupid = $('#groupid').val();
+     if(title!='')
+     {
+         $.ajax({
+            type: "POST",
+            dataType : 'json',
+            url: BASE_URL+"/social/linkedingrouppost",
+            beforeSend:function(){ 
+            $('.fa-spin', thisBtn).remove();             
+             thisBtn.append('<i class="fa fa-spinner fa-spin fa-lg"></i>').addClass('disable');
+            },
+            data: {
+                "groupid": groupid,
+                "title":title,
+                "description": descriptionMoreText         
+            },
+            success: function (data) 
+            {    
+              postCloseLinkedin();
+              $('.fa-spin', thisBtn).remove();  
+              thisBtn.removeClass('disable');
+              grouppost(groupid,0, false);
+                $dbConfirm({content:'successfully posted in LinkedIn Group',yes:false}); 
+            },
+            error: function (error) {
+               thisBtn.removeClass('disable');
+                loadError(error);
+            }
+        });
+     }else{
+        $dbConfirm({content:'please enter your text', yes:false,error:true}); 
+     }
+  });
+
+  $('body').on('click','.likelinkedinpost', function()
+  {
+     id = $(this).attr('data-id');
+     if(id!='')
+     {
+         $.ajax({
+            type: "POST",
+            dataType : 'json',
+            url: BASE_URL+"/social/linkedinpostlike",
+            data: {
+                "id": id      
+            },
+            success: function (data) 
+            {    
+               $dbConfirm({content:'like done',yes:false}); 
+            },
+            error: function (error) {
+                loadError(error);
+            }
+        });
+     }else{
+        $dbConfirm({content:'please enter your text', yes:false,error:true}); 
+     }
+  });
+
+
+
+  $dbLoader('#group-highlighted', 1);
+
+
+   $.ajax({
+        type: "POST",
+        dataType : 'json',
+        url: BASE_URL+"/social/linkedingroupajaxdetails",
+        data: {
+            "groupid": '<?php echo $this->groupid; ?>'          
+        },
+        success: function (data) 
+        {    
+            dataJosn = $.parseJSON(data.getnetwork);
+            htmlData = '';
+            var largeLogoUrl = '<i class="fa dbLinkedInIcon fa-3x"></i>';
+            var marginLogoTitle = 'style="margin-left:60px"';
+            var description = '';
+            if(typeof dataJosn.largeLogoUrl!='undefined'){
+                largeLogoUrl = '<img src="'+dataJosn.smallLogoUrl+'" class="linkedingGrpLogo">';
+                marginLogoTitle ='';
+            }
+             if(typeof dataJosn.description!='undefined'){
+                description = dataJosn.shortDescription;
+            }
+           
+           loginUserPic = data.pictureUrl;
+
+            htmlData='<div class="linkedinDetailsTitle">\
+                  <div class="linkedinDetailsLogo">\
+                      '+largeLogoUrl+'\
+                  </div>\
+                  <h2 '+marginLogoTitle+'>'+dataJosn.name+'</h2>\
+                </div>\
+                <div class="linkedinDetailsContent">\
+                  '+description+'\
+                </div>\
+                <div class="minPostTopBar">\
+                  <div class="pfpic">\
+                      <img border="0" src="'+data.pictureUrl+'" height="40" width="40" profilename="">\
+                  </div>\
+                  <div class="dbpostWrp clearfix">\
+                      <div class="cmntBntsWrapper">\
+                          <input type="text" id="linkedinComment" name="linkedinComment" placeholder="Start a discussion or share something with the group..." value="" class="">\
+                      </div>\
+                  </div>\
+            </div>';        
+            $('#group-highlighted').addClass('linkedinDetailsHighlited').html(htmlData);
+
+            grouppost(dataJosn.id,0, false);
+
+              
+              $('#linkedinComment').focusin(function(event) {
+                 if( $('.linkedinDetailsHighlited .minPostTopBar textarea').is(':visible')!=true){
+                $('.linkedinDetailsHighlited .minPostTopBar textarea, #contTxtChar').remove();
+                $('.postBtnsLinkedin').remove();
+
+                var linkedinPostBtn ='<div class="postBtnsLinkedin">\
+                      <a href="javascript:void(0);" class="btn btn-yellow pull-right" id="postBtnSubmitLinkedin">Post</a>\
+                      <a href="javascript:void(0);" class="btn  pull-right cancelPostLinkedin">cancel</a>\
+                  </div>';
+                var textAreaPost =   '<textarea  placeholder="Add more details...(optional)"></textarea>\
+                          <span id="contTxtChar"><i>200</i></span>';
+                $('.linkedinDetailsHighlited .minPostTopBar').after(linkedinPostBtn);
+                $('.linkedinDetailsHighlited .cmntBntsWrapper').append(textAreaPost);
+
+                $('.cancelPostLinkedin').click(function(event) {
+                   postCloseLinkedin();
+                });
+
+                $(this).keyup(function(event) {
+                    var valueText = $(this).val();
+                    var charlength = parseInt(200 - valueText.length);
+                      $('#contTxtChar i').text(charlength);
+                      if(charlength<0){
+                        $('#contTxtChar i').css({color:'red'});
+                        $('#postBtnSubmitLinkedin').addClass('disable');
+                      }else{
+                         $('#contTxtChar i').removeAttr('style');
+                          $('#postBtnSubmitLinkedin').removeClass('disable');
+                      }
+                });
+
+                }
+                  
+              }); // end focusin;
+
+            
+
+          
+
+            $dbTip();
+        },
+        error: function (error) {
+            loadError(error);
+        }
+    });
+
+ });
+  function postCloseLinkedin(){
+              $('#linkedinComment').val('');
+              $('.linkedinDetailsHighlited .minPostTopBar textarea, #contTxtChar').remove();
+              $('.postBtnsLinkedin').remove();
+            }
+
+function commentHtml (commentId, creatorPic, comment, username, postCommentTime){
+  return '<div class="comment-list2 " linkedin-cmnt-id="'+commentId+'">\
+                                              <div class="userPicLink">\
+                                                  <a title=""class="cmntuserLink" href="javascript:void(0)">\
+                                                      '+creatorPic+'\
+                                                  </a>\
+                                              </div>\
+                                              <div class="dbcomment-speechwrapper" id="dbcomment-speechwrapper">\
+                                                  <div class="dbcmntspeech">\
+                                                      <div>\
+                                                          <div fulldata="'+comment+'" rel="dbTip" title="" style="float:left; margin-bottom:5px;">\
+                                                            <a rel="dbTip" class="cmntuserLink" href="javascript:void(0)">'+username+'</a>&nbsp;'+comment+'\
+                                                            <div class="cmntDateTime">'+postCommentTime+'</div>\
+                                                          </div>\
+                                                      </div>\
+                                                  </div>\
+                                              </div>\
+                                              <div class="next-line"></div>\
+                                          </div>';
+}
+
+
+function grouppost(groupid, pageNumber, pageScroll)
+{
+ 
+
+
+    $.ajax({
+        type: "POST",
+        dataType : 'json',
+        async:false,
+        url: BASE_URL+"/social/linkedingetgrouppost",
+        data: {"groupid":groupid,"page":pageNumber},
+        beforeSend:function(){
+          if(pageScroll==true){
+                $('.loadingPage').remove();
+                $('.leftSideCnt').append('<div class="loadingPage"></div>');
+                $dbLoader('.loadingPage');
+              }else{
+                $('#dbee-feeds').html('');
+                $dbLoader('#dbee-feeds');
+              }
+        },
+        success: function (data){    
+            dataJosn = $.parseJSON(data.getnetwork);
+             totalPost = dataJosn._total;
+            htmlData = '';
+           
+           $.each(dataJosn.values, function(key, value) {
+
+                    if(typeof value.summary != "undefined")
+                      summary = value.summary
+                    else
+                      summary = '';
+                    var totalComment = '';
+                    var linkedinComment = '';
+                    var likeHtml ='';
+                      if(value.relationToViewer.isLiked==true){
+                        likeHtml = '<a href="javascript:void(0);" data-likewise="Like">Unlike</a>';
+                      }
+                      else{
+                        likeHtml = '<a href="javascript:void(0);" data-likewise="Unlike">Like</a>';
+                      }
+                     if(typeof value.comments != "undefined"){
+                      var htmlComments= '';
+                      var viewMoreCommnet = '<i>'+value.comments._total+'</i>';
+                     /* if(value.comments._total>3)
+                        viewMoreCommnet ='<a href="javascript:void(0)">See all <i>'+value.comments._total+'</i> comments</a>';*/
+
+                    
+                      totalComment ='<div class="cmntScoreState">\
+                                      <span class="viewAllCmment"><i class="fa fa-comment-o "></i> <strong>'+value.comments._total+'</strong></span>\
+                                      '+likeHtml+'\
+                                    </div>';
+                      if(typeof value.comments.values !='undefined' ){
+                        $.each(value.comments.values, function(index, val) {
+                           var creatorPic = '';
+                           var userName  = val.creator.firstName+' '+val.creator.lastName;
+                           if(typeof val.creator.pictureUrl !='undefined'){
+                            creatorPic = '<img border="0" src="'+val.creator.pictureUrl+'" width="32" height="32">';
+                           }else{
+                            creatorPic = '<img border="0" src="/userpics/default-avatar.jpg" width="32" height="32">';
+                           }
+                           var datePostingCmntTime = new Date(val.creationTimestamp);
+                               datePostingCmntTime = $.timeago(datePostingCmntTime); ;
+
+                            linkedinComment += commentHtml(val.id, creatorPic, val.text, userName, datePostingCmntTime);
+                        });
+                        
+                        }
+                     }
+
+                       if(typeof value.creator.pictureUrl !='undefined'){
+                           var  postCreatorPic = '<img border="0" src="'+value.creator.pictureUrl+'"  width="60" height="60">';
+                           }else{
+                          var  postCreatorPic = '<img border="0" src="/userpics/default-avatar.jpg" width="60" height="60">';
+                           }
+                      var attachmentHtml ='';
+                      if(typeof value.attachment !='undefined'){  
+                        var attachmentImage = '';
+                        var attachmentSummary ='';
+                        var attachmentTitle ='';
+                         
+                         var  marginImg = 'style="margin-left:0px"';
+                        if(typeof value.attachment.imageUrl !='undefined'){
+                            attachmentImage = '<img border="0" src="'+value.attachment.imageUrl+'">';
+                            marginImg = '';
+                           
+                        }
+                        if(typeof value.attachment.summary !='undefined'){
+                            attachmentSummary = value.attachment.summary;
+                        }
+                        if(typeof value.attachment.title !='undefined'){
+                            attachmentTitle = value.attachment.title;
+                        }
+
+                           attachmentHtml = '<div class="makelinkWrp">\
+                                              '+attachmentImage+'\
+                                                <div class="makelinkDes" '+marginImg+'>\
+                                                  <h2>'+attachmentTitle+'</h2>\
+                                                  <div class="desc">'+attachmentSummary+'</div>\
+                                                  <div class="makelinkshw">\
+                                                    <a href="'+value.attachment.contentUrl+'" target="_blank">'+value.attachment.contentUrl+'</a>\
+                                                  </div>\
+                                                </div>\
+                                            </div>';
+                     }   
+                     var datePostingTime = new Date(value.creationTimestamp);
+                      datePostingTime = $.timeago(datePostingTime); ;
+                      htmlData +='<li data-post-id="'+value.id+'" class="linkedinLisiting"><div class="postListContent">\
+                      <div class="pstListTitle"><a class="psUserName" href="#">\
+                         '+postCreatorPic+'\
+                          <div class="psName">\
+                            <h2 class="titleOfPostLinkedin">'+value.title+'</h2>\
+                            <span>'+value.creator.firstName+' '+value.creator.lastName+'</span>\
+                            <i>'+datePostingTime+'</i>\
+                          </div>\
+                          </a>\
+                      </div>\
+                      <div class="listTxtNew">'+summary+attachmentHtml+'</div></div>\
+                        <div class="listingCommentLatest">\
+                        <div class="comment-feed1">\
+                          '+totalComment+linkedinComment+'\
+                        </div>\
+                        <div class="minPostTopBar">\
+                          <div class="pfpic">\
+                            <img border="0" profilename="'+loginUserName+'" src="'+loginUserPic+'">\
+                          </div>\
+                          <div class="dbpostWrp clearfix">\
+                            <div class="cmntBntsWrapper">\
+                              <textarea  class="" value="" placeholder="Write a comment..." name="linkedinPost_comment" id="linkedinPost_comment"></textarea>\
+                            </div>\
+                          </div>\
+                        </div>\
+                      </div>\
+                      </li>';
+
+
+                  });
+            if(pageScroll==true){
+               $dbLoader('.leftSideCnt .loadingPage','','close');
+              $('#dbee-feeds').append(htmlData);
+              $('#page').val(data.page);   
+               $('[name="linkedinPost_comment"]').elastic();           
+            }else{
+               $dbLoader('#dbee-feeds','', 'close');
+              $('#dbee-feeds').html(htmlData);
+               $('[name="linkedinPost_comment"]').elastic();
+            }
+
+           
+
+            
+            
+            $dbTip();
+        },
+        error: function (error) {
+            loadError(error);
+        }
+    });
+}
+
+</script>
+
+<script type="text/javascript">
+jQuery(document).ready(function()
+{ 
+  loadLingedinGroup(0, false, true);
+
+
+    $('body').on('click','a[data-likewise]', function(){
+        var thisEl  = $(this);
+        var dataValue  = thisEl.attr('data-likewise');
+        var thisValue  = thisEl.text();
+        var parentLi  = thisEl.closest('li');
+        var postId = parentLi.attr('data-post-id');
+        // id = $(this).attr('data-id');
+         
+               $.ajax({
+                  type: "POST",
+                  dataType : 'json',
+                  url: BASE_URL+"/social/linkedinpostdislike",
+                  data: {id: postId,type: thisValue},
+                  success: function (data) {
+                    thisEl.attr('data-likewise',thisValue).text(dataValue);
+                  },
+                  error: function (error) {
+                      loadError(error);
+                  }
+              });
+           
+
+    });
+    // post comment 
+           $('body').on('keypress','textarea[name="linkedinPost_comment"]', function(event) {
+
+            if ( event.which == 13 ) {
+                
+                 var thisEl = $(this);
+                 var cmmntTxt = $.trim(thisEl.val()); 
+                 var parentLi =  thisEl.closest('li');                
+                 var postId = parentLi.attr('data-post-id');  
+                 var countCmnt = parentLi.find('.viewAllCmment strong i').text();
+                if(cmmntTxt!=''){             
+                   $.ajax({
+                    url: BASE_URL+'/social/linkedinpostcomment',
+                    type:'POST',
+                    data: {id: postId,commentText:cmmntTxt},
+                    beforeSend:function(){
+                      thisEl.closest('.dbpostWrp').find('.fa-spin').remove();
+                      thisEl.closest('.dbpostWrp').append('<i class="fa fa-spinner fa-spin fa-lg"></i>');
+                    },
+                    success:function(data){
+                      thisEl.closest('.dbpostWrp').find('.fa-spin').remove();
+                      var countPlus = parseInt(countCmnt)+1;
+                      $('.viewAllCmment strong i', parentLi).text(countPlus);
+
+                      var loginPic = '<img border="0" src="'+loginUserPic+'">';
+                      var htmlCmnt = commentHtml('', loginPic, cmmntTxt, loginUserName, 'few second ago');
+                      thisEl.closest('li').find('.comment-feed1').append(htmlCmnt);
+                      thisEl.val('');
+                    }
+                    
+                   });
+                  }
+                else{
+                  thisEl.focus();
+                }
+              }
+          
+          });
+
+          // end post comment
+   $(window).scroll(function (){
+       if ($(window).scrollTop() == $(document).height() - $(window).height()){
+          var page = $('#page').val();
+          var  groupid = $('#groupid').val();
+          if(totalPost>10){
+            grouppost(groupid,page, true);
+            }
+       }
+   });
+
+   $('#sidelinkedingGroup .rboxContainer').scroll(function (){
+    if ($(this).scrollTop() == $(this).prop('scrollHeight') - $(this).innerHeight()){
+       var pageSide = $('#pagevalue').val();
+        loadLingedinGroup(pageSide, true, true);
+       }
+ 
+});
+
+});
+
+</script>
+<!--this is page listing-->
+
+ <input type="hidden" id="page" value="10" name="page" >
+ <input type="hidden" id="groupid" value="<?php echo $this->groupid; ?>" name="groupid" >
+ <div class="leftSideCnt">
+    <div id="group-highlighted" class="groupHighlightedWrp"></div>
+    <ul class="postListing" id="dbee-feeds"></ul>
+  </div>
+	 <div id="rightListing">
+      <div class="whiteBox" id="sidelinkedingGroup">
+        <h2>My LinkedIn Groups</h2> 
+        <div class="rboxContainer" >
+          
+        </div>
+      </div>
+	</div>
+	<div class="clearfix"></div>
+<!--End page listing-->
+</div>
+</div>

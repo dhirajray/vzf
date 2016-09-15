@@ -1,0 +1,140 @@
+<?php
+
+//include "functions.php";
+
+if(isset($_GET['initial'])) $initial=$_GET['initial'];
+
+elseif(isset($_POST['initial'])) $initial=$_POST['initial'];
+
+if($initial=='') $initial=0;
+
+if(isset($_GET['check'])) $check=$_GET['check'];
+
+elseif(isset($_POST['check'])) $check=$_POST['check'];
+
+if(isset($_GET['seemore'])) $seemore=$_GET['seemore'];
+
+elseif(isset($_POST['seemore'])) $seemore=$_POST['seemore'];
+
+if($seemore=='') $seemore=0;
+
+
+
+if(isset($_GET['start'])) $start=$_GET['start'];
+
+elseif(isset($_POST['start'])) $start=$_POST['start'];
+
+if($start=='') $start=0;
+
+
+
+if(isset($_GET['end'])) $end=$_GET['end'];
+
+elseif(isset($_POST['end'])) $end=$_POST['end'];
+
+if($end=='' || $end=='NaN') $end=$start+5;
+
+
+
+if(isset($_GET['group'])) $group=(int)$_GET['group'];
+
+elseif(isset($_POST['group'])) $group=(int)$_POST['group'];
+
+
+
+if($seemore=='1') setcookie("CookieFeedEndOnReload", $startnew, time()+3600);
+
+
+
+$return='';
+
+/**************************************************/
+
+if($this->user) $cookieuser=$this->user; else $cookieuser=0;
+
+$commonbynew 	=	new Application_Model_Commonfunctionality();
+
+$privateGrp=false;
+$groupmodel  = new Application_Model_Groups();
+$grouptyperow = $groupmodel->allgroupdetailsuser($group);
+
+// CHECK IF PRIVATE GROUP
+if($grouptyperow[0]['GroupPrivacy']=='2') {
+	// CHECK IF USER IS GROUP OWNER
+	$GroupOwnerID=$grouptyperow[0]['User'];
+	if($GroupOwnerID==$cookieuser){$GroupOwner=true;}else{$GroupOwner=false;}
+
+	if(!$GroupOwner) {
+		$MemberChk = $groupmodel->allgroupdetailsuserre($group,$cookieuser);
+		$MemberNum=count($MemberChk);
+		if($MemberNum==0) {
+			$privateGrp=true;
+		}
+	}
+}
+
+if(!$privateGrp) {
+	$TotalDbeesval = $groupmodel->caltotaldbee($group); // CALCUATE TOTAL DBEES IN DATABASE
+	$TotalDbees = count($TotalDbeesval);
+	$result = $groupmodel->caltotaldbresult($group);
+	$i=1;
+	
+	if(count($result)>0) {
+	
+		if(isset($_GET['reload'])) $startnew=$end;
+	
+		else $startnew=$start+5;
+	
+		
+	
+		if(count($result)<5) {
+	
+			$startnew=$start;
+	
+			$seemorelabel='- no more '.POST_NAME.'s available to show -';
+	
+		}
+	
+		else $seemorelabel='more';
+	
+		
+	
+		$IDs='';
+	
+	
+		
+		foreach($result as $key => $row) {
+	     	$return.=$commonbynew->displayLayoutDbs($row,$this->Social_Content_Block,'all',$this->plateform_scoring,$this->adminpostscore);
+			$i++;
+			$dbeeList[] = $row['DbeeID'];
+		}
+	
+		$dblistarry = implode(',', $dbeeList); 
+	}
+	
+	else {
+	
+		$startnew=$start;
+		//$seemorelabel='- no more '.POST_NAME.' to show -';
+		$seemorelabel=''; 
+		$return='<li><div class="noFound">There are no '.ucwords(POST_NAME).'s in this Group.<br><br>Start a '.ucwords(POST_NAME).' now by using \'Post in this Group\' button above.</div></li>';
+	}
+} // END if(!$privateGrp)
+else {
+	$seemorelabel='- no more '.POST_NAME.' to show -';
+	$return='<li><div class="noFound"> <div class="surveyComplete">
+            <div  align="center" id="requesttojoin" >
+              <span class="fa-stack fa-lg">
+                <strong class="fa fa-circle-thin fa-stack-2x"></strong>
+                <strong  class="fa fa-exclamation fa-stack-1x "></strong>
+              </span>
+            This is a private group.<br/> Only members have access to '.POST_NAME.'s in this group.</div></div><li>'; 
+}
+if(isset($_GET['reload']))
+	echo $return;
+else{
+	$return.='<div id="see-more-feeds'.$startnew.'"><div id="more-feeds-loader" style="cursor:pointer; color:#333333; text-align:center;" onclick="javascript:seemorefeeds('.$startnew.',15);">'.$seemorelabel.'</div></div>';
+	echo $return.'~#~'.$end.'~#~'.$startnew.'~#~'.$dblistarry;
+}
+
+?>

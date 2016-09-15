@@ -1,0 +1,89 @@
+<?php   
+	$commonbynew 	=	new Application_Model_Commonfunctionality();
+
+    $IDs = '';  
+    $startnew=$this->start;
+    $startnew =$this->startnew;
+    $nameofCat = $this->nameofCat;
+    $dbeeList = array();
+   if($this->dbeealldbees) 
+   {
+		$k=1;        
+		if(strlen($row->Text)>250) $dots='...'; else $dots='';
+
+		if($k=='1' && $initial=='1') setcookie("CookiePostDate", $row->PostDate, time()+3600);
+		if($nameofCat!=''){
+			//echo'<pre>';print_r($nameofCat) ;die('----');
+			$returnCatval.='<ul class="fltrCatBtn">';
+			$abc=1;
+			foreach($nameofCat as $value){
+                if($abc==1){
+                	$addclass ='btn-yellow';
+                	$addcrossBtn ='';
+                }else
+                {
+                	$addclass ='';
+                    /*$addcrossBtn ='<a class="removecate" type="loginlogoimage" catid='.$value[0]['CatID'].' rel="dbTip" href="#">x</a>';*/
+                    $addcrossBtn ='<i class="cancelbtn fa fa-times-circle fa-1x" style="float: right; padding-left:5px;" catid="'.$value[0]['CatID'].'"></i>';
+                }
+                $returnCatval.='<li><a  class="catlistval btn btn-mini '.$addclass.'" href="javascript:void(0)" catid='.$value[0]['CatID'].' >'.$value[0]['CatName'].'<span class="removecate" href="#">'.$addcrossBtn.'</span></a></li>';
+                $abc++;
+			};
+			$returnCatval.='</ul>';
+		}      
+        foreach ($this->dbeealldbees as $row):
+        	$IDs .= $row['DbeeID'].',';
+			$dbeeList[] = trim($row['DbeeID']);
+        $slice = array();
+		if($row['TaggedUsers']!="")
+		{
+		 $slice=explode(',', $row['TaggedUsers']);
+	    }
+		
+		if(count($slice) > 0 && $this->session_data['UserID']!=$row['User'] && $row['PrivatePost']==1)
+		{
+			if(in_array($this->session_data['UserID'], $slice))
+	        {
+	     	$return.=$commonbynew->displayLayoutDbs($row,$this->Social_Content_Block,'all',$this->plateform_scoring,$this->adminpostscore);
+	       }
+	   }
+	   else
+	   {
+	   	$return.=$commonbynew->displayLayoutDbs($row,$this->Social_Content_Block,'all',$this->plateform_scoring,$this->adminpostscore);
+	   }
+			$k++;
+		endforeach; 
+	}
+	else {
+
+				if($nameofCat!=''){
+			//echo'<pre>';print_r($nameofCat) ;die('----');
+			$returnCatval.='<ul class="fltrCatBtn">';
+			$abc=1;
+			foreach($nameofCat as $value){
+                if($abc==1){
+                	$addclass ='btn-yellow';
+                	$addcrossBtn ='';
+                }else
+                {
+                	$addclass ='';
+                    /*$addcrossBtn ='<a class="removecate" type="loginlogoimage" catid='.$value[0]['CatID'].' rel="dbTip" href="#">x</a>';*/
+                    $addcrossBtn ='<i class="cancelbtn fa fa-times-circle fa-1x" style="float: right; padding-left:5px;" catid="'.$value[0]['CatID'].'"></i>';
+                }
+                $returnCatval.='<li><a  class="catlistval btn btn-mini '.$addclass.'" href="javascript:void(0)" catid='.$value[0]['CatID'].' >'.$value[0]['CatName'].'<span class="removecate" href="#">'.$addcrossBtn.'</span></a></li>';
+                $abc++;
+			};
+			$returnCatval.='</ul>';
+		}
+	 	
+	 	if($this->dbeenotavailmsg==1) $nomsg = '<div class="noFound"><strong>- no more '.POST_NAME.'s to show -</strong></div>';
+		else 	$nomsg = '<div class="noFound"><strong> - No posts found -</strong></div>';
+		$seemorelabel = $nomsg;
+	}
+	
+	$IDs=substr($IDs,0,-1);
+ 	/*$return.='<div id="catmyid" nameid='.$this->cat.'></div><div id="see-more-feeds'.$startnew.'"><div id="more-feeds-loader" style="cursor:pointer; color:#333333; text-align:center;background:#fff;" onclick="javascript:seemorefeeds('.$startnew.',15);">'.$seemorelabel.'</div></div>';*/
+ 	$return.='<div id="catmyid" nameid='.$this->cat.'></div><div id="see-more-feeds'.$startnew.'"><div id="more-feeds-loader" style="color:#333333; text-align:center;background:#fff;">'.$seemorelabel.'</div></div>';
+    //echo $nameofCat;die;
+	echo $return.'~#~'.$end.'~#~'.$IDs.'~#~'.$startnew.'~#~'.$nameofCat.'~#~'.$returnCatval.'~#~'.implode(',', $dbeeList);;
+?>

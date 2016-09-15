@@ -1,0 +1,133 @@
+
+<?php         
+   $this->title = "Posts";
+   $this->headTitle($this->title);
+   $deshObj= new Admin_Model_Deshboard();
+   $defaultimagecheck = new Admin_Model_Common();
+   $layoutsObj  = new Admin_Model_Layouts();
+   
+   ?>
+
+<script type="text/javascript">
+
+   $('document').ready(function() {
+       
+       $("#date_text").datepicker();
+
+   <?php
+      if (Zend_Controller_Front::getInstance()->getRequest()-> getParam('task') == 'create') { ?>
+           $('#searchContainer').show();
+           <?php
+      } else { ?>
+            $('#openCreateBtn').hide();
+            $('#searchContainer').hide();
+         <? } ?>
+   
+       <?php
+      if (Zend_Controller_Front::getInstance()->getRequest()->getParam('error') == 1) { ?>
+   
+           $messageError('No tweets found for keyword. Please change or remove in order to continue with the post. ');
+           $('#searchContainer').show();
+           $('#twitter-tag-text').focus();
+           window.history.pushState("string", "Title", "<?php echo BASE_URL; ?>/admin/dashboard/post");
+   
+           <?php
+      } ?>
+   
+       <?php
+      if (Zend_Controller_Front::getInstance()->getRequest()->getParam('error') == 2) { ?>
+   
+           $messageError('Please enter maximum 3 #hashtags/keywords.');
+           $('#searchContainer').show();
+           $('#twitter-tag-text').focus();
+           window.history.pushState("string", "Title", "<?php echo BASE_URL; ?>/admin/dashboard/post");
+   
+           <?php
+      } ?>
+   
+       <?php
+      if (Zend_Controller_Front::getInstance()->getRequest()->getParam('sucess') == 1) { ?>
+           $messageSuccess('Post added sucessfully !.');
+           window.history.pushState("string", "Title", "<?php echo BASE_URL; ?>/admin/dashboard/post");
+   
+           <?php
+      } ?>
+   
+   
+   
+      // scheduling post later
+      $("#scheduledate" ).datetimepicker({dateFormat: "dd-mm-yy",minDate: 0});
+      $('#postlater').click(function(){
+         var thisEl = $(this);
+
+         var chked = thisEl.attr('checked');
+          if(chked=='checked')
+         {
+            $('.postLaterclass').show();
+            $('.addConditionWrapper .helponoff').hide();
+              
+         }
+         else
+         {
+            $('#scheduledate').val('');
+            $('.postLaterclass').hide();
+            $('.addConditionWrapper .helponoff').show();
+         }
+      });
+
+      $('#posttimings').change(function(){
+         var thisEl = $(this);
+
+         var chked = thisEl.val();
+         if(chked=='99')
+         {
+            $('.postlaterCal').show();
+         } else
+         {
+            $('#scheduledate').val('');
+            $('.postlaterCal').hide();
+         }
+      });
+   
+   });
+</script>
+
+<?php
+if($this->task=='create')
+{
+  $heading='Create post';
+}
+else
+{
+   $heading='Most popular posts';
+}
+
+ ?>
+
+<h1 class="pageTitle dbeeViewAll" ><?=$heading?></h1>
+
+
+<?php if (count($this->paginator)){
+   echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml');  ?>
+<div class="pageheadinusr" style="font-size:15px;">
+   <?php echo "Page ". $this->page." of ".$this->totalpage;?> 
+</div>
+<div class="pageheadinusrlft" style="font-size:15px;">
+   <?php echo $this->total." posts";?> 
+</div>
+<?php } ?>
+<ul class="listing scoredList colStyle" id="searchresulthide">
+   <?php  
+   if (count($this->paginator)){ 
+      echo $layoutsObj->dbeeresultstemplate($this->paginator,'post');// coming whole layout from layouts model 
+    ?>
+</ul>
+<?php } else { ?>
+<p style="position:relative; top:100px;" class="dashBlockEmpty" >no posts found</p>
+<?php } ?>
+<?php 
+   /*
+    * Print the pagination of type
+    */
+   echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml');  ?>
+

@@ -1,0 +1,5 @@
+.twitterHasMain,.dbHasTage{min-height: 40px;}
+body input::-ms-clear {
+    display: none;
+}
+.picUplaoderPopup, .cmntBtnContent{display: none;}

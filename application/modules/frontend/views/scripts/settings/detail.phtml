@@ -1,0 +1,654 @@
+<?php echo $this->doctype() ?>
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+
+
+<head>
+
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+
+
+
+<title>dbee.me | the debate n rate social network</title>
+
+
+
+<meta name="description" content="db is a real time 'debate and rate' social network enabling you to share views on any subject, in open community or private groups. Create debate by posting opinions, photos, videos and links, score and be scored on posts, and rise or fall in db leagues.">
+
+
+
+<meta property="og:url" content="http://www.dbee.me.com" /> 
+
+
+
+<meta property="og:type" content="article" /> 
+
+
+
+<meta property="og:title" content="dbee.me | the debate n rate social network" /> 
+
+
+
+<meta property="og:site_name" content="db" /> 
+
+
+
+<meta property="og:description" content="db is a real time 'debate and rate' social network enabling you to share views on any subject, in open community or private groups. Create debate by posting opinions, photos, videos and links, score and be scored on posts, and rise or fall in db leagues." /> 
+
+
+
+<meta property="og:image" content="http://www.dbee.me/images/landing-logo.png" />
+
+
+
+<link rel="icon" type="image/png" href="http://dbee.me/images/favicon.png">
+
+
+
+
+
+
+
+<?php echo $this->headLink(array('rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => 'http://dbee.me/images/favicon.png'))
+
+
+
+                       // ->prependStylesheet(BASE_URL . '/css/bootstrap-responsive.min.css')
+
+
+
+                        ->prependStylesheet(BASE_URL . '/css/style.css')
+
+
+
+                        ->prependStylesheet(BASE_URL . '/css/global.css')
+
+
+
+                       // ->prependStylesheet(BASE_URL . '/css/bootstrap.min.css')
+
+
+
+						->prependStylesheet(BASE_URL . '/css/speechbubbles.css')					
+
+
+
+						->prependStylesheet(BASE_URL . '/css/ddcolortabs.css')					
+
+
+
+						->prependStylesheet(BASE_URL . '/css/tabcontent.css')
+
+
+
+						->prependStylesheet(BASE_URL . '/css/styles.css')
+
+
+
+						->prependStylesheet(BASE_URL . '/css/dbee.css')						
+
+
+
+						->prependStylesheet(BASE_URL . '/css/jquery.css')
+
+
+
+						->prependStylesheet(BASE_URL . '/css/jquery.blockUI.css')
+
+
+
+						->prependStylesheet(BASE_URL . '/css/shadowbox.css')
+
+
+
+						->prependStylesheet(BASE_URL . '/css/dbee.css')						
+
+
+
+						?>
+
+
+
+<!-- Scripts -->
+
+
+
+<?php echo $this->headScript()->prependFile(BASE_URL . '/js/html5.js', 'text/javascript', array('conditional' => 'lt IE 9',))
+
+
+
+                     // ->prependFile(BASE_URL . '/js/bootstrap.min.js')
+
+
+
+					  ->prependFile(BASE_URL . '/js/smooth.pack.js')
+
+
+
+                      ->prependFile(BASE_URL . '/js/jquery.min.js')
+
+
+
+				      ->prependFile(BASE_URL . '/js/functions.js')
+
+
+
+				      ->prependFile(BASE_URL . '/js/browser_check.js')
+
+
+
+				      ->prependFile(BASE_URL . '/js/ajaxupload.js')
+
+
+
+				      ->prependFile(BASE_URL . '/js/jquery-latest.js')
+
+
+
+				      ->prependFile(BASE_URL . '/js/jquery.min_1.4.4.js')
+
+
+
+				      ->prependFile(BASE_URL . '/js/jquery.min_1.4.js')
+
+
+
+				      ->prependFile(BASE_URL . '/js/jquery.slideto.v1.1.js')	
+
+
+
+				      //->prependFile(BASE_URL . '/js/shadowbox/show_shadowbox.js')
+
+
+
+				      //->prependFile(BASE_URL . '/js/shadowbox/shadowbox.js')				      
+
+
+
+				      ->prependFile(BASE_URL . '/js/all.js')				
+
+
+
+				      ->prependFile(BASE_URL . '/js/ddaccordion.js')
+
+
+
+				      ->prependFile(BASE_URL . '/js/dropdowncontent.js')
+
+
+
+				      ->prependFile(BASE_URL . '/js/dropdowntabs.js')	
+
+
+
+				      ->prependFile(BASE_URL . '/js/html5.js')
+
+
+
+				      ->prependFile(BASE_URL . '/js/javascript.js')
+
+
+
+				      ->prependFile(BASE_URL . '/js/jquery.blockUI.js')
+
+
+
+				      ->prependFile(BASE_URL . '/js/tabcontent.js')
+
+
+
+				      ->prependFile(BASE_URL . '/js/speechbubbles.js')
+
+
+
+				      ->prependFile(BASE_URL . '/js/jquery.js')
+
+
+
+				    				   
+
+
+
+				      ?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script language="javascript" type="text/javascript">
+
+
+
+var screenwidth = screen.width;
+
+
+
+if (screenwidth == 1024) {
+
+
+
+	document.write('<link rel="stylesheet" href="<?php echo BASE_URL.'/css/1024.css'?>" type="text/css" media="all" />');
+
+
+
+}
+
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<script language="javascript" type="text/javascript" src="<?php echo BASE_URL.'/js/functions.js?1379088342'?>"></script>
+
+
+
+<script type="text/javascript" src="<?php echo BASE_URL.'/js/browser_check.js'?>"></script>
+
+
+
+<script type="text/javascript" src="<?php echo BASE_URL.'/js/smooth.pack.js'?>"></script>
+
+
+
+
+
+
+
+<!-- BEGIN INCLUDE SCRIPTS TO CALL SHADOWBOX -->
+
+
+
+
+
+
+
+<script type="text/javascript" src="<?php echo BASE_URL.'/js/shadowbox/shadowbox.js'?>"></script>
+
+
+
+<script type="text/javascript" src="<?php echo BASE_URL.'/js/shadowbox/show_shadowbox.js'?>"></script>
+
+
+
+<!-- END INCLUDE SCRIPTS TO CALL SHADOWBOX -->
+
+
+
+
+
+
+
+<!-- DROPDOWN CONTENT FOR MY GROUP OPTIONS -->
+
+
+
+<script type="text/javascript" src="<?php echo BASE_URL.'/js/dropdowncontent/dropdowncontent.js'?>"></script>
+
+
+
+<!-- DROPDOWN CONTENT FOR MY GROUP OPTIONS -->
+
+
+
+
+
+
+
+<!-- DROPDOWN TOP MENU -->
+
+
+
+<script type="text/javascript" src="<?php echo BASE_URL.'/js/dropdowntab/dropdowntabs.js'?>"></script>
+
+
+
+<!-- DROPDOWN TOP MENU -->
+
+
+
+
+
+
+
+<!-- BEGIN INCLUDE SCRIPTS TO CALL DHTML TOOLTIP -->
+
+
+
+<link rel="stylesheet" type="text/css" href="<?php echo BASE_URL.'/css/speechbubbles.css'?>" />
+
+
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+
+
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+
+
+
+<script src="<?php echo BASE_URL.'/js/speechbubbles.js'?>"></script>
+
+
+
+<script type="text/javascript">
+
+
+
+jQuery(function($){ //on document.ready
+
+
+
+ $('.addspeech').speechbubble()
+
+
+
+})
+
+
+
+</script>
+
+
+
+<script type="text/javascript" src="<?php echo BASE_URL.'/scripts/ajaxupload.js'?>"></script>
+
+
+
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+
+
+
+<!-- SLIDING BACK TO TOP -->
+
+
+
+<script language="javascript" type="text/javascript" src="<?php echo BASE_URL.'/js/jquery.slideto.v1.1.js'?>"></script>
+
+
+
+<script language="javascript" type="text/javascript">
+
+
+
+var jqnctop = jQuery.noConflict();
+
+
+
+jqnctop(document).ready(function(){
+
+
+
+	jqnctop('a[name=slidetotop]').slideto({
+
+
+
+		target : '#pagetop',
+
+
+
+		speed  : 700
+
+
+
+	});
+
+
+
+});
+
+
+
+
+
+
+
+$(window).scroll(function(){
+
+
+
+	if($(window).scrollTop() > 200 ){
+
+
+
+		$('#backtotop').fadeIn("slow");
+
+
+
+	} else if($(window).scrollTop() < 200 ){
+
+
+
+		$('#backtotop').fadeOut("fast");
+
+
+
+	}
+
+
+
+});
+
+
+
+</script>
+
+<link rel="stylesheet" type="text/css" href="<?php echo BASE_URL.'/css/tabcontent.css'?>" />
+
+
+
+<script type="text/javascript" src="<?php echo BASE_URL.'/js/tabcontent.js'?>"></script>
+
+
+
+<script language="javascript" type="text/javascript">
+
+
+
+$(function() {
+
+
+
+	var open = false;
+
+
+
+	$('#footerSlideButton').click(function() {
+
+
+
+		if(open === false) {
+
+
+
+			document.getElementById('footerSlideText').style.display='block';
+
+
+
+			$('#footerSlideContent').animate({ height: '50px' });
+
+
+
+			$(this).css('backgroundPosition', 'bottom left');
+
+
+
+			open = true;
+
+
+
+		} else {
+
+
+
+			document.getElementById('footerSlideText').style.display='none';
+
+
+
+			$('#footerSlideContent').animate({ height: '0px' });
+
+
+
+			$(this).css('backgroundPosition', 'top left');
+
+
+
+			open = false;
+
+
+
+		}
+
+
+
+	});
+
+
+
+});
+
+
+
+</script>
+<style type="text/css">
+
+body {background-color:#FFFFFF}
+
+</style>
+
+
+</head>
+
+<body>
+
+<div style="clear:both"></div>
+
+<!---end header-->
+
+<?php
+
+$return='';
+
+$storage = new Zend_Auth_Storage_Session();
+
+$data	= $storage->read();
+
+$UserID  = $data['UserID'];
+
+//echo'<pre>';print_r($UserID);die;
+
+$usersnoti = new Application_Model_DbNotificationsettings();
+
+$getusersnotiinfo = $usersnoti->ausernotidetail($UserID);
+
+
+
+if(isset($getusersnotiinfo) && !empty($getusersnotiinfo)){
+
+
+
+// CHECK CURRENT STATUS OF DB NOTIFICATIONS
+
+if($getusersnotiinfo[0]['Dbees']=='1') $radioDB='<a href="javascript:void(0)" rel="scoring-off-popup~150" class="poplight" onclick="javascript:updatenotificationsetting(1);"><div id="scoring-status" class="radioTick"></div></a>';
+
+elseif($getusersnotiinfo[0]['Dbees']=='0') $radioDB='<a href="javascript:void(0)" rel="scoring-on-popup~150" class="poplight" onclick="javascript:updatenotificationsetting(1);"><div id="scoring-status" class="radio"></div></a>';
+
+
+
+// CHECK CURRENT STATUS OF COMMENT NOTIFICATIONS
+
+if($getusersnotiinfo[0]['Comments']=='1') $radioComments='<a href="javascript:void(0)" rel="scoring-off-popup~150" class="poplight" onclick="javascript:updatenotificationsetting(5);"><div id="scoring-status" class="radioTick"></div></a>';
+
+elseif($getusersnotiinfo[0]['Comments']=='0') $radioComments='<a href="javascript:void(0)" rel="scoring-on-popup~150" class="poplight" onclick="javascript:updatenotificationsetting(5);"><div id="scoring-status" class="radio"></div></a>';
+
+
+
+// CHECK CURRENT STATUS OF GROUP NOTIFICATIONS FROM PEOPLE I FOLLOW
+
+if($getusersnotiinfo[0]['Groups']=='1') $radioGroup='<a href="javascript:void(0)" rel="scoring-off-popup~150" class="poplight" onclick="javascript:updatenotificationsetting(2);"><div id="scoring-status" class="radioTick"></div></a><div style="float:left; margin:8px 0 0 10px; color:#999;">from people I follow</div>';
+
+elseif($getusersnotiinfo[0]['Groups']=='0') $radioGroup='<a href="javascript:void(0)" rel="scoring-on-popup~150" class="poplight" onclick="javascript:updatenotificationsetting(2);"><div id="scoring-status" class="radio"></div></a><div style="float:left; margin:8px 0 0 10px; color:#999;">from people I follow</div>';
+
+
+
+// CHECK CURRENT STATUS OF GROUP NOTIFICATIONS FROM PEOPLE I DONT FOLLOW
+
+if($getusersnotiinfo[0]['GroupsDontFollow']=='1') $radioGroupDontFollow='<a href="javascript:void(0)" rel="scoring-off-popup~150" class="poplight" onclick="javascript:updatenotificationsetting(4);"><div id="scoring-status" class="radioTick"></div></a><div style="float:left; margin:8px 0 0 10px; color:#999;">from people I dont follow</div>';
+
+elseif($getusersnotiinfo[0]['GroupsDontFollow']=='0') $radioGroupDontFollow='<a href="javascript:void(0)" rel="scoring-on-popup~150" class="poplight" onclick="javascript:updatenotificationsetting(4);"><div id="scoring-status" class="radio"></div></a><div style="float:left; margin:8px 0 0 10px; color:#999;">from people I dont follow</div>';
+
+
+
+// CHECK CURRENT STATUS OF MESSAGE NOTIFICATIONS
+
+if($getusersnotiinfo[0]['Messages']=='1') $radioMessage='<a href="javascript:void(0)" rel="scoring-off-popup~150" class="poplight" onclick="javascript:updatenotificationsetting(3);"><div id="scoring-status" class="radioTick"></div></a>';
+
+elseif($getusersnotiinfo[0]['Messages']=='0') $radioMessage='<a href="javascript:void(0)" rel="scoring-on-popup~150" class="poplight" onclick="javascript:updatenotificationsetting(3);"><div id="scoring-status" class="radio"></div></a>';
+
+
+
+// CHECK CURRENT STATUS OF FOLLOWERS NOTIFICATIONS
+
+if($getusersnotiinfo[0]['Followers']=='1') $radioFollowers='<a href="javascript:void(0)" rel="scoring-off-popup~150" class="poplight" onclick="javascript:updatenotificationsetting(6);"><div id="scoring-status" class="radioTick"></div></a>';
+
+elseif($getusersnotiinfo[0]['Followers']=='0') $radioFollowers='<a href="javascript:void(0)" rel="scoring-on-popup~150" class="poplight" onclick="javascript:updatenotificationsetting(6);"><div id="scoring-status" class="radio"></div></a>';
+
+
+
+$return.='<div style="border-bottom:1px dotted #CCC"><div class="formLabel" style="width:220px;">receive new '.POST_NAME.' notifications</div><div id="scoring-radio-1" class="fieldClass mynotesonoff">'.$radioDB.'</div><br style="clear:both"></div>
+
+			<div style="clear:both"></div>
+
+			<div style="border-bottom:1px dotted #CCC"><div class="formLabel" style="width:220px;">receive new comment notifications</div><div id="scoring-radio-5" class="fieldClass mynotesonoff">'.$radioComments.'</div><br style="clear:both"></div>
+
+			<div style="clear:both"></div>
+
+			<div style="border-bottom:1px dotted #CCC"><div class="formLabel" style="width:220px;">receive new group notifications</div><div id="scoring-radio-2" class="fieldClass">'.$radioGroup.'</div>
+
+			<div style="clear:both"></div>
+
+			<div class="formLabel" style="width:220px;"></div><div id="scoring-radio-4" class="fieldClass">'.$radioGroupDontFollow.'</div><br style="clear:both"></div>
+
+			<div style="clear:both"></div>
+
+			<div style="border-bottom:1px dotted #CCC"><div class="formLabel" style="width:220px;">receive new message notifications</div><div id="scoring-radio-3" class="fieldClass mynotesonoff">'.$radioMessage.'</div><br style="clear:both"></div>
+
+			<div style="clear:both"></div>
+
+			<div><div class="formLabel" style="width:220px;">receive new followers notifications</div><div id="scoring-radio-6" class="fieldClass mynotesonoff">'.$radioFollowers.'</div></div>
+
+			<br style="clear:both; font-size:1">';
+
+
+
+echo $return;
+
+}
+
+?>
+
+
+

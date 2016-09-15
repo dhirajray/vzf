@@ -1,0 +1,87 @@
+<?php
+$return='';
+$getuserbio = $this->userbiography;
+$getfield = $this->biographyfield;
+
+$userbiography = new Application_Model_DbUserbiography();
+$sessionUserID = $_SESSION['Zend_Auth']['storage']['UserID'];
+/*echo"<pre>";
+print_r($getfield);
+echo"</pre>";*/
+?>
+<!-- <div class="formRow">
+	<div class="formField">
+		<textarea id="aboutme" class="textareafield">'.$getuserbio[0]['AboutMe'].'</textarea>
+		<i class="optionalText">About me</i>
+	</div>
+</div>
+<div class="formRow">
+	<div class="formField">
+		<textarea id="occupation" class="textareafield">'.$getuserbio[0]['Occupation'].'</textarea>
+		<i class="optionalText">Occupation</i>
+	</div>
+</div>
+<div class="formRow">
+	<div class="formField">
+		<textarea id="political" class="textareafield">'.$getuserbio[0]['PoliticalViews'].'</textarea>
+		<i class="optionalText">Political views</i>
+	</div>
+</div>
+<div class="formRow">
+	<div class="formField">
+		<textarea id="relegious" class="textareafield">'.$getuserbio[0]['RelegiousViews'].'</textarea>
+		<i class="optionalText">Religious views</i>
+	</div>
+</div>
+
+
+	<div class="formRow">
+		<div class="formField">
+			<textarea id="hobbies" class="textareafield">'.$getuserbio[0]['HobbiesInterests'].'</textarea>
+			<i class="optionalText">Hobbies & interests</i>
+		</div>
+	</div>
+	<div class="formRow last">
+		<div class="formField">
+			<textarea id="likes" class="textareafield">'.$getuserbio[0]['LikesDislikes'].'</textarea>
+			<i class="optionalText">Likes & dislikes</i>
+		</div>
+	</div> -->
+<?php
+
+    $return.='<form id="bioformraj" method="POST">
+    	<div id="passform" class="postTypeContent" >';
+	
+	if(count($getfield) >0) {
+
+	foreach ($getfield as $key => $value) {		
+	
+	$return.='<div class="formRow">
+				<div class="formField">
+					<textarea id="'.$value['id'].'" name="'.$value['id'].'" class="textareafield">'.$userbiography->getbiofieldsvalue2($sessionUserID,$value['id']).'</textarea>
+					<label class="optionalText" for="'.$value['id'].'">'.$value['name'].'</label>
+				</div>
+			</div>';
+
+		}
+		}
+			
+
+	 $return.='<div>
+					<input type="hidden" id="ID" name="ID"  value="'.$getuserbio[0]['ID'].'">
+					<input type="hidden" id="UserID" name="UserID"  value="'.$sessionUserID.'">
+					<div id="signuploader" style="display:none; float:left;  padding-left:10px;"><img src="images/ajaxloader.gif" border="0" /></div>
+					<div id="SignupErr">All fields mandatory</div>
+				</div>
+			</div>
+	</form>';
+
+
+
+
+echo $return;
+
+?>
+
+
+

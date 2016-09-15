@@ -1,0 +1,115 @@
+<div id="profileCreatorBox" class="whiteBox noCollapse active">
+     <?php 
+        $storage  = new Zend_Auth_Storage_Session();
+        $session      = $storage->read();
+        
+      if($this->userid && isset($this->ResultData['User'])){
+        $fcnt =$this->following->chkfollowingcnt($this->ResultData['User'],$this->userid);
+        $uvar = 'User';
+      }else if($this->userid){
+        $fcnt =$this->following->chkfollowingcnt($this->ResultData['UserID'],$this->userid);
+        $uvar = 'UserID';
+      }
+
+      $fellowtxt = ($fcnt['ID']>0)?'Unfollow':'Follow';
+
+     if($this->userid=='')
+        $followdiv='';
+     else if($this->ResultData[$uvar]==$this->userid)
+         $followdiv='';
+     else if($this->ResultData[$uvar]==adminID)
+         $followdiv='';
+     else if($this->ResultData[$uvar]==100 && $session['usertype']!=100)
+         $followdiv='';
+     else if($this->ResultData['UserID']!=$this->userid)
+        $followdiv='<a href="javascript:void(0)" class="poplight btn btn-yellow btn-mini" onClick="javascript:followme(' . $this->ResultData[$uvar] . ',this);" id="follow-user"><div id="followme-label">'.$fellowtxt.'</div></a>';
+    ?>
+<!--    <h2>Post creator 
+   <?php echo $followdiv; ?></h2> -->
+   <div class="rboxContainer grpCreatorBox" id="grmemdetail">
+
+      <div class="dbDetailsBox1">
+            <div class="dbUserPic1">
+              <div class="bgProfile">
+              <?php if($this->ResultData['usertype']==100 && $session['usertype']!=100) { ?>            
+              <img border="0" src="<?php echo IMGPATH.'/users/medium/'.VIPUSERPIC; ?>" width="70" height="70">
+              <?php } else { ?>
+                 <img border="0" src="<?php echo IMGPATH.'/users/small/'.$this->ResultData['ProfilePic']; ?>" width="70" height="70">
+              <?php } ?>
+              </div>
+               <div class="dbDetailsTopBar">
+                  <div class="crSt">
+                     <i class="fa fa-pencil-square-o"></i>
+                     <span><?php echo $this->Myhome_Model->usersdbeecount($this->ResultData['UserID']); ?></span><b>Posts</b>
+                  </div>
+                  <div class="crSt">
+                     <i class="fa fa-male"></i>
+                     <span><?php echo count($this->following->getfolloweruserprofile($this->ResultData['UserID'])); ?></span><b>Following</b>
+                  </div>
+                  <div class="crSt">
+                     <i class="fa fa-child"></i>
+                     <span><?php echo count($this->following->getfollowing($this->ResultData['UserID'])); ?></span><b>Followers</b>
+                  </div>
+               </div>
+               <div class="buttonsPrctr">
+                  <?php echo $followdiv; ?>
+                  <?php if($this->ResultData['events']!=0 && $this->ResultData['events']!='') { ?>
+                  <a href="<?php echo BASE_URL; ?>/event/eventdetails/id/<?php echo $this->ResultData['events']; ?>" class="linkOrange" >Back to main event</a>
+                 <?php } ?>
+                 <?php if($this->ResultData['GroupID']!=0 && $this->ResultData['GroupID']!='' && $this->requestStatus!=3) { ?>
+                  <a href="<?php echo BASE_URL; ?>/group/groupdetails/group/<?php echo $this->grprow['GroupID']; ?>" class="linkOrange" >Back to main Group</a>
+                 <?php } ?>
+                 <?php  if($this->userid==adminID && $this->userid!='' && $this->ResultData['GroupID']==0)  echo '<a href="'.adminURL.'/admin/dashboard/postreport/m_-_xxp=t/'. base64_encode($this->ResultData['DbeeID']).'"  class="btn btn-green btn-mini" target="_blank" > <i class="fa fa-bar-chart"></i> Analytics</a>'; ?>
+              </div>               
+            </div>
+            <div class="creatorProfileDetails">
+                <div class="prCrUser">
+                 <?php if($this->ResultData['usertype']==100 && $session['usertype']!=100) { ?>
+                 <a href="javascript:void(0);" class="psUserName">
+                    <img border="0" src="<?php echo IMGPATH.'/users/small/'.VIPUSERPIC; ?>" width="70" height="70">
+                  </a>
+                <?php } else {  
+                $prfilLink = ($this->userid != '') ? BASE_URL.'/user/'.$this->myclientdetails->customDecoding($this->ResultData['Username']) : 'javascript:void(0)'; 
+                $class = ($this->userid != '') ? 'psUserName' : 'psUserName cursor-default'; 
+                ?>
+                <a href="<?php echo $prfilLink?>" class=" <?php echo $class?>">
+                  <img border="0" src="<?php echo IMGPATH.'/users/small/'.$this->ResultData['ProfilePic']; ?>" width="70" height="70">
+                </a>
+                <?php } ?>
+                </div>
+                <div class="prCrDetails">
+        <?php if($this->group==1){
+          echo '<span class="prcrLable">Created by</span>';
+          }else{
+          echo '<span class="prcrLable">Posted by</span>';
+        } ?>
+                 
+                 <span style="font-size:14px;" class="dbUserName">
+                  <?php if($this->ResultData['usertype']==100 && $session['usertype']!=100) { ?>
+
+                  <?php echo VIPUSER.'<br><font class="vipusertype">'.$this->ResultData['typename']; ?>
+
+                   <?php } else { ?>
+
+                   <?php echo $this->myclientdetails->customDecoding($this->ResultData['Name']).' '.$this->myclientdetails->customDecoding($this->ResultData['lname']).'<br><font class="vipusertype">'.$this->ResultData['typename']; ?>
+
+                  <?php } ?>
+                </font>
+                 </span>
+                 <?php if($this->ResultData['company']!="") {?>
+                 <div class="jobpostDesc"><?php echo $this->myclientdetails->customDecoding($this->ResultData['company']); ?></div>
+                 <?php } ?>                
+               
+               </div>
+            </div>
+      </div>
+   </div>
+</div>
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    $('body').on('click','#rightListing h2', function(){
+      $(this).closest('.whiteBox').addClass('active');      
+    });
+  });
+</script>

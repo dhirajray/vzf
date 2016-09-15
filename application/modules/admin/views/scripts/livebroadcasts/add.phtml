@@ -1,0 +1,369 @@
+<?php         
+   $this->title = "Add YouTube Live Streaming";
+   $this->headTitle($this->title);   
+   
+   ?>
+<script type="text/javascript">
+$('document').ready(function(){     
+$('div #searchContainer').show();
+
+});
+</script>
+
+<script type="text/javascript">
+$('document').ready(function(){
+   $("#date_text").datepicker();
+});
+
+$(function(){
+$("#startdate" ).datetimepicker({dateFormat:'yy-mm-dd', minDate:0});
+$("#enddate" ).datetimepicker({dateFormat:'yy-mm-dd', minDate:0});
+$('#specialdb').submit(function()
+    {
+        formdata = $('form#specialdb').serialize();
+
+        videoUrl = $('#yt_url').val();
+        
+        var p = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?(?=.*v=((\w|-){11}))(?:\S+)?$/;
+        var matches =  (videoUrl.match(p)) ? RegExp.$1 : 10;
+        var discription = $('#yt_des').val();
+        
+        if (matches == false && videoUrl)
+        {   $messageError('youtube url not valid');
+            return false;
+        }
+       if (discription == '')
+       { 
+         $messageError('video description cannot be empty');
+         return false;
+       }
+        var eventstart = $('#eventstart').val();        
+        if (eventstart == '')
+        { 
+            $messageError('event date cannot be empty');
+            return false;
+        }
+        DbeeID = $('#DbeeID').val();
+        
+       var thisEl  =   $(this);
+       var url     =   BASE_URL+'/admin/livebroadcasts/editvideodb';
+       var redirectUrl     =   BASE_URL+'/admin/livebroadcasts/insert';
+       postdata    =   formdata+'&vid='+matches+'&DbeeID='+DbeeID;
+       $messageSuccess('insert successfully');
+
+        $.ajax({                                      
+              url: url,                  
+              data: postdata,                        
+              method: 'POST', 
+              type:'json', 
+              beforeSend: function(){  
+              },
+              success: function(data)    
+              {            
+                $('#yt_url').val('');
+                $('#yt_des').val('');
+                $('#slideshare').val('');
+                $('#eventstart').val('');
+                $('#DbeeID').val('');
+                $('#specialdbsubmit').val(' Save ');
+                $('#searchContainer').css('display','none');
+                
+                  
+                 // $messageSuccess('Video broadcast added successfully');
+                location.href = redirectUrl;
+              }
+        }); 
+        return false;
+    });
+});
+</script>
+
+
+<h1 class="pageTitle dbeeViewAll">Live Video broadcasts <a href="#" class="btn btn-yellow btn-large openSearchBlock resetform">Create live video broadcast</a></h1>
+<div  id="searchWrapper" class="spSdbsSearchBox">
+   
+      <div id="searchContainer"> 
+         <div id="exp_condition" class="expenddcondition1" >            
+            <div class="whiteBox addConditionWrapper"> 
+                  <form name="livebroadcast" id="livebroadcast">
+                           <div class="searchField"> 
+                              <label class="label">Title</label>
+                              <div class="fieldInput"><input type="text" placeholder="Please enter the video title" id="title" name="title" style="width: calc(100% - 140px); -webkit-width: calc(100% - 140px); float:left; margin-right:5px" ></div>
+                           </div>
+                           <div class="searchField"> 
+                              <label class="label">Description </label>
+                              <div class="fieldInput"><textarea style="width: calc(100% - 140px); -webkit-width: calc(100% - 140px); float:left; margin-right:5px" class="textarea"  name="description" id="description" ></textarea></div>
+                           </div>
+                           <!-- <div class="searchField"> 
+                              <label class="label">SlideShare link </label>
+                              <div class="fieldInput"><textarea style="width: calc(100% - 140px); -webkit-width: calc(100% - 140px); float:left; margin-right:5px" id="slideshare" name="slideshare" class="textarea" ></textarea></div>
+                           </div> -->
+                           <div class="searchField"> 
+                              <label class="label">Start date / time </label>
+                              <div class="fieldInput"><input type="text" style="width:225px; float:left; margin-right:5px" id="startdate" name="startdate" ></div>
+                              
+                           </div>
+                           <div class="searchField"> 
+                              <label class="label">End date / time </label>
+                              <div class="fieldInput"><input type="text" style="width:225px; float:left; margin-right:5px" id="enddate" name="enddate" ></div>
+                              
+                           </div>
+                           <div class="searchField"> 
+                              <label class="label">Time zone </label>
+                              <div class="fieldInput"> <select name="timezoneevent" id="timezoneevent">        
+                                 <option value="-12.0">(GMT -12:00) Eniwetok, Kwajalein</option>
+                                 <option value="-11.0">(GMT -11:00) Midway Island, Samoa</option>
+                                 <option value="-10.0">(GMT -10:00) Hawaii</option>
+                                 <option value="-9.0">(GMT -9:00) Alaska</option>
+                                 <option value="-8.0">(GMT -8:00) Pacific Time (US &amp; Canada)</option>
+                                 <option value="-7.0">(GMT -7:00) Mountain Time (US &amp; Canada)</option>
+                                 <option value="-6.0">(GMT -6:00) Central Time (US &amp; Canada), Mexico City</option>
+                                 <option value="-5.0">(GMT -5:00) Eastern Time (US &amp; Canada), Bogota, Lima</option>
+                                  <option value="-4.0">(GMT -4:00) Atlantic Time (Canada), Caracas, La Paz</option>
+                                 <option value="-3.5">(GMT -3:30) Newfoundland</option>
+                                   <option value="-3.0">(GMT -3:00) Brazil, Buenos Aires, Georgetown</option>
+                                 <option value="-2.0">(GMT -2:00) Mid-Atlantic</option>
+                                 <option value="-1.0">(GMT -1:00 hour) Azores, Cape Verde Islands</option>
+                                 <option value="0.0" selected="selected">(GMT) Western Europe Time, London, Lisbon, Casablanca</option>
+                                 <option value="1.0">(GMT +1:00 hour) Brussels, Copenhagen, Madrid, Paris</option>
+                                 <option value="2.0">(GMT +2:00) Kaliningrad, South Africa</option>
+                                 <option value="3.0">(GMT +3:00) Baghdad, Riyadh, Moscow, St. Petersburg</option>
+                                 <option value="3.5">(GMT +3:30) Tehran</option>
+                                 <option value="4.0">(GMT +4:00) Abu Dhabi, Muscat, Baku, Tbilisi</option>
+                                 <option value="4.5">(GMT +4:30) Kabul</option>
+                                 <option value="5.0">(GMT +5:00) Ekaterinburg, Islamabad, Karachi, Tashkent</option>
+                                 <option value="5.5">(GMT +5:30) Bombay, Calcutta, Madras, New Delhi</option>
+                                 <option value="5.75">(GMT +5:45) Kathmandu</option>
+                                 <option value="6.0">(GMT +6:00) Almaty, Dhaka, Colombo</option>
+                                 <option value="7.0">(GMT +7:00) Bangkok, Hanoi, Jakarta</option>
+                                 <option value="8.0">(GMT +8:00) Beijing, Perth, Singapore, Hong Kong</option>
+                                 <option value="9.0">(GMT +9:00) Tokyo, Seoul, Osaka,  </option>
+                                 <option value="9.5">(GMT +9:30) Adelaide, Darwin</option>
+                                 <option value="10.0">(GMT +10:00) Eastern Australia, Guam, Vladivostok</option>
+                                 <option value="11.0">(GMT +11:00) Magadan, Solomon Islands, New Caledonia</option>
+                                 <option value="12.0">(GMT +12:00) Auckland, Wellington, Fiji, Kamchatka</option>
+                                 
+                                 <?php //endforeach;?>                                    
+                                 </select></div>
+                              
+                           </div>
+                           <div class="searchField"> 
+                              <label class="label">Broadcast type </label>
+                              <div class="fieldInput">
+                                 <select name="eventtype" id="eventtype">
+                                    <option value='Public'>Public</option>
+                                    <option value='Unlisted'>Unlisted</option>
+                                    <option value='Private'>Private</option>
+                                 </select>
+                              </div>
+                           </div>
+                            <div class="searchField"> 
+                            <label class="label"> </label>
+                              <div class="fieldInput">
+                              <label>
+                              <input name="commentduring" class="goupuser" id="commentduring" value="1" type="checkbox"><label for="commentduring"></label>Enable comments during broadcast (if unchecked, users will only be able to comment once the video broadcast has finished)</span></label>
+                              </div>
+                           </div>
+                           <!-- 
+                            <div class="searchField"> 
+                            <label class="label"> </label>
+                              <div class="fieldInput">
+                              <label>
+                              <input name="notification" class="goupuser" id="notification" value="1" type="checkbox"><label></label>notification <span style="color:#999">- Auto notify attendees of the video broadcast an hour before it starts.</span></label>
+                              </div>
+                           </div> -->
+
+                           <div class="searchField"> 
+                              <label class="label">&nbsp;</label>
+                              <div class="fieldInput">
+                                 <input id="editvideoPost" name="editvideoPost" type="hidden" value="0">
+                                 <input id="DbeeID" name="DbeeID" type="hidden" value="">
+                                 <input type="submit" id="specialdbsubmit" class="addbutton btn btn-green btn-medium pull-left" value="Save"> 
+                                 &nbsp;
+                                 <input type="submit" id="" class="btn btn-medium openSearchBlock resetform" value="Close" style=""> 
+                              </div>
+                           </div>
+                     <div class="clearfix"></div>
+                     
+
+                  </div>
+                  <div class="clearfix"></div>
+               </form>
+         </div>
+
+
+         <div class="clearfix"></div>
+      </div>
+
+      <div class="clearfix"></div>
+   
+</div>
+<div class="box-body " id="spcialDBbody">
+   <div id="listingTotalResults" style="float:right;margin: 10px 35px 0 0;"></div>
+   <ul class="listing scoredList" id="searchresulthide">
+      <?php  
+      //$offset = $this->start+10;
+      if (count($this->spdbs)){ ?>
+      <?php foreach($this->spdbs as $spdb => $liveDbee) :  ?>
+      <li>
+         <?php $dash_obj = new Admin_Model_Deshboard();
+         $descDisplay = '';
+         if($this->escape($liveDbee['Type'])==6) { 
+            //echo $liveDbee['Active'];
+            if($liveDbee['Active']==0)
+               $checked = 'checked="checked"';
+            else
+               $checked = '';
+
+            $dbtype  =  $cmnObj->getspecialdbType_CM($liveDbee['eventtype']).' Event ';
+            $dbtypeIcon =  '<div class="pstype typeVideo"></div>';
+            $dbVid         =  $liveDbee['VidID'];
+            $dbVidDesc     =  $liveDbee['VidDesc'];            
+            $descDisplay   .= '<div class="dbPicText">';
+            if($dbVid!='')
+            {
+               $descDisplay   .= '<div class="dbPic" ><a href="#"><img width="90" height="60" border="0" src="https://i.ytimg.com/vi/'.$dbVid.'/0.jpg"></a></div>';
+               $note = '';
+            }else{
+               $noPic = 'noPix';
+               $note = 'Unpublished - Add a youtube video link to make the broadcast live';
+            }
+            
+            $invitelink = '<strong class="spdbltboxnew">No users invited</strong>';
+            if($this->invite($liveDbee['DbeeID'])>0)
+               $invitelink = '';
+            
+            if($dash_obj->attendiesuser($liveDbee['DbeeID'],1)>0){
+            
+               $attendies = '<div class="spdbltbox"><strong><span>'.count($dash_obj->attendiesuser($liveDbee['DbeeID'],1)).'</span> users attending this event <a  href="javascript:void(0);" class="attendiesuser spdbltbox" dbid="'.$liveDbee['DbeeID'].'" type="1"> view</a></strong> </div>';
+               
+            }else
+               $attendies = '<div class="spdbltbox"><strong>No users attending this event</strong></div>';
+            
+            if($dash_obj->attendiesuser($liveDbee['DbeeID'],0)>0){
+               
+               $reqtojoin = '<strong><span>'.$dash_obj->attendiesuser($liveDbee['DbeeID'],0).'</span> user requested to join</strong><a class="reqtojoinuser spdbltbox" dbid="'.$liveDbee['DbeeID'].'" type="0" href="javascript:void(0);"> View</a>';
+            }else
+               $reqtojoin = '<div class="spdbltbox"><strong>No users requested to join</strong></div>';
+            
+            if($liveDbee['eventtype']==0) 
+               $descDisplay1 = 'Open video broadcast created '; 
+            if($liveDbee['eventtype']==1) 
+               $descDisplay1 = 'Request video broadcast created '; 
+            if($liveDbee['eventtype']==2)
+               $descDisplay1 = 'A private video broadcast created ';
+         
+
+            $descDisplay   .= '<div class="dbPicDesc '. $noPic.'">
+               <div class="spcDecptTxt">
+                 <div><h2>'.$descDisplay1.date('d M Y',strtotime($this->escape($liveDbee['PostDate']))).' | Event starts on '. date('d M Y \a\t h:i',strtotime($liveDbee['eventstart'])) .'</h2></div>
+                 '.$dbVidDesc.' 
+
+                 <div class="dbActBtnOver">
+                     <div class="dbActBtnLft">
+                        <span class="updateSpecialDbee btn btn-green btn-mini" videoid="'.$liveDbee['DbeeID'].'">Edit</span> 
+                             <a class="btn btn-green btn-mini" href="'.BASE_URL.'/dbee/'.$liveDbee['dburl'].'" videoid="'.$liveDbee['DbeeID'].'">View</a> 
+                      </div>
+                     <div class="dbActBtnRt">
+                         <div class="helponoff userActiveInactive updateDbeeUserStatus"> 
+                           <!-- Note : user_id is dbee_id -->
+                           <input type="checkbox" id="switcherTarget_'.$liveDbee['DbeeID'].'" '.$checked.' user_id="'.$liveDbee['DbeeID'].'" status="'.$liveDbee['Active'].'"> 
+                            <label for="switcherTarget_'.$liveDbee['DbeeID'].'">
+                              <div class="onHelp" on="Active" off="Inactive"></div>
+                              <div class="onHelptext">
+                                 <span>Activate</span>
+                                 <span>Deactivate</span>
+                              </div>
+                           </label>
+                        </div>
+                     </div>
+                 </div>
+
+               </div> 
+            </div>
+                 <!--Start social list-->
+              <div class="spcSocialOvrList">    
+                  <div class="dbSocialLft">
+                               '.$attendies.'
+                     <div class="spdbltbox">
+                        '.$invitelink.'
+                        '.$this->invitecnt($liveDbee['DbeeID']).'
+                     </div>
+                        '.$reqtojoin.'
+                    </div>
+                    <div class="dbSocialRt">
+                              <div class="spdbltbox">
+                          <div class="inPeople"> Invite from</div>
+                            <div class="spcPeopleIcon" >';
+                     if($this->facebookLogined==false)
+                        $descDisplay .='<a href="'.BASE_URL.'/admin/social/facebook?postid='.$liveDbee['DbeeID'].'&type=attendies" class="dbfbIcon"><span class="fa fa-facebook-square"></span></a>';
+                     else
+                        $descDisplay .='<a href="javascript:void(0);" data-uniqueValue ="'.$liveDbee['DbeeID'].'" class="dbfbIcon socialfriends" data-title="'.$liveDbee['Text'].'" data-for ="attendies" data-type="facebook" ><span class="fa fa-facebook-square"></span></a>';
+
+                     if($this->twitterLogined==false)
+                        $descDisplay   .= '<a href="'.BASE_URL.'/admin/social/twitter?postid='.$liveDbee['DbeeID'].'&type=attendies" class="dbtwitterIcon"><span class="fa fa-twitter-square"></span></a>';
+                     else
+                        $descDisplay   .= '<a href="javascript:void(0);"  data-uniqueValue ="'.$liveDbee['DbeeID'].'" class="dbtwitterIcon socialfriends" data-title="'.$liveDbee['Text'].'" data-for ="attendies" data-type="twitter" ><span class="fa fa-twitter-square"></span></a>';
+                     
+                     if($this->linkedinLogined==false)
+                        $descDisplay   .= '<a href="'.BASE_URL.'/admin/social/linkedin?postid='.$liveDbee['DbeeID'].'&type=attendies" class="dblinkedinIcon"><span class="fa fa-linkedin-square"></span></a>';
+                     else
+                        $descDisplay   .= '<a href="javascript:void(0);" data-uniqueValue ="'.$liveDbee['DbeeID'].'" class="dblinkedinIcon socialfriends" data-title="'.$liveDbee['Text'].'" data-for ="attendies" data-type="linkedin"><span class="fa fa-linkedin-square"></span></a>';
+
+                        $descDisplay   .= '<a href="javascript:void(0);" data-uniqueValue ="'.$liveDbee['DbeeID'].'" class="dbsocialIcon socialfriends" data-for ="attendies" data-type="dbee" data-title="'.$liveDbee['Text'].'" ></a>
+                       </div></div>';
+                       if($liveDbee['expertuser']==0)
+                       {
+                           $requestInvitation = $this->deshboard->checkinviteexpert($liveDbee['DbeeID']);
+                           $requestDbeeInvitation = $this->deshboard->checkdbeeinviteexpert($liveDbee['DbeeID']);
+
+                           if(!empty($requestInvitation))
+                                 $descDisplay  .='<div class="spdbltbox" style="margin-left: 67px;" id="spcPeopleIcon'.$liveDbee['DbeeID'].'"  ><a href="javascript:void(0);" data-title="'.$liveDbee['Text'].'" data-id="'.$liveDbee['DbeeID'].'" class="viewexistExpert">View existing invite</a>/div>';
+                             else if(!empty($requestDbeeInvitation))
+                                  $descDisplay  .='<div class="spdbltbox" style="margin-left: 67px;" id="spcPeopleIcon'.$liveDbee['DbeeID'].'" ><a href="javascript:void(0);" data-title="'.$liveDbee['Text'].'" data-id="'.$liveDbee['DbeeID'].'" class="viewexistExpert" >View existing invite</a></div>';
+
+                           if(empty($requestInvitation) && empty($requestDbeeInvitation))
+                           {
+                              $descDisplay  .='<div class="spdbltbox" id="spcPeopleIcon'.$liveDbee['DbeeID'].'"  style="padding-bottom:0; margin-bottom:0;">
+                               <div class="inPeople"> Invite guest speaker</div><div class="spcPeopleIcon">';
+                              if($this->facebookLogined==false)
+                                 $descDisplay .='<a href="'.$this->facebookurl.'" class="dbfbIcon" ><span class="fa fa-facebook-square"></span></a>';
+                              else
+                                 $descDisplay .='<a href="javascript:void(0);" data-uniqueValue ="'.$liveDbee['DbeeID'].'" class="dbfbIcon socialfriends" data-title="'.$liveDbee['Text'].'" data-for ="expert" data-type="facebook" ><span class="fa fa-facebook-square"></span></a>';
+
+                              if($this->twitterLogined==false)
+                                 $descDisplay   .= '<a href="'.BASE_URL.'/admin/social/twitter?postid='.$liveDbee['DbeeID'].'&type=expert" class="dbtwitterIcon"><span class="fa fa-twitter-square"></span></a>';
+                              else
+                                 $descDisplay   .= '<a href="javascript:void(0);" data-uniqueValue ="'.$liveDbee['DbeeID'].'" class="dbtwitterIcon socialfriends" data-title="'.$liveDbee['Text'].'" data-for ="expert" data-type="twitter" ><span class="fa fa-twitter-square"></span></a>';
+
+                              if($this->linkedinLogined==false)
+                                 $descDisplay   .= '<a href="'.BASE_URL.'/admin/social/linkedin?postid='.$liveDbee['DbeeID'].'&type=expert" class="dblinkedinIcon"><span class="fa fa-linkedin-square"></span></a>';
+                              else
+                                 $descDisplay   .= '<a href="javascript:void(0);" data-uniqueValue ="'.$liveDbee['DbeeID'].'" class="dblinkedinIcon socialfriends" data-title="'.$liveDbee['Text'].'" data-for ="expert" data-type="linkedin" ><span class="fa fa-linkedin-square"></span></a>';
+
+                              $descDisplay   .= '<a href="javascript:void(0);" data-uniqueValue ="'.$liveDbee['DbeeID'].'" class="dbsocialIcon socialfriends" data-title="'.$liveDbee['Text'].'" data-for ="expert" data-type="dbee" ></a></div></div></div>';
+                           }
+                       }else{
+                        $descDisplay   .= '<div class="spdbltbox" style="margin-left: 67px;" id="spcPeopleIcon'.$liveDbee['DbeeID'].'" >Invited guest speaker</div>';
+                       }
+                      $descDisplay .=  '</div><span style="color:red;">'.$note.'</span></div>';
+                      unset($checked);
+         } ?>
+
+
+         <div class="dataListWrapper"> 
+            <div class="dataListbox">
+               <div class="scoredData">
+                  <div class="dbPost"><?php echo $descDisplay;?></div>
+               </div>
+            </div>
+         </div>
+      </li>
+      
+            <?php $rowchange++; endforeach; ?>
+      </ul>
+
+<?php }  ?>
+
+      
+

@@ -1,0 +1,15 @@
+<!-- youtube video here -->
+<?php if($this->dbeedetail_row['VidSite']=='youtube') {  ?>
+<input type="hidden" id="videoID" value="<?php echo $this->dbeedetail_row['Vid']; ?>">
+<script type='text/javascript'> 
+    $(function(){
+      var tag = document.createElement('script');
+      tag.src = "https://www.youtube.com/iframe_api";
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+   });
+</script>
+<script src="<?php echo BASE_URL."/js/youtube.js"; ?>?v=<?php echo filemtime('js/youtube.js');?>"></script>
+<?php }else{ ?>
+<script src="<?php echo BASE_URL."/js/html5player.js"; ?>?v=<?php echo filemtime('js/html5player.js');?>"></script>
+<?php } ?>

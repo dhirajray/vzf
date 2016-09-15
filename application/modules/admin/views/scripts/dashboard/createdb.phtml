@@ -1,0 +1,63 @@
+<?php         
+$this->title = "Dbees";
+$this->headTitle($this->title);
+$deshObj= new Admin_Model_Deshboard();
+?>
+<script type="text/javascript">
+$('document').ready(function(){
+	$("#date_text").datepicker();
+	function load()
+	{
+		//alert('Coming');
+	}
+	
+});
+</script>
+ 
+
+
+
+<h1 class="pageTitle">Special Debates</h1>
+
+<div  id="searchWrapper">
+	
+		<a href="#" class="btn btn-yellow btn-large " id="openSearchBlock"><i class="searchSprite searchIcon"></i> Create db</a>
+		<div id="searchContainer" style="display:block">	
+			<div id="exp_condition" class="expenddcondition1" >				
+				<div class="whiteBox addConditionWrapper"> 
+					<div class="formCondition">	
+						<form name="specialdb" id="specialdb">
+							<div id="exp_criteria"  class="pull-left "> 
+								<div id="open_user" class="attributs" style="float:left;width:100%" >								
+									<div class="searchField"> You Tube Link : </span> <input type="text" id="yt_url" name="yt_url" placeholder="Paste you yube embeded url here" ></div>
+								</div> 
+								<div id="open_user" class="attributs" style="float:left;width:100%;margin:5px;" >								<div class="searchField"> You Tube Description : </span> 
+										<input type="text" placeholder="write something about this media..." name="yt_des" id="yt_des" ></div>
+								</div>
+								<div id="open_user" class="attributs" style="float:left;width:100%;margin:5px;" >
+									<div class="searchField"> Event Start : </span> 
+										<input type="text" id="eventstart" name="eventstart" placeholder="Event Start"></div>
+								</div>							
+							</div>
+							<div class="clearfix"></div>
+						</div>
+						<input type="submit" id="specialdbsubmit" class="addbutton btn btn-green btn-medium pull-right" value="Save"> 
+						<div class="clearfix"></div>
+					</form>
+				</div>
+			</div>
+
+
+			<div class="clearfix"></div>
+		</div>
+
+		<div class="clearfix"></div>
+	
+</div>
+<div class="box-body" id="box_body">
+	<div id="listingTotalResults" style="float:right;margin: 10px 35px 0 0;"></div>
+	<ul class="listing scoredList" id="searchresulthide">
+		<li></li>
+	</ul>
+		
+

@@ -1,0 +1,293 @@
+ <script type="text/javascript">
+    $("document").ready(function(){
+       $('body').on('change','.filtervideo',function(e){
+          type  = $(this).val();
+          $dbLoader({element:'.videobroadcast',overlay:true});
+          $.ajax({
+            type : "POST",
+            dataType : 'json',
+            url : BASE_URL + '/admin/dashboard/castfilter',
+            data : {'type':type},
+            success : function(response) {
+               if(type==16 || type==17 || type==18 || type == 109){
+                type= 109;
+              }
+              $('.dbtabContent[data-type="'+type+'"]').removeClass('loader').html(response.postlist);
+              $select('select');
+            }
+          });
+       });
+    }); 
+  </script>
+  <?php
+  $videoevent = $this->deshboard->getCountNotification($this->userid,109,1,'',''); 
+  $feedbackResult = $this->deshboard->getCountNotification($this->userid,15,1,'',''); 
+  $surveyResult = $this->deshboard->getCountNotification($this->userid,19,1,'','');
+  $postResult = $this->deshboard->getCountNotification($this->userid,30,1,'','');
+  $commentResult = $this->deshboard->getCountNotification($this->userid,2,1,'','');
+  $groupResult = $this->deshboard->getCountNotification($this->userid,20,1,'','');
+  $pollResult = $this->deshboard->getCountNotification($this->userid,44,1,'','');
+
+  ?>
+<h1 class="pageTitle">Notifications</h1>
+	<div id="messageWrapper" class="dbtabContainer notificationWrpMain advWrpMain">	
+		<ul class="dbtab">
+			
+      <li class="active"><a href="#post" rel="post" class="updateNotify <?php if(count($postResult)!=0){ echo 'newActiveMark';} ?>" Type="30">Approve posts <?php   if(count($postResult)!=0){ echo '<span class="newMark">new</span>'; } ?></a></li>
+      
+      <li><a href="#comment" rel="comment" class="updateNotify <?php if(count($commentResult)!=0){ echo 'newActiveMark';} ?>" Type="2">Comments <?php   if(count($commentResult)!=0){ echo '<span class="newMark">new</span>'; } ?></a></li>
+
+      <li><a href="#poll" rel="poll" class="updateNotify <?php if(count($pollResult)!=0){ echo 'newActiveMark';} ?>" Type="44">Polls <?php   if(count($pollResult)!=0){ echo '<span class="newMark">new</span>'; } ?></a></li>
+
+      <li><a href="#survey" rel="survey" class="updateNotify <?php if(count($surveyResult)!=0){ echo 'newActiveMark';} ?>" Type="19" >Surveys <?php   if(count($surveyResult)!=0){ echo '<span class="newMark">new</span>'; } ?></a></li>
+
+      <li><a href="#group" rel="group" class="updateNotify <?php if(count($groupResult)!=0){ echo 'newActiveMark';} ?>" Type="20">Groups <?php   if(count($groupResult)!=0){ echo '<span class="newMark">new</span>'; } ?></a></li>
+
+      <li><a href="#publicvideoevent" class="updateNotify updateNotifyVideo <?php if(count($videoevent)!=0){ echo 'newActiveMark';} ?>" rel="publicvideoevent" Type="109">Video broadcasts <?php  if(count($videoevent)!=0){ echo '<span class="newMark">new</span>'; } ?></a></li>
+
+      <li><a class="updateNotify <?php if(count($feedbackResult)!=0){ echo 'newActiveMark';} ?>" href="#feedback" rel="feedback" Type="15">Feedback <?php   if(count($feedbackResult)!=0){ echo '<span class="newMark">new</span>';  } ?></a></li>
+
+		</ul>
+
+      <div class="dbTabContainerDiv">
+
+        <div id="post" class="dbtabContent" style="display:block;" data-type="30">
+         
+              <?php  $result = $this->deshboard->getNotification($this->userid,30,'','',''); if(!empty($result)){ ?>
+               <div class="responsiveTable">
+               <table class="table-border2 userListTable table table2 table-hover">
+                     
+                  <tbody> 
+                      <?php 
+                   
+                    foreach ($result as $value) 
+                    {
+                      $postTitle = "";
+                      $db_url = $this->socialInvite->getdburltitle($value['act_typeId']);
+                      if($db_url['Type']==5)
+                        $postTitle = '<a href="'.BASE_URL.'/admin/dashboard/post/id/'.$db_url['DbeeID'].'">'.$db_url['PollText'].'</a>'; 
+                      else
+                        $postTitle = '<a href="'.BASE_URL.'/admin/dashboard/post/id/'.$db_url['DbeeID'].'">'.$db_url['Text'].'</a>';
+                       $checkdbpic = $this->common_model->checkImgExist($value['ProfilePic'],'userpics','default-avatar.jpg');
+
+                      ?>
+                         <tr>
+                          <td width="60"><?php echo '<img src="'.IMGPATH.'/users/small/'.$checkdbpic.'" width="40" height="40"/>'; ?></td>
+                          <td><?php echo '<strong>'.$this->myclientdetails->customDecoding($value['Name']).' '.$this->myclientdetails->customDecoding($value['lname']).'</strong> '.$this->activityaMsg[$value['act_message']].'<br/> '.$postTitle; ?> </td>
+                          <td width="120" class="dateCol"><?php echo ''. date('d M, Y', strtotime($value['act_date'])) .''; ?></td>
+                           <td width="120" ><a href="<?php echo BASE_URL;?>/admin/dashboard/post/id/<?php echo $db_url['DbeeID'];?>" class="addbutton btn btn-green pull-left">See post</a></td>
+                        </tr>
+                        <?php }  ?>
+                     </tbody>
+               </table>
+             </div>
+               <?php  unset($result); }else{ echo '<div class="notfound">No notifications </div>'; } ?>
+        </div>
+
+        <div id="comment" class="dbtabContent" data-type="2">
+         
+          <?php  $result = $this->deshboard->getNotification($this->userid,2,'','',''); if(!empty($result))
+          {  ?>
+           <div class="responsiveTable">
+             <table class="table-border2 userListTable table table2 table-hover">
+                    
+                     <tbody> 
+                       <?php 
+                   
+                     foreach ($result as $value) 
+                     { 
+                      
+                      $comment = $this->deshboard->getComment($value['act_cmnt_id'],'','');                    
+                      $rawdata = $this->socialInvite->getdburltitle($value['act_typeId']);
+
+                      if ($rawdata['Type'] == '1')
+                        $title = $rawdata['Text'];
+                      else if ($rawdata['Type'] == '2')
+                        $title = $rawdata['LinkTitle'];
+                      else if ($rawdata['Type'] == '3')
+                        $title = $rawdata['PicDesc'];
+                      else if ($rawdata['Type'] == '4' || $rawdata['Type'] == '6')
+                        $title = $rawdata['VidDesc'];
+                      else if ($rawdata['Type'] == '5')
+                        $title = $rawdata['polltext'];
+                      
+                      $postTitle = '<br><a href="'.BASE_URL.'/dbee/'.$rawdata['dburl'].'">'.$title.'</a>';
+                      ?>
+                         <tr>  
+                          <td width="60" style=" vertical-align: top;"><?php echo '<img src="'.IMGPATH.'/users/small/'.$value['ProfilePic'].'" width="40" height="40"/>'; ?></td>
+                          <td><?php echo '<strong>'.$this->myclientdetails->customDecoding($value['Name']).' '.$this->myclientdetails->customDecoding($value['lname']).'</strong> '.$this->activityaMsg[$value['act_message']].' '.$postTitle; ?> 
+                            <div class="commentBlock"><strong>Comment:</strong> <?php echo $comment; ?> </div>
+                          </td>
+                          <td width="120" class="dateCol" style=" vertical-align: top;"><?php echo ''. date('d M, Y', strtotime($value['act_date'])) .''; ?></td>
+                        </tr>
+                        <?php }  ?>
+                     </tbody>
+               </table>
+             </div>
+              <?php unset($result); }else{ echo '<div class="notfound">No notifications </div>'; } ?>
+        </div>
+
+         <div id="poll" class="dbtabContent" data-type="44">
+         
+          <?php  $result = $this->deshboard->getNotification($this->userid,44,'','',''); if(!empty($result)){  ?>
+           <div class="responsiveTable">
+             <table class="table-border2 table2 userListTable table table-hover">
+                   
+                     <tbody> 
+                       <?php 
+                   
+                     foreach ($result as $value) { 
+                      $checkdbpic = $this->common_model->checkImgExist($value['ProfilePic'],'userpics','default-avatar.jpg');
+                      $db_url = $this->socialInvite->getdburltitle($value['act_typeId']);
+                      $postTitle = '<a href="'.BASE_URL.'/admin/dashboard/postreport/m_-_xxp=t/'.base64_encode($db_url['DbeeID']).'">'.$db_url['PollText'].'</a>';
+                      ?>
+                         <tr>  
+                          <td width="60"><?php echo '<img src="'.IMGPATH.'/users/small/'.$checkdbpic.'" width="40" height="40" / >'; ?></td>
+                          <td><?php echo '<strong>'.$this->myclientdetails->customDecoding($value['Name']).' '.$this->myclientdetails->customDecoding($value['lname']).'</strong>'.$this->activityaMsg[$value['act_message']].'<br/>'.$postTitle; ?> </td>
+                          <td  width="120" class="dateCol"><?php echo ''. date('d M, Y', strtotime($value['act_date'])) .''; ?></td>
+                        </tr>
+                        <?php }  ?>
+                     </tbody>
+               </table>
+             </div>
+              <?php unset($result); }else{ echo '<div class="notfound">No notifications </div>'; } ?>
+        </div>
+
+         <div id="survey" class="dbtabContent" data-type="19">
+         
+          <?php  $result = $this->deshboard->getNotification($this->userid,19,'','',''); if(!empty($result)){  ?>
+           <div class="responsiveTable">
+             <table class="table-border2 table2 userListTable table table-hover">
+                   
+                     <tbody> 
+                       <?php 
+                     foreach ($result as $value) { 
+                      $checkdbpic = $this->common_model->checkImgExist($value['ProfilePic'],'userpics','default-avatar.jpg');
+                      $db_url = $this->socialInvite->getdburltitle($value['act_typeId']);
+                      $postTitle = '<a href="'.BASE_URL.'/admin/survey/surveyreport/id/'.$db_url['DbeeID'].'/'.$db_url['dburl'].'">'.$db_url['surveyTitle'].'</a>';
+                      ?>
+                         <tr>  
+                          <td width="60"><?php echo '<img src="'.IMGPATH.'/users/small/'.$checkdbpic.'" width="40" height="40"/>'; ?></td>
+                          <td><?php echo '<strong>'.$this->myclientdetails->customDecoding($value['Name']).' '.$this->myclientdetails->customDecoding($value['lname']).'</strong>'.$this->activityaMsg[$value['act_message']].'<br/>'.$postTitle; ?> </td>
+                          <td  width="120" class="dateCol"><?php echo ''. date('d M, Y', strtotime($value['act_date'])) .''; ?></td>
+                        </tr>
+                        <?php }  ?>
+                     </tbody>
+               </table>
+             </div>
+              <?php  unset($result); }else{ echo '<div class="notfound">No notifications </div>'; } ?>
+        </div>
+
+
+        <div id="group" class="dbtabContent" data-type="20">
+         
+          <?php  $result = $this->deshboard->getNotification($this->userid,20,'','',''); if(!empty($result)){  ?>
+           <div class="responsiveTable">
+             <table class="table-border2 userListTable table table2 table-hover table-stripe">
+                     <tbody> 
+                       <?php 
+                   
+                     foreach ($result as $value) { 
+                      $checkdbpic = $this->common_model->checkImgExist($value['ProfilePic'],'userpics','default-avatar.jpg');
+                      $rawdata = $this->deshboard->selectgroup($value['act_typeId']);
+                       $postTitle = '<a href="'.BASE_URL.'/group/groupdetails/group/'.$rawdata['ID'].'">'.$rawdata['GroupName'].'</a>';
+                      ?>
+                         <tr>  
+                          <td width="60"><?php echo '<img src="'.IMGPATH.'/users/small/'.$checkdbpic.'" width="40" height="40" />'; ?></td>
+                          <td><?php echo '<strong>'.$this->myclientdetails->customDecoding($value['Name']).' '.$this->myclientdetails->customDecoding($value['lname']).'</strong> '.$this->activityaMsg[$value['act_message']].' '.$postTitle; ?>
+                          </td>
+                          <td width="120" class="dateCol"><?php echo ''. date('d M, Y', strtotime($value['act_date'])) .''; ?></td>
+                        </tr>
+                        <?php }  ?>
+                     </tbody>
+               </table>
+             </div>
+              <?php  unset($result); }else{ echo '<div class="notfound">No notifications </div>'; } ?>
+        </div>
+
+        <div id="publicvideoevent"class="dbtabContent" data-type="109" >
+
+             <div>
+              <div style="float:right;">
+                  <select name="filtervideo" class="filtervideo">
+                        <option value="109">All</option>
+                        <option value="16">Open</option>
+                        <option value="17">Request</option>
+                        <option value="18">Private</option>
+                  </select>
+               </div>
+               <div style="clear:both;"></div>
+             </div>
+             
+              <?php  $result = $this->deshboard->getNotification($this->userid,109,'','',''); if(!empty($result))
+              { ?>
+               <div class="responsiveTable">
+               <table class="table-border2 userListTable table table2 table-hover videobroadcast">
+                     <tbody> 
+                       <?php 
+                     $accept = '';
+                     foreach ($result as $value) {
+                      if($value['act_type']==16)
+                        $type="Open";
+                      else if($value['act_type']==17)
+                      {
+                        $type="Request";
+                        $accReject ='<div class="notifyAccptBtnAdmin"><a data-id="'.$value['act_typeId'].'" user-id ="'.$value['UserID'].'" href="javascript:void(0);" data-act_id ="'.$value['act_id'].'" class="acceptVideoJoin acceptnotibutton btn btn-green">Accept</a><a href="javascript:void(0);" data-id="'.$value['act_typeId'].'" data-act_id ="'.$value['act_id'].'" user-id ="'.$value['UserID'].'"  class="rejectVideoJoin decinenotibutton btn btn-red">Reject</a></div>';
+                      }
+                      else if($value['act_type']==45)
+                      {
+                        $type="Request";
+                      }
+                      else if($value['act_type']==18)
+                        $type="Private";
+                      $db_url = $this->socialInvite->getdburltitle($value['act_typeId']);
+                      $postTitle = '<a href="'.BASE_URL.'/dbee/'.$db_url['dburl'].'">'.$db_url['VidDesc'].'</a>   ('.$type.') '.$accReject;
+                       $checkdbpic = $this->common_model->checkImgExist($value['ProfilePic'],'userpics','default-avatar.jpg');
+
+                      ?>
+                         <tr id="remove_<?php echo $value['act_id']; ?>" >
+                          <td width="60"><?php echo '<img src="'.IMGPATH.'/users/small/'.$checkdbpic.'" width="40" height="40"/>'; ?></td>
+                          <td><?php echo '<strong>'.$this->myclientdetails->customDecoding($value['Name']).' '.$this->myclientdetails->customDecoding($value['lname']).'</strong> '.$this->activityaMsg[$value['act_message']].'<br/> '.$postTitle; ?> </td>
+                          <td width="120" class="dateCol"><?php echo ''. date('d M, Y', strtotime($value['act_date'])) .''; ?></td>
+                        </tr>
+                        <?php $type = $accReject = '';}  ?>
+                     </tbody>
+               </table>
+              </div>
+               <?php  unset($result);}else{ echo '<div class="notfound">No notifications</div>'; } ?>
+        </div>
+      
+   			<div id="feedback" class="dbtabContent"  data-type='15'>
+            
+             <?php  $result = $this->deshboard->getNotification($this->userid,15,'','',''); if(!empty($result)){ ?>
+             <div class="responsiveTable">
+               <table class="table-border2 userListTable table table2 table-hover">
+                     <tbody> 
+                       <?php 
+                     foreach ($result as $value) { 
+                       if($value['act_type']==15){
+                        $feedArray = $this->deshboard->getFeedBack($value['act_typeId']);
+                        $name = $feedArray['name'];
+                      }else
+                       $name = '';
+                       $checkdbpic = $this->common_model->checkImgExist($value['ProfilePic'],'userpics','default-avatar.jpg');
+                      ?>
+                         <tr>
+                          <td width="60"><?php echo '<img src="'.IMGPATH.'/users/small/'.$checkdbpic.'" widht="40" height="40">'; ?></td>
+                          <td><?php echo '<strong>'.$this->myclientdetails->customDecoding($value['Name']).' '.$this->myclientdetails->customDecoding($value['lname']).'</strong> '.$this->activityaMsg[$value['act_message']].'  <strong>'.$name.'</strong>'; ?>  
+                            <div class="commentBlock"><strong>Message:</strong> <?php echo $feedArray['text']; ?></div>
+                          </td>
+                          <td width="120" class="dateCol"><?php echo ''. date('d M, Y', strtotime($value['act_date'])) .''; ?></td>
+                        </tr>
+                        <?php }  ?>
+                     </tbody>
+               </table>
+             </div>
+               <?php  unset($result);}else{ echo '<div class="notfound">No notifications
+                </div>'; } ?>
+        </div>
+   			
+      </div>
+	</div>
+
+

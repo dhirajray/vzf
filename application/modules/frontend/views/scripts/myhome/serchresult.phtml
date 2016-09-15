@@ -1,0 +1,201 @@
+<script>
+$(function(){
+	var checkusercount = $('#checkusercount').val();
+	if(checkusercount>0){$('.srcUsrWrapper').show();}
+	var checkdbeecount = $('#checkdbeecount').val();
+	if(checkdbeecount>0){$('.srcUsrWrapper').hide();}
+    fetchspecificadvert(<?php echo $this->dbeeuser; ?>,4);
+
+})
+
+$(function() {
+ //fillcategory();
+/* myfeeds('<?php echo $this->rssurl[0]['Site']; ?>','<?php echo  $this->rssurl[0]['Logo']; ?>','<?php echo  $this->rssurl[0]['Name']; ?>',1);*/ //for RSS
+	  
+	$('#notifications-top-dbee').click(function() {				
+		fetchintialfeeds();
+	});
+
+	$('.arrowBtn').click(function(event) {
+		$('#dbee-feed-rss').toggleClass('active');
+		$('#rssfeed-wrapper,#rssfeed-logo, #rss-icons .rss-icon-edit, #rss-icons .rss-icon-list').slideToggle();
+	});
+});
+<?php
+ $tab = Zend_Controller_Front::getInstance()->getRequest()->getParam('tab');
+?>
+<?php if(count($this->dbeedata) < 1 || $tab=='user') { ?>
+$(function() {
+
+	$('#search-results-users-tab').trigger('click');
+});
+<?php } ?>
+
+</script>
+
+<?php
+	$storage  = new Zend_Auth_Storage_Session();
+    $session      = $storage->read();
+	//update code raj
+	foreach($this->userdata as $usr):
+	$substr=substr($usr['Name'],0,1);							
+	$alphaRow=$this->myclientdetails->getRowHavingMasterfromtable('tblUsers',array('DISTINCT SUBSTRING(Name, 1, 1) AS firstletter'),array('firstletter'=>$substr),array('Name'=>'ASC'));
+    $alphabets[]=$alphaRow;
+    endforeach;
+    if(sizeof($alphabets)>0)
+    $alphabets = array_map("unserialize", array_unique(array_map("serialize", $alphabets)));
+
+	$res = null;
+	if(count($alphabets)>0)
+	{	
+		foreach ($alphabets as $v) {
+			if ($v !== null) {
+			    $res = $v;
+				break;
+				}
+			}
+	}
+
+	$first=$this->myclientdetails->customDecoding($res[firstletter]);
+	//update code raj
+
+
+
+
+
+?>
+	
+ <div id="leftListing">
+		<div id="Middle" style="padding:0px;">
+
+
+					<h2 class="user-name" style="margin-bottom:10px; padding:10px" >searched keyword: <span class="SearchWordSpan"><?=$this->q;?></span><span style="float:right;font-family: Arial "><a href="<?=URL?>/platformusers/viewall" title="All Users" class="btn btn-yellow btn-mini"><i class="fa fa-user fa-"></i><span class="labelSidebar"> All Users</span></a></span></h2>
+					<input type="hidden" id="ThirdOptionHidden" value="<?=$this->q?>">
+
+					
+					<input type="hidden" id="searchMember" value="<?=$this->q?>">
+
+					<!-- <div class="srcUsrWrapper">
+						<div class="sprite searchIcon2"></div>
+						<input type="text" id="searchfriendlist" class="searchfriendlist" value="" placeholder="filter my friends" onkeyup="javascript:filtersocailuser()" socialFriendlist="true">
+						<div id="Usercountfilter" class="Usercountfilter srcUsrtotal" Usercountfilter="true"></div>
+					</div> -->
+					<ul class="tabLinks userSearchResultTap">
+						
+							<? if(count($this->dbeedata)>0) { 
+							$classUsers=''; ?>
+							<li style="padding-left:10px"><a  href="javascript:void(0);" id="search-results-dbees-tab" class="active" data-type="search-results-dbees">
+							<?=count($this->dbeedata);?> <?php echo POST_NAME;?>s</a> </li>
+							<? } else $classUsers='active';
+							 if(count($this->userdata)>0) { ?>
+							 <input type="hidden" id="checkusercount" value="<?=count($this->userdata);?>">
+							 <li><a href="javascript:void(0);" id="search-results-users-tab" class="<?=$classUsers;?>" data-type="search-results-users" data-xx="">
+							 Users</a> </li><? } ?>
+						
+					</ul>
+
+
+					<div class="next-line"></div>
+                    <!--<div class="srcUsrWrapper" style="display:none">
+						<div class="fa fa-search fa-lg searchIcon2"></div>
+						<input type="text" id="searchfriendlist" class="searchfriendlist" value="" placeholder="filter users" onkeyup="javascript:filtersocailuser()" socialFriendlist="true">
+						<div id="Usercountfilter" class="Usercountfilter srcUsrtotal" Usercountfilter="true"></div>
+					</div> -->
+					<?
+					if(count($this->dbeedata)>0) {?>
+                      <input type="hidden" id="checkdbeecount" value="<?=count($this->dbeedata);?>">       
+					<?	echo '<div id="search-results-dbees" class="maindb-wrapper-border" style="padding:10px; margin-top:10px; margin-bottom:10px;"><div style="font-size:20px; margin-bottom:10px;">Posts</div><ul class="listSearchDbee">';
+
+						$dbfound=true;
+
+						$counter=1;
+						$count = count($this->dbeedata);
+						
+						foreach($this->dbeedata as $Row):
+							$Row['Name'] = $this->myclientdetails->customDecoding($Row['Name']);
+							$Row['Username'] = $this->myclientdetails->customDecoding($Row['Username']);
+							$ago='';	
+							$Name = (empty($Row['Name'])) ? $Row['Username'] : $Row['Name'];
+							$full_name = $this->myclientdetails->customDecoding($Row['full_name']);	
+							/*if($Row['Type']==1){
+								$text = $Row['Text'];
+							}else if($Row['Type']==2){
+								$text = $Row['UserLinkDesc'];
+							}else if($Row['Type']==3){
+								$text = $Row['PicDesc'];
+							}else if($Row['Type']==4){
+								$text = $Row['VidDesc'];
+							}else if($Row['Type']==5){
+								$text = $Row['OptionText'];
+							}else if($Row['Type']==6){
+								$text = $Row['VidDesc'];
+							}*/
+			              
+			               if($Row['usertype']==100 && $session['usertype']!=100 && isADMIN!=1) {
+							
+							echo '<li><a href="'.BASE_URL.'/dbee/'.$Row['dburl'].'">'.htmlspecialchars_decode(strip_tags(htmlspecialchars_decode($Row['Text']))).'</a><br /><span>'.$ago.'<i>by</i> <a href="javascript:void(0);">'.VIPUSER.' </a></span></li>';
+							} else if($Row['hideuser']==1 && isADMIN!=1 && $Row['UserID']!=$session['UserID']) {
+							
+							echo '<li><a href="'.BASE_URL.'/dbee/'.$Row['dburl'].'">'.htmlspecialchars_decode(strip_tags(htmlspecialchars_decode($Row['Text']))).'</a><br /><span>'.$ago.'<i>by</i> <a href="javascript:void(0);">'.HIDEUSER.' </a></span></li>';
+							}else {
+
+							echo '<li><a href="'.BASE_URL.'/dbee/'.$Row['dburl'].'">'.htmlspecialchars_decode(strip_tags(htmlspecialchars_decode($Row['Text']))).'</a><br /><span>'.$ago.'<i>by</i> <a href="'.BASE_URL.'/user/'.$Row['Username'].'">'.$full_name.' </a></span></li>';
+							}
+
+
+							$counter++;
+
+						endforeach;
+
+						echo '<ul></div>';
+
+					}
+
+					else $dbfound=false;
+
+					
+					
+					if(count($this->userdata)>0) {
+
+						if(count($this->dbeedata)>0) 
+							$display='display:none;';
+						else if (count($this->dbeedata)==0) 
+							$display='display:block;';
+						else if (count($this->userdata)==0) 
+						  $display='display:none;';
+						 else
+						 	$display='';
+						
+						//update code raj
+						echo '<div id="search-results-users" class="maindb-wrapper-border" style="margin-top:10px; '.$display.'"></div>';
+					
+					}
+
+					else $userfound=false;
+
+					?>
+
+
+			
+		<?php if(count($this->userdata)<1 && count($this->dbeedata)<1){
+			echo '<div onclick="javascript:seemorefeeds(10,15);" style="cursor:pointer; color:#333333; text-align:center;" id="more-feeds-loader"><div class="noFound"><strong>- No results found -</strong></div></div>';
+		} ?>
+		</div>
+ </div>
+					<div id="rightListing">
+						
+							
+
+						<!-- <div id="userEdvert">
+  						</div> -->
+  						<?php
+						$rightmenu = $this->partial('partials/rightmenu.phtml', array('userid' => $this->userid,'myclientdetails' => $this->myclientdetails,'eventglobal'=>$this->eventglobal));
+   						echo $rightmenu;
+   						?>					
+						<!-- <div class="whiteBox">
+							<h2>Upcoming Event<a href="#">view..</a></h2>
+							<img src="<?php echo BASE_URL;?>/img/addver.png">
+						</div> -->
+					</div>
+
+<div class="clearfix"> </div>

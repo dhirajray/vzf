@@ -1,0 +1,164 @@
+<?
+
+$grouptypes    = new Application_Model_Groups();
+
+$cookieuser = $this->userid;
+
+if(isset($this->searchuser)) {
+
+	$searchuser=true;
+
+	$keyword=$this->keyword;
+
+}
+
+else {
+
+	$searchuser=false;
+
+	$usertype=$this->usertype;
+
+}
+
+
+
+$from=$this->from;
+
+$group=$this->group;
+
+
+
+$return='';
+
+if($searchuser) {
+
+     $allsqlquery = $grouptypes->getusers($keyword);	 
+
+	$usertype='search';
+
+}
+
+else {
+
+	if($usertype=='followers'){		
+
+	            $allsqlquery = $grouptypes->getfollowersgrouptypes($cookieuser);		   
+
+		}
+
+	elseif($usertype=='following'){	
+
+		        $allsqlquery = $grouptypes->getfollowinggrouptypes($cookieuser);
+
+		}
+
+}
+
+$TotalUsers=count($allsqlquery);
+
+if($TotalUsers>0) {
+
+	$counter=1;
+
+	foreach($allsqlquery as $key => $Row) {
+
+	              $UserID = $Row['UserID'];
+
+			// CHECK IF USER FOLLOWS PROFILE HOLDER, AND ALLOWS TO BE NOTIFIED			     
+
+				 $ChkFollower = $grouptypes->ChkFollowerNum($cookieuser,$UserID);
+
+				 $ChkFollowerNum = count($ChkFollower);
+
+			if($ChkFollowerNum>0) {
+
+			    $NotificationRow = $grouptypes->Notification($UserID);
+
+				$NotifyMe=$NotificationRow['Groups'];
+
+			}
+
+			else {
+
+				// CHECK IF USER HAS ALLOWED GROUP NOTIFICATIONS FROM PEOPLE HE DONT FOLLOW
+
+				$NotificationRow = $grouptypes->Notificationdont($UserID);
+
+				$NotifyMe=$NotificationRow['GroupsDontFollow'];
+
+			}		
+
+			if($from=='directinvite') {
+
+                $memberRes = $grouptypes->checkgroupmem($group,$UserID);    
+
+				if(count($memberRes)>0) {
+
+					$inviteStatus=$memberRes[0]['Status'];
+
+				}
+
+				else $inviteStatus='-1';
+
+			}
+
+			
+
+			$inviteLabel='';
+
+			$BG='';
+
+			$Disabled='';
+
+			if($inviteStatus=='0') { $inviteLabel='<div class="next-line"></div><div align="center" style="color:#FF0000; margin-top:5px;">invited</div>'; $BG='style="background-color:#EAE7E7"'; $Disabled='disabled="disabled"'; $title=''; }
+
+			elseif($inviteStatus=='1') { $inviteLabel='<div class="next-line"></div><div align="center" style="color:#0000FF; margin-top:5px;">member</div>'; $BG='style="background-color:#EAE7E7"'; $Disabled='disabled="disabled"'; $title=''; }
+
+			elseif($NotifyMe=='0') { $inviteLabel='<div class="next-line"></div><div align="center"><div class="icon-blocked-small" style="margin-top:5px;"></div></div>'; $BG='style="background-color:#EAE7E7"'; $Disabled='disabled="disabled"'; $title='title="This user has chosen not to receive group invitations"'; }
+
+			elseif($NotifyMe=='1') { $title=''; }
+
+			
+
+			$return.='<div style="float:left" '.$title.'><label class="labelCheckbox"><div class="follower-box" '.$BG.'><input type="checkbox" id="inviteuser-'.$usertype.$counter.'" value="'.$Row['UserID'].'" '.$Disabled.'><label class="checkbox"></label><br /><img src="'.BASE_URL_IMAGES.'/show_thumbnails.php?ImgName='.$Row['ProfilePic'].'&ImgLoc=userpics&Width=50&Height=50" border="0" /><br />'.$Row['Name'].'</div>'.$inviteLabel.'</label></div>';
+
+			if($counter%7==0) $return.='<div class="next-line"></div>';
+
+			$counter++;
+
+	}
+
+
+
+	$return.="<div class='next-line'></div><div style='margin-top:15px;'><div style='float:left; margin-left:30px; margin-top:10px;'>";
+
+	if($from!='directinvite')
+
+		$return.="<a href='javascript:void(0);' onclick='javascript:skipinvitetogroup();'>skip invite</a>";
+
+	$return.="</div>";
+
+	if($from!='directinvite')
+
+		$return.="<div style='float:right; margin-top:25px; margin-right:20px;'><a href='javascript:void(0);' onclick='javascript:backtocreategroup();'>back</a></div>";
+
+	$return.="</div><br style='clear:both;' />";
+
+}
+
+else {
+
+	$return.='- No Users -';
+
+	if($from!='directinvite') {
+		$return.="<div style='margin-top:105px;'><div style='float:left;'><a href='javascript:void(0);' onclick='javascript:skipinvitetogroup();'>skip invite</a></div><div style='float:right'><a href='javascript:void(0);' onclick='javascript:backtocreategroup();'>back</a></div></div>";
+	}
+}
+
+
+
+$total=$counter-1;
+
+echo $return.'~#~'.$total;
+
+?>

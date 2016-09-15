@@ -1,0 +1,453 @@
+<?php
+$comm_model = new Application_Model_Commonfunctionality();
+  if($this->sessionExpire!='')
+  {
+    echo  '<div id="warningMsg" class="messageWarningview " style="display:block"><div id="warningMsgContent" class="pageCenter">'.$this->sessionExpire.' </div></div>';
+  }
+ 
+ $time = time();
+ $namespacexx = new Zend_Session_Namespace('zend_token'); // default namespace 
+ $namespacexx->time = $time;
+ $salt = 'b79jsMaEzXMvCO2iWtzU2gT7rBoRmQzlvj5yNVgP4aGOrZ524pT5KoTDJ7vNiIN';
+ $token = sha1($salt . $time);
+
+?>
+<input type="hidden" id="login" value="" name="login">
+<div id="successMsg" class="messageview success" style="display:none"></div>
+<div id="errorMsg" class="messageview error" style="display:none"></div>
+    <div id="warningMsg" class="messageWarningview " style="display:none">
+      <div id="warningMsgContent" class="pageCenter"> </div>
+    </div>
+    <div id="overlay"></div>
+<input type="hidden" value="" name="dbeeuser" id="dbeeuser">
+<?php 
+if(isset($this->message) && !empty($this->message) && $this->message[0] != 'block' && $this->message[0] != 'unblock') { 
+?>
+<script language="javascript" type="text/javascript">
+$(function(){
+	//$messageError("<?php echo implode('<br>', $this->message); ?>");
+  $dbConfirm({content:"<?php echo implode('<br>', $this->message); ?>", yes:false});
+
+});	
+</script>
+<?php
+}else if($this->message[0] == 'block'){
+?>
+<script> 
+
+$(document).ready(function(){
+
+    var SpAcceptPopup = '<div style="margin-top:5px; text-align:center" class="ajaxsocialblock" >All social sharing and connections have been disabled by the platform admin.</div>\
+            <div style="margin-top:5px; text-align:center" >\
+              <a href="javascript:void(0);" class=" btn btn-yellow"  id="ShowWarningPopup" >OK</a>\
+            </div>';
+
+      $messageWarning(SpAcceptPopup);
+
+    
+    });
+    
+</script>
+
+<?php } ?>
+<script type="text/javascript" src="<?php echo BASE_URL;?>/js/strength.js"></script>
+<script>
+
+   function logface()
+   {
+       var url = "<?php echo $this->loginUrl; ?>";
+       newwindow = window.open(url, '', 'width=800,height=400,left=200,top=200,scrollbars=1', false);
+       return false;
+   }
+   $(document).ready(function(){
+
+
+
+      $('#fullScreenBg').flexslider({
+        animation: "fade"
+      });
+      
+	   $('#passworddbee').strength({
+	       strengthClass: 'strength',
+	       strengthMeterClass: 'strength_meter',
+	       strengthButtonClass: 'button_strength',
+	       strengthButtonText: '',
+	       strengthButtonTextToggle: ''
+	   });
+   });
+</script>
+<style type="text/css">
+ <?php  $fontFamily =  $this->configuration->fontFamily;
+     if($fontFamily!=''){
+       echo  '@import url(https://fonts.googleapis.com/css?family=Oswald|Lato|Source+Sans+Pro|Montserrat|Raleway|Arimo|Dosis|Hind|Josefin+Sans);
+         body{font-family:'.$fontFamily.';}';
+      }
+    
+  if($this->configuration->highlightsColor!='') {
+   $bgColor = $this->configuration->highlightsColor;
+   $iconColor = $this->configuration->highlightsIconColor;
+     
+    //echo '.centerLoginBar .btn, .signInInput .fa, .btn.btn-orange{ background:'.$bgColor.'; border-color:'.$bgColor.'; color:'.$iconColor.' !important; }';
+  echo ' #dbTipWrapper{ color:'.$bgColor.' }';
+  echo '.frntSignIn .signInInput.active, .frntSignIn .rowfrontInput.active {box-shadow: 0 0 0 2px '.$bgColor.'; border-radius: 3px}';    
+  echo '.frntSignIn .signInInput.active .fa, .frntSignIn .rowfrontInput.active .fa{color: '.$bgColor.' !important;}'; 
+  echo ' .frntSignIn .signInInput.active input, .frntSignIn .rowfrontInput.active input, .frntSignIn .rowfrontInput.active{background: '.$comm_model->hex2rgba($bgColor,true).' !important; color: #fff !important;}';
+  echo '.frntSignIn .signinBtnGroup button.btn:hover{background:'.$comm_model->hex2rgba($bgColor,true).'; box-shadow: 0 0 0 2px '.$bgColor.'; color:'.$bgColor.' !important; border:0; outline: none;}'; 
+  echo '#login-form .signinBtnGroup button.btn:focus{background:'.$comm_model->hex2rgba($bgColor,true).'; box-shadow: 0 0 0 2px '.$bgColor.'; color:#fff !important; border:0; outline: none; }';
+  echo '.frntSignIn input:focus:-webkit-autofill{-webkit-box-shadow: 0 0 0px 1000px '.$comm_model->hex2rgba($bgColor,true).' inset; -webkit-text-fill-color: #fff !important;}';
+  echo '.infoMessageFromBottom ._infoContent a.btn.btn-orange:hover {background: '.$comm_model->hex2rgba($bgColor,true).'; box-shadow: 0 0 0 2px '.$bgColor.'; color:#fff !important; border:0;}';
+
+
+  } ?>
+
+#login-form input:-webkit-autofill{transition:background-color 50000s; -webkit-text-fill-color: #fff !important;}
+</style>
+<?php
+
+if($this->config->external->css==1) {  ?>
+<link href="/css1/<?php echo $this->config->external->cssname; ?>.css" rel="stylesheet" type="text/css">
+<?php }
+?>
+<body id="frontPage2">
+<!--   <div class='SignInHeader'>
+             <?php if($this->Social_Content_Block!='block'){ ?>                
+                 <a href="javascript:void(0)" id="createAccount" data-id="creatAccountBlock"><i class="fa fa-user fa-lg"></i> Create account</a> 
+                 <a href="javascript:void(0);" id="createAccount" data-id="signInBlock"><i class="fa fa-lock fa-lg"></i> Back to sign in</a>
+               <?php } ?>
+               <a  onclick="javascript:openforgotpass();" href="javascript:void(0);">Forgotten password?</a>
+  </div> -->
+
+<?php 
+
+if($this->configuration->loginbackgroundimage!='' && $chek_browdetails[0]!='1' ) { 
+$variable = explode(',',$this->configuration->loginbackgroundimage); 
+ $bgPosition = $this->configuration->backgroundImagePosition;
+ $bgAligment = 'top left';
+ $bgColor =  '';
+ if($bgPosition=='contain'){
+  $bgAligment = 'center center';
+   $bgColor =  $this->configuration->SigninColor;
+
+ }
+?>
+   <div id="fullScreenBg" >
+    <ul class="slides">
+  <?php foreach ($variable as $value) { 
+
+  $imgpath  =  BASE_URL."/img/".$value."";
+  $dataimg  =  getimagesize($imgpath);
+  $width    =  $dataimg[0];
+  $height   =  $dataimg[1];
+  
+    ?>
+ 
+  
+    <li class="loginsetbg" style="background:<?php echo $bgColor;?> url('<?=BASE_URL?>/img/<?=$value?>') no-repeat  <?php echo $bgAligment; ?>; background-size:<?php echo $bgPosition; ?>" ></li>
+    <?php } ?>
+  </ul>
+   </div>
+<?php }else{ ?>
+<div id="fullScreenBg" style="background-color:<?php echo $this->configuration->SigninColor; ?>">
+
+</div>
+<?php } ?>
+   <!--Start Page Container from here-->
+   <!--this is page listing-->
+   <div id="frntContainer">
+    
+    <?php if($this->configuration->SigninImage!='') { 
+
+    $URL = BASE_URL."/img/".$this->configuration->SigninImage;
+    list($width, $height) = getimagesize($URL);
+
+    if($width > 400) {
+      $containcss='background-size:contain;';
+    }else {
+      $containcss='';
+    }
+    if($height > 170){
+      $containcss='background-size:contain;';
+    }
+    else{
+      $containcss='';
+    }
+
+     ?>
+    <span class="brandContentLogo" style=" background: url('<?php echo BASE_URL."/img/".$this->configuration->SigninImage; ?>') no-repeat; <?=$containcss?> background-position:center center"></span>
+    <?php } ?>
+<!-- /**************************check browser and version , os******************************/ -->
+<?php
+
+$checkbrowser_ver = $comm_model->getallBrowserVersion();
+$chek_browdetails = explode('~', $checkbrowser_ver);
+if($chek_browdetails[0]=='1'){ ?>
+    <div class="sorryUseLatestVersion">
+        <div class="bgSorryIE" style=" background:#E6E6E6 url('<?php echo BASE_URL."/img/".$this->configuration->SiteLogo; ?>') repeat;  "></div>
+          <div class="sorryBrowserCenter">
+            <i class="oldBrowserIcon sadNewIcons"></i>
+          <div class="sorryCenterView">
+            Hey, we see you're using <?php echo ucfirst($chek_browdetails[1]);?> as your web browser.<br>  This platform runs at its very best on Google Chrome or Firefox. <br> Why not click on one of these links to install and enhance your platform experience?
+          <!--  We see you are using an older version of <?php echo ucfirst($chek_browdetails[1]);?>. Please update your browser in order to benefit from the platforms features. You can also try creating an account via Google Chrome or Firefox. Thank you. -->
+          </div>
+        
+          <ul>
+             
+              <li><a href="https://www.google.com/chrome" target="_blank"><i class="oldBrowserIcon chromeNewIcons"></i> <br>Google Chrome</a></li>
+               <li><a href="http://www.mozilla.org/en-US/firefox/fx/" target="_blank"><i class="oldBrowserIcon ffNewIcons"></i> <br>Mozilla Firefox</a></li>
+              <!-- <li><a href="http://www.apple.com/safari/" target="_blank">Safari</a></li>
+              <li><a href="http://www.opera.com/download/" target="_blank">Opera</a></li>
+              <li><a href="http://www.microsoft.com/windows/ie/" target="_blank">Internet Explorer (Windows)</a></li> -->
+          </ul>
+          </div>
+    </div>
+<?php }
+/*else if($chek_browdetails[0]=='2'){ ?>
+ <div class="sorryUseLatestVersion">
+    <div class="bgSorryIE" style=" background:#E6E6E6 url('<?php echo BASE_URL."/img/".$this->configuration->SiteLogo; ?>') repeat; "></div>
+          <div class="sorryBrowserCenter">
+            <i class="oldBrowserIcon sadNewIcons"></i>
+          <div class="sorryCenterView">
+            Hey, we see you're using <?php echo ucfirst($chek_browdetails[1]);?> as your web browser.<br>  This platform runs at its very best on Google Chrome or Firefox. <br> Why not click on one of these links to install and enhance your platform experience?
+          </div>
+        
+          <ul>
+              <li><a href="https://www.google.com/chrome" target="_blank"><i class="oldBrowserIcon chromeNewIcons"></i> <br>Google Chrome</a></li>
+              <li><a href="http://www.mozilla.org/en-US/firefox/fx/" target="_blank"><i class="oldBrowserIcon ffNewIcons"></i> <br>Mozilla Firefox</a></li>
+          </ul>
+          </div>
+    </div>
+
+<?php }*/
+else{ if($this->configuration->hightlightlink==1)
+          $hightlightclass = 'bx bx-yellow bx-mini';
+        else
+          $hightlightclass= ''; ?>
+<!-- /**************************check browser and version , os******************************/ -->
+      
+       <div class="SigninText"><?php echo stripcslashes($this->configuration->SigninText); ?></div>   
+       <?php  if($this->configuration->hideIcons!=1) { ?>
+       <div class="ctFeatureBar">
+            <ul>
+              <li class="ctFrIcons ctSentiment" rel="dbTip" title="Sentiment Analysis" tip-align="bottom"></li>
+              <li class="ctFrIcons ctBroadcasting " rel="dbTip" title="Live Video" tip-align="bottom"></li>
+              <li class="ctFrIcons ctSurveys" rel="dbTip" title="Surveys" tip-align="bottom"></li>
+              <li class="ctFrIcons ctQA2" rel="dbTip" title="Ask The Expert Q & A" tip-align="bottom"></li>
+              <li class="ctFrIcons ctSocialLinking" rel="dbTip" title="Full 2 Way Social Interaction" tip-align="bottom"></li>
+              <li class="ctFrIcons ctSpotlight" rel="dbTip" title="Gamification" tip-align="bottom"></li>
+              
+             <!--  <li class="ctFrIcons ctApp"></li>
+              <li class="ctFrIcons ctQA"></li>
+              <li class="ctFrIcons ctPoll"></li>
+              <li class="ctFrIcons ctFileSharing"></li>
+              <li class="ctFrIcons ctGroups"></li> -->
+            </ul>
+       </div>  
+       <?php } ?> 
+       <div class="lightBarLogin"> 
+        <div class="centerLoginBar">
+      <div class="frntSignIn"  id="signInBlock" <?php if($this->form_status == 1){ ?> style="display:none" <?php } ?> >
+         <form id="login-form" name="login-form" method="post" action="<?php echo BASE_URL?>/index/login" onSubmit="return checkLogin();">
+
+            <div class="formRow">
+               <div class="signInInput">
+                  <input id="token" name="token"  type="hidden"  value="<?php echo $token; ?>" />
+                  <input id="loginemail" name="loginemail" value="" type="email"  placeholder="Email" class="required" autocomplete="off" />
+                  <input id="tm" name="tm"  type="hidden"  value="<?php echo $time; ?>" />
+                  <i class="fa fa-user"></i>                  
+               </div>
+               <div class="signInInput">
+                <input id="loginpass" name="loginpass" value="" type="password" placeholder="Password" class="required" autocomplete="off" />
+                <i class="fa fa-lock"></i>
+              </div>
+              
+            </div>
+            <div class="formRow signinBtnGroup">
+               <button  class="btn btn-orange btn-large" >Log in</button>
+               <!--  <?php if($this->Social_Content_Block!='block'){ ?>                
+                 <a href="javascript:void(0)" class="<?php echo $hightlightclass; ?>"
+ id="createAccount" data-id="creatAccountBlock">Create account</a> <span></span>
+               <?php } ?>
+               <a  onclick="javascript:openforgotpass();" class="<?php echo $hightlightclass; ?>"
+ href="javascript:void(0);">Forgotten password?</a> -->
+            </div>
+            <div class="formRow signInActionRow">
+              <label class="labelCheckbox signinRemember" for="remember_me" >
+                  <input type="checkbox" value="1" checked="checked" name="remember_me" id="remember_me">
+                  <label class="checkbox" for="remember_me"></label>
+                  <span>Remember me</span> 
+                </label>
+                <span class="spt"></span>
+                 <a  onclick="javascript:openforgotpass();" class="forgetPass"  href="javascript:void(0);">Forgotten password?</a>
+                 <?php if($this->Social_Content_Block!='block'){ ?>   
+                 <span class="spt"></span>             
+                   <a href="javascript:void(0)" id="createAccount" data-id="creatAccountBlock">Create account</a> 
+                  
+                 <?php } else { ?>
+                  <span class="spt"></span>             
+                   <a href="javascript:void(0)" id="createAccount" data-id="requestAccountBlock">Request to join</a>
+                 <?php } ?>
+                
+            </div>
+         </form>
+        
+      </div>    
+      	<!--this is signup code-->
+						   <div class="frntSignIn" id="requestAccountBlock" <?php if($this->form_status == 0){ ?> style="display:none;" <?php } ?>>
+							      <div class="formRow">
+							         <div class="signInInput" style="box-shadow: none;">
+                          <div class="rowfrontInput">
+                             <input id="token" name="token"  type="hidden"  value="<?php echo $this->token; ?>" />                           
+                                 <input id="firstname"  name="firstname" value=""  type="text"  placeholder="First name" class="required"/>
+                          </div>
+							             <div class="rowfrontInput">
+							             	 	 
+                                 <input id="lastname"  name="lastname" value=""  type="text"  placeholder="Last name" class="required" />
+							             </div>
+							             <div class="rowfrontInput">
+								             <input id="email"  name="email" value="" type="email"  placeholder="Email" class="required"/>                              
+								            </div>
+                            <?php if(clientID==53) { ?>
+                            <div class="rowfrontInput"><input id="carrerid"  name="carrerid" type="text"  placeholder="Carer ID (optional) " class=""/></div>
+                            <?php } ?> 			
+							         </div>
+							      </div>
+                     <?php //if($this->Social_Content_Block!='block'){ ?>
+							      <div class="formRow signinBtnGroup">
+							        <button type="submit" name="submit" id="requestsignup" class="btn btn-orange btn-large pull-left requestsignupProcess" style="width:100%">Send Request</button>
+							      </div>
+                    <?php //} ?>
+								  <div class="signUpLogin">
+									 <a href="javascript:void(0);" style="display:block" id="createAccount" data-id="signInBlock" >Back to sign in</a>
+								  </div>
+							</div> 
+              <!--this is signup code-->
+              <div class="frntSignIn" id="creatAccountBlock" <?php if($this->form_status == 0){ ?> style="display:none;" <?php } ?>>
+                    <div class="formRow">
+                          <div class="rowfrontInput">
+                             <input id="token" name="token"  type="hidden"  value="<?php echo $this->token; ?>" />                           
+                                 <input id="firstname"  name="firstname" value=""  type="text"  placeholder="First name" class="required"/>
+                          </div>
+                           <div class="rowfrontInput">
+                               
+                                 <input id="lastname"  name="lastname" value=""  type="text"  placeholder="Last name" class="required" />
+                           </div>
+                           <div class="rowfrontInput">
+                             <input id="email"  name="email" value="" type="email"  placeholder="Email" class="required"/>                              
+                             </div>
+                           <div class="rowfrontInput passWordRow">
+                              <input id="passworddbee" name="password"  value=""  type="password"  placeholder="Password" class="required"/>                   
+                           </div>
+                           
+                          <div class="rowfrontInput ">
+                             <select  id="gender" name="gender" class="required">
+                                <option value="">Select gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option><!-- 
+                                <option value="Transgender">Transgender</option>
+                                <option value="Gender Fluid">Gender Fluid</option> -->
+                                <option value="No Response">Prefer not to say</option>                               
+                            </select>
+                          </div>
+                           <div class="rowfrontInput birthdayRow">
+                      <span>Select your birthday</span>
+                              <select  id="birthdayday" name="birthdayday" class="">
+                                <option value="">Day:</option>
+                               <?php for ($i = 1; $i <= 31; $i++) { ?>             
+                               <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
+                               <?php } ?>  
+                            </select>                         
+                               <select name="birthmonth" id="birthmonth" class="">
+                                  <option value="">Month</option>
+                                  <option value="01">Jan</option>
+                                  <option value="02">Feb</option>
+                                  <option value="03">Mar</option>
+                                  <option value="04">Apr</option>
+                                  <option value="05">May</option>
+                                  <option value="06">June</option>
+                                  <option value="07">July</option>
+                                  <option value="08">Aug</option>
+                                  <option value="09">Sep</option>
+                                  <option value="10">Oct</option>
+                                  <option value="11">Nov</option>
+                                  <option value="12">Dec</option>
+                            </select>
+                             <select   id="birthdayyear" name="birthdayyear" class="">
+                                 <option value="">Year</option>
+                               <?php for ($j = 1; $j <= 100; $j++) { 
+                                $time = strtotime(-$j." year", time());
+                                $date = date("Y", $time);
+                                ?>              
+                               <option value="<?php echo $date; ?>"  ><?php echo $date; ?></option>
+                               <?php } ?>
+                            </select> 
+                             <!-- <a href="#" title="This is an additional security measure to protect your password. We will ask you to provide your date of birth should you wish to change your password." rel="dbTip" style="margin:0px 15px 10px 0px; font-size:11px; color:#999; position:relative; top:10px; float:right;">Why do I need to provide this?</a> -->
+                            </div>
+                             <div class="rowfrontInput frntcondition" style="box-shadow:none">
+                                <label class="labelCheckbox" for="accept_terms_condition">
+                                  <input type="checkbox" value="1" name="accept_terms_condition" id="accept_terms_condition">
+                                  <label class="checkbox" for="accept_terms_condition"></label>By clicking here you agree to our <a href="javascript:openterms();" style="text-decoration: underline;">Terms & Conditions</a>, <a href="javascript:opentermsofuse();" style="text-decoration: underline;">Terms Of Use</a>, <a href="javascript:openprivacy();" style="text-decoration: underline;">Privacy Policy</a> and <a href="javascript:opencookies();" style="text-decoration: underline;">Cookie Policy</a></label>
+                                  <!-- <label class="labelCheckbox" for="cookiescheck">
+                                  <input type="checkbox" value="1" name="cookiescheck" id="cookiescheck" >
+                                  <label class="checkbox" for="cookiescheck"></label>I accept the use of <a href="javascript:openterms('cookies');" style="text-decoration: underline;">required cookies</a> on this site.
+                                </label>  -->                           
+                             </div>         
+                    </div>
+                     <?php //if($this->Social_Content_Block!='block'){ ?>
+                    <div class="formRow signinBtnGroup">
+                      <button type="submit" name="submit" id="signup" class="btn btn-orange btn-large pull-left" style="width:100%">Create Account</button>
+                    </div>
+                    <?php //} ?>
+                  <div class="signUpLogin">
+                   <a href="javascript:void(0);" id="createAccount" data-id="signInBlock" >Back to sign in</a>
+                  </div>
+              </div>
+						<!--end  is signup code-->
+            <?php
+                if(($this->socialloginabilitydetail['Facebooklogin']==0 || $this->socialloginabilitydetail['Twitterlogin']==0 || $this->socialloginabilitydetail['Linkedinlogin']==0 || $this->socialloginabilitydetail['Gpluslogin']==0) && ($this->Social_Content_Block!='block')){
+              ?>
+						<div class="signInWidth">
+              <span>Log in with</span>
+              <? if($this->socialloginabilitydetail['Facebooklogin']==0){?>
+              <a href="<?php echo BASE_URL;?>/index/facebook" class="faceBookSignBtn signInSprite" ></a>
+              <? }if($this->socialloginabilitydetail['Twitterlogin']==0){?>
+              <a href="<?php echo BASE_URL;?>/auth/twitter" class="twitterSignBtn signInSprite"></a>             
+              <? }if($this->socialloginabilitydetail['Linkedinlogin']==0){?>                  
+              <a href="<?php echo BASE_URL;?>/linkedin/login" class="linkdenSignBtn signInSprite"></a>
+               <? }if($this->socialloginabilitydetail['Gpluslogin']==0){?>
+              <a href="<?php echo $this->Googleplus; ?>" class="googlePlushSignBtn signInSprite"></a>
+               <?}?>
+            </div>
+            <?php } ?> 
+      
+      <?php } ?> 
+      
+      
+   </div>
+   </div>
+   </div>
+
+   <!-- <div class="infoMessageFromBottom">
+      <div class="_infoContent">
+          I understand the usage of cookies on this site. <a href="javascript:void(0)" onClick="javascript:openterms();">what is this?</a>
+      </div>
+      <div class="_infoBtn">
+        <a href="#" class="btn btn-yellow">GOT IT</a>
+      </div>
+   </div>
+   <div class="fntFTLinks" style="display:none">
+         <a href="javascript:void(0);" class="<?php echo $hightlightclass; ?>"
+ onClick="javascript:openterms();">Terms & Conditions</a> 
+         <a href="javascript:void(0);" class="<?php echo $hightlightclass; ?>"
+ onClick="javascript:openprivacy();"> Privacy Policy</a>  
+         <a href="javascript:void(0);" class="<?php echo $hightlightclass; ?>"
+ onClick="javascript:openabout();">About</a> 
+         <a href="javascript:void(0);" class="<?php echo $hightlightclass; ?>"
+ onClick="javascript:openfeedback();">Feedback</a>
+      </div> -->
+
+
+   <!--End page listing-->
+   <!--End Page Container from here-->
+   <script src="<?php echo BASE_URL; ?>/js1/account.js"></script>
+</body>
+

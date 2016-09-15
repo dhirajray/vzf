@@ -1,0 +1,42 @@
+<?php
+/**
+ * Home page view
+ *  
+ * @author Enrico Zimuel (enrico@zimuel.it)
+
+<script type="text/javascript" src="<?php echo BASE_URL."/adminraw/js/jquery.js";?>"></script>
+<script type="text/javascript" src="<?php echo BASE_URL."/adminraw/js/highcharts.js";?>"></script>
+<script type="text/javascript" src="<?php echo BASE_URL."/adminraw/js/charts.js";?>"></script>
+<script language="javascript">
+$(function () {
+	$("document").ready(function(){
+		var type	=	$("#charttype").val();
+		switch(type)
+		{
+			case ('dbee'):
+				chartofdbees();
+				break;
+			case ('score'):
+				chartofscores();
+				break;
+			case ('group'):
+				chartofgrops();
+				break;
+			default:
+				chartofdbees();
+		}
+		
+		
+	});
+});
+</script>  */
+//echo 'here';exit;
+?>
+<input type="hidden" id="charttype" value="<?php echo $this->charttype; ?>" >
+<?php 
+echo '<div id="container" style="min-width:400px; height:400px; margin: 0 auto;"></div>';
+?>
+<?php 
+//$this->title = "Home Page";
+//$this->headTitle($this->title);
+?>

@@ -1,0 +1,40 @@
+<?php 
+
+$commonbynew 	=	new Application_Model_Commonfunctionality();
+
+       $IDs = '';
+
+      // echo   $TotalDbees;
+
+     $startnew =$this->startnew;
+
+        if(count($this->dbeealldbees) > 0) {
+        	$k=1;  
+        	//$return.=count($this->dbeealldbees);      
+        	if(strlen($row->Text)>250) $dots='...'; else $dots='';
+         	if($k=='1' && $initial=='1') setcookie("CookiePostDate", $row->PostDate, time()+3600);
+	        foreach ($this->dbeealldbees as $row) :
+	        	$IDs .= $row['DbeeID'].',';
+	         	$return	.=	$commonbynew->displayLayoutDbs($row,$this->Social_Content_Block,'all',$this->plateform_scoring,$this->adminpostscore,7);
+				$k++;
+			endforeach; 
+		}
+		else {
+			$startnew=$this->startnew;
+			$seemorelabel='';
+			$return.='<div><div  style="cursor:pointer; color:#333333; text-align:center;"><div class="userVisibilityHide"><span class="fa-stack fa-2x"><i class="fa fa-check-square-o fa-lg"></i></span><br>You have not completed any survey yet.</div></div></div>';
+		}
+		 $IDs=substr($IDs,0,-1);
+
+		if(count($this->dbeealldbees) > 5) {
+
+			
+
+		$startnew=$this->startnew;
+		$return.='<div id="see-more-feeds'.$startnew.'"><div id="more-feeds-loader" style="cursor:pointer; color:#333333; text-align:center;">'.$seemorelabel.'</div></div>';
+		}
+		//$return.= '~#~'.'';
+		//$return.= '~#~'.$IDs;
+		echo $return.'~#~'.$startnew.'~#~'.$IDs.'~#~'.$startnew;
+
+			 ?>

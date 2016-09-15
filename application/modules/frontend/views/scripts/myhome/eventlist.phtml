@@ -1,0 +1,54 @@
+<!-- <div id="middleWrpBox" style="margin-bottom:35px !important;">
+ <div class="user-name titleHdpad">Events</div>
+</div> -->
+
+<div class="tabLinks" style="margin-top:0px; border-bottom:0">
+	<ul>
+		
+		<li>
+		  <a href="javascript:void(0);" id="event_section" data-from="child" class="active">All Events</a>
+		</li>
+		<li>
+		  <a href="javascript:void(0);" id="my_event_section">My Events</a>
+		</li>
+	</ul>
+</div>
+<?php $event = new Application_Model_Event();
+
+$result = $event->getAllEvent();
+$commonbynew 	=	new Application_Model_Commonfunctionality();
+if(count($result)>0) {
+echo '<ul id="dbee-feeds" class="postListing" style="margin-top:-2px;">';
+foreach ($result as $value) { 
+if($value['type']==3) $eventType='Private event'; else $eventType='Open event';
+?>
+
+<li class="eventListing" id="event-id-<?php echo $value['id']; ?>">
+	<?php 
+			if($value['logo']!='') echo '<img src="'.BASE_URL.'/event/'.$value['logo'].'" >'
+	?>
+
+	<div class="">
+	    <div class="pstListTitle">
+	      <div class="psUserName">
+	        <div class="oneline"><?php echo $value['title']; ?></div>
+	        <i>Created <?php echo $commonbynew->Commentagohelper($value['datetime']); ?> - <?php echo $eventType;?></i>
+	      </div>
+	  </div>
+	  <div class="listTxtNew">
+	  	<div class="eventDateTime">
+		  <div class="entdt"><strong>Starts:</strong> <?php echo date('d M Y&\nb\sp;&\nb\sp;  h:i A',strtotime($value['start']));?> <?php if($value['timezoneevent']!='') echo $commonbynew->timezoneevent($value['timezoneevent']);?></div>
+		</div>
+	  	<?php echo $value['description']; ?>
+	  </div>
+	  <div class="psListingFt">
+	  		<?php if($value['bgimage']!='' || $value['bgcolor']!='') { ?>
+	  		<a href="<?php echo BASE_URL; ?>/event/splash/id/<?php echo $value['id']; ?>" class="btn btn-yellow btn-mini pull-right" style="margin-right:0;">Go to event</a>
+	  		<?php }else{ ?>
+	  		<a href="<?php echo BASE_URL; ?>/event/eventdetails/id/<?php echo $value['id']; ?>" class="btn btn-yellow btn-mini pull-right" style="margin-right:0;">Go to event</a>
+	  		<?php } ?>
+	  </div>
+	</div>
+  <div class="clearfix"></div>
+</li>
+<?php } echo '</ul>';}else{ echo '<ul id="dbee-feeds" class="postListing"><div style="cursor:pointer; color:#333333; text-align:center;"><div class="userVisibilityHide" style="background-color:#FFFFFF;"><span class="fa-stack fa-2x"><i class="fa fa-calendar fa-lg"></i></span><br>No Live Events found.</div></div></ul>'; } ?>

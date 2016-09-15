@@ -1,0 +1,304 @@
+<?php         
+$this->title = "Posts";
+$this->headTitle($this->title);
+$deshObj= new Admin_Model_Deshboard();
+$defaultimagecheck = new Admin_Model_Common();
+?>
+<script type="text/javascript">
+$('document').ready(function(){
+	$("#date_text").datepicker();
+	function load()
+	{
+		//alert('Coming');
+	}
+	
+});
+</script>
+ 
+
+
+
+<!--<h1 class="pageTitle dbeeViewAll">Live posts <a href="#" class="btn btn-yellow btn-large" id="openSearchBlock"><i class="searchSprite searchIcon"></i> Search</a></h1>-->
+<h1 class="pageTitle dbeeViewAll">Live posts<div class="pageSubeTitle">A detailed overview of all platform posts</div></h1>
+
+
+<div  id="searchWrapper" style="display:none">
+	
+		<div id="searchContainer">	
+			<div class="searchTopBar clearfix">
+			<div  class="addcondition" > 
+				<a href="#" class="btn btn-yellow btn-large pull-left" id="add_condition">+ Add New Search Criteria</a>
+				<span id="load_filter_cls" class="loadfilter_cls">
+					
+					<select name="loadFilter" id="loadFilter">
+						<option value=''>Load Saved Filter</option>
+						<?php
+						foreach ($this->filters as $key => $value) {
+							echo "<option value='".$value['filter_id']."'>".$value['filter_name']."</option>";
+						}
+						?>
+					</select>
+
+				</span>
+			</div>			
+		</div>
+			<div id="exp_condition" class="expenddcondition" >				
+				<div class="whiteBox addConditionWrapper"> 
+					<div class="formCondition">
+						<div class="searchField"> 
+							<label>Search</label>
+								<select id="search_fields">
+									<option value="user">Users</option>
+									<option value="title">Posts</option>
+									<option value="date">Date Range</option> 	
+								</select> 
+						</div>
+						
+						<div id="exp_criteria"  class="pull-left "> 
+							<div id="open_user" class="attributs" style="display:none">
+								<div class="searchField searchUsername">
+									<label class="label">Search in : User Name <input type="radio" id="user_name" name="chktype" value=" User Name" ><label class="radio" ></label> </label>
+									<label class="label">User Email <input type="radio" id="user_email" name="chktype" value=" User Email" ><label class="radio" ></label> </label>
+								</div>
+
+								<span>Matching: </span>
+								<select id="usercondition">
+									<option value="eq">Exactly</option>
+									<option value="like">Similar To</option> 
+								</select> 
+								<div class="searchField">Keyword: </span> <input type="text" id="user_text" name="user_text" ></div>
+							</div>
+							
+							<div id="open_title" class="attributs searchField" style="display:none">
+								<input type="hidden" id="title_name" name="chkdbee" value=" Dbee Title" >	
+								<label class="label">Description <input type="radio" id="description" name="chkdbee" value=" Description"><label class="radio" ></label> </label>
+								<!--<div class="searchField">
+									<label>Search in DBEE </label><input type="hidden" id="title_name" name="chkdbee" value=" Dbee Title" >							
+									<label class="label">Description <input type="radio" id="description" name="chkdbee" value=" Description"><label class="radio" ></label> </label>		
+								</div>-->
+								<div class="searchField">
+									<select id="dbeecondition">
+										<option value="eq">Exactly</option>
+										<option value="like">Similar To</option> 
+									</select> 
+								</div>
+								<div class="searchField">
+									<span>Keyword: </span> <input type="text" id="dbee_text" >
+								</div>
+							</div>
+
+							<div class="searchField"> 
+								<label>For post type: </label>
+								<span id="dbeetypechk"></span>
+									<select id="dbeetype">
+										<option value="1">Text</option>
+										<option value="2">Link</option> 
+										<option value="3"> Pix</option>							
+										<option value="4">Media</option>
+										<option value="5">Polls</option>
+									</select> 
+							</div>
+
+							<div id="open_date" class="attributs" style="display:none">
+								<div class="searchField">
+									<label class="label">Same as <input type="radio" id="sameas" name="chkdate" value="date Same as" ><label class="radio" ></label> </label>
+									<label class="label">Before <input type="radio" id="before" name="chkdate" value="date Before"><label class="radio" ></label> </label>							
+									<label class="label">After <input type="radio" id="after" name="chkdate" value="date After"><label class="radio" ></label> </label>							
+									<input type="hidden" id="datefield" value="date">
+								</div>
+								<div class="searchField"><span>Date : </span> <input type="text" id="date_text"  > </div>
+							</div>
+						</div>
+						<div class="clearfix"></div>
+					</div>
+					<a href="#" id="stepcondition" class="addbutton btn btn-green btn-medium pull-right">+ Add </a>
+					<div class="clearfix"></div>
+			</div>
+			</div>
+			<form id="search_form" >
+				<div id="conditions" class="addedcondition" > </div>
+					<div  id="saveFtWrapper">
+						<div id="save_filter" class="savefilter pull-left"  style="display:none"  > 
+							<input type="button" name="gosave" id="gosave" value="Save As Filter"  class="btn btn-yellow btn-medium">
+						</div>
+						
+						<div id="save_filterName" class="savefiltername whiteBox addConditionWrapper"   style="display:none" > 
+							<input type="text"  name="filtname[]" id="filtname" placeholder="type a filter name">
+							<input type="button" name="gosavefilter" id="gosavefilter" class="btn btn-yellow btn-small" value="Save" style="margin-left:10px;">
+							
+							<div class="clearfix"></div>
+						</div>
+
+					</div>				
+					
+					<div class="searchBottomBar clearfix">
+						<div id="search_button" class="searchbutton" style="display: none;" > 
+							<button type="button" name="gosearch" id="gosearch" value="SEARCH" class="btn btn-yellow btn-large pull-right"><i class="searchSprite searchIcon"></i> Search</button>
+						</div>
+					</div>
+
+					<div class="savefiltername" style="display:none"  id="save_filterMsg"></div>
+				
+			</form>
+
+			<div class="clearfix"></div>
+		</div>
+
+		<div class="clearfix"></div>
+	
+</div>
+	
+
+<div class="box-body" id="box_body">
+	<div id="listingTotalResults" style="float:right;margin: 10px 35px 0 0;"></div>
+	<div id="beforecall" style=""></div>
+	<div class="clearfix"></div>
+	<div id="searchresultvis" style="display:none"></div>
+	<div id="showmore" style="display:none;text-align: center;">
+		<img src="<?php echo BASE_URL ?>/images/show.png" style="border:0" title="Show More" alt="Show More">
+	</div>
+	 <?php if (count($this->paginator)) echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml');  ?>
+	<div class="pageheadinusr">
+	<?php echo "Showing Page ". $this->page." of ".$this->totalpage;?> 
+	</div>
+	<div class="pageheadinusrlft">
+	<?php echo "Total Record ".$this->total;?> 
+	</div>
+	<ul class="listing scoredList" id="searchresulthide">
+					
+	<?php  if (count($this->paginator)){ 
+		
+	foreach($this->paginator as $liveDbee) : ?>
+	<li>
+	
+
+		<div  class="helponoff userActiveInactive updateDbeeUserStatus"> 
+		<!-- Note : user_id is dbee_id -->
+		<?php if($liveDbee->Active==1) { ?>
+				<input type="checkbox" id="switcherTarget_<?php echo $liveDbee->DbeeID; ?>" user_id="<?php echo $liveDbee->DbeeID; ?>"  status="0">
+		<?php }else{ ?>
+		<input type="checkbox" id="switcherTarget_<?php echo $liveDbee->DbeeID; ?>" checked="checked" user_id="<?php echo $liveDbee->DbeeID; ?>"  status="1"> 
+		<?php } ?>
+			<label for="switcherTarget_<?php echo $liveDbee->DbeeID; ?>">
+				<div class="onHelp" on="Active" off="Inactive"></div>
+				<div class="onHelptext">
+					<span>Activate</span>
+					<span>Deactivate</span>
+				</div>
+			</label>
+		</div>
+		<!-- <div class="deletePost" dbee_id="<?php echo $liveDbee->DbeeID; ?>" >Delete</div> -->
+	<?php 					
+			$descDisplay	='';
+			if($this->escape($liveDbee->type)==1) { 
+			$dbtype			=	'text post <a href="'.BASE_URL.'admin/dashboard/postreport/m_-_xxp=t/'. base64_encode($liveDbee->DbeeID).'"> post report</a>';
+			$dbtypeIcon	=	'<div class="pstype typeText"></div>';
+			$descDisplay	=	'<div class="dbLinkDesc">'.$liveDbee->description.'</div>';//substr($liveDbee->description,0,100).'</div>';
+			}
+			if($this->escape($liveDbee->type)==2) { 
+			$dbtype			=	'link post <a href="'.BASE_URL.'admin/dashboard/postreport/m_-_xxp=t/'. base64_encode($liveDbee->DbeeID).'"> post report</a>';
+			$dbtypeIcon	=	'<div class="pstype typeLink"></div>';
+			$dbLink			=	$liveDbee->Link;
+			$dbLinkTitle	=	$liveDbee->LinkTitle;
+			$dbLinkDesc		=	$liveDbee->LinkDesc;
+			$dbUserLinkDesc	=	!empty($liveDbee->UserLinkDesc) ? $liveDbee->UserLinkDesc : $liveDbee->LinkTitle;
+
+			$descDisplay	=	'<div class="dbLinkDesc">'.$dbUserLinkDesc.' - 
+			<a target="_blank" href="'.$dbLink.'">'.$dbLink.'</a></div>';
+			}
+			if($this->escape($liveDbee->type)==3) { 
+			$dbtype	=	'pix post <a href="'.BASE_URL.'admin/dashboard/postreport/m_-_xxp=t/'. base64_encode($liveDbee->DbeeID).'"> post report</a>';
+			$dbtypeIcon	=	'<div class="pstype typePix"></div>';
+			$dbPic		=	$liveDbee->Pic;
+			$dbPicDesc	=	$liveDbee->PicDesc;			
+			if($dbPic!='')
+			{
+				$checkdbpic = $defaultimagecheck->checkImgExist($dbPic,'imageposts','default-avatar.jpg');
+				$descDisplay	.=	'<div class="dbPic"><a href="javascript:void(0)"><img src="'.IMGPATH.'/imageposts/small/'.$checkdbpic.'" width="90" border="0" /></a></div>';
+			}else{
+
+				$noPic = 'noPix';
+			}
+			
+			$descDisplay	.=	'<div class="dbPicDesc '.$noPic.'">'.$dbPicDesc.'</div>';//substr($dbPicDesc,0,100).'</div>';
+			}
+			if($this->escape($liveDbee->type)==4) { 
+			$dbtype	=	'media post <a href="'.BASE_URL.'admin/dashboard/postreport/m_-_xxp=t/'. base64_encode($liveDbee->DbeeID).'"> post report</a>';
+			$dbtypeIcon	=	'<div class="pstype typeVideo"></div>';
+			$dbVid			=	$liveDbee->VidID;
+			$dbVidDesc		=	$liveDbee->VidDesc;
+			$dbLinkDesc		=	$liveDbee->LinkDesc;
+			$dbUserLinkDesc	=	!empty($liveDbee->UserLinkDesc) ? $liveDbee->UserLinkDesc : $liveDbee->LinkTitle;
+
+			
+			$descDisplay	.=	'<div class="dbPicText">';
+			if($dbVid!='')
+			{
+				$descDisplay	.=	'<div class="dbPic" ><a href="#"><img width="90" height="60" border="0" src="https://i.ytimg.com/vi/'.$dbVid.'/0.jpg"></a></div>';
+			}else{
+				$noPic = 'noPix';
+			}
+			
+			$descDisplay	.=	'<div class="dbPicDesc '.$noPic.'">'.$dbVidDesc.'</div></div>';//substr($dbVidDesc,0,100).'</div></div>';
+			
+			
+			}
+			if($this->escape($liveDbee->type)==5) { 
+				$dbtype	=	'poll'; 			
+				$dbtypeIcon	='<div class="pstype typePoll"></div>';				
+				$descDisplay	='<div class="dbTextPoll">'.$dbPollText.'</div>';//substr($dbPollText,0,100).'</div>';
+			}
+		   $liveDbeepic = $defaultimagecheck->checkImgExist($liveDbee->image,'userpics','default-avatar.jpg');
+	?>
+
+	<div class="listUserPhoto">
+		<!--User profile pic  who scored someone-->								
+		<img src="<?php echo IMGPATH ?>/users/medium/<?php echo $liveDbeepic; ?>" width="70" height="70" border="0" class="recievedUsePic"/>
+		<!--End User profile pic  who scored someone-->
+	</div>
+	<div class="dataListWrapper">
+		<div class="dataListbox">
+			<div class="scoredListTitle">
+				<?php // echo $dbtypeIcon; ?> <a class="show_details_user" userid="<?php echo $this->escape($liveDbee->UserID);?>" href="javascript:void(0)"><?php echo $this->myclientdetails->customDecoding($this->escape($liveDbee->username));?></a>
+				posted a </span><?php echo $dbtype; ?><!-- <a href="<?php echo BASE_URL ?>/dbee/<?php echo $liveDbee['dburl'] ?>"> - view</a> -->								
+			</div>
+			<div class="scoredData">
+				<div class="dbPost"><?php echo $descDisplay;?>&nbsp;</div>
+				<?php if($this->escape($liveDbee->twitter)) {?>
+				<div class="twitterbird-dbee-feed dbPost">
+					<span class="twitterbird scoreSprite "></span><?php echo htmlentities(substr($this->escape($liveDbee->twitter),0,100));?>
+				</div>	
+				<?php } ?>
+				<span class="usrcomment">
+								
+					<?php
+						$totcmnt 	=	$deshObj->getTotalComments($liveDbee->DbeeID);
+						if($totcmnt>0)
+						{
+							echo "<strong>".$totcmnt ." comments -</strong>";
+						}
+					?>
+					<i> <a href="<?php  echo BASE_URL.'/dbeedetail/home/id/'.$liveDbee->DbeeID ;?>" target="_blank"> view </a> </i>
+
+				</span>
+			</div>
+		</div>
+		<div class="scoredPostDate">Posted  on  - <?php echo date('d M Y',strtotime($this->escape($liveDbee['PostDate']))); ?></div>
+	</div>
+
+
+			
+				</li>
+				<?php $rowchange++; endforeach; ?>
+		</ul>
+		
+<?php } else { ?>
+
+<p class="notfound">Posts Not Found!</p>
+<?php } ?>
+
+<?php 
+	/*
+	 * Print the pagination of type
+	 */
+ echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml');  ?>

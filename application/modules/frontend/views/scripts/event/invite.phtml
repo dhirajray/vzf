@@ -1,0 +1,82 @@
+<?php if($this->sociallogin==true){ ?>
+ <script>
+	var SESS_USER_ID =  "<?php echo $this->session_data['UserID']; ?>";
+	var SESS2_USER_ID =  "<?php echo adminID; ?>";
+	var BASE_URL 			= '<?php echo BASE_URL; ?>';    
+   $(document).ready(function()
+    {
+      $.ajax({
+          type: "POST",
+          dataType : 'json',
+          url: BASE_URL+"/event/socialevent",
+          success:function(response)
+          {
+            console.log(response);
+            if(response.wrong==1)
+            {
+              var UsedAcceptPopup = "<div style='text-align:center;font-size:18px;color:#999999;''><div style='padding:30px 0px; 50px 0px;' class='formRow'>Sorry, this doesn't seem to be your invitation link!</div><div class='clearfix'></div></div>";
+              $.dbeePopup(UsedAcceptPopup, {width:420,overlay:true,closeBtnHide:true});
+            }
+            else if(response.used==1 && response.login==true)
+            {
+              var UsedAcceptPopup = "<div style='text-align:center;font-size:18px;color:#999999;''><div style='padding:30px 0px; 50px 0px;' class='formRow'>You have already confirmed your attendance at this event!</div><div class='clearfix'></div></div>";
+              $.dbeePopup(UsedAcceptPopup, {width:420,overlay:true,closeBtnHide:true});
+            }
+            else if(response.accept==true && response.login==true){
+              var GroupAcceptPopup = '<div style="margin-top:5px; text-align:center" >Please respond to the event invitation</div>\
+              <div style="margin-top:5px; text-align:center" >\
+                <a href="javascript:void(0);" event-type="3" event-id="<?php echo $this->id; ?>" class="eventJoin btn btn-yellow" >Accept</a>\
+                 <a href="/myhome" class="btn" id="rejectEventRequest" >Reject</a>\
+              </div>';
+              $messageWarning(GroupAcceptPopup);
+            }
+            else if(response.logout==true)
+            {
+                if(response.typelogin=='linkedin'){
+                  SocialTypeUserClass = 'fa dbLinkedInIcon fa-5x clrMsgBox';
+                  bgSocial = '#007ab9';
+                }
+                else if(response.typelogin=='twitter'){
+                  SocialTypeUserClass = 'fa dbTwitterIcon fa-5x clrMsgBox';
+                  bgSocial = '#20b8ff';
+                }
+                else if(response.typelogin=='facebook'){
+                  SocialTypeUserClass = 'fa dbFacebookIcon  fa-5x clrMsgBox';
+                  bgSocial = '#3a589b';
+                }
+                var logout = '<div class="signWithSMContainer">\
+                <div class="signwithSprite '+SocialTypeUserClass+'"></div>\
+                <div class="signTittleSocialM" id="socialCntTxt">\
+                You seem to be already logged into db with a different account. Please click the button below to log out and log back in with your\
+                <strong>'+response.typelogin+'</strong> account.\
+                </div>\
+                </div>';
+                $.dbeePopup(logout, {width:420,overlay:true,closeBtnHide:true, bg:bgSocial, otherBtn:'<a href="/myhome/logout" class="btn btn-yellow pull-right" >Logout</a>'});
+            }
+            else if(response.typelogin=='twitter' && response.login==false){
+               var reportTemplate = '<a href="'+BASE_URL+'/auth/twitter" class="signWithSMContainer">\
+                <div class="fa dbTwitterIcon fa-5x clrMsgBox"></div>\
+                <div class="signTittleSocialM">Click here to log in with Twitter</div>\
+                </a>';
+
+                $.dbeePopup(reportTemplate, {width:520,overlay:true,closeBtnHide:true, bg:'#20b8ff'});
+            }else if(response.typelogin=='facebook' && response.login==false){
+                var facebookLoginTemplate = '<div id="datafacebook"> <a href="/index/facebook" class="signWithSMContainer">\
+                <div class="fa dbFacebookIcon  fa-5x clrMsgBox"></div>\
+                <div class="signTittleSocialM">Click here to log in with Facebook</div>\
+                </a></div>';
+                $.dbeePopup(facebookLoginTemplate, {width:520,overlay:true,closeBtnHide:true, bg:'#3a589b'});
+            } else if(response.typelogin=='linkedin' && response.login==false){
+               var reportTemplate = '<a href="'+BASE_URL+'/linkedin/login" class="signWithSMContainer">\
+                                    <div class="fa dbLinkedInIcon fa-5x clrMsgBox"></div>\
+                                    <div class="signTittleSocialM">Click here to log in with LinkedIn</div>\
+                                  </a>';
+
+                $.dbeePopup(reportTemplate, {width:520,overlay:true,closeBtnHide:true, bg:'#007ab9'});
+            }
+
+          }   
+      });
+    });
+   </script>
+<?php } ?>

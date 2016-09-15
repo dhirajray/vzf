@@ -1,0 +1,76 @@
+
+		var parentDiv = $(this).closest('#dbeePopupWrapper');
+		
+
+		var dbeeid = $('#dbid').val();
+		surveyArray.push($('.flex-active-slide input:checked', parentDiv).val());
+
+		
+
+
+		if($('.flex-active-slide input', parentDiv).is(':checked')==false){
+			$messageError('please select any answer');
+			return false; 
+		}
+
+console.log(surveyArray);
+		if($(this).text()=='Finish'){
+				$(this).hide();
+				$.ajax({
+		            type: "POST",
+		            dataType:"json",
+		            url:BASE_URL+"/dbeedetail/surveyfinish",
+		            data:{"stringSurvey": surveyArray,'dbeeid':dbeeid},
+		            success:function(response){
+
+		            	//response.content
+		            	$('#StartSurvey').html(response.content);
+				        surveyArray=[];
+				        $('.StartSurvey').hide();
+		           }
+		        });
+
+
+			}
+
+
+		/*surveyArray.push($('.flex-active-slide input:checked', parentDiv).val());
+		$(this).closest('#dbeePopupWrapper').find('.flex-next:visible').trigger('click');
+		currentQuestions +=1;
+				
+			$('.totalQuestions strong').text(currentQuestions);
+
+		if(currentQuestions==TotalQuestions){
+					$(this).text('Finish');
+				}*/
+		$(this).closest('#dbeePopupWrapper').find('.flex-next:visible').trigger('click');
+		if(currentQuestions<TotalQuestions){
+
+				currentQuestions +=1;
+				$('.totalQuestions strong').text(currentQuestions);	
+
+								
+
+				
+	  	//var stringSurvey = surveyArray.join(',');
+
+
+			}
+
+			if(currentQuestions==TotalQuestions){
+				$(this).text('Finish');				
+			}
+
+
+		
+		/*$.ajax({
+            type: "POST",
+            dataType:"json",
+            url:BASE_URL+"/dbeedetail/surveyfinish",
+            data:{"stringSurvey": stringSurvey,'dbeeid':dbeeid},
+            success:function(response){
+            	$('#StartSurvey').html(response.content);
+		        surveyArray=[];
+		        $('.StartSurvey').hide();
+           }
+        });*/

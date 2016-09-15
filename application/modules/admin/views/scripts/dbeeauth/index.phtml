@@ -1,0 +1,530 @@
+<?php         
+   $this->title = "Create new client";
+   $this->headTitle($this->title);    
+   ?>
+ <style type="text/css">
+.error{
+  color: #FF0000;
+  font-size:12px;
+}
+
+.success{
+  color: #33CC00; 
+  font-size:12px;
+}
+ </style>
+
+<script type="text/javascript">
+function checkUserName(usercheck)
+  { 
+    $('#usercheck').html('<img src="<?php echo BASE_URL;?>/images/ajax-loader.gif" />');
+    $.post(BASE_URL+'/admin/dbeeauth/checkdomain', {client_subdomain: usercheck} , function(data)
+      {     
+         
+           if (data.status == 'error') 
+           {           
+             $('#NewClientSubmit').addClass('disabled');
+             $('#NewClientSubmit').prop("disabled", true);
+             $('#NewClientSubmit').css( 'cursor', 'inherit' );
+           }
+           else
+           {
+              $('#NewClientSubmit').removeClass('disabled');
+              $('#NewClientSubmit').prop("disabled", false);
+              $('#NewClientSubmit').css( 'cursor', 'pointer' );
+           }
+           if (data.content != '' || data.content != undefined || data.content != null) 
+           {           
+            $('#usercheck').html(data.content); 
+           }
+            },'json');  
+  }
+
+
+$("body").on('click','#NewClientSubmit',function(){
+var company_name     = $("#company_name").val();
+var client_subdomain = $("#client_subdomain").val();
+var client_email     = $("#client_email").val();
+var client_type      = $("#client_type").val();
+
+if (company_name == '')
+ { 
+   $messageError('company name cannot be empty');
+   $( "#company_name" ).focus();
+   return false;
+ }       
+ if (client_subdomain == '')
+ { 
+   $messageError('client subdomain cannot be empty');
+   $( "#client_subdomain" ).focus();
+   return false;
+ }
+ if (client_email == '')
+ { 
+   $messageError('client email cannot be empty');
+   $( "#client_email" ).focus();
+   return false;
+ }
+ if(!validateEmail(client_email)) {  
+  $messageError('Please enter a valid email address.');
+  $( "#client_email" ).focus();
+   return false; 
+ }        
+
+var htmlcontent ='<form name="insertclient" id="insertclient">\
+<input type="hidden" name="company_name" value="'+company_name+'">\
+<input type="hidden" name="client_subdomain" value="'+client_subdomain+'">\
+<input type="hidden" name="client_email" value="'+client_email+'">\
+<input type="hidden" name="client_type" value="'+client_type+'">\
+ <br><h3>UserName</h3>\
+ <input type="text" class="fluid" name="cp_username" id="cp_username" value="">\
+ <br><h3>Password</h3>\
+ <input type="password" class="fluid" name="cp_password" id="cp_password" value="">\
+ </form>';
+var html = '<div class="dialogBoxAddApi">'+htmlcontent+'</div>';
+
+  $('.dialogBoxAddApi').remove();
+  $('body').append(html);
+  $(".dialogBoxAddApi").dialog({
+        dialogClass: 'detailsDialogBox',
+        width: 330,
+        height: 220,
+        title: 'Add/Edit Social Api Details',
+        open: function() {
+            $fluidDialog();
+            $("#datacollect").html('');
+             var clientName = '';            
+            $('.ui-dialog-title').html('Enter details ');
+            //$('#userInfoContainer').html('Plese select user');
+        },
+        buttons: {
+            "Submit": function() {
+                thisEl = $(this);
+                formdata = $('form#insertclient').serialize();
+                postdata    =   formdata+'&task=add';
+                var redirectUrl     =   BASE_URL+'/admin/dbeeauth/';
+                $.ajax({
+                    type: "POST",
+                    dataType: 'json',
+                    data:postdata,
+                    url: BASE_URL+'/admin/dbeeauth/insert',
+                    success: function(response) {
+                        $('#company_name').val('');
+                        $('#client_subdomain').val('');
+                        $('#client_email').val('');                
+                        $('#NewClientSubmit').val(' Save ');
+                        $('#searchContainer').css('display','none');                  
+                        $messageSuccess('New client added successfully');
+                        location.href = redirectUrl;                       
+                        thisEl.dialog("close");
+                    }
+                });
+            }
+        }
+    }); 
+
+});
+
+
+$("body").on('click','.addApiAction',function(){
+var clientid  = $(this).attr('clientid');
+var client_type = $(this).attr('clientType');
+var clientName  = $(this).attr('clientName');
+
+var htmlcontent =' <div class="selectList"><span class="apiLabelOneline">Copy From: </span><div id="selectClientId" class="select"></div></div>\
+<form name="updateSocialApi" id="updateSocialApi"><input type="hidden" name="clint_id" value="'+clientid+'">\
+<input type="hidden" name="client_type" value="'+client_type+'">\
+ <div class="apiInpList"><span class="apiLabelTxt">SMTP key</span>\
+ <input type="text" class="fluid" name="smtp_key" id="smtp_key" value=""></div>\
+ <div class="apiInpList"><span class="apiLabelTxt">Short Url Api</span>\
+ <input type="text" class="fluid" name="short_url_api" id="short_url_api" value=""></div>\
+ <div class="apiInpList"><span class="apiLabelTxt">Facebook App Id</span>\
+ <input type="text" class="fluid" name="facebook_app_id" id="facebook_app_id" value=""></div>\
+ <div class="apiInpList"><span class="apiLabelTxt">Facebook Secret</span>\
+ <input type="text" class="fluid" name="facebook_secret" id="facebook_secret" value=""></div>\
+ <div class="apiInpList"><span class="apiLabelTxt">Facebook Domain</span>\
+ <input type="text" class="fluid" name="facebook_domain" id="facebook_domain" value=""></div>\
+ <div class="apiInpList"><span class="apiLabelTxt">LinkedIn App Id</span>\
+ <input type="text" class="fluid" name="linkedIn_app_id" id="linkedIn_app_id" value=""></div>\
+ <div class="apiInpList"><span class="apiLabelTxt">LinkedIn Secret</span>\
+ <input type="text" class="fluid" name="linkedIn_secret" id="linkedIn_secret" value=""></div>\
+ <div class="apiInpList"><span class="apiLabelTxt">Twitter App Id</span>\
+ <input type="text" class="fluid" name="twitter_app_id" id="twitter_app_id" value=""></div>\
+ <div class="apiInpList"><span class="apiLabelTxt">Twitter Secret</span>\
+ <input type="text" class="fluid" name="twitter_secret" id="twitter_secret" value=""></div>\
+ <div class="apiInpList"><span class="apiLabelTxt">Twitter Access Token</span>\
+ <input type="text" class="fluid" name="twitter_access_token" id="twitter_access_token" value=""></div>\
+ <div class="apiInpList"><span class="apiLabelTxt">Twitter Access Secret</span>\
+ <input type="text" class="fluid" name="twitter_access_secret" id="twitter_access_secret" value=""></div>\
+ <div class="apiInpList"><span class="apiLabelTxt">Google Plus App Id</span>\
+ <input type="text" class="fluid" name="gplus_app_id" id="gplus_app_id" value=""></div>\
+ <div class="apiInpList"><span class="apiLabelTxt">Google Plus Secret</span>\
+ <input type="text" class="fluid" name="gplus_secret" id="gplus_secret" value=""></div>\
+ <div class="apiInpList"><span class="apiLabelTxt">Google Plus Redirect Url</span>\
+ <input type="text" class="fluid" name="gplus_redirect_url" id="gplus_redirect_url" value=""></div>\
+ <div class="apiInpList"><span class="apiLabelTxt">Sematria Key</span>\
+ <input type="text" class="fluid" name="sematria_key" id="sematria_key" value=""></div>\
+ <div class="apiInpList"><span class="apiLabelTxt">Sematria Secret</span>\
+ <input type="text" class="fluid" name="sematria_secret" id="sematria_secret" value=""></div>\
+ <div class="apiInpList"><span class="apiLabelTxt">Google Email address</span>\
+ <input type="text" class="fluid" name="google_email" id="google_email" value=""></div>\
+ <div class="apiInpList"><span class="apiLabelTxt">Google Password</span>\
+ <input type="password" class="fluid" name="google_password" id="google_password" value=""></div>\
+ </form>';
+var html = '<div class="dialogBoxAddApi">'+htmlcontent+'</div>';
+
+  $('.dialogBoxAddApi').remove();
+  $('body').append(html); 
+
+  getApiData(clientid);
+
+  $(".dialogBoxAddApi").dialog({
+        dialogClass: 'detailsDialogBox',
+        width: 800,
+        height: 600,
+        title: 'Add/Edit Social Api Details',
+        open: function() {
+            $fluidDialog();
+            $("#datacollect").html('');
+             var clientName = '';            
+            $('.ui-dialog-title').html('Add/Edit Social Api Details for '+clientName);                     
+        },
+        buttons: {
+            "Submit": function() {
+                thisEl = $(this);
+                formdata = $('form#updateSocialApi').serialize();
+                postdata    =   formdata+'&task=add';
+                $.ajax({
+                    type: "POST",
+                    dataType: 'json',
+                    data:postdata,
+                    url: BASE_URL+'/admin/dbeeauth/updateclientsocialapi',
+                    success: function(response) {
+                        var myresult = response.status;
+                        var myval = myresult.split('~');                       
+                        $('div .acntImgThumb').append(myval[1]);
+                        $messageSuccess(response.message);
+                        thisEl.dialog("close");                        
+                    }
+                });
+            }
+        }
+    }); 
+});
+
+
+$('body').on('click','.clientActiveInactive input', function(e){
+
+          e.stopPropagation();
+          var thisEl = $(this);
+          var id = $(this).attr('ClientId');
+          var datastatus = $(this).attr('status');
+          
+          if (thisEl.is(':checked') == false) {
+                msg = 'Are you sure you want to make this client account inactive?';
+            } else {
+                msg = 'Are you sure you want to make this client account active?';
+            }  
+
+          $('#dialogConfirmSetting').remove();
+          $('body').append('<div id="dialogConfirmSetting">'+msg+'</div>');
+
+          $( "#dialogConfirmSetting" ).dialog({
+            resizable: false,
+            title:'Please confirm',
+            modal: true,            
+            buttons: {
+            "Yes": function() {
+                $( this ).dialog( "close" );
+                 $.ajax(
+                  {
+                      type : "POST",
+                      dataType : 'json',                      
+                      data : {'status':datastatus,'clientid':id},
+                      url : BASE_URL+'/admin/dbeeauth/updatestatus',
+                      beforeSend : function() { 
+
+                      },
+                      cache : false,
+                      success : function(response) 
+                      {               
+                         $messageSuccess(response.message);                       
+                         $('#updatestatus_'+id).html(response.statustext);
+                         $('#updatestatus_'+id).attr('data-status',response.statusvale);
+                         $('#clientswitcherTarget'+id).attr('status', response.statusvale);
+
+                         if(response.statusvale==1)
+                         {                           
+                             $('#clientswitcherTarget'+id).prop('checked', true);                              
+                         }
+                         else
+                         {  
+                            $('#clientswitcherTarget'+id).prop('checked', false);                            
+                         }   
+
+                      },  
+                      error : function(error) {
+
+                      }
+                  });        
+              }
+            }
+        });               
+                
+    });
+$("body").on('change','#SelectClient', function(){
+      var clientid = $(this).val();
+      getApiData(clientid);
+  });
+
+function validateEmail($email) {
+  var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+  return emailReg.test( $email );
+}
+function getApiData(clientid){
+  $.ajax({
+        type: "POST",
+        dataType: 'json',
+        data:{'clientid':clientid},
+        url: BASE_URL+'/admin/dbeeauth/fetchdomainapi',
+        success: function(data) {
+         
+            $('#selectClientId').html(data.select);
+            $select('#SelectClient');   
+            if(data.content.length>0){       
+            $('input[name="smtp_key"]').val(data.content[0].smtpkey);        
+            $('input[name="short_url_api"]').val(data.content[0].short_url_api);        
+            $('input[name="facebook_app_id"]').val(data.content[0].facebookAppid);        
+            $('input[name="facebook_secret"]').val(data.content[0].facebookSecret);        
+            $('input[name="facebook_domain"]').val(data.content[0].facebookDomain);        
+            $('input[name="linkedIn_app_id"]').val(data.content[0].linkedinAppid);        
+            $('input[name="linkedIn_secret"]').val(data.content[0].linkedinSecret);        
+            $('input[name="twitter_app_id"]').val(data.content[0].twitterAppid);        
+            $('input[name="twitter_secret"]').val(data.content[0].twitterSecret);        
+            $('input[name="taccess_token"]').val(data.content[0].twitterAccessToken);        
+            $('input[name="taccess_sec"]').val(data.content[0].twitterAccessSecret);        
+            $('input[name="gplus_app_id"]').val(data.content[0].gplusClientappid);        
+            $('input[name="gplus_secret"]').val(data.content[0].gplusClientSecret);        
+            $('input[name="gplus_redir_url"]').val(data.content[0].gplusRedierctUrl);        
+            $('input[name="sematria_key"]').val(data.content[0].sematriaKey);        
+            $('input[name="sematria_secret"]').val(data.content[0].semantriaSecret); 
+            $('input[name="google_email"]').val(data.content[0].google_email);        
+            $('input[name="google_password"]').val(data.content[0].google_password);  
+            }      
+         
+        }
+    });
+}
+
+$('document').ready(function(){ 
+
+    $('#addnewclient_popup').submit(function() {
+      formdata = $('form#addnewclient').serialize();
+      var company_name   = $('#company_name').val();
+      var client_subdomain = $('#client_subdomain').val();       
+      var client_email   = $('#client_email').val();
+      
+       if (company_name == '')
+       { 
+         $messageError('company name cannot be empty');
+         return false;
+       }       
+       if (client_subdomain == '')
+       { 
+         $messageError('client subdomain cannot be empty');
+         return false;
+       }
+       if (client_email == '')
+       { 
+         $messageError('client email cannot be empty');
+         return false;
+       }
+       if(!validateEmail(client_email)) {  
+        $messageError('Please enter a valid email address.');
+         return false; 
+       }        
+        
+       var thisEl  =   $(this);
+       var url     =   BASE_URL+'/admin/dbeeauth/insert';
+       var redirectUrl     =   BASE_URL+'/admin/dbeeauth/';
+       postdata    =   formdata+'&task=add';
+       //$messageSuccess('insert successfully');
+
+        $.ajax({                                      
+              url: url,                  
+              data: postdata,                        
+              method: 'POST', 
+              type:'json', 
+              beforeSend: function(){  
+              },
+              success: function(data)    
+              {            
+                $('#company_name').val('');
+                $('#client_subdomain').val('');
+                $('#client_email').val('');                
+                $('#NewClientSubmit').val(' Save ');
+                $('#searchContainer').css('display','none');                  
+                $messageSuccess('New client added successfully');
+                location.href = redirectUrl;
+              }
+        }); 
+        return false;
+    });
+
+
+
+
+});
+
+</script>
+
+
+<h1 class="pageTitle dbeeViewAll" >Manage clients<a href="#" class="btn btn-yellow btn-large openSearchBlock resetform" >Create new client</a></h1>
+<div  id="searchWrapper" class="spSdbsSearchBox">
+   
+      <div id="searchContainer"> 
+         <div id="exp_condition" class="expenddcondition1" >            
+            <div class="whiteBox addConditionWrapper"> 
+                 
+                           <div class="searchField"> 
+                              <label class="label">Client name</label>
+                              <div class="fieldInput"><input type="text" id="company_name" name="company_name" class="clientInpFld" ></div>
+                           </div>                      
+                         
+                           <div class="searchField"> 
+                              <label class="label">Client sub-domain</label>
+                              <div class="fieldInput"><input type="url" style="width:225px;"  id="client_subdomain" name="client_subdomain" onblur="checkUserName(this.value)"><span id="usercheck" style="padding-left:10px; ; vertical-align: middle;"></span></div>
+                              
+                           </div>
+                           <div class="searchField"> 
+                              <label class="label">Client email address</label>
+                              <div class="fieldInput"><input type="text"  style="width:225px;" id="client_email" name="client_email"></div>
+                              
+                           </div>
+
+                             <div class="searchField"> 
+                              <label class="label">Client type</label>
+                              <div class="fieldInput">
+                                <select name="client_type" id="client_type" style="width:205px;">
+                                <option value="1">Secure Communications</option>
+                                <option value="2">Marketing Communications</option>
+                                <option value="3">Events</option></select></div>
+                              
+                           </div>
+
+                           <div class="searchField"> 
+                              <label class="label">&nbsp;</label>
+                              <div class="fieldInput">                                 
+                                <a id="NewClientSubmit" class="addbutton btn btn-green btn-small pull-left">Save</a> 
+                                 &nbsp;
+                                 <input type="submit" id="" class="btn btn-small openSearchBlock resetform " value="Close" style=" padding:7px 10px;">  
+                              </div>
+                           </div>
+                     <div class="clearfix"></div>
+                     
+
+                  </div>
+                  <div class="clearfix"></div>
+               
+         </div>
+
+
+         <div class="clearfix"></div>
+      </div>
+
+      <div class="clearfix"></div>   
+</div>
+
+<div class="responsiveTable">
+ <table class=" table-border userListTable table table-hover table-stripe">
+          
+          <?php if (count($this->clientlist)){ ?>
+            <thead>                
+                <tr>
+                    <!-- <td style="text-align:left;" width="68">
+                            Client Id
+                    </td>  -->
+                    <td width="230" style="text-align:left;">
+                        <div class="searchInRpTable">
+                            <input type="text" value="" onkeyup="javascript:filterReportUser(this)" placeholder="type client name to filter list" class="searchByName"> Client Name
+                            <div class="sprite searchIcon2"></div>
+                        </div>
+                    </td>
+                    <td width="200">
+                        Client subdomain
+                    </td>
+                    <td nowrap="nowrap" width="300">Client Email</td>
+                    <td nowrap="nowrap" width="50">Status</td>
+                    <td nowrap="nowrap" width="170">Action</td>
+                </tr>
+            </thead>
+
+            <tbody>
+                
+              <?php foreach($this->clientlist as $data) : ?>
+                <?php if($rowchange%2==1) {$color='#CCC' ;} else {$color='#FFF' ;} 
+
+                  if($data['clientStatus']==1)
+                  {
+                      $clientStatustext='<span style="color:green">Active</span>';
+                      $checked='checked="checked"';
+                  }
+                  else
+                  {
+                     $clientStatustext='<span style="color:#ff0000">Deactive</span>';
+                     $checked='';
+                  }
+
+                ?>
+
+                <tr>
+
+                  <!--  <td style="text-align:left;">
+
+                            <span><?php //echo $data['clientID']; ?></span>
+                    </td>  -->
+                    
+                    <td style="text-align:left;">
+
+                            <span><?php echo $data['clientName']; ?></span>
+                    </td>   
+                    <td>
+                        <?php echo $data['clientDomain']; ?>
+                    </td>
+                    
+                    <td width="50">
+                       <?php echo $data['clientEmail']; ?>
+                    </td>
+                    <td nowrap="nowrap" width="50" id="updatestatus_<?php echo $data['clientID']; ?>"><?php echo $clientStatustext; ?></td>
+                    <td>
+                        <input type="hidden" name="page2" id="page2" value="2">
+                        <div class="ViewAllClickedUsers">
+                           <a class="btn btn-green btn-mini addApiAction" clientid="<?php echo $data['clientID']; ?>" clientName="<?php echo $data['clientName']; ?>" clientType="<?php echo $data['clientType']; ?>" href="javascript:void(0)">
+                              <i class="fa fa-pencil-square-o"></i> Add/Edit API  </a>
+
+                              <div class="helponoff clientActiveInactive userStatusListingTable"> 
+                                <input type="checkbox" id="clientswitcherTarget<?php echo $data['clientID']; ?>" ClientId="<?php echo $data['clientID']; ?>" <?=$checked?> status="<?php echo $data['clientStatus']; ?>" />
+                                <label for="clientswitcherTarget<?php echo $data['clientID']; ?>" >
+                                  <div class="onHelp" on="Activate" off="Deactivate"></div>
+                                  <div class="onHelptext">
+                                    <span>Activate</span>
+                                    <span>Deactivate</span>
+                                  </div>
+                                </label>
+                            </div>
+                        </div>
+                   </td>
+                </tr>
+                  <?php endforeach; ?>
+
+                  <?php } else { ?>
+
+                <tr>
+                    <td colspan="5"><div class="notfound">No results <input type="hidden" id="postnotfound" value="0"></div></td>
+                </tr>
+                <?php } ?>
+             
+            </tbody>
+        </table>
+
+</div>

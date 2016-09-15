@@ -1,0 +1,245 @@
+<?php
+   $group=$this->group;
+   $Row = $this->groupmodel->selectgroupprivacy($group);
+   if($Row[0]['GroupType']=='-1'){$display='block';} else{ $display='none';}
+   ?>
+<script>
+   $(function() {
+   	autoselectgrouptype(<?=$Row[0]['GroupType'];?>);
+
+
+
+
+var myDropzoneGroup =   new Dropzone("#uploadEditBgGroupDropzone",{ 
+                  url: BASE_URL+"/picture/groupimageupload",
+                  maxFiles:1,
+                  addRemoveLinks:true,
+                  parallelUploads:1,
+                  acceptedFiles: 'image/jpeg,image/png,image/gif',
+
+               });         
+               var fileList; 
+
+               myDropzoneGroup.on("maxfilesexceeded", function(file, serverFileName) {             
+                  //$messageError('You can upload only 1 file'); 
+                  $dbConfirm({content:"You can upload only 1 file", yes:false,error:true});               
+               });
+
+
+               myDropzoneGroup.on("error", function(file, serverFileName) {               
+                  //$messageError('Please upload only png, jpg, jpeg, gif file type'); 
+                   $dbConfirm({content:"Please upload only png, jpg, jpeg, gif file type", yes:false,error:true});                  
+               });
+
+               myDropzoneGroup.on("success", function(file, serverFileName) {       
+                  fileList = "serverFileName = "+ serverFileName;
+                  $.dbeePopup('resize');
+                  $('#group-pic-bg').val( serverFileName);
+                 
+               });
+              
+               myDropzoneGroup.on("removedfile", function(file) {
+                 
+                  createrandontoken();
+                  data += fileList+'&'+userdetails;
+                  $.ajax({
+                      url: BASE_URL+ "/picture/groupimageunlink",
+                      type: "POST",
+                      dataType:"json",
+                      data: data,
+                      success: function () {
+                          $('#group-pic-bg').val('');
+                          $.dbeePopup('resize');
+                      }
+                  });
+               });
+
+               var myDropzoneGroup =   new Dropzone("#uploadEditGroupDropzone",{ 
+                  url: BASE_URL+"/picture/groupimageupload",
+                  maxFiles:1,
+                  addRemoveLinks:true,
+                  parallelUploads:1,
+                  acceptedFiles: 'image/jpeg,image/png,image/gif'
+
+               });         
+               var fileList; 
+
+               myDropzoneGroup.on("maxfilesexceeded", function(file, serverFileName) {             
+                  //$messageError('You can upload only 1 file'); 
+                  $dbConfirm({content:"You can upload only 1 file", yes:false,error:true});               
+               });
+
+
+               myDropzoneGroup.on("error", function(file, serverFileName) {               
+                  //$messageError('Please upload only png, jpg, jpeg, gif file type'); 
+                   $dbConfirm({content:"Please upload only png, jpg, jpeg, gif file type", yes:false,error:true});                  
+               });
+
+               myDropzoneGroup.on("success", function(file, serverFileName) {       
+                  fileList = "serverFileName = "+ serverFileName;
+                  $.dbeePopup('resize');
+                  $('#group-pic').val( serverFileName);
+                 
+               });
+			        
+               myDropzoneGroup.on("removedfile", function(file) {
+                 
+                  createrandontoken();
+                  data += fileList+'&'+userdetails;
+                  $.ajax({
+                      url: BASE_URL+ "/picture/groupimageunlink",
+                      type: "POST",
+                      dataType:"json",
+                      data: data,
+                      success: function () {
+                          $('#group-pic').val('');
+                          $.dbeePopup('resize');
+                      }
+                  });
+               });
+                
+            // end group pic uploader
+
+         $('.changeGroupPic').click(function(e){
+            e.preventDefault();
+            $('#editGroupDropzoneWrapper').toggle();
+            setTimeout(function(){
+                     $.dbeePopup('resize');
+                  },100);
+         });
+
+
+          $('.changeGroupBackgroundPic').click(function(e){
+            e.preventDefault();
+            $('#editGroupBgDropzoneWrapper').toggle();
+            setTimeout(function(){
+                     $.dbeePopup('resize');
+                  },100);
+         });
+                     
+   });
+</script>
+<h2 class="user-name" class="titlePop">Edit Group</h2>
+<div class="clearfix"> </div>
+   <div id="edit-groups-wrapper">
+      <form id="edit" name="edit">
+	  <div id="passform" class="postTypeContent">
+         <div class="formRow" >
+			 <div class="formField">
+				 <input type="text" id="group-name" class="textfield"  value="<?=$Row[0]['GroupName'];?>">
+				 <label for="group-name" class="optionalText">group name</label>
+			 </div>
+         </div>
+		
+			 
+		<div class="formRow">
+            <div class="formField"><?php
+            $counter = 1;
+            $i       = 1;
+            foreach ($this->grouptype as $key => $GroupTypeRow) {
+                if ($i == '1')
+                    $width = '180px;';
+                elseif ($i == '2')
+                    $width = '180px;';
+                elseif ($i == '3')
+                    $width = '180px;'; 
+                if($Row[0]['GroupType']==$cat['TypeName']){
+                	$chk = 'checked="checked';
+                }
+                
+                ?>
+                <div style="width:<?php echo $width?> float:left;"><label><input type="radio" name="group-type" id="group-type" onClick="javascript:checkothergrouptype('<?php echo $GroupTypeRow['TypeID']?>')" value="<?php echo $GroupTypeRow['TypeID']?>" <?php echo $chk;?>><?php echo $GroupTypeRow['TypeName']?></label></div>
+               <?php  if ($counter % 3 == 0) {
+                    echo '<div class="next-line"></div>';
+                    $i = 0;
+                }
+                $counter++;
+                $i++;
+            } ?>
+            <label for="group-type" class="optionalText">group type</label>
+            </div>
+          </div>
+			 
+       <div class="formRow" >
+			 <div class="formField">
+				 <label><input type="radio" name="group-privacy" id="group-privacy" value="1" <? if($Row[0]['GroupPrivacy']=='1') echo 'checked="checked"'; ?>>Open</label><br /><label><input type="radio" name="group-privacy" id="group-privacy" value="3" <? if($Row[0]['GroupPrivacy']=='3') echo 'checked="checked"'; ?>>Request<span style="font-size:10px; margin-left:10px;">(non-invitees can request to join)</span></label><br /><label><input type="radio" name="group-privacy" id="group-privacy" value="2" <? if($Row[0]['GroupPrivacy']=='2') echo 'checked="checked"'; ?>>Private<span style="font-size:10px; margin-left:10px;">(by invitation only)</span></label><input type="hidden" id="groupid" value="<?=$group;?>">
+			 </div>
+         </div>
+         <div class="formRow">
+             <div class="formField">               
+               <label class="labelCheckbox" for="rest_groupdb">
+                  <input name="rest_groupdb" id="rest_groupdb" type="checkbox" value="<? if($Row[0]['GroupRes']){echo $Row[0]['GroupRes'];}?>" <? if($Row[0]['GroupRes']=='1') echo 'checked="checked"'; ?> >
+                  <label class="checkbox" for="rest_groupdb"></label>
+                  <span >Restrict posting to me</span>
+                </label>                
+                <label for="rest_groupdb" class="optionalText">post restriction </label>
+             </div>
+         </div>
+		  <!-- <div class="formRow">
+             <div class="formField">               
+               <label class="labelCheckbox" for="invitetoexperts">
+                  <input name="invitetoexperts" id="invitetoexperts" type="checkbox" value="<? if($Row[0]['Invitetoexpert']){echo $Row[0]['Invitetoexpert'];}?>" <? if($Row[0]['Invitetoexpert']=='1') echo 'checked="checked"'; ?> >
+                  <label class="checkbox" for="invitetoexperts"></label>
+                  <span >Restrict expert invitation to me</span>
+                </label>                
+                <i class="optionalText">expert restriction</i>
+             </div>
+         </div> -->
+ 		 <div class="formRow" >
+			 <div class="formField">
+			 <input type="hidden" id="group-pic" name="group-pic" value="" >
+			 <input type="hidden" id="group-pic1" name="group-pic" value="<?=$Row[0]['GroupPic'];?>" >
+			 <?php if(!empty($Row[0]['GroupPic']) && $Row[0]['GroupPic'] !== 'default-avatar.jpg'){
+         $checkImage = new Application_Model_Commonfunctionality();
+         $groupimg = $checkImage->checkImgExist($Row[0]['GroupPic'],'grouppics','default-avatar.jpg');
+        ?>
+				  <div id="upload_area" style="float:left; margin-right:20px;">
+            <img src="<?=IMGPATH?>/grouppics/medium/<?=$groupimg?>" border="0" /> </div>
+			<?php } ?>
+            <a href="javascript:void(0);" class="changeGroupPic pull-left" >Click here to edit Group logo</a>
+			 </div>
+      </div>
+ <div class="formRow" style="display:none; position:relative;"  id="editGroupDropzoneWrapper">
+            <div class="dropzone" id="uploadEditGroupDropzone">
+               <div class="fallback">
+                <input type="file" name="file"  />
+              </div>
+            </div>
+            
+          </div>
+      <div class="formRow" >
+       <div class="formField">
+       <input type="hidden" id="group-pic-bg" name="group-pic-bg" value="<?=$Row[0]['GroupBgPic'];?>" >
+       <?php if($Row[0]['GroupBgPic'] !== ''){
+        ?>
+          <div id="upload_area_backgroud" style="float:left; margin-right:20px;">
+            <img src="<?=IMGPATH?>/grouppics/medium/<?=$Row[0]['GroupBgPic']?>" border="0" /> </div>
+      <?php } ?>
+            <a href="javascript:void(0);" class="changeGroupBackgroundPic pull-left" >Click here to edit Group background</a>
+       </div>
+      </div>
+
+         
+
+
+           <div class="formRow" style="display:none;  position:relative;"  id="editGroupBgDropzoneWrapper">
+            <div class="dropzone" id="uploadEditBgGroupDropzone">
+               <div class="fallback">
+                <input type="file" name="file"  />
+              </div>
+            </div>
+            
+          </div>
+     
+		 
+			<div class="formRow last">
+				 <div class="formField">
+					<textarea id="group-desc" class="textareafield" ><?=$Row[0]['GroupDesc'];?></textarea>
+					 <i class="optionalText">description</i>
+				 </div>
+			 </div>
+		</div>
+      </form>
+   </div>
+   <div id="edit-groups-message" align="center" class="noFound" style="display:none;">Group details updated.</div>
+

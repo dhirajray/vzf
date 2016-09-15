@@ -1,0 +1,145 @@
+<script type="text/javascript">
+fetchadvert();
+function togglesearchres_xx(n) {
+	if(n=='search-results-users'){$('.srcUsrWrapper').show();}
+	else if(n=='search-results-dbees'){$('.srcUsrWrapper').hide();}
+    document.getElementById('search-results-dbees').style.display = 'none';
+    document.getElementById('search-results-users').style.display = 'none';
+   $('#'+n+'-tab').closest('ul').find('.active').removeClass('active');
+    document.getElementById(n).style.display = 'block';
+    document.getElementById(n + '-tab').className = 'active';
+    
+ 
+}
+
+</script>
+
+<div id="leftListing">
+	<div id="Middle">
+				<h2 class="user-name" style="margin-bottom:10px; padding:10px;" >searched keyword: #<span><?=$this->q;?></span></h2>
+				
+				<ul class="tabLinks userSearchResultTap">
+					
+						<? if(count($this->dbeedata)>0) { 
+						$classUsers=''; ?>
+						<li><a  href="javascript:void(0);" id="search-results-dbees-tab" data-type="search-results-dbees" class="active" >
+						<?=count($this->dbeedata);?> <?php echo ucfirst(POST_NAME);?>s</a> </li>
+						<? } else $classUsers='active';
+						 if(count($this->commentDbeeData)>0) { ?>
+						 <!-- <li><a href="javascript:void(0);" id="search-results-users-tab" class="<?=$classUsers;?>" onclick="javascript:togglesearchres_xx('search-results-users');"> -->
+						 <li><a href="javascript:void(0);" id="search-results-users-tab" data-type="search-results-users" class="<?=$classUsers;?>" >
+						<?=$countCommentDB = count($this->commentDbeeData); if($countCommentDB<1) { echo ' comments';}else{ echo ' comment'; }  ?></a> </li><? } ?>
+					
+				</ul>
+
+
+				<div class="next-line"></div>
+
+				<?
+
+				if(count($this->dbeedata)>0) {
+
+					echo '<div id="search-results-dbees" class="maindb-wrapper-border" style="padding:10px; margin-top:10px; margin-bottom:10px;"><div style="font-size:20px; margin-bottom:10px;">'.POST_NAME.'s</div><ul class="listSearchDbee">';
+
+					$dbfound=true;
+
+					$counter=1;
+					$count = count($this->dbeedata);
+					foreach($this->dbeedata as $Row):
+
+						$ago='';	
+
+						$Name = (empty($Row['Name'])) ? $Row['Username'] : $Row['Name'];	
+						$Name = $this->myclientdetails->customDecoding($Name);
+						if($Row['Type']!=5)
+							$text = $Row['Text'];
+						else
+							$text = $Row['PollText'];
+
+
+						echo '<li><a href="'.BASE_URL.'/dbee/'.$Row['dburl'].'">'.htmlspecialchars_decode(strip_tags(htmlspecialchars_decode($text))).'</a><br /><span>'.$ago.'<i>by</i> <a href="'.BASE_URL.'/user/'.$this->myclientdetails->customDecoding($Row['Username']).'">'.$Name.' '.$this->myclientdetails->customDecoding($Row['lname']).'</a></span></li>';
+
+
+						$counter++;
+
+					endforeach;
+
+					echo '<ul></div>';
+
+				}
+
+				else $dbfound=false;
+
+				?>
+
+
+
+				<?
+
+				if(count($this->commentDbeeData)>0) {
+
+					if(count($this->commentDbeeData)>0 && count($this->dbeedata)>0) 
+						$display='display:none;';
+					else if (count($this->dbeedata)==0) 
+						$display='display:block;';
+					else if (count($this->commentDbeeData)==0) 
+					  $display='display:none;';
+					 else
+					 	$display='';
+					echo '<div id="search-results-users" class="maindb-wrapper-border" style="padding:10px; margin-top:10px; margin-bottom:10px; '.$display.'" ><div style="font-size:20px; margin-bottom:10px;">Comments</div><ul class="listSearchDbee">';
+
+					$dbCommentfound=true;
+
+					$counter=1;
+					$count = count($this->commentDbeeData);
+					foreach($this->commentDbeeData as $Row):
+
+						$ago='';	
+
+						$Name = (empty($Row['Name'])) ? $Row['Username'] : $Row['Name'];	
+		                $Name = $this->myclientdetails->customDecoding($Name);
+						if($Row['Type']!=5)
+							$text = $Row['Text'];
+						else
+							$text = $Row['PollText'];
+					
+		
+						echo '<li><a href="'.BASE_URL.'/dbee/'.$Row['dburl'].'">'.htmlspecialchars_decode(strip_tags(htmlspecialchars_decode($text))).'</a><br /><span>'.$ago.'<i>by</i> <a href="'.BASE_URL.'/user/'.$this->myclientdetails->customDecoding($Row['Username']).'">'.$Name.' '.$this->myclientdetails->customDecoding($Row['lname']).'</a></span></li>';
+
+
+						$counter++;
+
+					endforeach;
+
+					echo '<ul></div>';
+
+				}
+
+				else $dbCommentfound=false;
+
+				?>	
+	<?php if($dbfound==false && $dbCommentfound==false){
+		echo '<div align="center" style="padding:10px;">No results</div>';
+	} ?>
+
+	</div>
+</div>
+
+<div id="rightListing">
+
+
+	<!-- <div id="userEdvert">
+    </div> -->
+	<?php
+	$rightmenu = $this->partial('partials/rightmenu.phtml', array('userid' => $this->userid,'myclientdetails' => $this->myclientdetails,'eventglobal'=>$this->eventglobal));
+	echo $rightmenu;
+	?>
+</div>
+</div>
+
+<div class="clearfix"> </div>
+
+
+			
+
+

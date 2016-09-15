@@ -1,0 +1,454 @@
+<script
+	src="<?php echo URL."/js1/jquery-2.0.3.min.js"; ?>?v=<?php echo filemtime('js1/jquery-2.0.3.min.js');?>"></script>
+
+<script type="text/javascript">
+ $(document).ready(function(){
+  $('.startDbGeader').css('visibility','hidden');
+  $('body').on('click','.postInGroup', function(){
+      hideIconsInCreatePost = true;
+      
+      var GroupType = $('.postInGroup').attr('data-GroupType');
+      GroupType = typeof(GroupType) != 'undefined' ? GroupType : '';
+      //$('#startdbHeaderBtn').attr("controlname","clickfromgroup");
+      groupidmaster = $(this).attr('data-groupid');
+      $('#startdbHeaderBtn').trigger('click');
+
+      if(GroupType==2)
+      {
+        $('#postinuserset').remove();
+        //$('#startdbHeaderBtn').attr("controlname","group");
+         $.ajax({
+              type: "POST",
+              dataType: 'json',
+              data: {
+                  "DbArray": 3,"id": '<?php echo $this->group; ?>'                   
+              },
+              url: BASE_URL + "/ajax/usermentionpost",
+              success: function(response) {
+                  var datares = response.html.userlist;
+                   $('#mentionpostuser').val(datares);    
+              }
+          });
+      }
+  });
+
+<?php if($this->user) {  ?>
+fetchspecificadvert(<?php echo $this->group; ?>,2); // get specific post advert
+<?php } ?>
+  $('body').on('click','.Loginpopup',function(){
+     $.ajax({
+          type: "POST",
+          dataType : 'json',
+          url: BASE_URL+"/group/socialurllogic",
+          success:function(response)
+          {
+            console.log(response);
+            if(response.wrong==1)
+            {
+              var UsedAcceptPopup = "<div style='text-align:center;font-size:18px;color:#999999;''><div style='padding:30px 0px; 50px 0px;' class='formRow'>Sorry, this doesn't seem to be your invitation link!</div><div class='clearfix'></div></div>";
+              $.dbeePopup(UsedAcceptPopup, {width:420,overlay:true});
+            }
+            else if(response.logout==true)
+            {
+                if(response.typelogin=='linkedin'){
+                  SocialTypeUserClass = 'fa dbLinkedInIcon fa-5x clrMsgBox';
+                  bgSocial = '#007ab9';
+                }
+                else if(response.typelogin=='twitter'){
+                  SocialTypeUserClass = 'fa dbTwitterIcon fa-5x clrMsgBox';
+                  bgSocial = '#20b8ff';
+                }
+                else if(response.typelogin=='facebook'){
+                  SocialTypeUserClass = 'fa dbFacebookIcon  fa-5x clrMsgBox';
+                  bgSocial = '#3a589b';
+                }
+                var logout = '<div class="signWithSMContainer">\
+                <div class="signwithSprite '+SocialTypeUserClass+'"></div>\
+                <div class="signTittleSocialM" id="socialCntTxt">\
+                You seem to be already logged into db with a different account. Please click the button below to log out and log back in with your\
+                <strong>'+response.typelogin+'</strong> account.\
+                </div>\
+                </div>';
+                $.dbeePopup(logout, {width:420,overlay:true, bg:bgSocial, otherBtn:'<a href="/myhome/logout" class="btn btn-yellow pull-right" >Logout</a>'});
+            }
+            else if(response.typelogin=='twitter' && response.login==false){
+               var reportTemplate = '<a href="'+BASE_URL+'/auth/twitter" class="signWithSMContainer">\
+                <div class="fa dbTwitterIcon fa-5x clrMsgBox"></div>\
+                <div class="signTittleSocialM">Click here to log in with Twitter</div>\
+                </a>';
+
+                $.dbeePopup(reportTemplate, {width:520,overlay:true,closeBtnHide:true, bg:'#20b8ff'});
+            }else if(response.typelogin=='facebook' && response.login==false){
+                var facebookLoginTemplate = '<div id="datafacebook"> <a href="/index/facebook" class="signWithSMContainer">\
+                <div class="fa dbFacebookIcon  fa-5x clrMsgBox"></div>\
+                <div class="signTittleSocialM">Click here to log in with Facebook</div>\
+                </a></div>';
+                $.dbeePopup(facebookLoginTemplate, {width:520,overlay:true,closeBtnHide:true, bg:'#3a589b'});
+            } else if(response.typelogin=='linkedin' && response.login==false){
+               var reportTemplate = '<a href="'+BASE_URL+'/linkedin/login" class="signWithSMContainer">\
+                                    <div class="fa dbLinkedInIcon fa-5x clrMsgBox"></div>\
+                                    <div class="signTittleSocialM">Click here to log in with LinkedIn</div>\
+                                  </a>';
+
+                $.dbeePopup(reportTemplate, {width:520,overlay:true,closeBtnHide:true, bg:'#007ab9'});
+            }
+
+          }   
+      });
+ });
+ });
+</script>
+
+<?php if($this->sociallogin==true){ ?>
+<script> 
+   $(document).ready(function()
+    {
+      $.ajax({
+          type: "POST",
+          dataType : 'json',
+          url: BASE_URL+"/group/socialurllogic",
+          success:function(response)
+          {
+
+            console.log(response);
+            if(response.wrong==1){
+              var UsedAcceptPopup = "<div style='text-align:center;font-size:18px;color:#999999;''><div style='padding:30px 0px; 50px 0px;' class='formRow'>Sorry, this doesn't seem to be your invitation link!</div><div class='clearfix'></div></div>";
+              $.dbeePopup(UsedAcceptPopup, {width:420,overlay:true});
+            }
+            else if(response.accept==true && response.login==true){
+              var GroupAcceptPopup = '<div style="margin-top:5px; text-align:center" >Please respond to group invitation by clicking a button below</div>\
+              <div style="margin-top:5px; text-align:center" >\
+                <a href="javascript:void(0);" class=" btn btn-yellow"  id="acceptGroupRequest" >Accept</a>\
+                 <a href="javascript:void(0);" class=" btn" id="rejectGroupRequest" >Reject</a>\
+              </div>';
+              $messageWarning(GroupAcceptPopup);
+            }
+            else if(response.logout==true)
+            {
+                if(response.typelogin=='linkedin'){
+                  SocialTypeUserClass = 'fa dbLinkedInIcon fa-5x clrMsgBox';
+                  bgSocial = '#007ab9';
+                }
+                else if(response.typelogin=='twitter'){
+                  SocialTypeUserClass = 'fa dbTwitterIcon fa-5x clrMsgBox';
+                  bgSocial = '#20b8ff';
+                }
+                else if(response.typelogin=='facebook'){
+                  SocialTypeUserClass = 'fa dbFacebookIcon  fa-5x clrMsgBox';
+                  bgSocial = '#3a589b';
+                }
+                var logout = '<div class="signWithSMContainer">\
+                <div class="signwithSprite '+SocialTypeUserClass+'"></div>\
+                <div class="signTittleSocialM" id="socialCntTxt">\
+                You seem to be already logged into db with a different account. Please click the button below to log out and log back in with your\
+                <strong>'+response.typelogin+'</strong> account.\
+                </div>\
+                </div>';
+                $.dbeePopup(logout, {width:420,overlay:true, bg:bgSocial, otherBtn:'<a href="/myhome/logout" class="btn btn-yellow pull-right" >Logout</a>'});
+            }
+            else if(response.typelogin=='twitter' && response.login==false){
+               var reportTemplate = '<a href="'+BASE_URL+'/auth/twitter" class="signWithSMContainer">\
+                <div class="fa dbTwitterIcon fa-5x clrMsgBox"></div>\
+                <div class="signTittleSocialM">Click here to log in with Twitter</div>\
+                </a>';
+
+                $.dbeePopup(reportTemplate, {width:520,overlay:true,closeBtnHide:true, bg:'#20b8ff'});
+            }else if(response.typelogin=='facebook' && response.login==false){
+                var facebookLoginTemplate = '<div id="datafacebook"> <a href="/index/facebook" class="signWithSMContainer">\
+                <div class="fa dbFacebookIcon  fa-5x clrMsgBox"></div>\
+                <div class="signTittleSocialM">Click here to log in with Facebook</div>\
+                </a></div>';
+                $.dbeePopup(facebookLoginTemplate, {width:520,overlay:true,closeBtnHide:true, bg:'#3a589b'});
+            } else if(response.typelogin=='linkedin' && response.login==false){
+               var reportTemplate = '<a href="'+BASE_URL+'/linkedin/login" class="signWithSMContainer">\
+                                    <div class="fa dbLinkedInIcon fa-5x clrMsgBox"></div>\
+                                    <div class="signTittleSocialM">Click here to log in with LinkedIn</div>\
+                                  </a>';
+
+                $.dbeePopup(reportTemplate, {width:520,overlay:true,closeBtnHide:true, bg:'#007ab9'});
+            }
+
+          }   
+      });
+    });
+   </script>
+<?php } 
+$CurrDate=date('Y-m-d H:i:s');
+
+if(!empty($this->loginuser)) {
+	$loggedin=true;
+	$cookieuser=$this->loginuser;
+} else {
+	$loggedin=false;
+	$cookieuser=0;
+}
+
+if(isset($this->token)){
+	$loggedin=true;
+	$cookieuser=$this->loginuser;
+	$token =$this->token;
+}
+$group=$this->group;
+$row = $this->row;
+$GroupOwnerID = $row[0]['User'];
+$GroupName=$row[0]['GroupName'];
+
+if($GroupOwnerID==$this->loginuser){$GroupOwner=true;}else{$GroupOwner=false;}
+$ShowGroup=true;
+$joinlink='0';
+
+if($row[0]['GroupPrivacy']=='2' || $row[0]['GroupPrivacy']=='3' || $row[0]['GroupPrivacy']=='4') {
+
+	if(!$GroupOwner) {
+
+		$MemberChk = $this->memberchk; 
+	
+		if(count($MemberChk)==0 ) {
+			
+			$ShowGroup=false;
+			if($row[0]['GroupPrivacy']=='2') {
+				$reqMsg='This is a private group.<br>Only group owner can invite you to this group.';
+				$joinlink=0;
+        header("Location: ".BASE_URL."/myhome");
+        die();
+			}
+			elseif($row[0]['GroupPrivacy']=='4') {
+				$reqMsg='This is a VIP group.<br>You need to be a member to view posts.<br><br>';
+				$joinlink=0;
+				
+			}
+			elseif($row[0]['GroupPrivacy']=='3') {
+				$reqMsg='This is a request to join group. You need to be a member to see it.';
+				$joinlink=1;
+			}
+		}
+		else {
+		if(!empty($this->memberchk)){
+			$MemberRow=$MemberChk;
+			
+			
+			if($MemberRow[0]['Status']!=1) {
+				$ShowGroup=false;
+				if($row[0]['GroupPrivacy']=='3' || $row[0]['GroupPrivacy']=='4') {
+					if($MemberRow[0]['SentBy']=='Self') {
+						$reqMsg="Your request is pending approval by the group owner. <div><a href='javascript:void(0)' class='poplight' onclick='javascript:joingroupreq(".$group.",".$GroupOwnerID.",1);' >Remind Group Owner</a></div>"; $joinlink=0; }
+					elseif($MemberRow[0]['SentBy']=='Owner') {
+						$reqMsg="Group owner invited you to this request to join group.<br />Please accept/reject the invite from your notifications."; $joinlink=0; }
+				}
+				//elseif($row[0]['GroupPrivacy']=='2') { $reqMsg='This is a private group.<br>Only group owner can invite you to this group.'; $joinlink=0; }
+        elseif($row[0]['GroupPrivacy']=='2') {
+            header('Location:'.BASE_URL.'/myhome');
+            exit();
+        }
+				else { $reqMsg=''; $joinlink=1; }
+			}
+			
+		}
+		}
+	}
+}
+
+?>
+
+<script>
+function reloadGroupFeeds() {
+	var group=$('#group').val();
+	var end=$('#reloadend').val();
+	end=parseInt(end)+5;
+	$('#dbee-feeds').load('groupdbees/group='+group+'&reload=1&end='+end, function() {});
+}
+$(function() {
+	//seegroupdetails(<?=$group;?>,<?=$GroupOwnerID;?>,<?=$joinlink;?>);
+	$dbLoader('#group-highlighted', 1);
+	$dbLoader('#memboxgr', 1);
+	$dbLoader('#grmemdetail', 1);
+	 $.ajax({
+        type: "POST",
+        dataType : 'json',
+        url: BASE_URL+"/group/agroupdetails",
+        data: {
+            "group": '<?php echo $group;?>',
+            "owner": '<?php echo $GroupOwnerID;?>',
+            "joinlink": '<?php echo $joinlink;?>'           
+        },
+        success: function (data) {  
+          
+            $('#group-highlighted').html(data.content);
+            $('#grmemdetail').html(data.detail);  
+            $('#grmemdetail').removeClass('whiteBox');  
+            $('#memboxgr').html(data.member);
+            <?php
+            		 if($ShowGroup==false) { ?>
+						$('.postInGroup').hide();
+            		 <? } ?>
+        },
+        error: function (error) {
+            
+        }
+    });
+<?php
+ if($ShowGroup) { ?>
+	loadgroupdbees('<?=$group;?>')
+<? } ?>
+});
+
+</script>
+<script type="text/javascript">
+var jqnc=jQuery.noConflict();
+jqnc(document).ready(function(){
+
+	//fadepopup();
+$('.postInGroup').css('display','none');
+  $('.grpMemberCnt .rboxContainer').perfectScrollbar({ wheelSpeed: 100,includePadding:true});
+});
+</script>
+
+
+
+
+<!--this is page listing-->
+
+<? 
+
+ if($ShowGroup) { ?>
+<input type="hidden" id="dbeeuser"
+	value="<?php echo $row[0]['User']; ?>">
+
+<input type="hidden" id="frompop" value="<?=$frompop;?>">
+<input type="hidden" id="group" value="<?=$group;?>">
+<input type="hidden" id="feedtype" value="group">
+<input type="hidden" id="startnewmydb" value="5">
+<input type="hidden" id="groupname" value="<?=$row[0]['GroupName'];?>">
+<input type="hidden" id="laodgroup" value="1">
+<input type="hidden" id="grouptype"
+	value="<?=$row[0]['GroupPrivacy'];?>">
+<input type="hidden" id="reloadend">
+<div class="leftSideCnt">
+
+	<div id="leftListing" class="groupDetials">
+		<div id="group-highlighted" class="groupHighlightedWrp"></div>
+		<ul id="dbee-feeds" class="postListing"></ul>
+	</div>
+</div>
+
+<? } else { ?>
+
+<div class="leftSideCnt">
+	<div id="group-highlighted" class="groupHighlightedWrp"></div>
+	<div id="leftListing" class="groupDetials">
+		<ul id="dbee-feeds" class="postListing">
+			<li>
+				<div class="surveyComplete">
+					<div align="center" id="requesttojoin">
+						<span class="fa-stack fa-lg"> <strong
+							class="fa fa-circle-thin fa-stack-2x"></strong> <strong
+							class="fa fa-exclamation fa-stack-1x "></strong>
+						</span>
+              <?=$reqMsg;?>
+            </div>
+    	     <?php if(count($MemberChk)==0 && $row[0]['GroupPrivacy'] !=2) {?>
+      	     <div id="remgroupow" align="center">
+						<a
+							onclick="javascript:joingroupreq('<?=$group;?>','<?php echo $row[0]['User']; ?>');"
+							href="javascript:void(0)">REQUEST TO JOIN HERE</a>
+					</div>
+    	     <?php }?>
+    	     <div id="request-group-message" align="center"></div>
+				</div>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<? } ?>
+
+<div id="rightListing">
+	<div class="whiteBox" id="grmemdetail"></div>
+	<div class="whiteBox grpMemberCnt active" id="memboxgrpr">
+    <div class="rtListOver">
+		<h2>Group members 
+		<?php if($GroupOwner) {
+        	echo '<a href="javascript:void(0);" group_id="'.$group.'" class="groupmembers_invite">Invite</a>';
+			 } ?>
+        </h2>
+     </div>    
+		<div class="rboxContainer" id="memboxgr"></div>
+	</div>
+		<? if($cookieuser!=0 && $this->IsLeagueOn==0) { ?>
+  <!--   <div class="whiteBox leagueRSPosition">
+		<h2>
+			League Positions <a href="#" class="clseSideBr"></a>
+		</h2>
+		<ul class="dbAccordion">
+			<li class="active">
+				<h3><?php echo $this->score->score1; ?> </h3>
+				<ul class="dbAccordionData">
+                <?php echo $this->mostlove; ?>
+              </ul>
+			</li>
+			<li>
+				<h3><?php echo $this->score->score2; ?></h3>
+				<ul class="dbAccordionData">
+                <?php echo $this->mosthate; ?>
+              </ul>
+			</li>
+			<li>
+				<h3><?php echo $this->score->score3; ?></h3>
+				<ul class="dbAccordionData">
+                <?php echo $this->mostfot; ?>
+              </ul>
+			</li>
+		</ul>
+	</div> -->
+		
+		<? } ?>
+
+  <div id="groupEdvert"></div>
+
+</div>
+<div class="clearfix"></div>
+
+<!--End page listing-->
+</div>
+</div>
+<script>
+function ScrollingList ()
+{
+	
+	var feedtype=$('#feedtype').val(); 
+	var group = $('#group').val();
+
+   	   if(feedtype=='all' || feedtype=='') {
+   		var mystart=$('#startnewall').val(); seemorefeeds(mystart,'5'); 
+   		}
+	   else if(feedtype=='mydbs') { var mystart=$('#startnewmydb').val();  seemoreglobaldbeelist(mystart,'5',1,'myhome','mydbee','mydb'); }
+	   else if(feedtype=='group') { var mystart=$('#startnewmydb').val();  loadgroupdbees(group,mystart); }
+	   else if(feedtype=='mycomments') { var mystart=$('#startnewmycomments').val();seemoreglobaldbeelist(mystart,'5',1,'comment','index','mycomments');  }
+	   else if(feedtype=='following') { var mystart=$('#startnewfollowing').val(); seemoreglobaldbeelist(mystart,'5',1,'following','index','follow'); }
+
+	   else if(feedtype=='favourite') { var mystart=$('#startnewfav').val(); seemoreglobaldbeelist(mystart,'5',1,'favourite','list','fav'); }
+
+	   else if(feedtype=='mostcommented') { var mystart=$('#startnewmc').val(); seemoreglobaldbeelist(mystart,'5',1,'myhome','mostcommented','mostcommented'); }
+
+	   else if(feedtype=='cat') { var mystart=$('#startnewcat').val(); var mycat=$('#filtercat').val(); seemoreglobaldbeelist(mystart,'5',3,'myhome','catetorylist','dbcat',mycat); }
+
+	   else if(feedtype=='type') { var mystart=$('#startnewtype').val(); var mytype=$('#filtertype').val(); seemoreglobaldbeelist(mystart,'5',"1",'myhome','filtertype','filtertype',mytype); }
+
+	   else if(feedtype=='filter') { var mystart=$('#startnewfilter').val(); var myscore=$('#filterscore').val(); seemoreglobaldbeelist(mystart,'5',"1",'myhome','dbfeedfilter','filterscore',myscore); }
+}
+
+$(window).scroll(function(){
+	var iOS = ( navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false );
+	if(iOS){
+ 		if($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
+ 			ScrollingList ();
+ 		}
+	}else{
+		if($(window).scrollTop() == $(document).height() - $(window).height()){ 
+ 			ScrollingList ();
+ 		}
+	}
+});
+
+
+</script>

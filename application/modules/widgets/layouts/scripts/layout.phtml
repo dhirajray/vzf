@@ -1,0 +1,46 @@
+<html >
+<head>
+	 <script type="text/javascript" src="<?php echo BASE_URL."/adminraw/js/jquery-1.9.1.min.js"; ?>"></script>
+	 <script type="text/javascript">
+	 	$(function (){
+			$('body').on('click','.closeBtn',function(){
+				var dataId  = $(this).closest('li').attr('data-id');
+				$(this).closest('li').remove();
+		         window.parent.getListId(dataId);
+		    });
+	 	});
+	 </script>
+<style type="text/css">
+@keyframes selectedOption {
+  from{transform:rotateX(90deg); opacity: 0;}
+  to{transform:translateX(0deg); opacity: 1;}
+}
+@keyframes selectedOptionA {
+  from{transform:rotateY(0deg); opacity: 1; }
+  to{transform:translateX(90deg); opacity: 0; display: none;}
+}
+
+*{  box-sizing:border-box; -webkit-box-sizing:border-box; -moz-webkit-box-sizing:border-box;}
+.closeBtn{ text-decoration: none; font-size: 0.8em; background: #333; display: inline-block; color: #fff; width: 20px; border-radius: 50%; height: 20px; text-align: center; line-height: 22px; overflow: hidden; position: absolute; right: 10px;}
+body{font-family: arial; margin: 0px; padding: 0px;  background: transparent;  position: relative; }
+	h1{font-size: 24px; color: #333; padding: 10px; margin: 0px;box-shadow: 0 2px 2px rgba(0,0,0,0.2); position: absolute; top: 0px; right: 0px; left: 0px; border-radius: 5px 5px 0px 0px; z-index: 1}
+	ul{padding: 0px; list-style: none; top: 48px; position: absolute; left: 0px ;right: 0px; overflow: auto; bottom: 0px; margin: 0px;} 
+	ul:empty, h1:empty{display: none;}
+	h1:empty + ul{top: 0px}
+	li{padding: 10px;border-bottom:1px solid #ccc; animation:selectedOptionA 0.5s ease forwards;  position: relative;}
+	li span{display: block; margin-right: 40px;}
+	ul li:last-child{border-bottom: 0px;}
+	.activeList, .noListInWidget{animation:selectedOption 0.5s ease forwards;}
+	.mainCnt{border: 1px solid #ccc; border-radius: 5px; position: fixed; top: 0px; bottom: 0px;right: 0px; left: 0px; background: #fff; overflow: hidden;}
+	.noListInWidget{position: absolute; top: 50%; font-size: 24px; text-align: center; margin-top: -15px; width: 100%; color: #ccc}
+</style>
+</head>
+<body>
+	<div class="mainCnt">
+	<h1></h1>
+	<ul></ul>
+	
+	</div>
+	<style type="text/css" id="stylesheet"></style>
+</body>
+</html>

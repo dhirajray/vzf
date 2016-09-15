@@ -1,0 +1,158 @@
+<?php         
+$this->title = "CSV upload results";
+$this->headTitle($this->title);
+$msgError ='';
+$backUrl = '';
+if($this->csvRefer=='ADD USERS' || $this->csvRefer=='ADD USERS CARERID')
+{
+	$title 	=	"User Added Successfully";
+	$backUrl = ''.BASE_URL.'/admin/user';
+}
+else if(trim($this->csvRefer)=='ADD VIP')
+{
+	$backUrl = ''.BASE_URL.'/admin/vipuser';
+}
+
+/*if($this->csvRefer!='ADD VIP')
+{
+	?>
+	<script type="text/javascript">
+
+	$("docoment").ready(function(){
+
+		$( "#csvupload" ).dialog( "open" );
+	});
+
+	</script>
+<?php } */?>
+
+<input type="hidden" id="chkrefererPage" value="<?php echo $this->csvRefer ?>"> 
+
+
+<div id="csvupload" title="<?php echo $title ?>">
+	
+		<?php
+
+			
+			
+		if($this->csvData!='limit exhausted')
+		{
+			if($this->csvRefer=='ADD USERS' || $this->csvRefer=='ADD USERS CARERID')
+			{	 
+				$backUrl = ''.BASE_URL.'/admin/user'; //echo $this->csvRefer; exit; 
+				//echo "<pre>";print_r($this->csvData);exit;
+				if($this->csvData=='404')
+				{
+					$msgError = '<div class="message warning">File upload error: A maximum of 500 records can be uploaded in one go.</div>';
+				}
+				else if(count($this->csvData)>1)
+				{
+					 $msgError = '<div class="messageNoLowercase error">Oops there seems to be a problem. We couldn\'t seem to create an account for the following users. These users may have already been invited, have an incorrect email address or the CSV is formatted incorrecly. Please download our example CSV <a href="'.BASE_URL.'/downloadcenter/importformat.csv">here</a>.</div>';
+						
+					foreach ($this->csvData as $key => $value) {
+						$vipreport .= $value;	
+						//if($this->csvData['totalSuccess']==0) break;
+						//echo $vipreport.'<br>' 	;	
+					}
+				}
+				else
+				{
+
+					$msgError = '<div class="message success">'.$this->totalSuccess.' user accounts created and activation emails sent successfully</div>';
+				}
+				
+			}
+			else if($this->csvRefer=='Invite')
+			{	
+				$backUrl = ''.BASE_URL.'/admin/import/invitedetails';
+				if($this->csvData=='404')
+				{
+					$msgError = '<div class="message warning">File upload error: A maximum of 500 records can be uploaded in one go.</div>';
+				}
+
+				else if(count($this->csvData)>1)
+				{
+					$msgError = '<div class="messageNoLowercase error">Oops there seems to be a problem. We couldn\'t seem to create an account for the following users. These users may have already been invited, have an incorrect email address or the CSV is formatted incorrecly. Please download our example CSV <a href="'.BASE_URL.'/downloadcenter/importformat.csv">here</a>.</div>';
+						
+					foreach ($this->csvData as $key => $value) {
+						$vipreport .= $value;	
+					};
+				}
+				else
+				{
+					$msgError = '<div class="message success">Invitation sent successfully</div>';
+				}
+			}
+			else if($this->csvRefer=='ADD VIP')
+			{
+				$vipreport = '';
+				$backUrl = ''.BASE_URL.'/admin/vipuser';
+				
+				if($this->csvData=='404')
+				{
+					$msgError = '<div class="message warning">File upload error: A maximum of 500 records can be uploaded in one go.</div>';
+				}
+
+				else if(count($this->csvData)>1)
+				{
+					$msgError = '<div class="messageNoLowercase error">Oops there seems to be a problem. We couldn\'t seem to create an account for the following users. These users may have already been invited, have an incorrect email address or the CSV is formatted incorrecly. Please download our example CSV <a href="'.BASE_URL.'/downloadcenter/importformat.csv">here</a>.</div>';
+						
+					foreach ($this->csvData as $key => $value) {
+						//$vipreport .= '<span style="float:left; padding:0px;">'.$value.'</span><br><br>';		
+						$vipreport .= $value;	
+					};
+					//$vipreport .= "</div>";
+				}
+				else
+				{
+					$msgError = '<div class="message success">User accounts created and activation emails sent successfully</div>';
+				}
+
+					/*$vipreport .='<div class="invitemsg" >
+										<span style="float:left;"><a href="'.BASE_URL.'admin/"> <- back to HOME</a></span>
+										<span style="float:right;"><a href="'.BASE_URL.'home/vipuser"><- back to VIP</a></span>
+									</div>';*/
+			}
+		}
+		else
+		{
+			$msgError = '<div class="message warning"><i class="fa fa-exclamation-triangle"></i> Total records on the CSV file are more than your remaining daily limit. No records were inserted.</div>';
+		}
+
+		?>
+		
+</div>
+<div class="">
+	<a href="<?php echo $backUrl ; ?>" class="btn btn-black pull-right">Back</a>
+</div>
+<div class="msgInviteWrp"> <?php echo $msgError ?></div>
+<?php
+
+if(count($this->csvData)>1) {
+?>
+<div class="responsiveTable">
+<table class="table-border userListTable table table-hover table-stripe">
+	<thead> 
+		
+		<tr>
+			<?php if($this->csvRefer=='ADD VIP') { ?>
+			<td>First Name</td>
+			<td>Last Name</td>
+			<td>Company</td>
+			<td>Job Title</td>
+			<td>Email</td>
+			<td>Status</td>
+			<td>Reason</td>
+			<?php } else { ?>
+			<td>Name</td>
+			<td>Email</td>
+			<td>Reason</td>
+			<?php } ?>
+		</tr>
+	</thead>
+	<tbody>
+		<?php  echo $vipreport; ?>
+	</tbody>
+</table>
+</div>
+<?php } ?>

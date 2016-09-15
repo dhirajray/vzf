@@ -1,0 +1,243 @@
+<?php         
+$this->title = "Scores";
+$this->headTitle($this->title);
+$deshObj	= new Admin_Model_Deshboard();	
+?>
+
+
+
+
+<h1 class="pageTitle dbeeViewAll">Live scoring</h1>
+
+	<div  id="searchWrapper" style="display:none">
+	
+	<div id="searchContainer">	
+		<form id="search_form_score" >	
+			<div id="exp_criteria"  class="pull-left "> 		
+				<div id="open_title" class="attributs searchField" >
+					
+					<div class="searchField">
+						<span>Score Owner: </span> <input type="text" id="score_owner" name="score_owner" >
+					</div>
+
+					<div class="searchField">
+						<span>Scored User: </span> <input type="text" id="score_by" name="score_by" >
+					</div>
+					
+				</div>
+
+				<div id="open_title" class="attributs searchField" >
+					
+					
+
+					<div class="searchField">Type :  
+						<select id="" name="score_type">
+							<option value="">All</option>
+							<option value="1">Love</option>
+							<option value="2">Like</option>
+							<option value="3">Food For Thought</option> 
+							<option value="4">Dis Like</option> 
+							<option value="5">Hate</option> 
+						</select> 
+					</div>
+					
+				</div>
+				<div id="open_title" class="attributs searchField" >
+					
+					<div class="searchField">Date range : </div>
+					<div class="searchField">
+						<span>From : </span> <input type="text" id="created_from" name="created_from"  >
+					</div>
+					<div class="searchField">
+						<span>To : </span> <input type="text" id="created_to" name="created_to" >
+					</div>	
+				</div>
+			</div>
+			<div class="clearfix"></div>		
+			<div class="searchBottomBar clearfix">
+				<div id="search_button" class="searchbutton" > 
+					<button type="button" name="score_search" id="score_search" value="SEARCH" class="btn btn-yellow btn-large pull-right"><i class="searchSprite searchListIcon"></i> Search</button>
+				</div>
+			</div>			
+		</form>
+
+		<div class="clearfix"></div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class="box-body" id="box_body">
+	<div id="listingTotalResults" style="float:right;margin: 10px 35px 0 0;"></div>
+	<div id="beforecall" style=""></div>
+	<div class="clearfix"></div>
+	<div id="searchresultvis" style="display:none"></div>
+	<div id="showmore" style="display:none;text-align: center;">
+		<img src="<?php echo BASE_URL ?>/images/show.png" style="border:0" title="Show More" alt="Show More">
+	</div>
+		<?php if (count($this->paginator)){ echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml');  ?>
+		<div class="pageheadinusr">
+		<?php echo "Showing Page ". $this->page." of ".$this->totalpage;?> 
+		</div>
+		<div class="pageheadinusrlft">
+		<?php echo "Total Record ".$this->total;?> 
+		</div><?php }?>
+		<ul class="listing scoredList"  id="searchresulthide">
+					<?php if (count($this->paginator)){ ?>
+					<?php foreach($this->paginator as $liveScore) : 
+					
+						$dbtype	='';
+						$dbtype1='';
+						$descDisplay	='';
+						
+						if($this->escape($liveScore->type)==1)
+						{
+							$dbdetails	=	$deshObj->getScoredbinfo($liveScore->type,$liveScore->ScoreID);
+							$dbtype1	=	' post';
+							$dbdesc		=	$dbdetails[0]['description'];
+							$viewsco = '<div class="livescorevew pull-right" ><a class="btn btn-full btn-mini btn-yellow" target="_blank" href="'.BASE_URL.'/dbee/'.$dbdetails[0]['dburl'].'" > View </a></div>';
+							//$viewsco = '<a href="'.BASE_URL.'/dbee/'.$dbdetails[0]['dburl'].'"> - view </a>';	
+
+						} else {
+							$dbdetails	=	$deshObj->getScoredbinfo($liveScore->type,$liveScore->ScoreID);
+							//echo'<pre>';print_r($dbdetails);
+							$dbtype1	=	' comment ';
+							$dbdesc		=	$dbdetails[0]['Comment'];
+							$viewsco = '<div class="livescorevew pull-right" ><a class="btn btn-full btn-mini btn-yellow" target="_blank" href="'.BASE_URL.'/dbeedetail/home/id/'.$dbdetails[0]['DbeeID'].'" > View </a></div>';
+							/*$viewsco = '<a href="'.BASE_URL.'/dbeedetail/home/id/'.$dbdetails[0]['DbeeID'].'"> - view </a>';*/
+						}
+									
+					
+						if($this->escape($dbdetails[0]['type'])==1) { 
+							//$dbtype			=	'text db<div class="icon-db-text"></div>';
+							$descDisplay	=	'<div class="dbTextPoll">'.$dbdesc.'</div>';
+						}
+						if($this->escape($dbdetails[0]['type'])==2) { 
+							//$dbtype			=	'link db<div class="icon-db-link"></div>';
+							$descDisplay	='';
+							$dbLink			=	$dbdetails[0]['Link'];
+							$dbLinkTitle	=	$dbdetails[0]['LinkTitle'];
+							$dbLinkDesc		=	$dbdetails[0]['LinkDesc'];
+							$dbUserLinkDesc	=	!empty($dbdetails[0]['UserLinkDesc']) ? $dbdetails[0]['UserLinkDesc'] : $dbdetails[0]['LinkTitle'];
+
+							$descDisplay	=	'<div class="dbLinkDesc">'.$dbUserLinkDesc.' - 
+								<a target="_blank" href="'.$dbLink.'">'.$dbLink.'</a>							
+							</div>';
+						}
+						
+						if($this->escape($dbdetails[0]['type'])==3) { 
+					     //$dbtype			=	'link db<div class="icon-db-link"></div>';
+						 $descDisplay	='';
+
+						$dbPic		=	$dbdetails[0]['Pic'];
+						$dbPicDesc	=	$dbdetails[0]['PicDesc'];
+						
+						$descDisplay	.=	'<div class="dbPicText">';
+						if($dbPic!='')
+						{
+							$defaultimagecheck = new Admin_Model_Common();
+					        $imagepic = $defaultimagecheck->checkImgExist($dbPic,'imageposts','default-avatar.jpg');
+							
+							$descDisplay .=	'<div class="dbPic" ><a href="#"><img src="'.IMGPATH.'/users/medium/'.$imagepic.'" width="80" height="80" border="0" class="recievedUsePic"/></a></div>';
+						}
+						else{
+							$noPic = 'noPix';
+						}
+						
+						$descDisplay	.=	'<div class="dbPicDesc '.$noPix.'">'.$dbPicDesc.'</div></div>';
+						
+						}
+						
+						if($this->escape($dbdetails[0]['type'])==4) { 
+						//$dbtype	=	'media db<div class="icon-db-vidz"></div>';
+						$descDisplay	='';
+						$dbVid			=	$dbdetails[0]['VidID'];
+						$dbVidDesc		=	$dbdetails[0]['VidDesc'];
+						$dbLinkDesc		=	$dbdetails[0]['LinkDesc'];
+						$dbUserLinkDesc	=	!empty($dbdetails[0]['UserLinkDesc']) ? $dbdetails[0]['UserLinkDesc'] : $dbdetails[0]['LinkTitle'];
+
+						$descDisplay	.=	'<div class="dbPicText">';
+						if($dbVid!='')
+						{
+							$descDisplay	.=	'<div class="dbPic" ><a href="javascript:void(0)"><img width="90" height="60" border="0" src="https://i.ytimg.com/vi/'.$dbVid.'/0.jpg"></a></div>';
+						}
+						else{
+							$noPic = 'noPix';
+						}
+						$descDisplay	.=	'<div class="dbPicDesc '.$noPix.'">'.$dbVidDesc.'</div></div>';
+						}
+						if($this->escape($dbdetails[0]['type'])==5) {  
+						$dbPollText			=	$dbdetails[0]['PollText'];
+						//$dbtype	=	'polls <div class="icon-db-poll"></div>';
+						$descDisplay	=	'<div class="dbTextPoll">'.$dbPollText.'</div>';
+						}
+						
+					//
+					$configurations = $deshObj->getConfigurations();
+					$post_score_setting = json_decode($configurations['ScoreNames'],true);
+
+					
+
+
+					$ScoreIcon1='';
+					if($this->escape($liveScore->Score)==1){
+						$scorediv	=	'<span class="scoreSprite scoreLove"></span>';
+						 $ScoreIcon1=$this->myclientdetails->ShowScoreIcon($post_score_setting[1]['ScoreIcon1']);
+
+					} else if($this->escape($liveScore->Score)==2){
+						$scorediv	=	'<span class="scoreSprite scoreLike"></span>';
+						 $ScoreIcon1=$this->myclientdetails->ShowScoreIcon($post_score_setting[2]['ScoreIcon2']);
+					} else if($this->escape($liveScore->Score)==3){
+						$scorediv	=	'<span class="scoreSprite scoreFft"></span>';
+						//$ScoreIcon1=$this->myclientdetails->ShowScoreIcon($this->post_score_setting[1]['ScoreIcon1']);
+					} else if($this->escape($liveScore->Score)==4){
+						$scorediv	=	'<span class="scoreSprite scoreUnLike"></span>';
+						 $ScoreIcon1=$this->myclientdetails->ShowScoreIcon($post_score_setting[3]['ScoreIcon3']);
+					} else if($this->escape($liveScore->Score)==5){
+						$scorediv	=	'<span class="scoreSprite scoreHate"></span>';
+						 $ScoreIcon1=$this->myclientdetails->ShowScoreIcon($post_score_setting[4]['ScoreIcon4']);
+					}
+					$defaultimagecheck = new Admin_Model_Common();
+					$imagepic = $defaultimagecheck->checkImgExist($liveScore->image,'userpics','default-avatar.jpg');
+					$Ownerimagepic = $defaultimagecheck->checkImgExist($liveScore->Ownerimage,'userpics','default-avatar.jpg');
+
+
+					
+
+
+					?>
+
+					<li>
+					<div class="listUserPhoto">
+						<!--User profile pic  who scored someone-->
+						<div class="scoredUserPic">
+							<img src="<?php echo IMGPATH ?>/users/small/<?php echo $imagepic ?>" width="40" height="40" border="0" />
+							<div class="arrowlivescore fa-flip-horizontal "><i class="fa fa-reply-all fa-rotate-270 "></i></div>
+						</div>
+						<img src="<?php echo IMGPATH ?>/users/small/<?php echo $Ownerimagepic ?>" width="50" height="50" border="0" class="recievedUsePic"/>
+
+					</div>
+					<div class="dataListWrapper">
+						<div class="dataListbox">
+							<div class="scoredListTitle"><?php // echo $scorediv; ?>
+								<a href="#" class="show_details_user" userid="<?php echo $this->escape($liveScore->UserID);?>"><?php echo $this->myclientdetails->customDecoding($this->escape($liveScore->username)).' '.$this->myclientdetails->customDecoding($this->escape($liveScore->lname));?></a> scored 
+								<?php echo '<a href="#"  class="show_details_user" userid="'.$this->myclientdetails->customDecoding($this->escape($liveScore->OwnerID)).'">'.$this->myclientdetails->customDecoding($this->escape($liveScore->Ownername)).' '.$this->myclientdetails->customDecoding($this->escape($liveScore->Ownerlname)).'&rsquo;s</a> '.$dbtype.' '. $dbtype1.' '.$ScoreIcon1.' - '.date('d M Y',strtotime($this->escape($liveScore->ScoreDate))).''.$viewsco.''; ?>
+							</div>
+							<div class="scoredData"><?php echo $descDisplay;//$liveDbee->description;?></div>
+						</div>
+						
+					</div>
+
+
+					</li>
+					<?php  $rowchange++; endforeach; ?>
+					
+	<?php } else { ?>
+	<p style="position:relative; top:100px;" class="dashBlockEmpty">no scores found</p>
+	<?php } ?>
+	</ul>
+
+<?php 
+	/*
+	 * Print the pagination of type
+	 */
+ echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml');  ?>

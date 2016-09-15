@@ -1,0 +1,44 @@
+
+
+<!---------end header---------------------------->
+
+<?php
+
+$return='';
+
+$storage = new Zend_Auth_Storage_Session();
+
+$data	= $storage->read();
+
+$UserID  = $data['UserID'];
+
+$userscore = new Application_Model_DbUser();
+
+$getuserscoreinfo = $userscore->ausersocialdetail($UserID);
+
+//echo'<pre>';print_r($getuserscoreinfo);
+
+
+
+if($getuserscoreinfo[0]['ScoringStatus']=='1')
+
+	$radio='<a href="javascript:void(0)" rel="scoring-off-popup~200" class="poplight" onclick="javascript:updatescoring();"><div id="scoring-status" class="radioTick"></div></a>';
+
+else
+
+	$radio='<a href="javascript:void(0)" rel="scoring-on-popup~200" class="poplight" onclick="javascript:updatescoring();"><div id="scoring-status" class="radio"></div></a>';
+
+$return.='<div class="formLabel" style="width:100px;">scoring status</div><div id="scoring-radio" class="fieldClass">'.$radio.'</div>
+
+<div style="float:left; margin-left:10px; font-size:10px; margin-top:28px;">This hides your scores from the public and league tables, it doesn\'t however remove your followers position.</div>
+
+<br style="clear:both; font-size:1">';
+
+
+
+echo $return;
+
+?>
+
+
+

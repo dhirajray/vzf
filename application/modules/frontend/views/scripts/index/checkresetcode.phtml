@@ -1,0 +1,38 @@
+<?php
+
+		$resetcode=$this->resetcode;
+
+		$user=intval($this->user);
+
+		$userdet = new Application_Model_DbUser();
+
+		$Num = $userdet->checkresetcode($user,$resetcode);
+        
+		if($Num==1) {
+			$return.='1~<div class="recover-title">Reset your password</div>
+
+					<div style="padding:10px;">
+
+						<div>New password</div>
+
+						<div style="position:relative; overflow:hidden; border-radius:3px;"><input type="password" id="newpass" class="textfield" style="border:1px solid #CCC;" ></div>
+
+						<div class="next-line"></div>
+
+						<div style="margin:10px 0 0 0">Repeat new password</div>
+
+						<div><input type="password" id="newpassrepeat" class="textfield" style="border:1px solid #CCC;"></div>
+
+						<div class="next-line"></div>
+
+						<button class="btn btn-yellow btn-large" style="margin:10px 0 10px 0;" onclick="javascript:resetpass(this)">Reset</button>
+
+						<div id="resetpass-error" style="margin-bottom:10px;"></div>
+
+					</div>';
+		} else $return=0;
+		echo trim($return);
+
+		
+
+?>		

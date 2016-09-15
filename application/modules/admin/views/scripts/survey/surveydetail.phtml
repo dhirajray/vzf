@@ -1,0 +1,57 @@
+<?php 
+ $counter = $this->deshboard->checkUserCompleteSurvey($this->dbeeid);  
+ $commonobj 		= new Admin_Model_Common(); 
+  ?>
+<h1 class="pageTitle dbeeViewAll ">Edit survey
+<a href="<?php echo BASE_URL ;  ?>/admin/survey" class="btn btn-black pull-right">Back</a>
+</h1>
+
+<div class="clearfix"></div>
+<div id="surveyDetailsPage">
+<div style="position:relative" class="surveryWrpTitle">
+<?php if($counter==0) { $questionsWrp = 'questionsWrp'; ?>
+<a href="#" class="surveyTitlEdit btn btn-black upBtn" >Edit</a>
+<?php }else $questionsWrp =''; ?>
+<ul class="listStyle1" >
+	<li data-id="<?php echo $this->dbeeid; ?>">
+		<div class="surveyDetailsTitle" >
+			<?php echo $this->surveyDetails['0']['surveyTitle']; 
+
+			?>
+
+		</div>
+		<?php $where = array('Dbeeid'=>$this->dbeeid,'parentID'=>0);
+				
+				$surveyDetails = $this->myclientdetails->getAllMasterfromtable('tblSurveyquestion',array('id','content'),$where);
+				 
+				 if($this->surveyDetails['0']['Active']==0){
+					 echo '<span style="color:red;padding:10px;"  id="'.$this->surveyDetails['0']['DbeeID'].'" >NOTE: This survey is not yet published.</span>'; } ?>
+		<div class="listBtnsWrp " style="margin-top: 10px;">
+			<?php if($this->surveyDetails['0']["surveyPdf"]!=''){ ?>
+					<a href="<?php echo BASE_URL ?>home/downloadpdf/filepdf/<?php echo $this->surveyDetails['0']["surveyPdf"]; ?>"  class="btn btn-black btn-mini">View PDF</a>
+					<?php } ?>
+
+					<?php if($this->surveyDetails['0']["surveyLink"]!=''){ ?>
+					<a target="blank" href="<?php echo $commonobj->addhttp($this->surveyDetails['0']["surveyLink"]); ?>"  class="btn btn-black btn-mini">Go to link</a>
+					<?php } ?>
+				<?php
+					if($counter==0) {?>
+					<div dbeeid="<?php echo $this->dbeeid; ?>" count-id="<?php echo count($surveyDetails); ?>" data-title="<?php echo $this->surveyDetails['0']['surveyTitle']; ?>" status="<?php echo $this->surveyDetails['0']['Active']; ?>" id="addsurveyQuestion<?php echo $this->surveyDetails['0']['DbeeID']; ?>" class="addsurveyQuestion btn btn-green">Add question</div>
+					<?php }else{ ?>
+					<!-- <div class="btn btn-green disabled" rel="dbTip" title="You cannot add more questions to a survey once it has been completed by any user"  >Add question</div> -->
+					<span>You cannot add more questions to a survey once it has been completed by any user </span>
+					<?php } ?>
+			
+		</div>
+	</li>
+</ul>
+</div>
+<div class="questionlistitem">
+	
+</div>
+	<script type="text/javascript">
+		$(function(){
+			surveyQuestion('<?php echo $this->dbeeid; ?>');
+	    });
+    </script>
+</div>

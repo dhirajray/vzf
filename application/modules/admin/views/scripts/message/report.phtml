@@ -1,0 +1,93 @@
+<h1 class="pageTitle"><strong>Email statistics</strong></h1>
+<script>
+
+$("document").ready(function()
+{
+    $('body').on('change', '#emaildropdown',function(e){
+        var type = $("#emaildropdown option:selected").val();
+        $.ajax({
+            type: "POST",
+            data:{'type':type},
+            url:BASE_URL+"/admin/message/ajaxreport",
+            success:function(response)
+            {
+                var param=response.split("~");
+                makechart(JSON.parse(param[0]),JSON.parse(param[1]));
+            }   
+        });         
+    });
+	
+     makechart(<?php echo $this->providerscategory; ?>,<?php echo $this->providersData; ?>);
+});
+
+function makechart(name,data)
+{
+    $('#emailstats').highcharts({
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Email stats'
+            },
+            xAxis: {
+                categories: name,
+                type: 'category'
+            },
+            yAxis: {
+                title: {
+                    text: 'No. of emails'
+                }
+            },
+            legend: {
+                enabled: false
+            },
+            plotOptions: {
+                series: {
+                    borderWidth: 0,
+                    dataLabels: {
+                        enabled: true,
+                        formatter: function() {
+                            return this.y +' ';
+                        }
+                    }
+                }
+            },
+            series: [{
+                name: 'Email stats',
+                colorByPoint: true,
+                data: data
+            }],
+            tooltip: {
+                enabled: false
+            },
+            exporting: {
+                enabled: true
+            }
+      });
+}
+</script>	
+
+<div class="tabContainer" id="rpTabContainer">
+	<div class="tabContent" dataTab="social">
+		<div class="dashBlock_full">
+			<h2 class="dragHandler subHdLft"><!--<abbr class="reportHdLft">Email sent stats</abbr>--><div class="searchField" style="float:right; margin-bottom:0; margin-right:0;"> 
+<div class="fieldInput">
+    <select name="emaildropdown" id="emaildropdown">
+        <option value='today'>Today</option>
+        <option value='last_7_days'>Last 7 days</option>
+        <option value='last_30_days'>Last 30 days</option>
+        <option value='last_60_days'>Last 60 days</option>
+        <option value='last_90_days'>Last 90 days</option>
+        <option value='all_time'>Overall</option>
+    </select>
+</div>
+</div><div class="clearfix"></div></h2>
+			<div id="emailstats" class="signedupContent"></div>
+		</div>
+		<div style="clear:both"></div>
+	</div>
+    <div class="emailStats">
+        <h1>What are 'Unique Opens' and 'Unique Clicks'?</h1>
+        <span>An 'open' is the opening / reading of an email and a 'click' is the clicking of the URL link in the email. A 'unique' open or click tracks the first instance of a user opening or clicking from an admin sent email. After this, all other opens or clicks of the same email are classed as 'standard' as opposed to 'unique'.</span>
+    </div>
+</div>

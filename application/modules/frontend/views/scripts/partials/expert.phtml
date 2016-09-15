@@ -1,0 +1,132 @@
+<div class="expertOverfade"></div>
+<?php $currentdate = date('Y-m-d H:i:s', time()); if(!empty($this->expertArray) && $this->resultData['Type']==20){ 
+  foreach ($this->expertArray as $value) 
+{ 
+ $expertList = explode(',', $this->resultData['expertuser']);
+  ?>
+
+  <div id="expertlistuser">  
+  <span class="curveArrow"></span>
+  <span class="crossIcon"></span>
+   
+  <ul class="slides">
+<li data-thumb="<?php echo IMGPATH."/users/medium/".$value['ProfilePic'].""; ?>">
+<div class="whiteBox">
+<?php 
+      $ExpertContent ='';
+     
+        $ExpertContent.='<div class="dbexpert whiteBox expertOverbox" data-expert-user = "'.$value['UserID'].'" id="dbexpertRightCont" data-content ="New '.$this->expertText.'"> ';
+              $ExpertContent.= '<div class="rboxContainer "><div class="expertDbUserPic">
+              <div class="bgProfile">
+                 <img border="0" src="'.IMGPATH.'/users/medium/'.$value['ProfilePic'].'" width="100" height="100">
+              </div>
+             ';
+
+                 $ExpertContent.= ' <div class="exprtInnerCnt"> <input type="hidden" name="expertidhidden" id="expertidhidden" value="'.$value['UserID'].'">
+                <a href="'.BASE_URL.'/user/'.$this->myclientdetails->customDecoding($value['Username']).'">
+                  <img border="0" src="'.IMGPATH.'/users/medium/'.$value['ProfilePic'].'" width="110" height="110">
+                </a>
+                 <h3>'.$this->myclientdetails->customDecoding($value['Name']).'</h3>
+                <span class="exprtTagTitle">'.$this->expertText.'</span>
+              </div>
+            </div>';
+
+               $ExpertContent.= '<div class="dbExpertUserDesc">
+                 <p><span>'.$this->myclientdetails->customDecoding($value['Name']).'</span>';
+                 if($this->userid!='' && $this->userid == $value['UserID'])
+                   $ExpertContent.= '<a href="javascript:void(0)" class="iconEdit fa fa-pencil"></a>';
+                  $ExpertContent.= '</p>';
+
+                if(($this->userid!='' && $this->userid == $value['UserID']) || ($value['title']!='') )
+                {
+                    $title = ($value['title']!=NULL)?$this->myclientdetails->customDecoding($value['title']):"Edit your title";
+                    $style1 = ($value['title']!=NULL)? "style='font-style:normal;'":"";
+                    $ExpertContent.= '<p class="dbxprtTitle" '. $style1.' ><span>'.$title.'</span>';
+                    if($this->userid!='' && $this->userid == $value['UserID'])
+                      $ExpertContent.= '<a href="javascript:void(0)" class="iconEdit fa fa-pencil"></a>';
+                    $ExpertContent.= '</p>';
+                }
+
+                if(($this->userid!='' && $this->userid == $value['UserID']) || ($value['company']!=''))
+                {
+                    $company = ($value['company']!=NULL)?$this->myclientdetails->customDecoding($value['company']):"Edit your company";
+                    $style2 = ($value['company']!=NULL)? "style='font-style:normal;'":"";
+                    $ExpertContent.= '<p class="dbxprtTitleCompany" '. $style2.' ><span>'.$company.'</span>';
+                    if($this->userid!='' && $this->userid == $value['UserID'])
+                      $ExpertContent.= '<a href="javascript:void(0)" class="iconEdit fa fa-pencil"></a>';
+                    $ExpertContent.= '</p>';
+                }
+                $Biography = new Application_Model_DbUserbiography();
+                $biotext = $Biography->getbiofieldsvalue($value['UserID'],'about_me');
+                if(($this->userid!='' && $this->userid == $value['UserID']) || ($biotext!=NULL))
+                {
+                    if($biotext!=NULL)
+                      $style3 = ($biotext!=NULL)? "style='font-style:normal;'":"";
+
+                    $biotext = ($biotext!=NULL)?$biotext:"Edit your biog";
+
+                    $ExpertContent.= '<p class="dbxprtTitleBio" '. $style3.' ><span>'.$biotext.'</span>';
+                    if($this->userid!='' && $this->userid == $value['UserID'])
+                      $ExpertContent.= '<a href="javascript:void(0)" class="iconEdit fa fa-pencil"></a>';
+                    $ExpertContent.= '</p>';
+                }
+              $ExpertContent.= '</div>';
+
+           if($this->userid!='' && $this->userid == $value['UserID'])
+           { 
+               if($value['Expert_Mail_Status']==1)
+                $checked11 = 'checked="checked"';
+              else
+                $checked22 = 'checked="checked"';
+               $ExpertContent.= '<div class="rightNotiSwitcher" id="notify-expertNotificationOn">
+                  <span class="emnotLable"> Email notifications</span>
+                   
+                    <label class="newRadioBtn" for="expertNotification2'.$value['UserID'].'">
+                      <input type="radio" '.$checked22 .' name="expertNotification" id="expertNotification2'.$value['UserID'].'" class="expertNotification" value="0">
+                       <span>No</span>
+                    </label>
+                     <label class="newRadioBtn" for="expertNotification'.$value['UserID'].'">
+                      <input type="radio" '.$checked11 .' name="expertNotification" id="expertNotification'.$value['UserID'].'" class="expertNotification" value="1">
+                      <span>Yes</span>
+                    </label>
+              </div>';
+           }
+         $ExpertContent.= '<div class="dbexprtContFooter">';
+       
+         if($this->userid != $this->resultData['UserID'] && !in_array($this->userid, $expertList) && $this->resultData['Type']==20 && (strtotime($currentdate) >= strtotime($this->resultData['qaschedule'])) && (strtotime($currentdate) < strtotime($this->resultData['qaendschedule'])))
+            $ExpertContent.= "<a href='javascript:void(0)'  id='askquestion-".$value['UserID']."' class='askExpertBtn AskAnExpert ".$class."' ".$tooltip." dbeeid ='".$this->resultData['DbeeID']."' data-promoted ='false' expertid ='".$value['UserID']."' style='width:100%'>Ask a question</a>";
+          else if($this->userid != $this->resultData['UserID'] && $this->userid!='' && !in_array($this->userid, $expertList) && $this->allowexperts==1)
+             $ExpertContent.= "<div style='padding:10px; background: #FBF9DD;'>Sorry you can't ask a question at this time</div>";
+          
+          echo $ExpertContent.= '</div></div></div>';
+
+
+?>
+</div>
+</li>
+<?php }echo '</ul></div>';}else if($this->resultData['Type']==20){ 
+  echo '<div class="whiteBox" style="padding-top: 0px; min-height: 175px; ">
+    <div class="dbexpert whiteBox expertOverbox" data-expert-user="25" id="dbexpertRightCont" data-content="New Q&amp;A Speaker" style="padding-top: 0px; min-height: 175px;">
+        <div class="rboxContainer ">
+            <div class="expertDbUserPic">
+                <div class="bgProfile" style="background:#333"></div>
+                <div class="exprtInnerCnt" style="padding-top:20px;">
+                    <a href="javascript:void(0)" class="fa fa-question-circle " style="font-size:60px; text-decoration:none">  </a>
+                    <h3>Awaiting</h3>
+                    <span class="exprtTagTitle">'.$this->expertText.'</span>
+                </div>
+            </div>            
+        </div>
+    </div>
+</div>
+</div>';
+} ?>
+<?php if($this->resultData['Type']==20){ ?>
+<div class="whiteBox expertQAEND" style="display:none;">
+  <h2>This Q&A session will close in</h2>
+  <div class="rboxContainer" style="text-align:center">
+      <span class="expertQAENDs" style="width:auto; display: inline-block;"></span>
+  </div>
+</div>
+<?php } ?>
+

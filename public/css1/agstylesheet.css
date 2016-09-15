@@ -1,0 +1,110 @@
+body{    background: #ffffff;}
+#pageCenterCont.pageCenter {margin-top: 0px;}
+#header{position: relative; padding-top: 20px;}
+#pageCenterCont{margin-top: 46px; box-shadow: none; padding: 0px;}
+#topMenu ul, #topMenu{background: transparent; box-shadow: none;}
+#topMenu{height: auto;}
+#topMenu .agNavigation ul{background: #fff; box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.35); }
+#topMenu .agNavigation ul:before{content:''; left: 24px; border-width: 6px; border-style: solid; border-color: transparent; border-bottom: 9px solid #FFF; position: absolute; top: -15px;} 
+.siteLogoAg{width: 425px !important; float: left}
+#topMenu .siteLogoAg a{height: auto !important; padding: 0px; line-height: inherit;}
+
+.headerSearch input{ border-radius:0px; box-shadow: none; border: 3px solid #CD1543; margin-right: 0px; background: #fff; padding: 7px 32px 7px 15px}
+.headerSearch .fa-search{display: inline-block; left: inherit; right: 10px; color: #000;     top: 7px;}
+.headerSearch input:focus + .fa-search{color:#CD1543 }
+#searchBox{position: relative; width: inherit;}
+.headerSearch{width: auto; float: right; padding: 0px; top: -5px; right: 7px;}
+.headerMenu li a.agBtnBlue{background:#191d65; color: #fff;font-size: 16px; padding: 10px !important; height: inherit; line-height: 17px; font-weight: bold; margin-top: 20px; }
+.agBtnBlue:hover{ color: #fff !important;}
+.agNavigation{padding: 0px 20px; display: inline-block; width: 100% ; background: #e6e6e6; position: relative;}
+.agNavigation ul > li{float: left; position: relative;}
+.agNavigation ul > li a{ padding: 20px 20px; display: inline-block; color: #9b9b9b;}
+.agNavigation ul > li.active a, .agNavigation ul > li.activeNotification a, #topMenu .balloonBox, #mySideMenu .balloonBox{ color: #cd1543;}
+.agNavigation ul > li a i{font-size: 20px ;}
+.agNavigation ul ul{display: none;}
+#homePageBtn  a i{font-size:21px }
+li.topSettingMenu .fa{font-size: 21px; margin-top: -1px;}
+li.topmessageMenu .fa{margin-top: -1px;}
+#notificationsTop .fa{font-size: 19px;}
+ul.headerMenu{display: inline-block; width: 100%; visibility: visible;}
+.loginOrRegistor{ background:#191d63; color: #fff; display: inline-block; width: 100%; margin-bottom: 10px; padding: 0px 0px;}
+.logiReg{padding: 10px 0px;}
+.loginOrRegistor h2{text-transform: uppercase; font-weight: bold; font-size: 20px; float: left; display: inline-block; padding: 3px 10px; }
+.startDbGeader{ float: right; margin-top: 12px;}
+.headerMenu .startDbGeader{margin-top: 20px; margin-right: 10px; display: none;}
+
+#startdbHeaderBtn{font-size: 14px; line-height: 20px;  background: #cd1543 !important; border-radius: 0px; box-shadow: none; margin-top: 0px; text-shadow:none;     }
+ #startdbHeaderBtn i{ color: #fff !important; }
+.startDbGeader ~ h2{margin-top: 5px;}
+.loginAndReg{color: #fff; font-weight: normal; display: inline-block;vertical-align: middle; font-size: 18px; margin-left: 30px;}
+.loginOrRegistor h2 + .loginAndReg { display: inline-block; padding: 4px 30px; border-left: 2px solid #fff;}
+.ac_resultsMsg:before, .ac_results:before{ content: '';   left: 22px}
+.agNavigation ul li.activeMenu ul{display: block; position: absolute; width: 200px;     border-radius: 0px 0px 5px 5px;  top: 100%;}
+.agNavigation ul li ul li{width: 100%; border-bottom: 1px solid #ccc}
+.agNavigation ul li ul li:last-child{ border-bottom: 0px solid #ccc}
+.agNavigation ul li ul li:last-child a{ border-radius: 0px 0px 5px 5px;}
+.agNavigation ul li li { padding: 0px }
+.agNavigation ul li li a{display: block; float: left; width: 100%; text-decoration: none; padding: 10px }
+.agNavigation ul li li:hover a{color: #CD1543}
+.tourStep5, .tourStep7{top: 203px; left: 403px;}
+.tourStep2{top: 189px;}
+.tourStep3{top: 520px;}
+.tourStep1{top: 460px;}
+.tourStep6{top: 261px;}
+body[socialactive="1"] .headerSearch{width: auto}
+.agNavigation ul > li#notificationsTop{position: relative;}
+.agNavigation ul > li#notificationsTop.activeNotification{}
+.agNavigation ul > li#notificationsTop.activeNotification i{color: #CD1543}
+.agNavigation ul > li#notificationsTop.activeNotification #actnotifications-top-wrapper i{font-size: 14px;}
+.moreBarHeader{float: left; text-decoration: none; background: #cd1543; color: #fff; padding: 10px 15px; border-right: 3px solid #fff }
+.loginOrRegistor a{text-decoration: none; color: #FFF;}
+.mainHeaderSearch{top: 142px !important; position: absolute !important;}
+.loginOrRegistor .userActionArrow  ul{  left: 0px; background: #cd1543  !important;  color: #fff; border-radius: 0px; border:0; overflow: hidden ;width: 300px}
+.loginOrRegistor .userActionArrow  ul li:hover a{ background: #191d63 ; color: #fff}
+.goToAdmin{margin-left: -105px;}
+#notiListing, #notiListingMsg{top: 199px !important;}
+/*.tourSteplist:after{content:''; position: fixed; left: 0px; right: 0px; top: 0px; bottom: 0px; background: rgba(0,0,0,0);}*/
+ @media only screen  and (max-width:1024px) {
+
+  .headerMenu .startDbGeader{display: inline-block !important;}
+  .headerMenu li{width: auto}
+  .headerMenu li a{border: 0px;}
+  .loginOrRegistor{padding:  0px;}
+  .siteLogoAg{margin-left: 20px;}
+  .headerMenu{position: relative; left: 0px;}
+  .headerMenu .agBtnBlue{margin-right: 20px;}
+  #mySideMenu.fixedMySideBar{position: relative; width: 100%; box-shadow: none;background: #e6e6e6; top: 0px; margin-bottom: 0px;}
+  .agNavigation{display: none;}
+  #mySideMenu a{color: #333}
+  #mySideMenu ul ul{background: #fff}
+  .tourStep3{    top: 250px;}
+  .tourStep2{left: 20px; top: 146px;}
+  .tourStep6{top: 131px;right: 150px;}
+  .startTakeATour #mySideMenu ul > li > a:not([data-id="myRighSideBtn"]){background: none}
+}
+@media only screen and (max-width: 800px){
+  .siteLogoAg{ width: 270px !important; margin-top: 14px;}
+  .loginOrRegistor h2{font-size: 15px}
+}
+
+@media only screen and (max-width: 600px){
+   #startdbHeaderBtn{   padding: 5px 13px;}
+  #startdbHeaderBtn span{position: relative;  display: none;    top: -5px;}
+  #startdbHeaderBtn .createPostIcon{top: 1px; right: 0px;}
+
+.loginOrRegistor h2{display: none;}
+}
+@media only screen and (max-width: 480px){
+   #startdbHeaderBtn{       padding: 2px 6px;}
+  #startdbHeaderBtn .fa{font-size: 18px;}
+  .headerMenu li a.agBtnBlue{  margin-top: 11px; padding: 8px !important; font-size: 11px;}
+  .headerMenu .startDbGeader{    margin-top: 5px;}
+.siteLogoAg{width: 165px !important;}
+.headerMenu li a.agBtnBlue{margin-top: 5px;}
+.loginOrRegistor h2{font-size: 12px;}
+.siteLogoAg{margin-left: 10px;}
+.headerMenu .agBtnBlue{    margin-right: 10px;}
+}
+@media only screen and (max-width: 400px){
+.loginOrRegistor h2{font-size: 9px;}
+}

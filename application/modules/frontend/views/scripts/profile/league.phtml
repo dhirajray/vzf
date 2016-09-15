@@ -1,0 +1,319 @@
+<?php
+
+// CHECK INDIVIDUAL SCORES
+
+$loveScore=$this->loveScore;
+
+$likeScore=$this->likeScore;
+
+$philosopherScore=$this->philosopherScore;
+
+$dislikeScore=$this->dislikeScore;
+
+$hateScore=$this->hateScore;
+
+// CHECK INDIVIDUAL SCORES
+
+
+
+// CHECK LEAGUE SCORES
+
+$loveLeagueScore=$this->loveLeagueScore;
+
+$hateLeagueScore=$this->hateLeagueScore;
+
+$philLeagueScore=$this->philLeagueScore;
+
+$mostFollowedScore=$this->mostFollowedScore;
+
+$user =$this->user;
+
+
+
+?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+
+<title>Untitled Document</title>
+
+
+
+<style type="text/css">
+
+<!--
+
+body {
+
+	background-color: #FFFFFF;
+
+	margin-left: 0px;
+
+	margin-top: 0px;
+
+	margin-right: 0px;
+
+	margin-bottom: 0px;
+
+}
+
+.style3 {font-size: 12px;
+
+	font-weight: bold;
+
+}
+
+figure { display: block; width: 100%; height: 100%; margin: 5px 0 0 10px; font-size:24px; }
+
+.league-smallfont { font-size:12px }
+
+-->
+
+</style>
+
+
+
+	<!-- liteAccordion css -->
+
+	
+
+
+
+	<!-- jQuery -->        
+
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+
+
+
+	<!-- easing -->
+
+	
+
+
+
+	<!-- liteAccordion js -->
+
+	<script src="<?php echo BASE_URL;?>/js/liteaccordion/liteaccordion.jquery.js"></script>
+	<link href="<?php echo BASE_URL;?>/css/liteaccordion.css" rel="stylesheet" />
+	<script src="<?php echo BASE_URL;?>/js/liteaccordion/jquery.easing.1.3.js"></script>
+	
+
+
+
+	<!--[if lt IE 9]>
+
+		<script>
+
+			document.createElement('figure');
+
+			document.createElement('figcaption');           
+
+		</script>
+
+	<![endif]-->         
+
+
+
+	<script>
+
+		$(function() {
+
+			
+
+			$('#league-accordion').liteAccordion({
+				containerWidth : 600,
+				containerHeight : 50
+			});
+			
+			$('#league-accordion').css("background-color:#ffffff"); 
+			
+
+			seeuserleaguepop('mostfollowed','<?=$user['UserID']?>');
+
+		
+
+		});  
+
+	</script>
+
+
+
+</head>
+
+
+
+<body>
+
+<div style="padding:0px;">
+
+	<div class="user-name" style="margin-bottom:20px; float:left;"><?=$user['Name']?>'s scores</div>
+
+	<div class="user-name" style="margin-bottom:20px; float:right;"><a href="/dbleagues" target="_top">View Main Leagues</a></div>
+
+	<div class="next-line"></div>
+
+	<div align="center" style="float:left; width:120px;">
+
+		<div class="leaguepop-count-bg"><?=$loveScore[0]?></div>
+
+		<div class="leaguepop-love"></div>
+
+		<div style="display:inline-block">loved</div>
+
+	</div>
+
+	
+
+	<div align="center" style="float:left; width:120px;">
+
+		<div class="leaguepop-count-bg"><?=$likeScore[0]?></div>
+
+		<div class="leaguepop-like"></div>
+
+		<div style="display:inline-block">liked</div>
+
+	</div>
+
+	
+
+	<div align="center" style="float:left; width:120px;">
+
+		<div class="leaguepop-count-bg"><?=$dislikeScore[0]?></div>
+
+		<div class="leaguepop-dislike"></div>
+
+		<div style="display:inline-block">disliked</div>
+
+	</div>
+
+	
+
+	<div align="center" style="float:left; width:120px;">
+
+		<div class="leaguepop-count-bg"><?=$hateScore[0]?></div>
+
+		<div class="leaguepop-hate"></div>
+
+		<div style="display:inline-block">hated</div>
+
+	</div>
+
+	
+
+	<div align="center" style="float:left; width:120px;">
+
+		<div class="leaguepop-count-bg"><?=$philosopherScore[0]?></div>
+
+		<div class="leaguepop-fft"></div>
+
+		<div style="display:inline-block">food for thought</div>
+
+	</div>
+
+	
+
+	<div class="next-line"></div>
+
+	
+
+	<div class="solid-separator"></div>
+
+	
+
+	<div>
+
+		<div id="league-accordion">
+
+            <ol>
+
+                <li onclick="javascript:seeuserleaguepop('mostfollowed',<?=$user['UserID']?>);">
+
+                    <h2><div id="leaguepop-tab-mostfollowed" class="leaguepop-tab-mostfollowed-open"></div></h2>
+
+                    <div>
+
+                        <figure>Most Followed</figure>
+
+                    </div>
+
+                </li>
+
+                <li onclick="javascript:seeuserleaguepop('love',<?=$user['UserID']?>);">
+
+                    <h2><div id="leaguepop-tab-love" class="leaguepop-tab-love"></div></h2>
+
+                    <div>
+
+                        <figure>Love List <span class="league-smallfont">combination of LOVES and LIKES</span></figure>
+
+                    </div>
+
+                </li>
+
+                <li onclick="javascript:seeuserleaguepop('rogue',<?=$user['UserID']?>);">
+
+                    <h2><div id="leaguepop-tab-rogue" class="leaguepop-tab-rogue"></div></h2>
+
+                    <div>
+
+                        <figure>Rogues Gallery <span class="league-smallfont">combination of DISLIKES and HATES</figure>
+
+                    </div>
+
+                </li>
+
+                <li onclick="javascript:seeuserleaguepop('philosopher',<?=$user['UserID']?>);">
+
+                    <h2><div id="leaguepop-tab-philosopher" class="leaguepop-tab-philosopher"></div></h2>
+
+                    <div>
+
+                        <figure>Food For Thought</figure>
+
+                    </div>
+
+                </li>
+
+            </ol>
+
+        </div>	
+
+	</div>
+
+	
+
+	<div style="margin-top:10px;">
+
+		<div id="league-table"></div>
+
+	</div>
+
+</div>	
+
+	<!-- SCRIPT FOR FADE POPUP -->
+
+	<div id="removemember-popup" class="popup_block"></div>
+
+
+	<script type="text/javascript">
+
+	var jqnc=jQuery.noConflict();
+
+	jqnc(document).ready(function(){
+
+		fadepopup();
+
+	});
+
+	</script>
+
+	<!-- SCRIPT FOR FADE POPUP -->
+
+</body>
+
+</html>

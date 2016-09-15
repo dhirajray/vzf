@@ -1,0 +1,464 @@
+<!--<script type="text/javascript" src="<?php echo BASE_URL."/adminraw/js/message.js"; ?>?v=<?php echo filemtime('/adminraw/js/message.js');?>"></script>-->
+<?php  
+$request = $this->request;       
+$this->title = "My Users";
+$this->headTitle($this->title);
+$totRequest = $this->myclientdetails->passSQLquery("select count(UserID) as tot from tblUsers where Status=2 AND clientID= ".clientID);
+
+$userreq = ($totRequest[0]['tot']==1)? ' User Request' : ' User Requests';
+?>
+<h1 class="pageTitle ">Users 
+<?php if($totRequest[0]['tot']>0){?> <a style="margin-top:0px;margin-right:4px;font-weight:normal" href="javascript:void(0)" onclick="usershorting(6,'statussearch')" class=" btn btn-yellow rpCsvExport"><?php echo $totRequest[0]['tot'].$userreq;?> </a> <?php } ?></h1>
+
+
+<div class="userUpBar">
+						<div class="userSearchBox">
+							<div class="appendType  pull-left">	
+								<form action="<?php echo $this->url(array('controller'=>'user','action'=>'index'));?>" method="POST">
+									<input type="text" placeholder="Search" id="searchfield" name="searchfield"> 
+									<button class="btn btn-black" id="submit" name="submit" type="submit">Search</button>
+								</form>			
+								<div class="clearfix"></div>
+								
+							</div>
+						</div>
+						<div class="pull-right buttonRight">
+							<!--for message to user-->
+                             	
+						    <!--for message to user-->
+							<div class="dropDown  pull-left" id="userAddNew">
+								<a href="#" class="btn dropDownTarget"><i class="fa fa-plus fa-lg"></i> Create new user accounts</a> 
+								<div class="dropDownList right">
+									<p class="validateTips " >Name and Email required</p>
+									<form class="right">
+										<div class="formRow">
+											<input type="text" id="usernameInput" name="usernameInput" placeholder="Name"> 
+										</div>
+										<div class="formRow">
+											<input type="text" name="useremail" id="useremail" value=""  placeholder="Email"/>
+											<!-- <div class="subText"><i class="fa-info-sign"></i> Add a name and email to automatically create an account for a user. <br><br>	<i class="fa-info-sign"></i> Separate multiple names and email addresses with a comma (,)
+											<br><br>	
+											Accounts will display on the list below once activated by the user</div> -->
+										</div>
+										<?php if(clientID==53) { ?>
+										<div class="formRow">
+											<input type="text" id="carerid" name="carerid" placeholder="Carer ID"> 
+										</div>
+										<?php } ?>
+										<div class="formRow">
+											<input type="text" id="jobtitleInput" name="jobtitleInput" placeholder="Job title"> 
+										</div>
+										<div class="formRow">
+											<input type="text" id="companyInput" name="companyInput" placeholder="Company"> 
+										</div>
+										<div class="formRow">
+												<input type="hidden"  id="calling" value="addadmin" />											
+												<button type="button" class="btn btn-green fluidBtn  pull-right addUsersBtn" id="addUsersBtn" style="margin-right:0px;"> 
+													<i class="fa fa-plus fa-lg"></i>  Add User 
+												</button>
+										</div>
+									</form>
+
+								</div>
+							</div>
+							<?php
+							$curDate = date('Y-m-d');
+							$csvlimit = "SELECT COUNT(*) AS TotalSentToday FROM `tblUsers` WHERE clientID=".clientID." AND DATE_FORMAT(`RegistrationDate`,'%Y-%m-%d')='".$curDate."'  AND fromcsv=1";
+							$todaysLim = $this->myclientdetails->passSQLquery($csvlimit);
+							if($todaysLim[0]['TotalSentToday']<1001)
+							{	
+								$addcarer = (clientID==53)?'ADD USERS CARERID':'ADD USERS';
+								$filecarer = (clientID==53)?'importformatcarer.csv':'importformat.csv';
+						
+
+							 ?>
+							<div class="dropDown pull-left">
+								<a href="#" class="btn dropDownTarget"><i class="fa fa-file-excel-o fa-lg"></i> Create users from CSV</a>
+								<div class="dropDownList right">									
+									<form method="POST" id="formid"  action="<?php echo $this->url(array('controller'=>'import','action'=>'getcsvrecords'));?>" enctype="multipart/form-data">
+										<div class="formRow">
+											<div class="appendType">
+												<input type="text" class="uploadType" name="" readonly>
+												<a class="btn btn-black" href="javascript:void(0);">Browse <input type="file" class="fileType" name="csvfile" id="addusers" ></a>
+											</div>
+										</div>
+										<div class="formRow">
+										<button type="submit" name="csv_submit" id="csv_submit" value="<?php echo $addcarer?>" class="btn btn-green fluidBtn">
+											<i class="fa fa-plus fa-lg"></i> Add users
+										</button>
+										</div>
+										<div class="formRow">
+											<span class="pull-right link" style="color:#ba7725" ><i class="fa-download-alt fa-lg"></i> Daily import limit: 1000 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Remaining: <?php echo 1000-$todaysLim[0]['TotalSentToday'] ?>  </span>
+										</div>
+										<div class="formRow crtCsvover">
+											<span class="pull-right"><i class="fa fa-download"></i><a href="<?php echo BASE_URL ?>/downloadcenter/<?php echo $filecarer ?>" class="link">Click here to download example</a></span>
+
+									     <span class="pull-right"><i class="fa fa-search"></i><a href="#" id="openxcel" class="pull-right link">Click here to view sample</a></span>
+
+											<div style="clear:both"></div>
+											<div class="subText"><i class="fa-info-sign"></i>
+Upload a CSV with multiple names and emails to create accounts for all users.</div>
+										</div>
+										<div class="clearfix"></div>
+									</form>
+								</div>
+							</div>
+							<?php
+							}
+							else 
+							{
+								echo '<div class="dropDown pull-left" id="imprtVip"><a href="#" class="btn dropDownTarget"><i class="fa fa-file-excel-o fa-lg"></i> Import Custom users from CSV</a></div><br> <div class="message warning pull-right" style="width:56%" >Daily import limit exhausted</div>';
+							}
+							?>	
+						</div>
+					</div>	
+
+<div class="clearfix"></div>
+
+<div class="clearfix"><?php echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml'); ?></div>
+<div class="rpGraphTop clearfix">
+	<h2 class="pull-left">Total: <?php echo $this->totUsers; ?></h2>
+	
+	<div class="search pull-right">
+		<input type="hidden" id="statussearch" value="<?php  echo $this->statussearch ?>"> 
+		<input type="hidden" id="orderfield" value="<?php  echo $this->orderfield ?>"> 
+		<input type="hidden" id="controll" value="user"> 
+		<!-- <form action="<?php echo $this->url(array('controller'=>'user','action'=>'index'));?>" method="POST" > this.form.submit() -->
+			<select class="gh-tb"  maxlength="200" value="" id="statussearch" name="statussearch" onchange="usershorting(this.value,'statussearch')" > 
+				<option value="0"  > - Sort by status - </option>
+				<option value="4" <?php if($this->statussearch==4) { echo "selected=\"selected\" "; } ?> > All </option>
+				<option value="5" <?php if($this->statussearch==5) { echo "selected=\"selected\" "; } ?> > Currently online </option>
+				<!-- <option value="100" <?php if($this->statussearch==100) { echo "selected=\"selected\" "; } ?> > VIP user </option> -->
+				<option value="1" <?php if($this->statussearch==1) { echo "selected=\"selected\" "; } ?> > Active </option>
+				<option value="2" <?php if($this->statussearch==2) { echo "selected=\"selected\" "; } ?> > Deactive </option>
+				<option value="3" <?php if($this->statussearch==3) { echo "selected=\"selected\" "; } ?> > Pending </option>
+
+			</select>
+				
+		<!-- </form> -->
+	</div>	
+	<div class="search pull-right" style="margin-right:5px">
+		<!-- <form action="<?php echo $this->url(array('controller'=>'user','action'=>'index'));?>" method="POST" > -->
+			<select class="gh-tb"  maxlength="200" value="" id="orderfield" name="orderfield" onchange="usershorting(this.value,'orderfield')" > 
+				<option value="0"  > - Sort results - </option>
+				<!-- <option value="0"  > All </option> -->
+				<option value="1" <?php if($this->orderfield==1) { echo "selected=\"selected\" "; } ?> > User name (a-z)</option>
+				<option value="2" <?php if($this->orderfield==2) { echo "selected=\"selected\" "; } ?> > User name (z-a)</option>
+				<option value="3" <?php if($this->orderfield==3) { echo "selected=\"selected\" "; } ?> > Newest first </option>
+				<option value="4" <?php if($this->orderfield==4) { echo "selected=\"selected\" "; } ?> > Oldest first </option>
+				<option value="5" <?php if($this->orderfield==5) { echo "selected=\"selected\" "; } ?> > Last CSV uploaded </option>				
+			</select>
+				
+		<!-- </form> -->
+	</div>		
+</div>
+<div class="responsiveTable">
+	<table class="table-border userListTable table table-hover table-stripe">
+		<thead>
+			<?php  if (count($this->paginator)){ ?>
+			<?php $rowchange	=	0; 
+			?>
+			<?php //echo htmlentities(json_encode($this->forcsvrec)); exit;  ?> 
+			<tr>
+			    <td colspan="8">
+			    	<div class="rpGraphTop clearfix">
+			    		<?php if ($this->seachfield !='') { ?>
+			    		<a href="<?php echo BASE_URL ?>/admin/user" class="btn btn-black pull-left">Back</a>
+			    		<?php }?>
+						<form action="<?php echo BASE_URL ?>/admin/reporting/getcsv" method="post">
+							<div>
+								<div class="pull-left" style="font-weight:normal; line-height: 28px;">A user account can be deleted if no content has been added by the user. If content has been added, the account can be deactivated but not deleted.<br />Please refresh browser to check user account creation status.</div>
+								<div class="sortUserdrop">
+								<a class=" btn btn-yellow btn-mini rpCsvExport" href="javascript:void(0)" style="margin-top:0px;margin-right:4px;font-weight:normal" >
+									<i class="fa fa-file-excel-o fa-lg"></i>
+									Export all users 
+								</a> 
+								<?php if($this->statussearch==3) { ?>
+								<a href="javascript:void(0)" class="btn btn-green btn-mini inviteAction " calling="reinviteAll" >
+									<i class="fa fa-repeat"></i> Re invite all
+								</a>&nbsp;&nbsp;&nbsp;
+								<?php } ?>
+								<?php if($this->statussearch==1) { ?>
+								<a href="javascript:void(0)" class="btn btn-green btn-mini inviteAction " calling="deactiveAll" >
+									<i class="fa fa-repeat"></i> Deactivate all
+								</a>&nbsp;&nbsp;&nbsp;
+								<?php } ?>
+								<?php if($this->statussearch==2) { ?>
+								<a href="javascript:void(0)" class="btn btn-green btn-mini inviteAction " calling="activateAll" >
+									<i class="fa fa-repeat"></i> Active all
+								</a>&nbsp;&nbsp;&nbsp;
+								<?php } ?>
+								</div>
+							</div>
+							<input type="hidden" name="calling" value="usersList">
+							<input type="hidden" name="filename" value="users list">
+
+							<input type="hidden" name="seachfieldChk" value="<?php echo $this->seachfield; ?>">
+							<input type="hidden" name="orderfieldChk" value="<?php echo $this->orderfield; ?>">
+							<input type="hidden" name="records" value=" <?php //echo htmlentities(json_encode($this->forcsvrec));   ?> ">
+						</form>
+					</div>
+				</td>
+			    
+			</tr>
+
+			<tr>
+				<td class="oneline"> 
+					<label title="Select all">
+						<input type="hidden" name="page" value="<?php echo $request['page'] ?>"> 
+						<input type="hidden" name="urlpage" value="user"> 
+						<input type="checkbox" value="allInResults" class="deleteallvips"  id="tlallresult" name="goupusermain" onclick="selectallcheckbox(this,'.deletecheck')">
+						<label for="tlallresult"></label>
+					</label>
+					<a href="javascript:void(0);" class="btn btn-danger btn-mini  disabled" email="all selected " calling="deleteallvips">Delete</a>&nbsp;
+					<a href="javascript:void(0);" style="display:none" class="btn btn-mini btn-green disabled" email="all selected " calling="markedvip">Make VIP</a>
+				</td>
+				<!-- <td class="oneline">	
+					<label title="Select all">
+						<input type="checkbox" value="allInResults" class="reinviteallvips" onclick="selectallcheckbox(this,'.reinvitecheck')">
+						<label for="tlallresult"></label>
+					</label>
+					<a href="javascript:void(0)" class="btn btn-green btn-mini inviteAction disabled" calling="reinviteallvips" >
+						<i class="fa fa-repeat"></i> Re Invite All
+					</a>
+				</td> -->
+			    <td>Name</td>
+			    <td>Username</td>
+				<td>Email</td>
+				<td>Gender</td>
+				<?php echo $td = (clientID==1)?'<td> Carer ID </td>' : '<td>Account Type</td>'; ?>
+				
+				<td>Status</td>
+				<td width="340">Action</td>
+			 
+			</tr>
+		</thead>
+		<form name="userform" id="userform">
+		<tbody>
+			<input type="hidden" name="page" value="<?php echo $request['page'] ?>"> 
+			<input type="hidden" name="urlpage" value="user"> 
+			
+			<?php foreach($this->paginator as $user) : ?>
+			<?php if($rowchange%2==1) {$color = '#CCC';} else {$color ='#FFF';} ?>
+			<?php //print_r($user); die; ?>
+			<tr id="userslist_<?php echo $this->escape($user->UserID);?>">
+				<?php
+
+							 $deleteAccount = true;
+							 $getDbs =$this->myclientdetails->getfieldsfromtable(array("count('DbeeID') as post"),'tblDbees','User',$user->UserID);
+							 if($getDbs[0]['post']==0)
+							 {
+							 	$getcmnts =$this->myclientdetails->getfieldsfromtable(array("count('CommentID') as tcmnt"),'tblDbeeComments','UserID',$user->UserID);
+							 	if($getcmnts[0]['tcmnt']>0) $deleteAccount = false;
+							 }
+							 else
+							 {
+							 	$deleteAccount = false;
+							 }
+
+							?>
+							<td class="deletecheck">
+								<?php if($user->activeFirstTime=='1') {?>
+									
+									 <?php
+									 
+
+									 if($deleteAccount==true)
+									 {
+									 ?>
+										<label>
+											<input type="checkbox" title="DELETE" name="deleteall[]" id="user-<?php echo $this->escape($user->UserID);?>" value="<?php echo $this->escape($user->UserID);?>" onclick="selectsinglecheckbox(this,'.deletecheck')" >
+											<label for="user-<?php echo $this->escape($user->UserID);?>"></label>
+										</label>
+									<?php }
+									} else { ?>
+							
+									<label>
+										<input type="checkbox" title="DELETE" name="deleteall[]" id="user-<?php echo $this->escape($user->UserID);?>" value="<?php echo $this->escape($user->UserID);?>" onclick="selectsinglecheckbox(this,'.deletecheck')" >
+										<label for="user-<?php echo $this->escape($user->UserID);?>"></label>
+									</label>
+										
+										
+								    
+							        <?php } ?>    
+						    </td> 
+						    <!-- <td class="reinvitecheck">
+								<?php if($user->activeFirstTime=='1') {?>
+									
+									 <?php
+									 
+
+									 if($deleteAccount==true)
+									 {
+									 ?>
+									
+									<?php }
+									} else { ?>
+									<label>
+										<input type="checkbox" name="reinviteallvips[]" value="<?php echo $this->escape($user->UserID);?>" onclick="selectallcheckbox(this,'.reinvitecheck')" >
+										<label for="<?php echo $this->escape($user->UserID);?>"></label>
+									</label>
+									    
+							        <?php } ?>    
+						    </td>  -->
+			    <td nowrap="nowrap"><?php echo $this->myclientdetails->customDecoding($this->escape($user->Name)).' '.$this->myclientdetails->customDecoding($this->escape($user->lname));?> <?php if($user->usertype==100) { echo'<span style="color:#bd362f; font-weight:bold; margin-top: 5px; display: inline-block;">(VIP)</span>'; } ?></td>
+			    <td><?php echo $this->myclientdetails->customDecoding($this->escape($user->Username));?></td>
+				<td><?php echo $this->myclientdetails->customDecoding($this->escape($user->Email));?></td>
+				<td><?php echo $this->myclientdetails->customDecoding($this->escape($user->Gender));?></td>
+				<?php if(clientID==53){ 
+					$carrerid = $this->myclientdetails->passSQLquery('select carerid from tblUserMeta where Userid='.$user->UserID);
+					$carerdsip = ($carrerid[0]['carerid']>0)? $carrerid[0]['carerid'] : 'No Carer ID  <span class="btn btn-green btn-mini inviteAction" calling="addcarerid"  action="openDialog" userid="'. $this->escape($user->UserID).'" email="'.$this->myclientdetails->customDecoding($this->escape($user->Email)).'">Add</span>';
+					?>
+						<td id="<?php echo $user->UserID?>"><?php echo $carerdsip; ?></td>
+				
+				<?php } else {?> 		
+					<td><?php if($user->Socialtype==0){ echo "Standard";} elseif($user->Socialtype==1){ echo "Facebook";} elseif($user->Socialtype==2){ echo "Twitter";} elseif($user->Socialtype==3){ echo "Linkedin";} elseif($user->Socialtype==4){ echo "Google";} ?></td>
+				<?php } ?> 		
+				<td class="usrStatusTd"><?php
+				if($user->Status==2){ echo "<span style='color:red'>Request Pending</span>";} 
+				else {
+					if($user->activeFirstTime==1){ 
+						if($user->Status==1){ echo "<span style='color:green'>Active</span>";} else { echo "<span style='color:red'>Inactive</span>"; }
+						} else {
+							echo "<span style='color:#0000ff'>Pending</span>";
+						}
+				} 
+				?></td>
+				<td>
+
+					<?php if($user->activeFirstTime==1) {?>
+						 <a href="javascript:void(0);" class="btn btn-yellow btn-mini inviteAction show_details_user" userid="<?php echo $this->escape($user->UserID);?>"><i class="fa fa-eye-open"></i> Details</a><span class="sprt">  </span>
+						 <!-- <a class="btn btn-green btn-mini inviteAction" href="<?php echo BASE_URL.'/admin/user/userdetails/uid/'.$this->escape($user->UserID);?>"><i class="fa fa-eye-open "></i> Full details</a> --> <span class="sprt">  </span>
+
+						<div class="helponoff userActiveInactive updateUserDetailStatus userStatusListingTable"> 
+							<?php 
+							if($user->Status==1)
+								echo '<input type="checkbox" id="switcherTarget'.$user->UserID.'" user_id="'.$user->UserID.'" checked="checked"   status="0">' ;
+							else
+								echo  '<input type="checkbox" id="switcherTarget'.$user->UserID.'"  user_id="'.$user->UserID.'"  status="1"> ';
+							?>
+
+							<label for="switcherTarget<?php echo $user->UserID ?>" >
+							<div class="onHelp" on="Activate" off="Deactivate"></div>
+							<div class="onHelptext">
+							<span>Activate</span>
+							<span>Deactivate</span>
+							</div>
+							</label>
+						</div> 
+
+						 <?php
+						 $deleteAccount = true;
+						 $getDbs =$this->myclientdetails->getfieldsfromtable(array("count('DbeeID') as post"),'tblDbees','User',$user->UserID);
+						 if($getDbs[0]['post']==0)
+						 {
+						 	$getcmnts =$this->myclientdetails->getfieldsfromtable(array("count('CommentID') as tcmnt"),'tblDbeeComments','UserID',$user->UserID);
+						 	if($getcmnts[0]['tcmnt']>0) $deleteAccount = false;
+						 }
+						 else
+						 {
+						 	$deleteAccount = false;
+						 }
+
+						 if($deleteAccount==true)
+						 {
+						 	if($user->usertype!=100) {
+						 ?>
+
+						 <a style="display:none"  class="btn btn-green btn-mini markvipAction" data-userid="<?php echo $this->escape($user->UserID);?>" href="javascript:void(0);">Make VIP</a>
+
+						 <?php } ?>
+
+						 <a href="javascript:void(0);" class="btn btn-danger btn-mini inviteAction" calling="deletevips"  action="openDialog" userid="<?php echo $this->escape($user->UserID);?>" email="<?php echo $this->myclientdetails->customDecoding($this->escape($user->Email));?>">Delete</a>
+							<?php 
+						} else
+							{ ?>
+								<?php
+							}
+					} else {  
+						$BText = ($user->Status==2)?'<i class="fa fa-accept"></i> Accept' : '<i class="fa fa-repeat"></i> Re Invite'; 
+						$acaller = ($user->Status==2)?'acceptuser' : '';
+					?>
+						<a href="javascript:void(0)" class="btn btn-green btn-mini inviteAction" calling="reinvitevips" userid="<?php echo $this->escape($user->UserID);?>" requestfrom="<?php echo $acaller ?>" email="<?php echo $this->myclientdetails->customDecoding($this->escape($user->Email));?>"> <?php echo $BText ?>  </a>
+									
+				       	<a href="javascript:void(0);" requestfrom="<?php echo $acaller ?>" class="btn btn-danger btn-mini inviteAction" calling="deletevips"  action="openDialog" userid="<?php echo $this->escape($user->UserID);?>" email="<?php echo $this->myclientdetails->customDecoding($this->escape($user->Email));?>"> <i class="fa fa-trash"></i>  Delete </a> 
+			        <?php } ?>  
+					<!-- <a href="javascript:void(0);" class="link show_details_user" userid="<?php echo $this->escape($user->UserID);?>"><i class="fa-eye-open"></i> details</a> <span class="sprt">|</span>
+					<a href="<?php echo BASE_URL.'/admin/user/userdetails/uid/'.$this->escape($user->UserID);?>"  class="link"><i class="fa-eye-open"></i> full details</a>  -->
+				</td>
+			    <?php /*<td>
+			         <a href="<?php echo $this->url(array('controller'=>'index', 
+			            'action'=>'edit', 'id'=>$user->id));?>">Edit</a>
+			        <a href="<?php echo $this->url(array('controller'=>'index', 
+			            'action'=>'delete', 'id'=>$user->id));?>">Delete</a> 
+			    </td> */?>
+			</tr>
+			<?php $rowchange++; endforeach; ?>
+				<?php } else { ?>
+				<tr><td colspan=5><a href="<?php echo BASE_URL ?>/admin/user" class="btn btn-black pull-left">Back</a></td></tr>	
+				<tr><td colspan=5>No users found!</td></tr>	
+				<?php } ?>
+
+
+		</tbody>
+		</form>
+	</table>
+</div>
+
+<div id="openxcelfile" title="Sample csv file" style="display: none;">
+	<?php $imgcarer = (clientID==53)?'careid.PNG':'excel-img.png'; ?>
+	<img src="<?php echo BASE_URL.'/adminraw/img/'.$imgcarer ?>">
+
+</div>
+
+<script type="text/javascript">
+$('document').ready(function(){
+
+
+		var from = $('input[name="frm"]');
+		var  to = $('input[name="frmto"]');
+		from.datepicker({               	
+			changeMonth: true,
+			dateFormat: 'dd-mm-yy',
+			numberOfMonths: 1,
+			onClose: function( selectedDate ) {
+				to.datepicker( "option", "minDate", selectedDate );
+			}
+		});
+		to.datepicker({
+			changeMonth: true,
+			dateFormat: 'dd-mm-yy',
+			numberOfMonths: 1,
+			onClose: function( selectedDate ) {
+				from.datepicker( "option", "maxDate", selectedDate );
+			}
+		});
+
+		from.focus(function(event) {
+			$('#ui-datepicker-div').css('z-index', '99999');
+		});
+		to.focus(function(event) {
+			$('#ui-datepicker-div').css('z-index', '99999');
+	    });
+
+	$("#openxcel").click(function(){           
+		$( "#openxcelfile" ).dialog( "open" )
+	});
+	$( "#openxcelfile" ).dialog({
+			    autoOpen: false,		    
+			    height: 350,
+			    width: 420,
+			    modal: true,			    
+	});
+
+
+
+
+})
+</script>
+
+<?php 
+	/*
+	 * Print the pagination of type
+	 */
+	echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml'); ?>

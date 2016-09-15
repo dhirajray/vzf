@@ -1,0 +1,108 @@
+<?php         
+$this->title = "Deshboard";
+$this->headTitle($this->title);
+$deshObj= new Admin_Model_Deshboard();
+?>
+
+
+<div class="search">
+<?php /* <form action="<?php echo $this->url(array('controller'=>'user','action'=>'index'));?>" method="POST">
+	<input type="text" class="gh-tb"  maxlength="200" value="" id="searchfield" name="searchfield" placeholder="Search User" autocomplete="OFF">
+	<input type="image" id="ghSearch"  src="<?php echo $images ?>/search_button.png" class="search_button" alt="">	
+</form> */ ?>
+</div>		
+<table style="width:650px;" border="0">
+<tbody>
+	<?php if (count($this->paginator)){ ?>
+	<?php foreach($this->paginator as $comment) : ?>
+	<?php 
+	
+		if($this->escape($comment->type)==1) { $dbtype	=	'text db<div class="icon-db-text"></div>';}
+		if($this->escape($comment->type)==2) { $dbtype	=	'link db<div class="icon-db-link"></div>';}
+		if($this->escape($comment->type)==3) { $dbtype	=	'pix db<div class="icon-db-pix"></div>';}
+		if($this->escape($comment->type)==4) { $dbtype	=	'media db<div class="icon-db-vidz"></div>';}
+		if($this->escape($comment->type)==5) { $dbtype	=	'polls<div class="icon-db-poll"></div>';}
+	$commentdbpic = $defaultimagecheck->checkImgExist($comment->image,'userpics','default-avatar.jpg');	
+	?>	
+	<div style="" class="giftbox">
+		<div style="min-height:120px;width:640px;margin-top:10px ;margin:0px 10px 10px 8px;" class="box">
+			<div style="height:70px;width:70px;float:left;" class="box_image">
+				<div class="details-gift"> 
+					<!-- <img border="0" src="<?php echo BASE_URL; ?>show_thumbnails.php?ImgName=<?php echo $this->escape($comment->image);?>&amp;ImgLoc=userpics&amp;Width=60&amp;Height=60"> -->
+					<img src="<?php echo IMGPATH ?>/users/small/<?php echo $commentdbpic ?>" width="60" height="60" border="0" />
+				</div>
+			</div>
+			
+			<div style="width:560px;float:left" class="box_image">
+				<div style="float:left">
+					<?php echo $this->escape($comment->username);?> has posted a <?php echo $dbtype ?>
+				</div>
+				<div style="float:left">
+					<div class="details-gift"> 
+						<?php echo $this->escape($comment->description);?>
+						<?php //echo  $this->escape($UserObj->getComment($comment->DbeeID,$comment->UserID,$comment->type));?>
+					</div>
+				</div>
+				<div style="float:left">
+					<?php if($this->escape($comment->twitter)) {?>
+					<div class="twitterbird-dbee-feed">
+						<div class="twittertag-dbee-feed"><?php echo $this->escape($comment->twitter);?></div>
+					</div>	
+					<?php } ?>
+					
+					<div class="details-gift"> 
+						<b>categories : </b><?php echo  $this->escape($comment->category);?>
+					</div>
+				</div>
+			</div>		
+		</div>		
+	</div>
+	<!--
+	<tr>
+    <td><?php echo $this->escape($comment->type);?></td></tr>
+	
+	<tr>
+    <td><?php echo $this->escape($comment->username);?></td></tr>
+	
+	<tr>
+    <td><?php echo $this->escape($comment->image);?></td></tr>
+	
+	<tr>
+    <td><?php echo $this->escape($comment->description);?></td></tr>
+	
+	<tr>
+    <td><?php // echo $comment->DbeeID.'-'.$comment->UserID.'-'.$comment->type;
+	echo $this->escape($deshObj->getComment($comment->DbeeID,$comment->UserID,$comment->type));?></td></tr>
+	
+	<tr>
+    <td><?php echo $this->escape($comment->twitter);?></td></tr>
+	
+	<tr>
+    <td><?php echo $this->escape($comment->category);?></td></tr>
+	
+	<?php 
+	//echo "<pre>";
+	//echo $this->escape($comment->username);
+	//print_r($comment); die;?>
+	<?php $rowchange	=	0; ?>
+	-->
+<?php // echo $this->escape($user->Name);?>
+<?php $rowchange++; endforeach; ?>
+	<?php } else { ?>
+	<tr><td colspan=5>Users Not Found!</td></tr>	
+	<?php } ?>
+<tr>
+
+
+
+
+
+
+<td colspan=5>&nbsp;</td></tr>	
+<tr><td colspan=5><?php /*
+	/*
+	 * Print the pagination of type
+	 */
+	/* echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml'); */ ?></td></tr>
+</tbody>
+</table>

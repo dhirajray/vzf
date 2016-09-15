@@ -1,0 +1,302 @@
+<?php IF(!$this->zfcUserIdentity()):
+var_dump($this->zfcUserIdentity());
+ ?>
+<?php echo $this->zfcUserLoginWidget(array('redirect'=>'application')); ?>
+<?php ENDIF; ?>
+<link rel="icon" type="image/png" href="http://dbee.me/images/favicon.png">
+<link rel="stylesheet" href="css/styles.css" type="text/css" />
+<link rel="stylesheet" type="text/css" href="shadowbox/shadowbox.css">
+<link rel="stylesheet" type="text/css" href="css/ddcolortabs.css" />
+
+<!--[if gte IE 7]>  
+	<link rel="stylesheet" type="text/css" media="all" href="css/ie7.css" />
+<![endif]--> 
+
+<!--[if gte IE 8]>  
+	<link rel="stylesheet" type="text/css" media="all" href="css/ie8.css" />
+<![endif]-->
+
+<script language="javascript" type="text/javascript">
+var screenwidth = screen.width;
+if (screenwidth == 1024) {
+	document.write('<link rel="stylesheet" href="css/1024.css" type="text/css" media="all" />');
+}
+</script>
+
+
+<script language="javascript" type="text/javascript" src="js/functions.js?1972283102"></script>
+<script type="text/javascript" src="js/browser_check.js"></script>
+<script type="text/javascript" src="js/smooth.pack.js"></script>
+
+<!-- BEGIN INCLUDE SCRIPTS TO CALL SHADOWBOX -->
+<script type="text/javascript" src="shadowbox/shadowbox.js"></script>
+<script type="text/javascript" src="shadowbox/show_shadowbox.js"></script>
+<!-- END INCLUDE SCRIPTS TO CALL SHADOWBOX -->
+
+<!-- DROPDOWN CONTENT FOR MY GROUP OPTIONS -->
+<script type="text/javascript" src="js/dropdowncontent/dropdowncontent.js"></script>
+<!-- DROPDOWN CONTENT FOR MY GROUP OPTIONS -->
+
+<!-- DROPDOWN TOP MENU -->
+<script type="text/javascript" src="js/dropdowntab/dropdowntabs.js"></script>
+<!-- DROPDOWN TOP MENU -->
+
+<!-- BEGIN INCLUDE SCRIPTS TO CALL DHTML TOOLTIP -->
+<link rel="stylesheet" type="text/css" href="css/speechbubbles.css" />
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+<script src="js/speechbubbles.js"></script>
+<script type="text/javascript">
+jQuery(function($){ //on document.ready
+ //$('.addspeech').speechbubble()
+})
+</script>
+<!-- BEGIN INCLUDE SCRIPTS TO CALL DHTML TOOLTIP -->
+
+<script type="text/javascript" src="scripts/ajaxupload.js"></script>
+
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+
+<!-- SLIDING BACK TO TOP -->
+<script language="javascript" type="text/javascript" src="js/jquery.slideto.v1.1.js"></script>
+<script language="javascript" type="text/javascript">
+var jqnctop = jQuery.noConflict();
+jqnctop(document).ready(function(){
+	jqnctop('a[name=slidetotop]').slideto({
+		target : '#pagetop',
+		speed  : 700
+	});
+});
+
+$(window).scroll(function(){
+	if($(window).scrollTop() > 200 ){
+		$('#backtotop').fadeIn("slow");
+	} else if($(window).scrollTop() < 200 ){
+		$('#backtotop').fadeOut("fast");
+	}
+});
+</script>
+<!-- SLIDING BACK TO TOP -->
+
+
+
+<!-- BEGIN INCLUDE SCRIPTS FOR TABBED CONTENT FOR INVITE TABS -->
+<link rel="stylesheet" type="text/css" href="css/tabcontent.css" />
+<script type="text/javascript" src="js/tabcontent.js"></script>
+<!-- BEGIN INCLUDE SCRIPTS FOR TABBED CONTENT FOR INVITE TABS -->
+
+
+<!-- SLIDING FOOTER FUNCTION -->
+<script language="javascript" type="text/javascript">
+$(function() {
+	var open = false;
+	$('#footerSlideButton').click(function() {
+		if(open === false) {
+			document.getElementById('footerSlideText').style.display='block';
+			$('#footerSlideContent').animate({ height: '50px' });
+			$(this).css('backgroundPosition', 'bottom left');
+			open = true;
+		} else {
+			document.getElementById('footerSlideText').style.display='none';
+			$('#footerSlideContent').animate({ height: '0px' });
+			$(this).css('backgroundPosition', 'top left');
+			open = false;
+		}
+	});
+});
+</script>
+<!-- SLIDING FOOTER FUNCTION -->
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script><!-- AUTOCOMPLETE SEARCH -->
+
+
+
+<script>
+function reloadMessages(id) {
+	$('#message-feed-wrapper').fadeOut('slow').load('message/messagedbee').fadeIn("slow");
+}
+
+$(function() {
+	seeuserprofile(14570);
+	newmessagefeed('0');
+});
+</script>
+<script type="text/javascript">
+
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-28197067-1']);
+_gaq.push(['_trackPageview']);
+
+(function() {
+var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+
+</script></head>
+
+<body>
+<script language="javascript" type="text/javascript">setInterval("chktopnotification(1)",2000);</script>
+<div id="pagetop"></div>
+<div id="topWrapper" class="topWrapper">
+	<div class="top">
+		<div class="topLeft">
+			<div style="float:left; width:190px; margin-left:50px;">
+							<div style="float:left; margin-top:3px;">
+							<img src="'.BASE_URL_IMAGES.'/show_thumbnails.php?ImgName=dhiraj_1354699544.jpg&ImgLoc=userpics&Width=45&Height=45" style="border:1px solid #CCCCCC" /></div>
+				<div>
+										<div style="float:left; color:#FFF; margin:10px 0 0 7px; font-size:12px;">Hi dhiraj<br /><a href="user/logout" style="margin:2px 0 0 0;" class="logout-link">Logout</a></div>
+				</div>
+						</div>
+						<div id="searchBox" style="float:left; margin-top:15px;"><div style="float:left"><form name="searchform" id="searchform" method="post" action="<? $this->serverurl()?>/myhome/search"><input type="text" id="searchword" name="searchword" class="textfieldSearch" onFocus="if(this.value == 'username/keyword') { this.value = ''; }" onBlur="if(this.value == '') { this.value = 'username/keyword'; }" value="username/keyword"><input type="hidden" name="searchtype" id="searchtype"><input type="hidden" name="searchid" id="searchid"></form></div><div style="float:left;" class="search-go" onClick="javascript:document.searchform.submit();">
+						<input type="image" src="/images/navicons/search.png" style="margin-left:1px;"></div></div>
+					</div>
+		<div class="topRight">
+			<div class="topRightLinks"><div id="menutab" class="ddcolortabs">
+	<ul>
+		<li><div style="float:left"><div class="icon-navhome"></div><a href="myhome" title="Home"><span class="navLinksText">Home</span></a></div></li>
+		<li><div class="nav-separator"></div></li>
+		<li><div style="float:left"><div class="icon-navprofile"></div><a href="profile" title="Profile"><span class="navLinksText">Profile</span></a></div></li>
+		<li><div class="nav-separator"></div></li>
+		<li><div class="icon-navnotification"></div><div style="float:left"><a href="notification" title="Notifications"><span class="navLinksText">Notifications</span></a></div><div style="position:absolute"><div id="notifications-top-wrapper" class="notificationcount topnotespos"><div id="notifications-top" style="margin-top:-3px;"></div><div class="speech-top-notes"></div></div></div></li>
+		<li><div class="nav-separator"></div></li>
+		<li><div class="icon-navmessages"></div><div style="float:left"><a href="message" title="Messages"><span class="navLinksText">Messages</span></a></div><div style="position:absolute"><div id="notifications-msg-top-wrapper" class="notificationcount topnotesmsgpos"><div id="notifications-msg-top" style="margin-top:-3px;"></div><div class="speech-top-notes"></div></div></div></li>
+		<li><div class="nav-separator"></div></li>
+		<li><div class="icon-navgroups"></div><div style="float:left"><a href="javascript:void(0);" rel="dropmenu_groups"><span class="navLinksText">Groups</span></a></div><div style="position:absolute"><div id="notifications-group-top-wrapper" class="notificationcount topnotesgrppos"><div id="notifications-group-top" style="margin-top:-3px;"></div><div class="speech-top-notes"></div></div></div></li>
+		<li><div class="nav-separator"></div></li>
+		<li><div class="icon-navsettings"></div><div style="float:left"><a href="javascript:void(0);" rel="dropmenu_settings"><span class="navLinksText">Settings</span></a></div></li>
+	</ul>
+</div>
+
+<!-- drop down menu -->
+<div id="dropmenu_messages" class="dropmenudiv_a" style="width:107px;">
+<a href="newmessages.php">unread</a>
+<a href="mymessages.php">read</a>
+</div>
+
+<div id="dropmenu_groups" class="dropmenudiv_a" style="width:99px;">
+<a href="<?php echo $this->serverurl(); ?>/group">my groups</a>
+<a href="javascript:void(0);" onClick="javascript:OpenShadowbox('group/searchgroups','','125','580');">search groups</a>
+<a href="javascript:void(0);" onClick="javascript:OpenShadowbox('group/creategroup','','325','600');">create group</a>
+<a href="javascript:void(0);" onClick="javascript:OpenShadowbox('group/notifications','','320','600');">notifications</a>
+</div>
+
+<div id="dropmenu_settings" class="dropmenudiv_a" style="width:111px;">
+<a href="javascript:void(0);" onClick="javascript:OpenShadowbox('profile/profileedit','','350','650');">my account</a>
+<a href="javascript:void(0);" onClick="javascript:OpenShadowbox('notification/show','','480','500');">my notifications</a>
+</div>
+
+<script type="text/javascript" language="javascript">
+//SYNTAX: tabdropdown.init("menu_id", [integer OR "auto"])
+tabdropdown.init("menutab")
+</script>
+
+			</div>
+		</div>
+	</div>
+</div>
+<input type="hidden" id="curr-notification-count">
+<input type="hidden" id="notifications-top-hidden" value="0">
+<input type="hidden" id="notifications-top-redb-hidden" value="0">
+<input type="hidden" id="notifications-top-mentions-hidden" value="0">
+<input type="hidden" id="notifications-top-score-hidden" value="0">
+<input type="hidden" id="notifications-top-comment-hidden" value="0">
+<input type="hidden" id="notifications-top-msg-hidden" value="0">
+<input type="hidden" id="notifications-top-grpinvite-hidden" value="0">
+<div id="Middle">
+	<div id="MiddleTopPost">
+		<a href="myhome"><div id="Logo" style="margin-bottom:20px;"></div></a><div class="startnewdb" onClick="javascript:openpostdb()">new <?php echo POST_NAME;?></div>
+		<div class="next-line"></div>
+		<div id="dbee-highlighted-wrapper">
+			<div id="profile-highlighted"></div>
+			<div class="next-line"></div>
+		</div>
+		</div>
+	<div id="MiddleLeft">
+		<div id="dbees-feeds-wrapper">
+			<div>
+				<div class="user-name" style="margin:5px 0 5px 0px;">my messages</div>
+				<div class="next-line"></div>
+				<div style="margin-top:10px;">
+					<div id="all-message-feed"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="MiddleRight">
+			</div>
+	<div class="next-line"></div>
+</div>
+<div style="clear:both"></div>
+
+<div id="footerSlideContainer">
+	<div id="footerSlideButton"></div>
+	<div id="footerSlideContent">
+		<div id="footerSlideText" style="display:none">
+			<div style="float:left"><a href="http://www.myplanetlife.com" target="_blank"><div class="footerLogo"></div></a></div>
+			<div align="right" style="float:right; margin-right:20px;">
+				<a href="http://www.facebook.com/dbee.me" target="_blank"><div class="footer-fb" style="margin-top:10px;"></div></a>
+				<a href="https://twitter.com/dbee_me" target="_blank"><div class="footer-twitter" style="margin-top:10px; margin-left:10px;"></div></a>
+				<div style="margin-top:20px; margin-left:20px; float:left"><a href="javascript:void(0);" onClick="javascript:openterms();"><font color="#FFFFFF">Terms & Conditions</font></a> <font color="#FFFFFF">|</font> <a href="javascript:void(0);" onClick="javascript:openprivacy();"><font color="#FFFFFF">Privacy Policy</font></a> <font color="#FFFFFF">|</font> <a href="javascript:void(0);" onClick="javascript:openabout();"><font color="#FFFFFF">About</font></a> <font color="#FFFFFF">|</font> <a href="javascript:void(0);" onClick="javascript:openfeedback();"><font color="#FFFFFF">Feedback</font></a></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!--
+<div id="footer">
+	<div class="footerContent">
+		<div style="float:left"><a href="http://www.myplanetlife.com" target="_blank"><div class="footerLogo"></div></a></div>
+		<div align="right" style="float:right; margin-right:20px;">
+			<a href="http://www.facebook.com/pages/dbee-LIFE/202074076532820" target="_blank"><div class="footer-fb" style="margin-top:10px;"></div></a>
+			<a href="https://twitter.com/#!/dbeeLIFE" target="_blank"><div class="footer-twitter" style="margin-top:10px; margin-left:10px;"></div></a>
+			<div style="margin-top:20px; margin-left:20px; float:left"><a href="javascript:void(0);" onclick="javascript:openterms();"><font color="#FFFFFF">Terms & Conditions</font></a> <font color="#FFFFFF">|</font> <a href="javascript:void(0);" onclick="javascript:openprivacy();"><font color="#FFFFFF">Privacy Policy</font></a> <font color="#FFFFFF">|</font> <a href="javascript:void(0);" onclick="javascript:openabout();"><font color="#FFFFFF">About</font></a> <font color="#FFFFFF">|</font> <a href="javascript:void(0);" onclick="javascript:openfeedback();"><font color="#FFFFFF">Feedback</font></a></div>
+		</div>
+	</div>
+</div>
+-->
+<div id="postdbee-popup" class="popup_block"><?php echo POST_NAME;?> posted to your profile.</div>
+<div id="favourite-popup" class="popup_block"><?php echo POST_NAME;?> added to your favourites.</div>
+<div id="archivemsg-popup" class="popup_block">Message deleted from your list.</div>
+<div id="deletefavourite-popup" class="popup_block">Do you really want to remove this <?php echo POST_NAME;?> from your favourites?<br /><br /><div id="deletefavourite-controls"></div></div>
+<div id="joingroup-popup" class="popup_block">Request sent to group owner.</div>
+<div id="hideuserdb-popup" class="popup_block"></div>
+
+<div class="sticky-left-wrapper">
+<!--	<div class="sticky-left-fblike sticky-left"></div> -->
+	<a href="http://www.facebook.com/dbee.me" target="_blank"><div class="sticky-left-fb sticky-left"></div></a>
+	<a href="https://twitter.com/dbee_me" target="_blank"><div class="sticky-left-twitter sticky-left"></div></a>
+	<div class="sticky-left-about sticky-left" onClick="javascript:openabout();"></div>
+</div>
+
+<div id="sticky-left-newcomm" style="display:none" onClick="javascript:opennewcomm()">
+	<div class="sticky-left-newcomm"><div id="sticky-left-newcomm-num"></div></div>
+</div>
+<a href="dbleagues"><div class="sticky-left-leagues"></div></a>
+
+<div id="ghstpopup"><div id="ghstpopup-text">Adam Jones added a new <?php echo POST_NAME;?>.</div></div>
+
+<a name="slidetotop"><div id="backtotop" class="sticky-backtotop"></div></a>
+
+<!-- QTIP FUNCTION -->
+<script type="text/javascript" src="js/qtip/jquery.qtip-1.0.0-rc3.min.js"></script>
+<!-- QTIP FUNCTION -->
+<!-- SCRIPT FOR FADE POPUP -->
+<div id="blockusermsg-popup" class="popup_block"></div>
+<script type="text/javascript">
+var jqnc=jQuery.noConflict();
+jqnc(document).ready(function(){
+	fadepopup();
+});
+</script>
+<!-- SCRIPT FOR FADE POPUP -->
+</body>
+</html>

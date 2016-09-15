@@ -1,0 +1,71 @@
+<?php  
+
+$commonbynew 	=	new Application_Model_Commonfunctionality();
+$this->profile_obj 	=	new Application_Model_Profile();
+
+$postcount = '';
+$dbeeList = array(); 
+$return='<input type="hidden" id="hiddendbmy" class="mydbeexxx" value="1">';
+
+if(count($this->dbeealldbees) > 0) 
+{
+	$postcount = 1;
+        $k=1;       
+        foreach ($this->dbeealldbees as $row) :
+			$IDs .= $row['DbeeID'].',';
+
+			$slice = array();
+			if($row['TaggedUsers']!="")
+			{
+			 $slice=explode(',', $row['TaggedUsers']);
+		    }
+
+		$followinguser= $this->profile_obj->getTotalUsers2($this->session_data['UserID']);
+		
+		if(count($slice) > 0 && $this->session_data['UserID']!=$row['User'] && $row['PrivatePost']==1)
+		{
+			if(in_array($this->session_data['UserID'], $slice))
+	        {
+	     	$return.=$commonbynew->displayLayoutDbs($row,$this->Social_Content_Block,'all',$this->plateform_scoring,$this->adminpostscore);
+	     	}
+		}
+	    else
+	    {
+	        $return.=$commonbynew->displayLayoutDbs($row,$this->Social_Content_Block,'all',$this->plateform_scoring,$this->adminpostscore);
+	    }
+	    
+			$k++;
+			$dbid       = $row['DbeeID'];
+			$dbeeList[] = trim($row['DbeeID']);
+			
+			$activeuser =  $this->profile_obj->getTotalUsers($this->session_data['UserID'], $row['DbeeID']);
+			$data[$dbid] =json_encode(array_merge(json_decode($followinguser, true),json_decode($activeuser, true)));
+
+		endforeach; 
+
+		
+}
+else 
+{
+	if($this->dbeenotavailmsg==1) $nomsg = '';
+	else 	{
+
+		$allow_admin_post_live= ($this->session_data['UserID']!=adminID)? $this->allow_admin_post_live: '0';
+
+		$nomsg = '<div><div class="userVisibilityHide"><span class="fa-stack fa-2x"><i class="fa fa-pencil fa-lg"></i></span><br>No posts found.</div><div style="display:none" class="btn popOver checkingaction checkingMyprofile" data-groupid="'. $this->session_data['groupid'].'" controlName="dashboarduser" id="startdbHeaderBtn"  data-title="db link" rel="dbtext" usertype="'.$this->session_data['usertype'].'" data-AdminApprove="'.$allow_admin_post_live.'" data-IsLeagueOn="'.$this->IsLeagueOn.'" data-allow_user_create_polls="'. $this->allow_user_create_polls.'" currentholder="off"><span>Create a post now</span></div></div>';
+	}
+   $seemorelabel = $nomsg;
+
+   $postcount = 0;
+} 
+	 
+$startnew=$this->startnew;
+		$return.='<div id="see-more-feeds'.$startnew.'"><div id="more-feeds-loader" style="cursor:pointer; color:#333333; text-align:center;" onclick="">'.$seemorelabel.'</div></div>';
+		//$return.= '~#~'.'';
+		//$return.= '~#~'.$IDs;
+		echo $return.'~#~'.$startnew.'~#~'.$IDs.'~#~'.$startnew.'~#~'.implode(',', $dbeeList).'~#~'.$postcount;
+ 
+			
+
+?>
+       

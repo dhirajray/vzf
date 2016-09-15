@@ -1,0 +1,43 @@
+<?php 
+	 $counter = 1; foreach ($this->qaResult as $row): 
+		$ago = $this->common_model->Commentagohelper($row['timestamp']);
+		 if ($row['user_id'] != '-1') {
+	        if ($row['Status'] == 1)
+	            $profilelinkstart = '<a href="' . BASE_URL . '/user/' . $this->myclientdetails->customDecoding($row['Username']) . '" class="cmntuserLink">';
+	        else 
+	            $profilelinkstart = '<a href="javascript:void(0)" class="profile-deactivated" title="' . DEACTIVE_ALT . '" onclick="return false;">';
+	        $profilelinkend = '</a>';
+
+			$userTypenal = $this->common_model->checkuserType($row['usertype']);
+
+	    } else 
+	    {
+	        $profilelinkstart = '';
+	        $profilelinkend   = '';
+	    }
+
+		$return .= '<div id="comment-block-question-' . $row['id'] . '" class="comment-list " ' . $no_bottom_border . '><div style="float:left; width:40px; height:40px;">' . $profilelinkstart . '<img src="'.IMGPATH.'/users/small/' . $row['ProfilePic'] . '" width="30" height="30" border="0" />' . $profilelinkend . '</div>';
+		$return .= '<div id="dbcomment-speechwrapper" class="dbcomment-speechwrapper">
+		<div class="cmntPrpLnks propqa">' . $profilelinkstart . $this->myclientdetails->customDecoding($row['Name']) . ' ' . $this->myclientdetails->customDecoding($row['lname']) . $userTypenal . $profilelinkend.'<span style="font-weight:bold">answered: </span>';
+		$return .= '&nbsp;' . $this->comment_model->convert_clickable_links($row['qna']) . '</div>';
+		if ($row['parentid'] != 0) 
+		{
+            $divcontainer = $this->expert_model->getallanswersfromcommentid($row['parentid']);
+            $return .= '<div class="parentcomment" >' . $divcontainer . '</div>';
+        } 
+		$return .= '</div>';
+		$return .= '<div class="next-line"></div><div class="ftrCmnt"><div style="float:left;">' . $ago . '</div>';
+		
+		if ($this->loginUserId ==$this->expertid && $this->loginUserId!='' && false) 
+		{   
+			 $return .= '<div style="float:right; margin-left:2px;"><a href="javascript:void(0);" class="removeanswer" parentid="' . $row['parentid']. '" answer_ids ="' . $row['id'] . '" ><div class="icon-delete1" style="float:right;font-size:10px;" title="remove my answer">remove my answer </div></a></div>';
+		}else if($this->loginUserId == adminID && $this->loginUserId && false)
+		{
+			$return .= '<div style="float:right; margin-left:2px;"><a href="#?w=330" class="removeanswer" comment_ids ="' . $row['id'] . '" type="1" >remove answer </a></div>';
+		}
+		
+		$return .= '<br style="clear:both; font-size:1px;" /></div>';
+		$return .= '</div></div></div>';
+	$counter++; endforeach;  
+	echo $return; 
+?>

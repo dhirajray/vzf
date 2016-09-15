@@ -1,0 +1,13 @@
+<ul class="tabHeader tabLinks" id="repliesQA">
+<li><a href="javascript:void(0);" data-tab="publicqa" class="publicQa">Live questions<span class="CountQA" id="publicQaCount"></span></a></li>
+<?php if($this->livequestion!=0 && (in_array($this->loginUserId,$this->expertlist) || $this->loginUserId == $this->ownerid)){ ?>
+<li><a href="javascript:void(0);" data-tab="liveqa" class="ShowMyquestion">Answered questions <span class="CountQA" id="LiveQACount"></span></a></li>
+<?php } ?>
+<?php if(!in_array($this->loginUserId,$this->expertlist) && $this->myquestion!=0){ ?>
+  <li><a href="javascript:void(0);" data-tab="myqa" class="Myquestion">My questions <span class="CountQA" id="myQACount"></span></a>
+  </li>
+ <?php } ?>
+<?php  if((in_array($this->loginUserId,$this->expertlist) && $this->pendingquestion!=0) || ($this->loginUserId == $this->ownerid && $this->pendingquestion!=0)) { ?>
+<li><a href="javascript:void(0);" data-tab="pqa" class="Pendingquestion">Pending questions <span class="CountQA" id="pendingQACount"></span></a></li>
+ <?php } ?>
+</ul>

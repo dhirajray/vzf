@@ -1,0 +1,14 @@
+<?php
+$return = '';
+if(count($this->resultData) > 0) 
+{
+	$k=1;  
+ 	if($k== 1) 
+ 		setcookie("CookiePostDate", $row->PostDate, time()+3600);
+    foreach ($this->resultData as $row) :
+     	$return	.=	$this->commonmodel_obj->displayLayoutDbs($row,$this->Social_Content_Block,'all',$this->plateform_scoring,$this->adminpostscore);
+		$k++;
+	endforeach; 
+}
+echo $return;
+?>

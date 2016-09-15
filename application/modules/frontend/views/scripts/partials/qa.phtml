@@ -1,0 +1,65 @@
+<?php 
+	 $counter = 1; foreach ($this->qaResult as $row): 
+
+		$ago = $this->common_model->Commentagohelper($row['timestamp']);
+		 if ($row['user_id'] != '-1') {
+	        if ($row['Status'] == 1)
+	            $profilelinkstart = '<a href="' . BASE_URL . '/user/' . $this->myclientdetails->customDecoding($row['Username']) . '" class="cmntuserLink">';
+	        else 
+	            $profilelinkstart = '<a href="javascript:void(0)" class="profile-deactivated" title="' . DEACTIVE_ALT . '" onclick="return false;">';
+	        $profilelinkend = '</a>';
+
+			$userTypenal = $this->common_model->checkuserType($row['usertype']);
+
+	    } else {
+	        $profilelinkstart = '';
+	        $profilelinkend   = '';
+	    }
+        $divcontainer = '';
+        $propqa = '';
+        if ($row['reply'] == 1) 
+		{ 
+            $parentDiv = $this->expert_model->getallanswersfromcommentidQA($row['id'],$this->expertText);
+            if($parentDiv!=''){
+            	$divcontainer = '<div class="parentcomment" >' . $parentDiv . '</div>';
+            	$propqa = ' propqa ';
+        	}
+        }
+
+		$return .= '<div id="comment-block-question-' . $row['id'] . '" class="comment-list " ' . $no_bottom_border . '><div style="float:left; width:40px; height:40px;">' . $profilelinkstart . '<img src="'.IMGPATH.'/users/small/' . $row['ProfilePic'] . '" width="30" height="30" border="0" />' . $profilelinkend . '</div>';
+		$return .= '<div id="dbcomment-speechwrapper" class="dbcomment-speechwrapper"><div class="cmntPrpLnks '.$propqa.'">' . $profilelinkstart . $this->myclientdetails->customDecoding($row['Name']) . ' ' . $this->myclientdetails->customDecoding($row['lname']) . $userTypenal . $profilelinkend;
+		$return .= '&nbsp;'.$this->comment_model->convert_clickable_links($row['qna']).'</div>';
+
+        $return .=$divcontainer;
+        $return .= '</div>';
+		$return .= '<div class="ftrCmnt"><div style="float:left;">' . $ago . '</div>';
+	
+		if ($row['reply']== 0 && $this->loginUserId ==$this->expertid && $this->loginUserId!='') 
+		{   
+			$return .= '<div style="float:right; margin-left:2px;"><a href="javascript:void(0);" class="replytoquestion btn btn-mini btn-green" expert_id="' . $row['expert_id'] . '" cmntowner="' . $row['UserID'] . '" dbid="' . $row['dbeeid'] . '" commentID="' . $row['id'] . '">Answer</a></div>';
+			if($row['status']==3)
+			 	$return .= '<div style="float:right; margin-left:2px;" class="qaotherexpert">Marked as other</div>';
+			$return .= '<div class="replymebox" id="replymebox' . $row['id'] . '"></div>';
+		}
+		else if ($this->loginUserId==$this->ownerid && $this->loginUserId!='' && $this->expertid!='') 
+		{   
+			if($row['status']==2)
+			{
+				$markasOther = '<div style="float:right; margin-left:2px;"><a href="javascript:void(0);" data-type="movetoother"  class="movetoexpert btn btn-mini btn-green" dbid="' . $row['dbeeid'] . '" commentID="' . $row['id'] . '">Mark as other</a></div>';
+				$markasOther = '';
+				$return .= '<div class="qalinks" id="qalinks_'.$row['id'].'" ><div style="float:right; margin-left:2px;"><a href="javascript:void(0);" data-type="movetohide" class="movetoexpert btn btn-mini" dbid="' . $row['dbeeid'] . '" commentID="' . $row['id'] . '">Remove</a></div><div style="float:right; margin-left:2px;"><a href="javascript:void(0);" data-type="movetoexpert" class="movetoexpert btn btn-mini btn-green" dbid="' . $row['dbeeid'] . '" commentID="' . $row['id'] . '">Verify</a></div>'.$markasOther.'</div>';
+
+			}else if($row['status']==5)
+			 	$return .='<div style="float:right; margin-left:2px;" class="qaverified">Verified</div>';
+			else if($row['status']==3 && false)
+			 	$return .='<div style="float:right; margin-left:2px;" class="qaother">Marked as other</div>';
+		}
+		if(($this->loginUserId == $row['user_id'] && $this->loginUserId && $row['reply'] == 0) || ($this->loginUserId == adminID && $this->loginUserId && $row['reply'] == 0)) 
+		{
+			$return .= '<div style="float:right; margin-left:2px;"><a href="javascript:void(0);" class="removequestion btn btn-mini" expert_id="' . $row['expert_id'] . '" cmntowner="' . $row['UserID'] . '" dbid="' . $row['dbeeid'] . '" commentID="' . $row['id'] . '">Remove</a></div>';
+		}else
+			$return .= '<br style="clear:both; font-size:1px;" /></div>';
+		$return .= '</div></div></div>';
+	$counter++; endforeach;  
+	echo $return; 
+?>

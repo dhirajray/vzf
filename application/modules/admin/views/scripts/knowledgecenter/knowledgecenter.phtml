@@ -1,0 +1,110 @@
+<?php         
+$this->title = "Invited";
+$this->headTitle($this->title);
+
+?>
+
+
+<div id="inviteusersDialog" title="Invite Users to DBEE" style="display:none;">
+	<p class="validateTips">All form fields are required.</p>
+ 
+	<form>
+	<fieldset>
+		<label for="name">Name</label>
+		<input type="text" name="inv_username" id="inv_username" class="text ui-widget-content ui-corner-all" />
+		<label for="email">Email</label>
+		<input type="text" name="inv_useremail" id="inv_useremail" value="" class="text ui-widget-content ui-corner-all" />
+		<p class="" style="color:red">Separate multiple names and email addresses with a comma (,)</p>
+	</fieldset>
+	</form>
+</div>
+
+
+ <div style="float:left; width:600px; margin-bottom:10px">
+
+ 	<div id="exp_search" class="mainsearch" style="width:130px;" ><span>Invite new user</span></div>
+ 	<a  href="<?php echo BASE_URL ?>home/user">
+ 		<div  class="mainsearch" style="float:right;  width:130px;" ><span>Add new user</span></div>
+ 	</a>
+ </div>
+
+<div id="addusers" title="Add Users to DBEE">
+	<div class="" style="width:650px;float:left;border:0px solid gray">
+		
+		<div id="expended" class="mainsearchexpand" >
+			
+			<div  class="addcondition" > 
+				<span id="im_inviteusers"> Invite user using form  </span> 
+				<span id="add_condition" class="loadfilter_cls">
+					Invite users from file
+				</span>
+			</div>
+			<div id="exp_condition" class="expenddcondition" >
+				<div style="float:right; padding-right:20px;">
+					<a href="<?php echo BASE_URL ?>downloadcenter/importformat.csv">Click Here to Download Example</a>
+				</div>
+				<form id="formid" method="POST" action="<?php echo $this->url(array('controller'=>'import','action'=>'getcsvrecords'));?>" enctype="multipart/form-data">
+						<div id="save_filterName" style="padding:20px;" > 
+							<input type="file"  name="csvfile" id="inviteusers" >
+							<input type="submit"  name="csv_submit" id="csv_submit" value="Invite">
+						</div>
+					
+				</form>
+				
+			</div>
+		</div>	
+	</div>	
+</div>
+
+
+
+<div class="search">
+
+	<form action="<?php echo $this->url(array('controller'=>'import','action'=>'invitedetails'));?>" method="POST">
+		<input type="text" class="gh-tb"  maxlength="200" value="" id="searchfield" name="searchfield" placeholder="Search User" autocomplete="OFF">
+		<input type="image" id="ghSearch"  src="<?php echo $images ?>/search_button.png" class="search_button" alt="">
+		
+	</form>
+</div>		
+<table style="width:650px;" border="0">
+<tbody>
+	<?php if (count($this->paginator)){ ?>
+	<?php $rowchange	=	0; ?>
+<tr style="text-align:left;background-color:yellow;height:30px;">
+    <th>Name</th>
+    <th>Email</th>
+	<th>Status</th>
+	<th>Action</th>  
+</tr>
+<?php foreach($this->paginator as $user) : ?>
+<?php if($rowchange%2==1) {$color	=	'#EEE';} else {$color ='#EEE';} ?>
+<?php //print_r($user); die; ?>
+<tr style="background-color:<?php echo $color?>;height:30px;" id="userslist_<?php echo $this->escape($user->inv_id);?>">
+    <td><?php echo $this->escape($user->inv_name);?></td>
+    <td><?php echo $this->escape($user->inv_email);?></td>
+	<td><?php echo ($user->isadded==1) ?  "Added":  "Pending";?></td>
+	<td>
+		<?php if(($user->isadded!=1)) { ?>
+        <span class="cursor inviteAction" action="re" userid="<?php echo $this->escape($user->inv_id);?>" email="<?php echo $this->escape($user->inv_email);?>"> Re Invite </span>
+        <?php } else { ?> 
+        <span > Tot Invited </span>
+        <?php } ?>
+        <span id="recounter_<?php echo $this->escape($user->inv_id);?>">(<?php echo ($this->escape($user->reinvite));?>)</span>
+           
+            &nbsp;&nbsp;&nbsp;&nbsp;
+       	
+       	<span class="cursor inviteAction"  action="delete" userid="<?php echo $this->escape($user->inv_id);?>" email="<?php echo $this->escape($user->inv_email);?>"> Delete </span> 
+    </td> 
+</tr> 
+<?php $rowchange++; endforeach; ?>
+	<?php } else { ?>
+	<tr><td colspan=5>Users Not Found!</td></tr>	
+	<?php } ?>
+<tr><td colspan=5>&nbsp;</td></tr>	
+<tr><td colspan=5><?php 
+	/*
+	 * Print the pagination of type
+	 */
+	echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml'); ?></td></tr>
+</tbody>
+</table>

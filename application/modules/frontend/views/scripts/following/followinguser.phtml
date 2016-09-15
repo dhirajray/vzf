@@ -1,0 +1,62 @@
+<link href="<?php echo BASE_URL;?>/css/styles.css" media="screen" rel="stylesheet" type="text/css" />
+
+
+
+
+<div style="height:300px"> 
+
+<?php
+
+
+
+$NameRow = $this->user;
+
+
+
+$UserName=ucwords($NameRow['Name']).' is being followed by';
+
+$UserNamemsg=ucwords($NameRow['Name']);
+
+echo '<div id="my-dbees" style="padding: 10px 10px 10px 10px;"><div class="user-name titleHdpad" style="margin-bottom:15px">'.$UserName.'</div><div class="next-line"></div><div>';     
+
+ 
+
+echo '<div id="mydbcontrols"></div>';
+
+
+
+if(count($this->followingdbees)>0) {
+
+	$counter=1;
+
+	foreach($this->followingdbees as $Row):
+
+		$return.='<a href="/user/'.$Row['Username'].'" target="_top"><div class="follower-box-auto"><img src="'.IMGPATH.'/users/miedum/'.$Row['ProfilePic'].'" border="0"  width="95" height="95/><br /><div style="width:95px">'.$Row['Name'].'</div></div></a>';
+
+		if($counter%5==0) $return.='<div class="next-line"></div>';
+
+		$counter++;
+
+	endforeach;
+
+}
+
+else {	
+
+	$return.='<div class="noFound" align="center">'.$UserNamemsg.' is currently not followed by anyone.</div>';
+
+}
+
+$return.='</div>';
+
+
+
+echo $return;
+
+
+
+
+
+?>
+
+</div>

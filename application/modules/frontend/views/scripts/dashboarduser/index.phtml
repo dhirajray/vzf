@@ -1,0 +1,1117 @@
+<?php
+$storage 	= new Zend_Auth_Storage_Session();
+$data	  	= $storage->read();
+$userlogincheck = $data['UserID'];
+$personaledit = ($this->personaledit=='')?'false':'true';
+$user_allowTC_session = new Zend_Session_Namespace('User_AllowTC');
+
+$islogin = (! empty ( $this->userid )) ? true : false;
+ 
+?>
+<input type="hidden" id="xxfeedtype">
+<input type="hidden" id="startnewlivevideo" value="<?php echo PAGE_NUM; ?>">
+<script type="text/javascript">
+
+	$(document).ready(function(){
+
+			
+
+		 	var profileLocation = '/user/'+$('#ProfileLink').attr('data-user')+'?=taketour';
+		 	
+		    if(window.location.href.split('?=taketour').length==2){
+		      $takeTour(); 
+		    }
+
+		if(TAKEATOUR==0){
+		    	//$takeTour();
+				$('.startTourNow, .skipTour').click(function(){
+					$.ajax({
+					    type: "POST",
+					    dataType: 'json',
+					    url: BASE_URL + '/dashboarduser/takeatour/',
+					    beforeSend: function() {},
+					    cache: false,
+					    success: function(response){
+					      /*  if (response.success == '') {
+					            $messageError ('Oops, something went wrong.');	                
+					        }*/
+					    }
+
+					});
+				});
+		 }
+     
+		var hash = window.location.hash.substring(1);
+		if(hash!='_=_' && window.location.hash){
+			$('#leftListing').html('<ul id="my-dbees" class="postListing"></ul>').show();
+			$('.profileStatsWrp').remove();	
+			$("#"+hash).click();			
+		}else{
+			$('#leftListing').show();
+		}
+
+		<?php if($data['usertype']!=100 && $this->usertype==100){ 
+
+
+			?>
+			
+			$('#leftListing').html('<div class="userVisibilityHide">\
+									<span class="fa-stack fa-4x">\
+									  <i class="fa fa-user fa-stack-1x"></i>\
+									  <i class="fa fa-ban fa-stack-2x"></i>\
+									</span><br>\
+									This is a VIP profile. <br> <a href="'+BASE_URL+'/myhome">Click here</a>\
+									to go back to home.</div>');
+			
+		<?php }	?>
+
+		<?php if($this->hideuser==1 && $this->profileholder!=1){ ?>
+			
+			$('#leftListing').html('<div class="userVisibilityHide">\
+									<span class="fa-stack fa-4x">\
+									  <i class="fa fa-user fa-stack-1x"></i>\
+									  <i class="fa fa-ban fa-stack-2x"></i>\
+									</span><br>\
+									This is an anonymous profile.<br> <a href="'+BASE_URL+'/myhome">Click here</a> to go back to home.</div>');
+
+
+		<?php }	?>
+
+		
+	});
+</script>
+
+<?php if($this->invite=='linkedin') { ?>
+	<script type="text/javascript">
+	$(document).ready(function(){
+		linkedinUserProfile();
+	});
+	</script>
+<?php } ?>
+
+<?php if($_GET['type']=='facebook') { ?>
+	<script type="text/javascript">
+	$(document).ready(function(){
+		facebookfriends();
+	});
+	</script>
+<?php } ?>
+<script>
+	
+	var sidebarTab = <?php echo $this->sidebartab; ?>
+		
+
+	$(document).ready(function(){
+		fetchspecificadvert(<?php echo $this->userid; ?>,4);
+		/*setTimeout(function(){
+			fetchspecificadvert(<?php echo $this->userid; ?>,4);
+		}, 5000);*/	
+		<?php if($this->profileholder==1){ ?>
+			$( "#sortable").sortable({
+			    placeholder: "ui-state-highlight",
+			    handle: ".rtListOver",	
+                axis: "y",
+			    update:function(){
+			    	var arrayPosition = $("#sortable").sortable('toArray', {attribute:"dataindex"});
+			    	
+			    	$.ajax({
+			    		url: BASE_URL+'/dashboarduser/sideboxposition/',
+			    		type: 'POST',
+			    		data: {sideBoxPosition:arrayPosition},
+			    	});
+			    	
+			    }
+			  });
+
+			$( "#sortable" ).disableSelection();
+
+		<?php } ?>
+
+
+
+			<?php if($this->sidebartab!=''){ ?>
+				$( "#sortable > div").each(function(index, el) {
+					$(this).attr('dataindex', index);
+				});
+				$.each(sidebarTab, function(index, val) {	
+					var listItems = $( "#sortable > div[dataindex="+val+"]").detach();
+					 listItems.appendTo('#sortable');
+					$( "#sortable > div[dataindex="+val+"]").fadeIn();
+				});
+			<?php }else{  ?>
+				$( "#sortable > div").each(function(index, el) {
+					$(this).attr('dataindex', index).show();
+				});
+			<?php } ?>
+		
+
+
+		$('#aboutLinkedAcount').click(function(event) {
+			var text = 'Link your social accounts and easily control facebook posts and tweets from within the platform. Easily share on the platform and to your linked social accounts via the \'Social feed\' link.';
+   			$.dbeePopup(text);
+   		});
+   		$('body').on('click','#aboutVIPAnonymity', function(event) {
+			var text = 'As a VIP user, you are automatically anonymous to all non-VIP users. By clicking ‘On’ you will also be anonymous to all VIP users. Your content and activity is only anonymous to other VIP users for as long as this feature is switched on.';
+   			$.dbeePopup(text);
+   		});
+   		
+   		
+
+		var profileholder = '<?php echo $this->profileholder;?>';	
+		if(profileholder==''){
+			$('#leftsideMenu').find('.active').removeClass('active');		
+		}
+
+		$('.scrInfoSide').click(function(event) {
+			$('.scoringDesSide').slideToggle();
+		});
+		
+		
+
+		
+
+		<?php //} ?>
+		
+	
+        
+
+	});
+	customDashboardDisplay(); // fetching customized posts
+	setTimeout(function(){
+		topmessagedisplay('.topmessagedisplay',<?php echo $personaledit ?>,<?php echo $this->userid ?>,'notedit');
+		adminliveDisplay('.adminonlive'); 
+		loaduserpdf('.userpdfleft');	
+		PendingQuestion('#pendingquestion');
+		MyPendingQuestion('#mypendingquestion');
+		
+	}, 5000);	
+
+	
+</script>
+
+
+<?php if($this->userexiest==1){
+			$personaledit = ($this->personaledit==true)?'<a href="#" class="fa fa-pencil"></a>':'';
+	?>
+
+<?php if($this->profileholder==1){ 
+	$style="";
+}else
+{
+   $style="dashuser";
+}
+
+?>
+<?php if($this->chkAllowTC < 1 ){
+echo '<input type="hidden" id="oracleTrm" value="'.nl2br($this->login_terms).'">';
+} ?>
+<input type="hidden" id="startnewcat" value="<?php echo PAGE_NUM; ?>">
+<!--this is page listing-->
+<div id="filtercat" value="" style="float: left;margin-left: 21px;padding-top: 0;width: 49.5%;"></div>
+
+<?php if($this->useractivestatus==1) {?>
+<div id="leftListing" class="myDashboard" style="display:none">
+
+	<div class="dashboarprofleWrp <?=$style?>" id="dashboarduserDetails">	
+	</div>
+
+	<div id="previewTemplate" class="dz-preview dz-file-preview">
+	    <div class="dz-details">
+	        <div class="dz-filename"><span data-dz-name></span></div>
+	        <div class="dz-size" data-dz-size></div>
+	        <img data-dz-thumbnail />
+	    </div>
+	    <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
+	</div>
+
+ 	<div class="span6">   <div class="dropzone-previews"></div> </div>
+		<!-- abot me section -->
+		<?php 
+		  if(count($this->biographi) > 0)
+		{
+		?>
+			
+			<div class="biogrophydisplay">
+				
+				<div id="biogrophydisplayForm" style="display:none;">
+				<div class="rboxContainer">	
+								
+					<div id="bioData"></div>	
+					<div class="bioInfoSep">
+						 <div id="dashboardpersonalinfo"></div>					 
+						<!--  <div id="dashboardcontactinfo"></div> -->
+					</div>	
+				
+				</div>
+				
+			</div>
+			</div>	
+			<div class="clearfix"> </div>
+		<?php } ?>
+
+	<?php if($this->profileholder==1){ ?>
+		
+		
+		<?php if($this->session_data['role']!=100) {?>
+		<div class="">
+			<div class="customizeDeshboard">
+				
+				<div class="customizeDeshboardform" style="display:none">
+					<input type="hidden" id="filterdashcat" > 
+					<input type="hidden" id="filterdashgroupcat" >
+					<input type="hidden" id="filterdashgroupType" >
+					<div class="rboxContainer">
+						<div class="defaultCategories" data-type=""></div>
+						<!--<div class="pull-right "><a id="postCategory" class="pull-left btn btn-black filterdashboard" href="javascript:void(0)">Post</a></div>-->
+					</div>
+					<div class="rboxContainer">
+						<div class="defaultGrpCategories" data-type=""></div>
+						<!--<div class="pull-right "><a id="groupCategory" class="pull-left btn btn-black filterdashboard" href="javascript:void(0)">Post</a></div>-->
+					</div>
+					<div class="rboxContainer showPostTheseUsers">
+						<h2><span>Users <i>Show me posts from these users</i></span><a id="Following" class="pull-right btn btn-yellow  btn-mini  filterdashboard" href="javascript:void(0)">Save</a></h2>
+						<div class="clearfix"> </div>
+						<ul id="invitetabs" class="tabHeader tabLinks">
+							<li><a href="#" rel="following-list" class="active">Following</a></li>
+							<li><a href="#" rel="followers-list" >Followers</a></li>
+							<li><a href="#" rel="search-list" >Search</a></li>
+						</ul>
+				
+						<div class="tabcontainer tabContainerWrapper">
+							<div class="postTypeContent" id="passform">
+								<div id="following-list" class="tabcontent" style="display:block;overflow-y:auto;width:100%" ></div>
+								<div id="followers-list" class="tabcontent"  style="overflow-y:auto;width:100%"></div>
+								<div class="btn btn-green pull-right" style="display:none" onclick="followandsearchusers(followers,this)">show more</div>
+								<div id="search-list" class="tabcontent" style="overflow-y:auto;width:100%;" >
+									<div class="singleRow">
+										<div class="formField">										
+											<div id="searchUserBox">
+												<form name="searchleagueUsers" id="searchleagueUsers" action="#"  onSubmit="followandsearchusers();return false;">
+													<div class="srcUsrWrapper">
+														 <div class="fa fa-search fa-lg searchIcon2"></div>													
+														<input type="text" id="keyword" value="" style="min-width:100%;">
+														<!-- <button type="submit" class="btn btn-yellow" style="float:left; display:none;" ><i class="searchIconWhite"></i></button> -->
+													</div>
+												</form>	
+											</div>
+										</div>
+									</div>
+									<div id="searchunfollowusers" class="formRow" style="display:none">
+									<div class="formField"></div>
+								</div>
+								</div>
+		
+							</div>
+						</div>
+					
+					</div>				
+				</div>
+			</div>
+		</div>
+
+		<div id="postMenu" class="tabLinks">
+			
+		<ul id="postMenuLinks" class="customDashboard" style="transition: none 0s ease 0s ;margin-bottom:15px;">
+		</ul>
+		</div>
+		<?php } ?>
+
+		<input type="hidden" id="startnewfollowing" value="<?php echo PAGE_NUM; ?>">
+		<input type="hidden" id="startnewdrouppost" value="<?php echo PAGE_NUM; ?>">
+		<input type="hidden" id="startnewmovedpost" value="<?php echo PAGE_NUM; ?>">
+		<input type="hidden" id="startnewcat" value="<?php echo PAGE_NUM; ?>">
+		<input type="hidden" id="filtertype">
+		<input type="hidden" id="filtercat">
+		<input type="hidden" id="masterUsers"  >
+		
+
+		
+
+	<?php }else{ ?>
+		<div id="postMenu" class="tabLinks">		
+			<ul id="postMenuLinks" style="transition: none 0s ease 0s ;margin-bottom:15px;">
+				<li>
+					<a  href="javascript:void(0)" id="my-dbees-profile" class="active" title="My posts" onclick="javascript:seeglobaldbeelist(<?php echo $this->userid; ?>,4,'my-dbees-profile','myhome','mydbee','mydb')" data-OtherUser="1">posts</a>			
+				</li>		
+				<li>
+					<a onclick="javascript:seeglobaldbeelist('<?php echo $this->userid;?>',4,'my-comments-home2','Comment','index','comment');" class="feed-link" id="my-comments-home2" href="javascript:void(0)" data-OtherUser="1">comments </a>
+				</li>
+				<li>
+					<a id="other-following-profile" class="feed-link" fellowby="profile" following_user_uid="<?php echo $this->userid;?>" data-OtherUser="1">following
+						<span class="notificationcount noshadow balloonBox top right" id="newdbcount-wrapper" style="display:none"><div id="newdbcount"></div></span>
+					</a>
+				</li>
+				<li>
+					<a id="other-followers-profile" data-OtherUser="1"  class="feed-link" fellowby="profile" follow_user_uid='<?php echo $this->userid;?>'>followers</a>
+				</li>
+			</ul>
+		</div>
+		<div class="tabdiv tabDivDeshboard">
+	<?php }?>
+     <?php if($this->session_data['role']!=100) {?>
+	<ul class="postListing postSepline" id="my-dbees"></ul>
+	
+	
+	<ul class="postListing" id="follower-dbees-more"></ul>
+	<ul class="postListing" id="following-dbees-more"></ul>
+	<ul class="follower-show-more " style="display:none;" currentOffset="0" caller="moreFollower" id="show-more-other-followers-profile" follow_user_uid="<?php echo $this->userid;?>" fellowby="profile" ><li class="btn btn-green pull-right">show more</li></ul>
+	<ul class="following-show-more loadmore" style="display:none" currentOffset="0" caller="moreFollowing" id="show-more-other-following-profile" following_user_uid="<?php echo $this->userid;?>" fellowby="profile" ><li class="btn btn-green pull-right btnShowMore">show more</li></ul>
+	<?php } ?>
+	<input type="hidden" id="reloadend">
+    <?php if($this->profileholder!=1){ echo "</div>";}?>
+	<input type="hidden" id="dbid" value="0">
+	
+	<input type="hidden" id="profileuser" value="<?php echo $this->userid;?>">
+	<input type="hidden" id="totalcomments">
+	<input type="hidden" id="totaldbees">
+	<input type="hidden" id="totalredbees">
+	<input type="hidden" id="feedtype">
+	
+	<input type="hidden" id="startnew" value="<?php echo PAGE_NUM;?>">
+	<input type="hidden" id="startnewmydb" value="<?php echo PAGE_NUM;?>">
+	<input type="hidden" id="startnewmyredb" value="<?php echo PAGE_NUM;?>">
+	<input type="hidden" id="startnewmycomments" value="<?php echo PAGE_NUM;?>">
+	<input type="hidden" id="startnewfav" value="<?php echo PAGE_NUM;?>">
+</div>
+<?php } else {?>
+	<div id="leftListing" class="myDashboard" ><div class="userVisibilityHide"><span class="fa-stack fa-4x"><i class="fa fa-user fa-stack-1x"></i><i class="fa fa-ban fa-stack-2x"></i></span><br>This is an inactive profile. <br> <a href="/myhome">Click here</a> to go back to home.</div></div>
+<?php } ?>
+<div id="rightListing">
+<?php if($islogin && $this->profileholder==1 && $this->useractivestatus==1  && $this->carerid!='' && $this->carerid!=0)
+ {  
+	$carrID = $this->carerid;
+	$bookingbtn = '<a href="javascript:void(0);" id="get-booking" data-page="1" class="btn btn-yellow" carrID="'.$carrID.'"  href="javascript:void(0)">
+			<div id="followme-label">My Bookings</div></a>'; 
+	?>
+	<div class="whiteBox followUnfollowWrp">
+		<?php echo $bookingbtn; ?>
+	</div>
+<?php } ?>
+<?php if(isADMIN ==0) {?>
+	<?php if($this->socialloginabilitydetail['allSocialstatus']==0 && $this->profileholder==1  && $this->useractivestatus==1) { ?>
+	<div class="profileStatsWrp">		
+			 <?php if ($this->socialloginabilitydetail['Linkedinstatus']==0  || $this->socialloginabilitydetail['Twitterstatus']==0 || $this->socialloginabilitydetail['Facebookstatus']==0) {
+			?>
+		<div class="profileStatsCell">
+			<div class="profileStats">
+				<div class="prstTitle">Linked accounts <a href="javascript:void(0);" id="aboutLinkedAcount"><i class="fa fa-question-circle"> </i></a> <span class="fa fa-times-circle-o LinkClose"></span></div>
+				<div class="prolinks" id="lkdac"></div>
+				<div class="progressBar" id="plink" style="display:none;"><span class="progressComplete"></span></div>
+			</div>
+		</div>
+		<?php } ?>		
+	</div>
+	<?php } ?>
+	<?php } ?>
+
+
+     <?php $sortMob = 'id="sortable"';        
+       if(ismobile)$sortMob = '';
+     ?>
+
+		<?php
+
+   	  $MyUserId=$this->session_data['UserID'];  
+   	  $this->userpic;      	   
+     ?>
+
+	<?php if($this->userid==$this->session_data['UserID']) 
+	{
+	 
+	?>
+	<div class="whiteBox userMenuSideBar mobSortlist active" style="display:block;">
+		<div class="rtListOver">  
+       	<h2 class="mymenuItem" title="">
+            <a class="myprphotort" style="background-image:url(<?=IMGPATH?>/users/<?=$this->userpic?>);"></a> 
+            <div class="userinfoRt">
+              <?= $this->myclientdetails->customDecoding($this->session_data['full_name']) ?><span>My menu</span>
+            </div>
+        </h2>     	  
+       	  <!--  <h2 class="mymenuItem" title="Click to open or Drag to re-arrange"><i class="fa fa-bars"></i>My menu</h2> -->
+       </div>
+
+	     <div class="rboxContainer" id="mymenuItem" style="display:block">
+		     	<div class="rbcRow">
+			     	<a id="my-comments-home" class="userMenuRight" commentsid="<?=$MyUserId?>" href="javascript:void(0);">
+					 	<i class="fa fa-comment"></i><span id="labelSidebarMyComment" class="labelSidebar Dt1">Comments</span>
+					</a>
+			 </div>
+
+			  <div class="rbcRow">
+				<a id="my-poll" class="userMenuRight" onclick="javascript:seeglobaldbeelist(<?=$MyUserId?>,1,'dbee-feed-favourite','myhome','polllist','mypoll')" href="javascript:void(0);">
+					<i class="fa fa-signal"></i>
+					<span id="labelSidebarFav" class="labelSidebar infLnkTxt">Polls </span>
+				</a>
+			 </div>	
+
+			 <div class="rbcRow">
+				<a id="my-tagged_db" class="userMenuRight" data_myid="<?=$MyUserId?>" href="javascript:void(0);">
+					<i class="fa fa-pencil"></i><span id="labelSidebarFav" class="labelSidebar">Tagged posts</span>
+				</a>
+			 </div>
+			 
+			 <div class="rbcRow">
+				<a id="my-following-profile" class="userMenuRight" href="javascript:void(0);" following_user_uid="<?=$MyUserId?>">
+					<i class="fa fa-male"></i><span>Following</span>
+				</a>
+			 </div>
+
+			 <div class="rbcRow">			     	
+				<a id="my-followers-profile" class="userMenuRight" href="javascript:void(0);"  follow_user_uid="<?=$MyUserId?>">
+					<i class="fa fa-child"></i><span>Followers</span>
+				</a>
+			</div>
+
+			<!-- <div class="rbcRow">
+				<a id="my-contacts" class="userMenuRight" data_myid="<?=$MyUserId?>" href="javascript:void(0);">
+					<i class="fa fa-user fa-lg"></i><span id="labelSidebarFav" class="labelSidebar">Contacts</span>
+				</a>
+			 </div> -->		
+<?php 
+ $checkImage = new Application_Model_Commonfunctionality();	
+
+ if($checkImage->TotalInfluence($MyUserId) > 0) {?> 
+
+			<!--  <div class="rbcRow">
+				<a id="my-influence" class="userMenuRight" onclick="javascript:seeglobaldbeelist(<?=$MyUserId?>,1,'dbee-feed-favourite','favourite','list','fav')" href="javascript:void(0);">
+					<i class="fa fa-lightbulb-o"></i>
+					<span id="labelSidebarFav" class="labelSidebar infLnkTxt">Influence </span>
+				</a>
+			 </div>	 -->
+<?php } ?>
+			 			 
+
+	     </div>
+   </div>
+	<div <?php echo $sortMob ?> class="mobSortlist">
+     
+   
+       
+	<?php } ?> 
+
+	<?php if($this->count > 0 && $this->session_data['role']!=100 && $this->profileholder==1 && $this->count > count($this->FollowsUserdata)  && $this->useractivestatus==1 ) { ?>
+		 
+   <div class="whiteBox InTMember">
+		<div class="rtListOver">		  
+			<h2 class="InTMemberlist" title="Click to open or Drag to re-arrange"><i class="fa fa-user"></i>Connection suggestions</h2>
+		</div>
+		
+
+		<div class="rboxContainer sliderLoader" id="InTMemberlist" style="display:block;">
+			<i class="fa fa-spin fa-spinner fa-lg" id="intmLoader"></i>
+		  <div id="sliderInfo1">
+			<ul class="slides">
+		 <?php 		 
+		 $checkImage = new Application_Model_Commonfunctionality();		 
+       	 $temp = array();
+       	 if(count($this->FollowsUserdata) > 0)
+       	 {
+	       	 foreach ($this->FollowsUserdata as $key => $value) {
+	       	 	$temp[] = $value['User'];
+	       	 }
+       	 }
+       	 
+       	 $k=1;
+
+		 foreach ($this->DisInsUser as $key => $value) { 
+		  if (!in_array($value['userid'], $temp)) {
+		  $userprofilepicxx = $checkImage->checkImgExist($value['ProfilePic'],'userpics','default-avatar.jpg');
+		  $textinfo='';
+		  $userpath="";
+		  $textinfo.=$this->myclientdetails->customDecoding($value['full_name']);		  
+		  
+		  $userpath=BASE_URL.'/user/'.$this->myclientdetails->customDecoding($value['Username']);
+		    ?>
+		  <li onclick="window.location.href='<?=$userpath?>'">		     		  	
+		  	 <a href="<?=$userpath?>" style="background-image:url(<?=IMGPATH?>/users/small/<?=$userprofilepicxx?>);">
+		    </a>
+		     <dl class="userInfoDetail">
+		     	 <dt class="oneline"><?php echo $textinfo; ?></dt>
+		     	 <dd class="oneline"><?php echo $this->myclientdetails->customDecoding($value['title']); ?></dd>
+		     	 <dd class="oneline"><?php echo $this->myclientdetails->customDecoding($value['company']); ?></dd>
+		     </dl>		    
+		  </li>
+		 <?php 
+		     $temp[] = $value['userid'];
+		     
+		       } 
+             }
+		 ?>
+		</ul>
+	 </div>
+
+		</div>
+		 <script type="text/javascript">
+   $(function(){
+   	$('#InTMemberlist').show();
+   	$('#sliderInfo1 li').width('40');
+   });
+  $(window).load(function() {
+
+  $('#sliderInfo1').flexslider({
+	animation: "slide",
+	animationLoop: false,	
+	slideshow: false,
+	useCSS:false,
+	controlNav: false,
+	itemWidth: 40,	
+	minItems: 5,
+    itemMargin:7,
+	nextText:'',	
+	prevText:''
+  });  
+   
+
+ 
+  $('#InTMemberlist').removeClass('sliderLoader');
+  $('#sliderInfo1 li:first').addClass('flex-active-slide'); 
+
+setTimeout(function(){
+	  $('#InTMemberlist').removeAttr('style'); 
+	  $('#sortable .InTMember h2').trigger('click')
+}, 100);
+
+  $('#sliderInfo1 .slides li').on('mouseover',function(){
+  		$(this).closest('ul').find('.flex-active-slide').removeClass('flex-active-slide');
+  		$(this).addClass('flex-active-slide');  		
+    });   
+ ;
+});
+
+
+
+</script>
+   </div>
+
+ 
+
+
+<?php } ?>      
+
+ <?php if($this->profileholder==1  && $this->useractivestatus==1){ ?>
+	<div class="whiteBox">        
+			<div id="sharefiles">							    
+					<form action="<?php echo BASE_URL; ?>/myhome/sharefile" class="dropzone" enctype="multipart/form-data" id="fadeDropzone1">							 
+					     <div class="fallback">
+						   <input name="file" type="file"/>
+					     </div>						      
+		          </form> 
+		          <h2 class="sharefile" title="Click to open or Drag to re-arrange"><i class="fa fa-upload"></i> Share files</h2>
+
+			</div>					
+	</div>
+<?php } ?>
+
+
+<?php if($this->profileholder==1 && $this->session_data['role']!=100  && $this->useractivestatus==1){ 
+
+
+ if($this->chkpdf==1) { ?>
+ 
+<div class="whiteBox" id="pdfrtbox">
+		<div class="rtListOver">		  
+			<h2 class="pdfdownload" title="Click to open or Drag to re-arrange"><i class="fa fa-file-text"></i>Downloads
+				<span class="navAllLink"><a id="pdfrtviewall">view all</a></span> 
+			</h2>
+		</div>
+		<div class="rboxContainer userpdfleft" id="pdfdownload"></div>
+   </div>
+<?php } 
+ if($this->chkmyupload==1 && $this->profileholder==1) { ?>
+ <div class="whiteBox" id="myuploadsbox">
+		<div class="rtListOver">		  
+			<h2 class="myuploads" title="Click to open or Drag to re-arrange"><i class="fa fa-upload"></i>My uploads
+				<span class="navAllLink"><a id="myuploadsvew" rel="myuploadsvew">view all</a></span>  
+			</h2>
+		</div>
+		<div class="rboxContainer" id="myuploads">
+		</div>
+   </div>
+<?php
+ }
+  } ?>
+	
+	
+
+	
+<?php if($this->profileholder==1  && $this->useractivestatus==1){ ?> 
+<div class="" id="pendingbox" style="display:none"></div>
+
+   
+<div class="" id="mypendingbox" style="display:none"></div>
+
+   <!--<div class="whiteBox topmessagedisplay"></div>-->
+<?php } ?>
+
+	<?php if($this->session_data['role']!=4 && $this->profileholder==1  && $this->useractivestatus==1) {?>
+	<div class="whiteBox">
+		<div class="rtListOver">		  
+			<h2 class="admPost" title="Click to open or Drag to re-arrange"><i class="fa fa-pencil"></i>Admin posts</h2>
+		</div>
+		<div class="rboxContainer adminonlive" id="admPost">
+		</div>
+   </div>
+   <?php } ?>
+<?php 
+	if($this->profileholder ==1  && $this->useractivestatus==1){  ?>
+	
+		</div>	
+ <?php }
+ 
+ 	if($this->profileholder !=1 && $islogin  && $this->useractivestatus==1) 
+	{
+		$follwoing = new Application_Model_Following ();
+
+		//echo $this->profileuserid.' - '.$this->session_data['UserID'];
+		$fcnt = $follwoing->chkfollowingcnt( $this->profileuserid, $this->session_data['UserID'] );
+		$fellowtxt = ($fcnt['ID'] > 0) ? 'Unfollow' : 'Follow';
+		
+		if($this->userid==adminID)
+			{
+				if($this->admin_searchable_frontend==1)
+				{
+					$follobtn = '';
+		        }
+	   }
+	   else
+	   {
+	   	 	$follobtn = '<a href="javascript:void(0);" class="btn btn-yellow fallowina" followid="'.$this->profileuserid.'" onclick="javascript:followme('.$this->profileuserid.',this);" href="javascript:void(0)">
+	   			<div id="followme-label">'.$fellowtxt.'</div></a>';
+	   }
+	   	?>
+
+	   		<div class="whiteBox followUnfollowWrp">
+	   				<?php echo $follobtn?>
+			   		 <a  href="javascript:void(0)" class="btn messageina btn-sn" onclick="javascript:opensendmessage('<?php echo $this->profileuserid ?>','<?php echo $this->susername ?>',this);">
+			   			<i class="fa fa-envelope-o"></i> <span>message</span>
+			   		</a>
+			   	
+		   </div>
+
+	   	<?php
+	}
+
+	if($this->plateform_scoring==0 && $this->profileholder !=1  && ($data['usertype']!=100 && $this->usertype!=100 || $data['usertype']==100 && $this->usertype==100 || $data['usertype']==100 && $this->usertype==0) && $this->hideuser==0  && $this->useractivestatus==1)
+	{
+		if($this->role==1 && $this->adminpostscore==1 || $this->role==3){
+	?>
+		<script type="text/javascript">		
+		openmutualscores(<?php echo $this->userid;?>);
+		  $(document).ready(function(){
+              $('.mutualScoringDisplay').addClass('active');
+
+			});
+		</script>
+	<div class="whiteBox mutualScoringDisplay">
+		<div class="rtListOver"><h2 class="Mutualpostion"><i class="fa fa-check-square-o"></i> Mutual scores</h2></div>
+		<div class="rboxContainer " id="Mutualpostion" ></div>
+	</div>	
+	<?php } } ?>	
+        
+	
+
+
+	<div id="userEdvert">
+	</div>
+
+	
+	 <script type="text/javascript">	
+		  $(document).ready(function(){
+		  	var totalPicInGallary = 0;
+	 		//$('body').on('click','.galleryPciUploader',function(){ 
+         		 $('#uploaderGallery').dropzone({
+		            url: BASE_URL + "/dashboarduser/imguplod",
+		            addRemoveLinks: true,
+		            parallelUploads: 1,
+		            maxFilesize: 10,
+		            acceptedFiles: '.png, .jpg, .jpeg, .gif, .JPG, .JPEG, .PNG, .GIF',
+		            error: function(file, serverFileName) {
+		                $dbConfirm({
+		                    content: serverFileName,
+		                    yes: false,
+		                    error: true
+		                });
+		            },
+		            processing: function(file, serverFileName) {
+		               
+		            },
+		            success: function(file, serverFileName) {
+		            	console.log(file);
+		            	console.log(serverFileName);
+		            	var res = serverFileName.split(',');
+		            	var serverFileName = res[0];
+		            	var picId = res[1];
+		            $('html').removeClass('noPhotoInGallery');
+		               $('#profileGalleryList li[data-timestamp="'+file.mychck+'"]').html('<div class="gaPicTitle oneline"></div>').attr({'data-name':serverFileName, 'data-id':picId}).removeClass('gallryUploading').css({background:'url('+IMGPATH+'/usergallery/'+SESS_USER_ID+'/small/'+serverFileName+')'});
+
+		               if($('body').hasClass('largeGPicActive') && totalPicInGallary ==1){
+		               		$('#profileGalleryList ul li:first').trigger('click');
+		               }
+
+		               
+		               		               this.removeFile(file);
+
+		            },
+		            thumbnail: function(file, dataUrl) {
+		            	/*if($('html').hasClass('activeGalleryBoxs')==false){
+		              		$('#profileGallery .galleryExpand').trigger('click');
+		              	}*/
+		            	var d = new Date();
+		            	var n = d.getTime()
+		            	file.mychck = n;
+		            	$('#profileGalleryList .galleryLoading').hide();
+		              	$('#profileGalleryList ul').prepend('<li data-timestamp="'+n+'" class="gallryUploading"  style="background:url('+dataUrl+')"><div><i class="fa fa-spin fa-spinner"></i></div></li>');
+		              	totalPicInGallary +=1;
+
+		            }
+
+		        });
+    		//});
+		
+			var noPhotoInGallery = '<div class="galleryLoading" style="color:#ccc"><i class="fa fa-info-circle fa-3x"></i> <br>No photo uploaded</div>';
+			
+			$.ajax({
+				url:BASE_URL+'/dashboarduser/gallerylist',
+				type:'POST',
+				dataType:'json',
+				data : {owner:'<?php echo base64_encode($this->userid);?>'},
+				beforeSend:function(){
+					$('#profileGalleryList').html('<div class="galleryLoading"><i class="fa fa-spin fa-spinner fa-2x"></i> <br>Please wait</div>')
+					$('.galleryPciUploader, .galleryExpand').hide();
+				},
+				success:function (profileData){
+					var data= profileData.content;
+
+					if(data==''){
+						data= noPhotoInGallery;
+						$('html').addClass('noPhotoInGallery');
+					}
+					$('#profileGalleryList').html('<ul>'+data+'</ul>');
+					$('#profileGallery h2').prepend('<div class="userGalleryProfilepic">\
+		          		<img src="'+IMGPATH+'/users/small/'+profileData.users.ProfilePic+'">\
+		          	</div>');
+					$('.galleryPciUploader, .galleryExpand').show();
+					totalPicInGallary  = $('#profileGalleryList li').size();
+				}
+			});
+
+			$('body').on('click','#profileGalleryList li:not(.gallryUploading)', function (e){
+				e.preventDefault();
+        		e.stopPropagation();
+        		/*if($('html').hasClass('activeGalleryBoxs')==true){
+		              
+				var thisEl = $(this);
+				var p = thisEl.closest('#profileGallery');
+				$('.galleryActionIcon',p).remove();
+				thisEl.append('<div class="galleryActionIcon"><a href="javascript:void(0)" class="fa fa-search-plus picZoomGallery" ></a><a href="javascript:void(0)" class="fa fa-pencil picEditGallery"></a></div>');
+					}
+*/		
+				if($('html').hasClass('activeGalleryBoxs')==false){
+		              		$('#profileGallery .galleryExpand').trigger('click');
+		              	}
+				//$('.picZoomGallery').click(function (){
+					$('#profileGalleryList ul').perfectScrollbar({wheelSpeed:100});
+					$('body').addClass('largeGPicActive');
+					var p = $(this);
+					var currentImg = p.attr('data-name');
+					var currentId = p.attr('data-id');
+					var currentTitle = $('.gaPicTitle',p).text();
+					var largeImageTemplate = '<div class="galleryLargeImgWrp">\
+												<div class="galleryLargeImgCnt">\
+													<img class="progressive-image" src="'+IMGPATH+'/usergallery/'+profileholderId+'/'+currentImg+'" data-name="'+currentImg+'" data-id="'+currentId+'" data-title="'+currentTitle+'" />\
+													 <span class="galleryLargeImghelper"></span>\
+												</div>\
+												<div class="galleryPicNavigation"><a href="javascript:void(0)" data-type="prev"><i class="fa fa-chevron-left"> </i></a><a href="javascript:void(0)" class="" data-type="next"><i class="fa fa-chevron-right"> </i></a></div>\
+												<div class="largTitleGlr">'+currentTitle+'</div>\
+											 </div>';
+					$('.galleryLargeImgWrp, .editPicDesc').fadeOut(function (){
+						$(this).remove();
+					});
+					$('#profileGalleryList ul').after(largeImageTemplate);
+					var photpGallery = [];
+					$('#profileGalleryList ul li').each(function (){
+						photpGallery.push($(this).attr('data-name'));
+					});
+					var gInd = photpGallery.indexOf(currentImg);
+					/*var gNt = photpGallery.indexOf(currentImg);
+					var gPrev = photpGallery.indexOf(currentImg);*/
+					function checkGalleryNavi(){
+						var gNav = $('.galleryPicNavigation');
+						if(gInd==0){
+							$('a[data-type="prev"]', gNav).hide();
+						}else{
+							$('a[data-type="prev"]', gNav).show();
+						}	
+						if(photpGallery.length-1==gInd){
+							$('a[data-type="next"]', gNav).hide();
+						}else{
+							$('a[data-type="next"]', gNav).show();
+						}
+					}
+					checkGalleryNavi();
+					var cntImgCheck = -1;
+					$('.galleryPicNavigation a').click(function (){
+						var dataType = $(this).attr('data-type');
+						if(dataType=='next'){
+							cntImgCheck = +1;
+						}
+						 gInd = gInd+cntImgCheck;
+					var gVimg = photpGallery[gInd];
+						checkGalleryNavi();
+						$('#profileGalleryList ul li[data-name="'+gVimg+'"]').trigger('click');
+					});
+
+				//});
+			});
+
+			$('.galleryExpand').click(function (){
+				$('html').toggleClass('activeGalleryBoxs');
+				$('body').removeClass('largeGPicActive')
+				$('i', this).toggleClass('fa-arrows-alt');
+				$('i', this).toggleClass('fa-compress');
+				$('.galleryLargeImgWrp').remove();
+			});
+
+			$('.galleryEditPic').click(function (){
+				var cntImg = $('.galleryLargeImgCnt img').attr('data-name');				
+				var cntTitle= $('.galleryLargeImgCnt img').attr('data-title');				
+				var edtiTmp = '<div class="editPicDesc" style="display:none">\
+				<div class="editPicDescRow">\
+					<div class="gImgCnt" style="background:url('+IMGPATH+'/usergallery/'+profileholderId+'/small/'+cntImg+') no-repeat; background-size:cover;"></div>\
+					<div><input type="text" placeholder="Insert photo title" value="'+cntTitle+'"></div>\
+					<div><a href="javascript:void(0);" class="saveThisPicGallery">Save</a></div>\
+					<div><a href="javascript:void(0);" class="closeThisPicGallery">Close</a></div>\
+					<div><a href="javascript:void(0);" class="deleteThisPicGallery">Delete</a></div>\
+				</div>\
+				<div>';
+				$('.editPicDesc').remove();
+				$('#profileGallery #profileGalleryList').append(edtiTmp);
+				$('.editPicDesc').fadeIn(function (){
+					$('input', this).focus().val(cntTitle);
+				});
+
+				$('.closeThisPicGallery').click(function(){
+					$('.editPicDesc').fadeOut(function (){
+						$(this).remove();
+					});
+				});
+				$('.saveThisPicGallery').click(function(){					
+				var dataId = $('.galleryLargeImgCnt img').attr('data-id');
+				var dataTitle = $('.editPicDesc input').val();
+					$.ajax({
+						url:BASE_URL+'/dashboarduser/updategallery',
+						type:'POST',
+						data:{imgid:dataId,imgtitle:dataTitle},
+						success:function(){
+							$('#profileGalleryList li[data-Id="'+dataId+'"] .gaPicTitle, .galleryLargeImgWrp .largTitleGlr').text(dataTitle);
+							$('#profileGallery .galleryLargeImgCnt img').attr('data-title', dataTitle);
+							$('.closeThisPicGallery').trigger('click');
+						}
+					});
+				});
+				$('.deleteThisPicGallery').click(function(){					
+				var dataId = $('.galleryLargeImgCnt img').attr('data-id');
+				var dataName = $('.galleryLargeImgCnt img').attr('data-name');
+					$.ajax({
+						url:BASE_URL+'/dashboarduser/imgunlink',
+						type:'POST',
+						data:{serverFileName_:dataName, imgid:dataId},
+						beforeSend:function(){
+							$dbLoader('.galleryLargeImgCnt','center');
+							$('.closeThisPicGallery').trigger('click');
+							$('.galleryActicn').hide();
+						},
+						success:function(){
+							$('.galleryActicn').show();
+							$('.closeThisPicGallery').trigger('click');
+							$('#profileGalleryList li[data-Id="'+dataId+'"]').remove();	
+							$('.galleryLargeImgWrp, .editPicDesc').fadeOut(function (){
+								$(this).remove();
+							});	
+							 totalPicInGallary = $('#profileGalleryList li').size();
+							if(totalPicInGallary==0){
+								$('#profileGalleryList ul').html(noPhotoInGallery);
+								$('html').addClass('noPhotoInGallery');
+							}				
+							$('#profileGalleryList li:first').trigger('click');		
+						}
+					});
+				});
+
+			});
+
+    	});
+    </script>
+
+     <?php if( $this->useractivestatus==1){ ?>
+	<div class="whiteBox" id="profileGallery">        
+		          <h2 class="profilegallery">		          	
+		          	<i class="fa fa-photo"></i> Photo Gallery
+		          	<div class="galleryActicn"> 
+			          	<a href="javascript:void(0)" class="galleryExpand"><i class="fa fa-arrows-alt" ></i></a>
+			          	<?php if($this->profileholder==1){ ?>
+			          	<a href="javascript:void(0)" class="galleryPciUploader">
+			          		<i class="fa fa-upload" >
+			          			<div id="uploaderGallery" class="dropzone"> </div>
+			          		</i>
+			          	</a> 
+			          	
+			          	<a href="javascript:void(0)" class="galleryEditPic"><i class="fa fa-pencil" ></i></a><?php } ?>
+		          	</div>
+		          </h2>
+			<div class="rboxContainer " id="profileGalleryList">
+				<ul></ul>
+			</div>
+	</div>
+	<?php } ?>
+
+
+
+	<?php
+	if($this->eventglobal==1 && $this->session_data['role']!=100){
+	     $commonmodel_obj      = new Application_Model_Commonfunctionality(); echo $commonmodel_obj->displayEvent();
+?>
+	     <script type="text/javascript">	
+		  $(document).ready(function(){
+			 $('#sortable .upcommingevent h2').trigger('click');
+			});
+		</script>
+		<?php 
+	 }
+
+	?>
+
+	
+	
+	
+
+
+
+
+
+	
+</div>
+<div class="clearfix"> </div>
+
+<?php
+$redirection_name_space = new  Zend_Session_Namespace('User_Session');
+if(isset($redirection_name_space->screen_name) && !empty($redirection_name_space->screen_name)){
+if($_GET['invite']=='twitter'){
+?>
+<script type="text/javascript">
+$(function(){
+TwitterInviteFriendsprofile();
+});
+</script>
+<?php
+//$redirection_name_space->screen_name ='';
+//unset($redirection_name_space->screen_name);
+} } ?>
+<div id="redb-popup" class="popup_block"><?php echo POST_NAME;?> successfully posted on your profile</div>
+<script type="text/javascript">
+$(function() {
+	
+	if(window.location.hash=="" || window.location.hash=='#_=_')
+	{
+	$('#leftListing').show();	
+	setTimeout(function(){	updatebio('', true);}, 10000);
+	dashboardprofile('<?php echo $this->userid;?>',0, 1);
+	seeglobaldbeelist(<?php echo $this->userid; ?>,'4','my-dbees-profile','myhome','mydbee','mydb');
+	}
+	else
+	{
+		$('#mymenuItem').show();
+	}
+	//$.removeCookie('MyMenuItem', { path: '/' });  
+});
+
+
+function loadmoreEvents()
+{
+	var feedtype=$('#feedtype').val();
+	var xxfeedtype=$('#xxfeedtype').val();
+	var masterfieldids=$('#masterUsers').val();
+	//alert(xxfeedtype);
+
+	if(xxfeedtype=='livevideo') { 
+//alert('teet');
+ 	var mystart=$('#startnewlivevideo').val(); seemoreglobaldbeelist(mystart,'<?php echo PAGE_NUM; ?>',"1",'myhome','filtertype','liveBroadcast','c.type = 15 OR'); }
+
+	if(feedtype=='mydbs') {
+		var totaldbees=document.getElementById('totaldbees').value;
+		var mystart=$('#startnewmydb').val();  seemoreglobaldbeelist(mystart,'<?php echo PAGE_NUM; ?>',<?php echo $this->userid;?>,'myhome','mydbee','mydb');
+		//seemoremyfeeds(mystart,'<?php echo PAGE_NUM;?>');
+	}
+	if(feedtype=='mypolls') {
+		var totaldbees=document.getElementById('totaldbees').value;
+		var mystart=$('#startnewmydb').val();  seemoreglobaldbeelist(mystart,'<?php echo PAGE_NUM; ?>',<?php echo $this->userid;?>,'myhome','polllist','mypoll');
+		//seemoremyfeeds(mystart,'<?php echo PAGE_NUM;?>');
+	}
+	if(feedtype=='tagpost') {
+		var mystart=$('#startnewmydb').val(); 
+		seemoreglobaldbeelist(mystart,'<?php echo PAGE_NUM; ?>',<?php echo $this->userid;?>,'myhome','mytaggeddbee','mydb');
+	}
+	else if(feedtype=='myredbs') {
+		var totalredbees=document.getElementById('totalredbees').value;
+		var mystart=document.getElementById('startnewmyredb').value;
+		seemoreredbee(mystart,'<?php echo PAGE_NUM;?>');
+	}
+	else if(feedtype=='mycomments') { var mystart=document.getElementById('startnewmycomments').value;
+		seemoremycomments(mystart,'<?php echo PAGE_NUM;?>',<?php echo $this->userid;?>);	}
+	else if(feedtype=='cat') { 
+		var mystart=$('#startnewcat').val(); 
+		var mycat=$('#catmyid').attr('nameid'); 
+		
+		seemoreglobaldbeelist(mystart,'<?php echo PAGE_NUM; ?>',3,'myhome','catetorylist','dbcat',masterfieldids); 
+	}
+	
+
+	if(feedtype=='following') {  var mystart=$('#startnewfollowing').val(); seemoreglobaldbeelist(mystart,'<?php echo PAGE_NUM; ?>',masterfieldids,'following','customdashboarduser','follow'); }
+
+	if(feedtype=='favourite') { var mystart=$('#startnewfav').val(); seemoreglobaldbeelist(mystart,'<?php echo PAGE_NUM; ?>',"<?php echo $this->userid;?>",'favourite','list','fav'); }
+
+
+	
+	if(feedtype=='moveddbposts') { var mystart=$('#startnewmovedpost').val(); seemoreglobaldbeelist(mystart,'<?php echo PAGE_NUM; ?>',masterfieldids,"group","customdashboardgroups","movedposts"); }
+
+
+	
+	if(feedtype=='groupcatpost') { var mystart=$('#startnewmovedpost').val(); seemoreglobaldbeelist(mystart,'<?php echo PAGE_NUM; ?>',masterfieldids,"group","customdashboardgroups","groupCatsPost"); }
+}
+ 
+
+
+$(window).scroll(function(){
+	
+	
+	//console.log(feedtype)
+	if($(window).scrollTop() == $(document).height() - $(window).height() && !busy)
+	{
+		//alert('ewewew')
+		busy = true;
+		loadmoreEvents();		
+	}
+
+});
+//setTimeout(function(){ fetchscoringdetails('userprofile'); }, 10000);
+
+<?php if($this->profileholder==1){ ?>
+	setTimeout(function(){  $('.checkingMyprofile').show(); }, 4000);
+	
+<?php } ?>	
+</script>
+
+
+
+<input type="hidden" id="dbeeuser" value="<?php echo $this->userid?>">
+
+<input type="hidden" id="dbeepopchk" value="1">
+<input type="hidden" id="frompop" value="0">
+
+<?php }
+else{
+	echo "<span style='display: block;font-size: 20px;min-height:300px;padding: 30px;text-align: center;'>User profile you are trying to view does not exist.</span>";
+} ?>
+
+
+	

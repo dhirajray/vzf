@@ -1,0 +1,142 @@
+<?php         
+$this->title = "Profanity filter";
+$this->headTitle($this->title);
+
+
+?>
+<h1 class="pageTitle ">Profanity / keyword filter</h1>
+<div class="pageSubeTitlevip">Add any abusive language or keywords you wish to be restricted completely from the platform.</div>
+
+
+							<div class="dropDown pull-left">
+								<a class="btn btn-large dropDownTarget" href="#"  style="width:300px"><i class="fa fa-file-excel-o fa-lg"></i> Upload CSV</a>
+								<div class="dropDownList right">									
+									<form enctype="multipart/form-data" action="/home/import/getcsvrecords" id="formid" method="POST">
+										<div class="formRow">
+											<div class="appendType">
+												<input type="text" readonly="" name="" class="uploadType">
+												<a href="javascript:void(0);" class="btn btn-black">Browse <input type="file" id="addusers" name="csvfile" class="fileType"></a>
+											</div>
+										</div>
+										<div class="formRow">
+										<button class="btn btn-green fluidBtn" value="ADD FILTER WORD" id="csv_submit" name="csv_submit" type="submit">
+											<i class="fa fa-plus fa-lg"></i> Add
+										</button>
+										</div>
+										<div class="formRow">
+										<a class="pull-right link" href="<?php echo BASE_URL ?>/downloadcenter/importfilterformat.csv">
+												<i class="fa-download-alt fa-lg"></i> Click Here to Download Example
+											</a>
+											<div style="clear:both"></div>
+											<div class="subText"><i class="fa-info-sign"></i> Upload a CSV with multiple word</div>
+										</div>
+										<div class="clearfix"></div>
+									</form>
+								</div>
+							</div>
+<!-- <div class="userUpBar">
+						<div class="userSearchBox">
+							<div class="appendType  pull-left">	
+								<form action="<?php //echo $this->url(array('controller'=>'dashboard','action'=>'profanityfilter'));?>" method="POST">
+									<input type="text" placeholder="Search existing restricted words" id="searchfield" name="searchfield"> 
+									<button class="btn btn-black" id="submit" name="submit" type="submit">Search</button>
+								</form>			
+								<div class="clearfix"></div>
+							</div>
+						</div>
+						<div class="pull-right buttonRight">
+							<div class="dropDown  pull-left">
+								<a href="#" class="btn dropDownTarget"><i class="fa fa-plus fa-lg"></i>  Add new word</a>
+								<div class="dropDownList right">
+									
+									<form class="right" action="<?php //echo $this->url(array('controller'=>'dashboard','action'=>'addprofanityfilter'));?>" method="POST">
+										<div class="formRow" style="padding:0px;">
+											<label class="label">Enter word :</label>
+											<div class="field">
+												<input type="text" id="Profanityfilter" name="ProfanityfilterInput">
+												<div class="subText"><i class="fa-info-sign"></i> Separate multiple words with a comma</div>
+											</div>
+										</div>
+										
+										<div class="formRow" style="padding:0px;">
+											<label class="label"></label>
+											<div class="field">
+												<button type="submit" class="btn btn-green fluidBtn" id="addUsersBtn"> <i class="fa fa-plus fa-lg"></i>  Add</button>
+											</div>
+										</div>
+									</form>
+
+								</div>
+							</div>
+
+							<div class="dropDown pull-left">
+								<a class="btn dropDownTarget" href="#"><i class="fa fa-file-excel-o fa-lg"></i> Add words from CSV</a>
+								<div class="dropDownList right">									
+									<form enctype="multipart/form-data" action="/home/import/getcsvrecords" id="formid" method="POST">
+										<div class="formRow">
+											<div class="appendType">
+												<input type="text" readonly="" name="" class="uploadType">
+												<a href="javascript:void(0);" class="btn btn-black">Browse <input type="file" id="addusers" name="csvfile" class="fileType"></a>
+											</div>
+										</div>
+										<div class="formRow">
+										<button class="btn btn-green fluidBtn" value="ADD FILTER WORD" id="csv_submit" name="csv_submit" type="submit">
+											<i class="fa fa-plus fa-lg"></i> Add
+										</button>
+										</div>
+										<div class="formRow">
+											<a class="pull-right link" href="/downloadcenter/importfilterformat.csv">
+												<i class="fa-download-alt fa-lg"></i> Click Here to Download Example
+											</a>
+											<div style="clear:both"></div>
+											<div class="subText"><i class="fa-info-sign"></i> Upload a CSV with multiple word</div>
+										</div>
+										<div class="clearfix"></div>
+									</form>
+								</div>
+							</div>
+							
+						</div>
+					</div> -->	
+
+<div class="clearfix"></div>
+
+
+
+<!-- <div id="profanityFilterCloud" class="kcRightPanel" style="width:100%;">
+	
+		<div class="kcRightHeader clearfix">
+			<div class="clearfix">
+				<h2 class="pull-left" style="margin:8px 5px 0 10px">Total: <?php echo count($this->data); ?></h2>
+				
+				<div class="search pull-right">
+						<form action="<?php echo $this->url(array('controller'=>'dashboard','action'=>'profanityfilter'));?>" method="POST">
+						<select class="gh-tb"  maxlength="200" value="" id="orderfield" name="orderfield" onchange="this.form.submit()" > 
+							<option value="0"  > - Sort Results - </option>
+							<option value="1" <?php if($this->orderfield==1) { echo "selected=\"selected\" "; } ?> > Alphabetically A-Z</option>
+							<option value="2" <?php if($this->orderfield==2) { echo "selected=\"selected\" "; } ?> > Alphabetically Z-A</option>
+						</select>
+							
+					</form>
+				</div>	
+				
+			</div>			
+		</div>
+		<div class="proCloundlist">
+			<?php 
+			if(count($this->data)>0){
+			foreach($this->data as $row): ?>
+				<span filterId="<?php echo $this->escape($row['id']);?>" class="dgrpUrsName" id="grpid_<?php echo $this->escape($row['id']);?>">
+					<i><?php echo $this->escape($row['name']);?></i>
+					<a class="removeCompare" href="javascript:void(0);">x</a>
+				</span>
+			<?php endforeach;
+				}else{
+				echo '<div class="dashBlockEmpty">No Records found</div>';
+				}
+			?>
+			
+		</div>
+	
+</div>
+ -->

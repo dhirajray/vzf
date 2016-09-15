@@ -1,0 +1,43 @@
+<div>
+<?php
+$return='';
+$storage = new Zend_Auth_Storage_Session();
+$data	= $storage->read();
+$UserID  = $data['UserID'];
+
+$getusersocilinfo = $this->myclientdetails->getfieldsfromtable('*','tblUsers','UserID',$UserID);
+$return.='<div style="color:#ccc; font-size:14px; margin-bottom:10px">Paste your social links below to promote via your profile.</div><div id="passform" class="postTypeContent">			
+			 <div class="formRow">
+				 <div class="formField">
+					 <input type="text" id="socialfb" class="textfield" value="'.$getusersocilinfo[0]['SocialFB'].'">
+					 <i class="optionalText">Facebook</i>
+				 </div>
+			 </div>
+			<div class="formRow">				
+				<div class="formField">
+					<input type="text" id="socialtwitter" class="textfield" value="'.$getusersocilinfo[0]['SocialTwitter'].'">
+					<i class="optionalText">Twitter</i>
+				</div>
+			</div>
+			<div class="formRow last">				
+				<div class="formField">
+					<input type="text" id="sociallinkedin" class="textfield" value="'.$getusersocilinfo[0]['SocialLinkedin'].'">
+					<i class="optionalText">LinkedIn</i>
+				</div>
+			</div>
+			<div >
+				<input type="hidden" id="cheditsoci"  value="'.checkeditsoci.'">
+				<input type="hidden" id="UserID"  value="'.$getusersocilinfo[0]['UserID'].'">
+			
+				<div id="signuploader" style="display:none; float:left; padding-left:10px;"><img src="images/ajaxloader.gif" border="0" /></div>
+			</div>
+		</div>';
+
+echo $return;
+
+?>
+
+</div>
+
+
+

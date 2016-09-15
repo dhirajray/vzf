@@ -1,0 +1,40 @@
+<?php 
+
+$commonbynew 	=	new Application_Model_Commonfunctionality();
+
+       $IDs = '';
+
+      // echo   $TotalDbees;
+
+     $startnew =$this->startnew;
+
+        if(count($this->dbeealldbees) > 0) {
+        	$k=1;        
+        	if(strlen($row->Text)>250) $dots='...'; else $dots='';
+         	if($k=='1' && $initial=='1') setcookie("CookiePostDate", $row->PostDate, time()+3600);
+	        foreach ($this->dbeealldbees as $row) :
+	        	$IDs .= $row['DbeeID'].',';
+	         	$return	.=	$commonbynew->displayLayoutDbs($row,$this->Social_Content_Block,'all',$this->plateform_scoring,$this->adminpostscore,1);
+				$k++;
+			endforeach; 
+		}
+		else {
+			$startnew=$this->startnew;
+			//$seemorelabel='- no more '.POST_NAME.'s available to show -';
+		}
+		 $IDs=substr($IDs,0,-1);
+
+			//if($TotalDbees>5) {
+
+			
+
+		$startnew=$this->startnew;
+		if(count($this->dbeealldbees) > 5)
+		{
+		$return.='<div id="see-more-feeds'.$startnew.'"><div id="more-feeds-loader" style="cursor:pointer; color:#333333; text-align:center;" onclick="javascript:seemorefeed('.$startnew.',5);">'.$seemorelabel.'</div></div>';
+}
+		//$return.= '~#~'.'';
+		//$return.= '~#~'.$IDs;
+		echo $return.'~#~'.$startnew.'~#~'.$IDs.'~#~'.$startnew;
+
+			 ?>

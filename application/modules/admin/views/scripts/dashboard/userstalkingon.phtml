@@ -1,0 +1,237 @@
+<?php         
+
+$this->title = "Comments";
+$this->headTitle($this->title);
+$deshObj= new Admin_Model_Deshboard();
+$defaultimagecheck = new Admin_Model_Common();
+?>
+<style type="text/css">
+.rightSideList{margin: 35px 10px 10px}
+h2 {background: rgba(0, 0, 0, 0) linear-gradient(0deg, #0c7ef0, #0c7ef0) repeat scroll 0 0;
+    color: #ffffff;font-size: 13px;    padding: 13px 10px;}
+</style>
+<h1 class="pageTitle dbeeViewAll">Sentiment for "<?php echo $this->seachfield ?>"</h1>
+	
+<div class="search pull-right">
+		<input type="hidden" id="statussearch" value="<?php  echo $this->statussearch ?>"> 
+		<input type="hidden" id="orderfield" value="<?php  echo $this->orderfield ?>"> 
+		<input type="hidden" id="entity" value="<?php  echo $this->seachfield ?>"> 
+		<!-- <form action="<?php echo $this->url(array('controller'=>'vipuser','action'=>'index'));?>" method="POST" > this.form.submit() -->
+			<select class="gh-tb"  maxlength="200" value="" id="statussearch" name="statussearch" onchange="sentimentsshorting(this.value,'statussearch')" > 
+				<option value="0"  > - Sort by sentiments - </option>
+				<option value="" <?php if($this->polarity=='') { echo "selected=\"selected\" "; } ?> > All </option>
+				<option value="positive" <?php if($this->polarity=='positive') { echo "selected=\"selected\" "; } ?> > positive </option>
+				<option value="neutral" <?php if($this->polarity=='neutral') { echo "selected=\"selected\" "; } ?> > neutral </option>
+				<option value="negative" <?php if($this->polarity=='negative') { echo "selected=\"selected\" "; } ?> > negative </option>
+			</select>
+				
+		<!-- </form> -->
+	</div>
+	<div class="box-main" style="float:left; width:100%">
+		<div class="box-body" id="box_body" style="float:left; width:70%">
+			
+			<div id="beforecall" style=""></div>
+			<div class="clearfix"></div>
+			
+			<?php if (count($this->paginator)) { //echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml');  
+
+			$colorEle = array('neutral'=>'#999','positive'=>'green','negative'=>'red');
+			$IconEle = array('neutral'=>'<i class="fa fa-meh-o"></i>','positive'=>'<i class="fa fa-smile-o"></i>','negative'=>'<i class="fa fa-frown-o"></i>');
+			?>
+					<div class="pageheadinusr" style="font-size:15px;">
+					<?php echo "Page ". $this->page." of ".$this->totalpage;?> 
+					</div>
+					<div class="pageheadinusrlft" style="font-size:15px;">
+					<?php
+					$tots = ($this->total>1) ? ' comments' :' comment';
+					 echo $this->total.$tots?> 
+					</div><?php }?>
+				<ul class="listing scoredList" id="searchresulthide" >
+							<?php if (count($this->paginator)){ ?>
+							<?php foreach($this->paginator as $latestComment) : 
+		                      //echo'<pre>';print_r($latestComment);die;
+							?>
+							<li>
+							<?php  
+							
+							    //$viewcmm = '<a href="'.BASE_URL.'/dbeedetail/home/id/'.$latestComment->DbeeID.'"> view </a>';//href="'.BASE_URL.'/dbee/'.$latestComment->CommentID.'"	
+							    $viewcmm = '<a class="btn btn-full btn-mini btn-yellow" target="_blank" href="'.BASE_URL.'/dbee/'.$latestComment->dburl.'" style="float:right"> View </a>';
+							    $deletecmm = '<a class="btn btn-full btn-danger btn-mini delcomm" target="_blank"  commid="'.$latestComment->CommentID.'" style="float:right"> Delete </a>';
+								$dbtype	='';	
+								$descDisplay	='';
+								if($this->escape($latestComment->type)==1) { 
+									$dbtype			=	'text db<div class="icon-db-text"></div>';
+									$descDisplay	=	'<div  class="dbTextPoll">'.$latestComment->Comment.'</div>';//substr($latestComment->Comment,0,100).'</div>';
+								}
+								if($this->escape($latestComment->LinkDesc)!='') { 
+									$dbtype			=	'link db<div class="icon-db-link"></div>';
+									$dbLink			=	$latestComment->Link;
+									$dbLinkTitle	=	$latestComment->LinkTitle;
+									$dbLinkDesc		=	$latestComment->LinkDesc;
+									$dbUserLinkDesc	=	!empty($latestComment->UserLinkDesc) ? $latestComment->UserLinkDesc : $latestComment->LinkTitle;
+
+									$descDisplay	=	'<div style="padding:5px; margin-top:5px; margin-bottom:5px; background-color:#DAD9D9;">
+									<div class="font12">'.$dbUserLinkDesc.' - 
+									  <a target="_blank" href="'.$dbLink.'">'.$dbLink.'</a>
+									</div>
+									<div class="font12" style="margin-top:10px;"></div></div>';
+									}
+									if($this->escape($latestComment->Pic)!='') { 
+									 $dbtype			=	'Image post<div class="icon-db-link"></div>';
+
+									$dbPic		=	$latestComment->Pic;
+									$dbPicDesc	=	$latestComment->PicDesc;
+
+									$descDisplay	.=	'<div class="dbPicText">';
+									$checkdbpic = $defaultimagecheck->checkImgExist($dbPic,'imageposts','default-avatar.jpg');
+									if($dbPic!='')
+									{
+										$descDisplay	.=	'<div class="dbPic" ><a href="#"><img src="'.IMGPATH.'/imageposts/small/'.$checkdbpic.'" width="90" border="0" /></a></div>';
+									}
+									
+									$descDisplay	.=	'<div class="dbPicDesc">'.$dbPicDesc.'</div></div>';
+								}
+								if($this->escape($latestComment->Pic)!='') { 
+									$dbtype	=	'media db<div class="icon-db-vidz"></div>';
+
+									$dbtype			=	'link db<div class="icon-db-link"></div>';
+									$dbVid			=	$latestComment->VidID;
+									$dbVidDesc		=	$latestComment->VidDesc;
+									$dbLinkDesc		=	$latestComment->LinkDesc;
+									$dbUserLinkDesc	=	!empty($latestComment->UserLinkDesc) ? $latestComment->UserLinkDesc : $latestComment->LinkTitle;
+
+									$descDisplay	.=	'<div class="dbPicText">';
+									if($dbVid!='')
+									{ 
+										$descDisplay	.=	'<div class="dbPic" ><a href="javascript:void(0)"><img width="90" height="60" border="0" src="https://i.ytimg.com/vi/'.$dbVid.'/0.jpg"></a></div>';
+									}
+									
+									$descDisplay	.=	'<div class="dbPicDesc">'.$dbVidDesc.'</div></div>';
+								}
+								if($this->escape($latestComment->type)==5) {  
+								$dbPollText			=	$latestComment->PollText;
+								$dbtype	=	'polls <div class="icon-db-poll"></div>';
+								$descDisplay	=	'<div  class="dbTextPoll">'.$dbPollText.'</div>';
+								}
+		                        $checkcomuserpic = $defaultimagecheck->checkImgExist($latestComment->image,'userpics','default-avatar.jpg');
+								?>
+								
+
+									<div class="listUserPhoto">
+				<img src="<?php echo IMGPATH ?>/users/medium/<?php echo $checkcomuserpic ?>" width="70" height="70" border="0" class="recievedUsePic"/>
+										<!--End User profile pic  who scored someone -->
+									</div>
+									<div class="dataListWrapper">
+										<div class="dataListbox userstalkList">
+											<div class="scoredListTitle">
+												<a href="javascript:void(0)" class="show_details_user" userid="<?php echo $this->escape($latestComment->UserID);?>"><?php echo $this->myclientdetails->customDecoding($this->escape($latestComment->username)).' '.$this->myclientdetails->customDecoding($this->escape($latestComment->lname));?></a>
+											 commented on  </span><a href="javascript:void(0)" class="show_details_user" userid="<?php echo $this->escape($latestComment->OwnerID);?>"><?php echo $this->myclientdetails->customDecoding($this->escape($latestComment->Ownername)).' '.$this->myclientdetails->customDecoding($this->escape($latestComment->Ownerlname)).'&rsquo;s </a>'; ?> post - <?php echo date('d M Y',strtotime($this->escape($latestComment->CommentDate))); ?>
+
+											 	<span class="scoreIcon" style="color:<?php echo $colorEle[$latestComment->sentiment_polarity]?>"><?php echo $this->escape($latestComment->sentiment_polarity) . $IconEle[$latestComment->sentiment_polarity]; ?></span>										
+											</div>
+											<div class="scoredData"><?php 
+												$rplme = '<span style="font-weight:bold;color:'.$colorEle[$latestComment->sentiment_polarity].'">'.$this->seachfield.'</span>';
+											echo str_ireplace(  $this->seachfield,$rplme,  $descDisplay);?></div>
+											<div class="cmtview"><?php echo $viewcmm ?></div>
+											<div class="deletecmm"><?php echo $deletecmm ?></div>
+											
+										</div>
+										<!-- <div class="scoredPostDate">Commented on  - <?php //echo date('d M y',strtotime($this->escape($latestComment->CommentDate))); ?></div> -->
+									</div>			
+					
+							</li>
+							<?php $entity_type = $latestComment->entity_type; $rowchange++; endforeach; ?>
+							
+			<?php } else { ?>
+			<p style="position:relative; top:100px;" class="dashBlockEmpty">no comments found</p>
+			<?php } ?>
+			</ul>
+		</div>	
+		<div class="userstalkRt"> 
+			<div class="rightSideList">
+
+				<div class="matchKeywords">
+					<h2 class="pageTitle">Keywords matching "<?php echo $this->seachfield ?>"</h2>
+					<div class="tagsListingWrp" id="word-cloud">
+						<?php
+
+						$ght ="select entity_type,entity_title from tblsematira where clientID=".clientID."  AND entity_type='".$entity_type."' AND entity_title!='".$this->seachfield	."' group by entity_title";
+						$semQue = $this->myclientdetails->passSQLquery($ght);
+
+						//print_r(($semQue));
+            			if (count($semQue) > 0){
+            				foreach ($semQue as $key => $value) {
+            					echo '<a class="" href="'.BASE_URL.'/admin/dashboard/userstalkingon/entity/'.$value['entity_title'].'" style="font-size: 34px;">'.$value['entity_title'].'</a>';
+            				}
+            			} else{
+            				echo '<a class="notfound" style="margin: 32px;"> No match found</a>';
+            			}	?>
+					
+						
+					</div>
+				</div>
+				<?php
+				$polarityEle = array('neutral','positive','negative');
+				foreach ($polarityEle as $key => $value) {
+					
+				?>
+					<div class="talkListbox">
+						<h2 class="pageTitle">Users with  <?php echo $value?>  sentiment <i class="expendIcon fa fa-plus"></i></h2> 
+						
+						
+						<div class="dataWrpCheckbox">
+							
+							<?php
+							
+							$tght ="select full_name,ProfilePic,Username,u.UserID  from tblsematira as sem, tblUsers as u where sem.userid = u.UserID AND sem.clientID=".clientID."  AND entity_title='".$this->seachfield."' AND sentiment_polarity 	='".$value."'  group by sem.userid";
+
+
+							$tsemQue = $this->myclientdetails->passSQLquery($tght);
+	            			if (count($tsemQue) > 0){
+	            				foreach ($tsemQue as $key => $value2) {
+
+	            					echo '<a username="'. $this->myclientdetails->customDecoding($value2['full_name']).'" userid="	'.$value2['UserID'].'" class="show_details_user" rel="dbTip" href="javascript:void(0)" title="'. $this->myclientdetails->customDecoding($value2['full_name']).'"><img width="40" src="'.IMGPATH.'/users/small/'.$value2['ProfilePic'].'" width="40" height="40"></a><input type="checkbox" class="groupcheck" checked="checked" value="'.$value2['UserID'].'" name="goupuserid">';
+	            					
+	            				};
+	            				echo $this->common_model->addtogroupbutton(1,'Add to user set','Save to existing set','Add new set','Save set', 'disabled',$btnID='addgroupBtn');
+	            			} else{
+	            				echo '<a class="notfound" style="margin: 32px;"> No match found</a>';
+	            			}	?>
+					
+							</div>
+						
+					</div>
+				<?php
+				}	
+				?>	
+			</div>
+		</div>
+	</div>
+
+<?php 
+	/*
+	 * Print the pagination of type
+	 */
+ echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml');  ?>
+
+ <script type="text/javascript">
+	$(' #word-cloud a').each(function (){
+        var fontSize = Math.random()*(40-10)+10;
+        var fontColor = Math.random()*(100000-900000)+900000;
+        var rotate = Math.random()*(45-0)+0;
+        $(this).css({fontSize:fontSize+'px', color:'#'+fontColor});
+       var textWidth =  $(this).width();
+       var textHeight =  $(this).height();
+      //  $(this).css({transform:'rotate('+rotate+'deg)'});
+     });
+
+    $('.talkListbox .groupinsertWrapper').removeClass('right').addClass('left');
+    $('body').on('click','.talkListbox h2', function(){        
+        $(this).closest('.talkListbox').find('.dataWrpCheckbox').slideToggle(200);
+        $(this).closest('.talkListbox').find('.expendIcon').toggleClass('fa-minus');
+    });
+
+	
+
+	
+ </script>

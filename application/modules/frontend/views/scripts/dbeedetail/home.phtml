@@ -1,0 +1,816 @@
+<script type="text/javascript" src="<?php echo BASE_URL."/js/angular.min.js";?>"></script>
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+<style type="text/css">.ytp-fresca-suggested-promo-sidebar{ display: none !important}</style>
+
+<?php
+ $slice = array();
+if($this->dbeedetail_row['TaggedUsers']!="")
+{
+$slice=explode(',', $this->dbeedetail_row['TaggedUsers']);
+}
+
+if(count($slice) > 0 && $this->session_data['UserID']!=$this->dbeedetail_row['User'] && $this->dbeedetail_row['PrivatePost']==1)
+{
+  if(!in_array($this->session_data['UserID'], $slice))
+    {
+      $_redirector = Zend_Controller_Action_HelperBroker::getStaticHelper('redirector');
+      $_redirector->gotoUrl('/myhome');
+      // $this->_redirect('/home');
+  }
+}
+
+
+if($this->dbeedetail_row['expertuser']==$this->session_data['UserID'] && $this->dbeedetail_row['Type']==15)
+{
+  ?>
+  <script type="text/javascript">
+
+  
+ $(document).ready(function(){ 
+   $('.moreViewTitle').css('font-weight','bold'); 
+   $('.moreViewTitle').css('margin-bottom','0'); 
+   $('.sentimentsGetWrp').remove(); 
+   $('.yPlayBtn').click(); 
+
+   $('.ytp-fresca-suggested-sidebar-close-button').trigger('click');
+   });
+  </script>
+
+  <?php
+}
+
+
+if($this->dbeedetail_row['Type']==15)
+{
+  $client = new apiClient();
+  $client->setApplicationName("Dbee Login Application");
+  $client->setScopes(array('https://www.googleapis.com/auth/userinfo.email','https://www.googleapis.com/auth/plus.me'));
+  $client->setClientId('601662717833-i78ohlghnpft16viuu3j77m1u62gl1b2.apps.googleusercontent.com');
+  $client->setClientSecret('dDeiWn94VLti_NFtLpgrD3Y2');
+  //$client->setRedirectUri('https://production.db-csp.com/googleauth');
+  $client->setRedirectUri(FRONT_URL.'/googleauth');
+  $plus = new apiPlusService($client);
+  $plus2 = new apiOauth2Service($client);
+  $authNamespace = new Zend_Session_Namespace('Google_Auth_Dburl');
+  $authNamespace->Auth_Dburl = $this->dbeedetail_row['dburl'];
+        
+  echo '<a href="'.$client->createAuthUrl().'" id="googleauthlink" style="display:none;">test</a>';
+
+
+if(($_GET['sptype']=='facebook' && !in_array($this->session_data['UserID'], $this->joineduser) && $this->dbeedetail_row['eventtype']==2) || ($_GET['sptype']=='twitter' && !in_array($this->session_data['UserID'], $this->joineduser) && $this->dbeedetail_row['eventtype']==2))
+{
+    ?>
+  <script> 
+  $(document).ready(function(){
+
+    $("#overlay").css('display','block');
+    var SpAcceptPopup = '<div style="margin-top:5px; text-align:center" >Click on a button below to respond to invitation</div>\
+    <div style="margin-top:5px; text-align:center" >\
+    <a href="javascript:void(0);" class=" btn btn-yellow joinRequest" data-id="<?php echo $this->dbeeid; ?>"  >Accept</a>\
+    <a href="javascript:void(0);" class=" btn" id="LiveRejectDbeeRequest" >Reject</a>\
+    </div>';
+
+    $messageWarning(SpAcceptPopup);
+
+  });
+  </script>
+<?php
+}
+
+  switch ($_GET['sptype']) 
+  {
+    case 'facebook':
+      if(!in_array($this->facebookid, $this->fbjoineduser) && count($this->fbjoineduser) < 0 && $this->dbeedetail_row['eventtype']==2)
+      {
+         $_redirector = Zend_Controller_Action_HelperBroker::getStaticHelper('redirector');
+          $_redirector->gotoUrl('/myhome');
+      }
+      break;
+    case 'twitter':
+      if(!in_array($this->session_data['Socialid'], $this->twjoineduser) && count($this->twjoineduser) < 0 && $this->dbeedetail_row['eventtype']==2)
+      {
+         $_redirector = Zend_Controller_Action_HelperBroker::getStaticHelper('redirector');
+          $_redirector->gotoUrl('/myhome');
+      }
+      break;
+    default:
+      if(!in_array($this->session_data['Socialid'], $this->joineduser) && count($this->joineduser) < 0 && $this->dbeedetail_row['eventtype']==2)
+      {
+         $_redirector = Zend_Controller_Action_HelperBroker::getStaticHelper('redirector');
+          $_redirector->gotoUrl('/myhome');
+      }
+      break;
+  }   
+  
+  ?>
+  <script type="text/javascript">
+ $(document).ready(function(){    
+   $('.yPlayBtn').click(); 
+   $('#countdown').fadeIn(1000);
+   });
+  </script>
+  <?php
+}
+
+?>
+
+
+<input type="hidden" id="pagenumberpending" name="pagenumberpending" value="1">
+<input type="hidden" id="commentPageExist" name="commentPageExist" value="0">
+<input type="hidden" id="pagenumbermyquestion" name="pagenumbermyquestion" value="1">
+<input type="hidden" name="pagenumber" id="pagenumber" value="2" >
+<input type="hidden" name="pagenumbercomment" id="pagenumbercomment" value="2" >
+<input type="hidden" id="dbid" value="<?php echo $this->dbeeid; ?>">
+<input type="hidden" id="tokenid" value="<?php echo $this->TokenValue; ?>">
+<input type="hidden" id="seo_title" value="<?php echo $this->seo_title; ?>">
+<input type="hidden" id="mentionusers" value=''>
+<input type="hidden" id="Logineduser" value="<?php echo $this->UserID; ?>">
+<input type="hidden" id="CommentsID" value="">
+<input type="hidden" id="dbeeuser" value="<?=$this->userid;?>">
+<input type="hidden" name="shortUrl" id="shortUrl" value="" >
+
+
+<div class="pageloading-dbeedetail" style="border: 0px solid #999999; padding: 20px;position: relative;height:500px;"><div class="loaderAjWrp" ><i class="fa fa-spinner fa-spin fa-3x"></i></div></div>
+
+
+<?php 
+$checkImage = new Application_Model_Commonfunctionality();
+
+if($this->special_dbee_session->showAcceptPopup == "accept" && $this->special_dbee_session->invitationType=="private" && $this->UserID) { ?>
+<script> 
+
+$(document).ready(function(){
+
+    var SpAcceptPopup = '<div style="margin-top:5px; text-align:center" >Click on a button below to respond to invitation</div>\
+            <div style="margin-top:5px; text-align:center" >\
+              <a href="javascript:void(0);" class=" btn btn-yellow joinRequest" data-id="<?php echo $this->dbeeid; ?>"  >Accept</a>\
+               <a href="javascript:void(0);" class=" btn" id="RejectDbeeRequest" >Reject</a>\
+            </div>';
+
+      $messageWarning(SpAcceptPopup);
+    
+    });
+</script>
+
+<?php } ?>
+
+
+
+<!-- private invitation -->
+
+<?php 
+
+if($this->special_dbee_session->showAcceptPopup == "reject" && $this->special_dbee_session->invitationType=="private" && $this->UserID) { ?>
+
+ <script> 
+   $(document).ready(function(){
+    var type_of_user = '<?php echo $this->special_dbee_session->Special_Type; ?>';
+    var SocialTypeUserClass='';
+     var bgSocial='';
+   if(type_of_user=='twitter'){
+        SocialTypeUserClass = 'fa dbTwitterIcon fa-5x clrMsgBox';
+        bgSocial = '#20b8ff';
+    }
+     else if(type_of_user=='facebook'){
+        SocialTypeUserClass = 'fa dbFacebookIcon  fa-5x clrMsgBox';
+        bgSocial = '#3a589b';
+    }
+    
+  var SpTwitterAcceptPopupLogout = '<div class="signWithSMContainer">\
+                    <div class="'+SocialTypeUserClass+'"></div>\
+                    <div class="signTittleSocialM" id="socialCntTxt">\
+                      You seem to be already logged into db with a different account. Please click the button below to log out and log back in with your\
+                      <strong>'+type_of_user+'</strong> account.\
+                    </div>\
+            </div>';
+
+      $.dbeePopup(SpTwitterAcceptPopupLogout, {width:420,overlay:true, bg:bgSocial, otherBtn:'<a href="/myhome/logout" class="btn btn-yellow pull-right" >Logout</a>'});
+       
+      });
+   </script>
+
+<?php } ?>
+
+
+
+<?php if($_GET['from']=='sphere'){ ?>
+
+   <script type="text/javascript">
+   $(document).ready(function(){
+     $('#twittersphere').trigger('click');
+   });
+   </script>
+   
+<?php } ?>
+
+
+
+<?php if($_GET['expirelink']==1){ ?>
+
+ <script> 
+   $(document).ready(function(){
+
+    var SpUsedAcceptPopup = '<div style="text-align:center;font-size:18px;color:#999999;"><div style="padding:30px 0px; 50px 0px;"  class="formRow">Sorry you are using wrong  url </div><div class="clearfix"></div></div>';
+      $.dbeePopup(SpUsedAcceptPopup, {width:420,overlay:true});
+
+      });
+   </script>
+
+<?php } ?>
+
+<!-- special dbee code here  -->
+
+<?php   
+
+$redirection_name_space = new Zend_Session_Namespace('User_Session');
+if($redirection_name_space->showTwitterAcceptPopup == true && $redirection_name_space->dbeeid == $this->dbeeid && $this->UserID)
+{
+?>
+
+<script> 
+  
+   $(document).ready(function(){
+
+     var AcceptPopup = '<div style="margin-top:5px; text-align:center" >Please respond to <?php echo $this->expertText; ?> invitation by clicking a button below </div>\
+              <div style="margin-top:5px; text-align:center" >\
+                <a href="javascript:void(0);" class=" btn btn-yellow"  id="acceptExpertRequest" >Accept</a>\
+                 <a href="javascript:void(0);" class=" btn" id="rejectExpertRequest" >Reject</a>\
+              </div>';
+
+        $messageWarning(AcceptPopup);
+      
+      });
+   </script>
+
+<?php
+
+}
+
+?>
+
+<?php if($_GET['used']==1){ ?>
+
+ <script> 
+   $(document).ready(function(){
+
+    var UsedAcceptPopup = '<div style="text-align:center;font-size:18px;color:#999999;"><div style="padding:30px 0px; 50px 0px;"  class="formRow">Sorry this is an invalid link</div><div class="clearfix"></div></div>';
+      $.dbeePopup(UsedAcceptPopup, {width:420,overlay:true});
+
+      });
+   </script>
+
+<?php } ?>
+
+<?php if($_GET['wrong']==1){ ?>
+
+ <script> 
+   $(document).ready(function(){
+
+    var UsedAcceptPopup = "<div style='text-align:center;font-size:18px;color:#999999;''><div style='padding:30px 0px; 50px 0px;' class='formRow'>Sorry this is an invalid link</div><div class='clearfix'></div></div>";
+      $.dbeePopup(UsedAcceptPopup, {width:420,overlay:true});
+
+      });
+   </script>
+
+<?php } ?>
+
+<script type="text/javascript">
+ $(function(){
+  $('#alltweet .twTagsTab li:first').trigger('click');
+ });
+
+  var userInfo = [];
+
+</script>
+
+<?php
+   if($this->showTwitterAcceptPopupLogout ==true)
+    {  ?>
+   
+   <script> 
+   $(document).ready(function(){
+    var type_of_user = '<?php echo $this->typeExpert; ?>';
+
+    var SocialTypeUserClass='';
+     var bgSocial='';
+   if(type_of_user=='twitter'){
+        SocialTypeUserClass = 'fa dbTwitterIcon fa-5x clrMsgBox';
+        bgSocial = '#20b8ff';
+    }
+     else if(type_of_user=='facebook'){
+        SocialTypeUserClass = 'fa dbFacebookIcon  fa-5x clrMsgBox';
+        bgSocial = '#3a589b';
+    }
+    
+        var TwitterAcceptPopupLogout = '<div class="signWithSMContainer">\
+                                      <div class="signwithSprite '+SocialTypeUserClass+'"></div>\
+                                      <div class="signTittleSocialM" id="socialCntTxt">\
+                                        You seem to be already logged into db with a different account. Please click the button below to log out and log back in with your\
+                                        <strong>'+type_of_user+'</strong> account.\
+                                      </div>\
+                              </div>';
+      $.dbeePopup(TwitterAcceptPopupLogout, {width:420,overlay:true, bg:bgSocial, otherBtn:'<a href="/myhome/logout" class="btn btn-yellow pull-right" >Logout</a>'});
+       
+      });
+   </script>
+
+   <?php } ?>
+
+<script type="text/javascript">
+  $(document).ready(function()
+  {
+  <?php 
+ if($this->session_data['UserID']=='')
+ {
+  if($_GET['from']=='twitter' || $_GET['logintwitter']==true){ ?> 
+    var reportTemplate = '<a href="'+BASE_URL+'/auth/twitter" class="signWithSMContainer">\
+    <div class="fa dbTwitterIcon fa-5x clrMsgBox"></div>\
+    <div class="signTittleSocialM">Click here to log in with Twitter</div>\
+    </a>';
+    $.dbeePopup(reportTemplate, {width:520,overlay:true,closeBtnHide:true, bg:'#20b8ff'});
+  <?php } } ?>
+   <?php 
+ if($this->session_data['UserID']=='')
+ {
+  if($_GET['loginfacebook']==true){ ?> 
+    var reportTemplate = '<a href="'+BASE_URL+'/index/facebook" class="signWithSMContainer">\
+    <div class="fa dbFacebookIcon  fa-5x clrMsgBox"></div>\
+    <div class="signTittleSocialM">Click here to log in with Facebook</div>\
+    </a>';
+    $.dbeePopup(reportTemplate, {width:520,overlay:true,closeBtnHide:true, bg:'#3a589b'});
+  <?php } } ?>
+
+  $('body').on('click','.Loginpopup',function()
+  {
+
+    var type = $(this).attr('type');
+    switch(type) 
+    {
+    case 'twitter':
+       var reportTemplate = '<a href="'+BASE_URL+'/auth/twitter" class="signWithSMContainer">\
+                                      <div class="fa dbTwitterIcon fa-5x clrMsgBox"></div>\
+                                      <div class="signTittleSocialM">Click here to log in with Twitter</div>\
+                                    </a>';
+        $.dbeePopup(reportTemplate, {width:520,overlay:true,closeBtnHide:true, bg:'#20b8ff'});
+      break;
+    case 'facebook':
+       var reportTemplate = '<div id="datafacebook"> <a href="'+BASE_URL+'/index/facebook" class="signWithSMContainer" >\
+                                      <div class="fa dbFacebookIcon  fa-5x clrMsgBox"></div>\
+                                      <div class="signTittleSocialM">Click here to log in with Facebook</div>\
+                                    </a></div>';
+
+      $.dbeePopup(reportTemplate, {width:520,overlay:true,closeBtnHide:true ,bg:'#3a589b'});
+      break;
+    }
+     
+ });
+ });
+</script>
+
+<?php
+  
+$TwitterLogin = false;
+$FacebookLogin = false;
+$LinkedinLogin = false;
+
+if($this->special_dbee_session->Special_Type=='twitter' && isset($this->special_dbee_session->Special_Token) && $this->special_dbee_session->invitationType == 'private' && $this->UserID=='')
+$TwitterLogin = true;
+else if($this->special_dbee_session->Special_Type=='facebook' && isset($this->special_dbee_session->Special_Token) && $this->special_dbee_session->invitationType == 'private' && $this->UserID=='')
+$FacebookLogin = true;
+else if($this->special_dbee_session->Special_Type=='linkedin' && isset($this->special_dbee_session->Special_Token) && $this->special_dbee_session->invitationType == 'private' && $this->UserID=='')
+$LinkedinLogin = true;
+
+if($this->redirection_name_space_inviteexpert->type=='twitter' && isset($this->redirection_name_space_inviteexpert->token))
+$TwitterLogin = true;
+else if($this->redirection_name_space_inviteexpert->type=='facebook' && isset($this->redirection_name_space_inviteexpert->token))
+$FacebookLogin = true;
+else if($this->redirection_name_space_inviteexpert->type=='linkedin' && isset($this->redirection_name_space_inviteexpert->token))
+$LinkedinLogin = true;
+  
+  ?>
+
+  <?php
+
+   if($TwitterLogin){   ?>
+   <script> 
+
+   $(document).ready(function(){
+       var reportTemplate = '<a href="'+BASE_URL+'/auth/twitter" class="signWithSMContainer">\
+                                      <div class="fa dbTwitterIcon fa-5x clrMsgBox"></div>\
+                                      <div class="signTittleSocialM">Click here to log in with Twitter</div>\
+                                    </a>';
+
+      $.dbeePopup(reportTemplate, {width:520,overlay:true,closeBtnHide:true, bg:'#20b8ff'});
+
+      });
+   </script>
+
+   <?php } ?>
+
+<?php
+   if($FacebookLogin){ ?>
+   <script> 
+   $(document).ready(function(){
+
+   var reportTemplate = '<div id="datafacebook"> <a href="<?php echo $this->facebookloginUrl; ?>" class="signWithSMContainer" >\
+                                      <div class="fa dbFacebookIcon  fa-5x clrMsgBox"></div>\
+                                      <div class="signTittleSocialM">Click here to log in with Facebook</div>\
+                                    </a></div>';
+
+               $.dbeePopup(reportTemplate, {width:520,overlay:true,closeBtnHide:true, bg:'#3a589b'});
+			});
+			
+    </script>
+   <?php } 
+   
+  if($LinkedinLogin)
+  {
+?>
+ 
+
+    <script> 
+
+   $(document).ready(function(){
+
+    
+       var reportTemplate = '<a href="'+BASE_URL+'/linkedin/login" class="signWithSMContainer">\
+                                      <div class="fa dbLinkedInIcon fa-5x clrMsgBox"></div>\
+                                      <div class="signTittleSocialM">Click here to log in with LinkedIn</div>\
+                                    </a>';
+
+      $.dbeePopup(reportTemplate, {width:520,overlay:true,closeBtnHide:true, bg:'#007ab9'});
+
+      });
+
+   </script>
+
+
+   <?php }
+   
+   $this->title = "Dbee detail";
+   $this->headTitle($this->title);
+   
+   // No any function will work if dbee is not active
+   if($this->isdbactive==1)   
+   {
+   	?>
+  <script>
+
+  $(document).ready(function(){
+
+        <?php if($this->UserID) { 
+          if($this->dbeedetail_row['Type']==9) {  ?>
+          fetchspecificadvert(<?php echo $this->dbeedetail_row['events']; ?>,7);
+        <?php }else if ($this->dbeedetail_row['GroupID']!=0){ ?>
+          fetchspecificadvert(<?php echo $this->dbeedetail_row['GroupID']; ?>,5); // get specific post adver
+        <?php }else{ ?>
+          fetchspecificadvert(<?php echo $this->dbeeid; ?>,5);// get specific post adver
+        <?php }} ?>
+
+
+         $('body').on('click','.ShowMycomment',function()
+         {
+             var dbid = $("#dbid").val();
+             $("#dbee-expert-question").hide();
+             if($('#commentleagueExist').val()==1)
+               $('#comment-league-wrapper').show();
+             $("#dbee-comments").show();
+             $(".ShowMycomment").addClass('active');
+             $(".ShowMyquestion ").removeClass('active');
+             $('.Myquestion').removeClass('active');
+             $('.Pendingquestion').removeClass('active');
+             $('#LivePostCount').html('').css({display:'none'});
+             loadComment('','loadfirst',dbid);
+        });
+    });
+
+     $(function() 
+     {      
+        <?php if($this->dbeedetail_row['Type']!=7)  { ?>
+       	seedbee('<?php echo $this->dbeeid; ?>','<?php echo $this->GroupID; ?>',0, '<?php echo  $this->expertArray['UserID'] ?>');
+       	$('#toggleml').click(function()
+       	{
+       		$('#comment-league-wrapper').slideToggle('slow', function() {
+       			document.getElementById('toggleml').innerHTML=(document.getElementById('toggleml').innerHTML=='close') ? 'open' : 'close';
+       		});
+       	});
+        <?php } ?>
+   });
+   
+   function createdrop(start,end) {
+     	for(i=start;i<=end;i++) {
+     		dropdowncontent.init("scorecomment"+i, "left-bottom", 100, "mouseover");
+     	}
+   }
+   
+   function changeHistory() {
+   	var box=document.getElementById('historyMonths');
+   	var month=box.options[box.selectedIndex].value;
+   	seehistorylist(<?php echo $this->dbeeid; ?>,month);
+   }
+
+    
+   var busy = true;
+   $(function(){
+   //$dbTip();
+    //$('.dbtypeWrapper_7 #leftListing, .dbtypeWrapper_7 #rightListing').remove();
+    $(window).scroll(function(){  
+      dbeeCommentCount = parseInt($('#dbeeCommentCount<?php echo $this->dbeeid; ?>').val());
+      if  ((dbeeCommentCount>10) && ($(window).scrollTop() == $(document).height() - $(window).height())){
+           if(busy == true){ 
+             loadComment('','scroll','<?php echo $this->dbeeid; ?>');
+          }
+     }
+    });
+   });
+   
+ /*   <?php if($this->profileholder==false && !empty($this->userid) && $this->dbeedetail_row['TwitterTag']!='') 
+    { $Twitertag = $this->dbeedetail_row['TwitterTag'];
+      ?> 
+      setInterval("Twiterright('<?php echo $this->dbeeid; ?>')",40000);  
+    <?php } ?>*/
+   
+</script>
+
+<?php
+  $dbleagejs = $this->partial('partials/dbleagejs.phtml');
+   echo $dbleagejs;
+?>
+
+<?php
+   }  // closing if db is not active 
+   ?>	
+<input type="hidden" id="notifications-top-redb-hidden" value="0">
+<input type="hidden" id="dbeeCommentCount<?php echo $this->dbeeid; ?>" value="0">
+<input type="hidden" id="notifications-top-mentions-hidden" value="0">
+ <style type="text/css">
+.pageloading-dbeedetail{display: none;}
+</style>
+
+ <?php 
+$sty="";
+ if($this->dbeedetail_row['Type']==6){ 
+$sty='style="margin-bottom:10px"';
+  } ?>
+
+<div  class="<?php echo 'dbtypeWrapper_'.$this->isdbType ?>   dbDetailsPageMain">
+  <div class="leftBigSide">
+   <input type="hidden" name="divtype" value="" id="divtype">
+    <div class="dbDetailsWrapper" id="mainDbeeDetails" <?=$sty?>>
+      <div class="dbDetailsContent">
+         <div id="dbee-highlighted" style="padding:0px;border:0px;">
+            <?php
+            //echo "<pre>"; print_r($this->dbee_highlighted); exit;
+            if(is_array($this->dbee_highlighted)){
+              echo $this->dbee_highlighted['content'];
+              echo $this->dbee_highlighted['translatefooter'];
+            }else{
+               echo $this->dbee_highlighted;
+            }
+               if(!$this->isdbactive) 
+               echo '<span style=" display: block;font-size: 20px;padding: 30px;text-align: center;">The post you are trying to view does not exist any more.</span>'
+               ?> 
+         </div>
+      </div>
+    </div>       
+    <?php if($this->dbeedetail_row['Type']!=7){ ?>
+      <div id="dbees-feeds-wrapper" >
+         <a name="feedcontrols" id="feedcontrols"></a>
+         <div id="maindb-wrapper" class="maindb-wrapper  maindb-wrapper-border">
+	       <? $dbtype_obj= $this->dbright;	
+		        if($dbtype_obj['Type']==5) $tmpmargin='style=""'; else $tmpmargin='';
+	       ?>
+            <!-- <div id="my-dbees" <? echo $tmpmargin; ?>> -->
+
+            <div id="my-comment-box" <? echo $tmpmargin; ?>>
+               
+               <div id="dbee-post-comment"></div>
+
+               <?php
+                 $comment_sort ='';
+                 if($this->LoginUserid !='' && $this->TotalComments!=0) 
+                 {
+                     $sen_comments  = new Application_Model_Comment();
+                     $NotifyEmail = $sen_comments->notifyemail($this->dbeeid, $this->LoginUserid);
+                     $blockuser    = $sen_comments->blockuser($this->LoginUserid, $this->dbeeid);
+                    // CHECK IF USER IS BLOCKED
+                      $cookieUserBlocked=false;
+                      $cookieUserBlockedInt=0;
+                      $userBlockedNum=$blockuser;        
+                      if($userBlockedNum>0) {
+                        $cookieUserBlocked=true; $cookieUserBlockedInt=1;
+                      }
+                      // CHECK IF USER IS BLOCKED:
+                      if(!$cookieUserBlocked) 
+                      { 
+
+                      if($NotifyEmail[0]['NotifyEmail']==1) {
+                        $radioClass='radioTick'; $sendNotify=1;
+                      } elseif($NotifyEmail[0]['NotifyEmail']=='0') {
+                        $radioClass='radio'; $sendNotify=0;
+                      } else { $radioClass='radioTick'; $sendNotify=-1; }
+                      if($this->dbeedetail_row['Type']!=5)
+                      {
+                        /*$comment_sort ="<div class='sortAndTweeterfeedWrapper'>
+                          <div id='sort-comments' class='pull-left'>
+                            <span style='display:inline-block;margin-right:5px;float:left;'>Display:</span>
+                            <span id='sort-latest' class='sort-active' onclick='javascript:sortcomments(\"DESC\")'>latest</span>
+                            <span id='sort-oldest' class='sort-nonactive' onclick='javascript:sortcomments(\"ASC\")'>oldest </span>
+                          </div>";*/
+                      }
+                      elseif($this->dbeedetail_row['Type']==5 && false)
+                      {
+                       /* $comment_sort .="<div class='sortAndTweeterfeedWrapper'>
+                        <div id='sort-comments' class='pull-left'>
+                          <span style='display:inline-block;margin-right:5px;float:left;'>Display:</span>
+                          <span id='sort-latest' class='sort-active' onclick='javascript:sortcomments(\"DESC\")'>Highest Votes</span>
+                          <span id='sort-oldest' class='sort-nonactive' onclick='javascript:sortcomments(\"ASC\")'>Lowest Votes</span>
+                        </div>";*/
+                     }
+          					if($this->LoginUserid && $this->LoginUserid!=adminID && $this->dbeedetail_row['Type']!=5 && !empty($NotifyEmail)) 
+                    { 
+                        $comment_sort.= "<div style='background: #FFF;text-align: right;padding: 5px;padding-right:20px;'><div id='notify-comment-div'>
+                          Email notifications for this post 
+                          <label class='switcher' dbee-id=".$this->dbeedetail_row['DbeeID'].">";
+                           if($sendNotify==1){ $comment_sort.= '<input type="checkbox" />'; }
+                           else{ 
+                            $comment_sort.='<input type="checkbox" checked="checked"/>'; 
+                         } 
+                        $comment_sort.= '<span class="switchOnOff"><span class="switchOn"></span></span></label></div></div>';
+                    }else if($this->dbeedetail_row['Type']==5)
+                    { 
+                      if($this->PollComments_On_Option==2 || $this->PollComments_On_Option==4 || $this->Is_PollComments_On==0)
+                          $comment_sort.='';
+                      else
+                      {
+                        $comment_sort.='<div class="sortPoll" align="left"><div class="btn btn-yellow dropDown" align="left">Sort by poll options <i class="fa fa-angle-down"></i><ul class="dropDownList left">';
+                        foreach ($this->poRes as $key => $value) {
+                          $comment_sort.='<li>
+                          <a class="polloption" poll-id="'.$value['ID'].'" >'.$value['OptionText'].' 
+                          </a></li>';
+                        }
+                        $comment_sort.='</ul></div>';
+                      }
+                       $comment_sort.='</div>';
+                    }						      
+                      if($this->dbeedetail_row['Type']==5 && ($this->PollComments_On_Option==2 || $this->PollComments_On_Option==4 || $this->Is_PollComments_On==0))
+                      {
+                          $comment_sort.='';
+                      }
+                      // tab for expert question answer 
+                    
+                    } else {
+                       $comment_sort.="<div class='user-blocked-box'>You are blocked from this post by the author</div><div class='next-line'></div></div>";
+                    }
+                } echo $comment_sort; 
+                ?>
+                <div id="dbee-visited-wrapper" class="tabing" style="display:none;"> </div>
+			         <div id="dbee-comments"></div>
+               <div id="dbee-expert-question"></div>
+            </div>
+            
+         </div>
+         <?php } ?>
+         <input type="hidden" id="commentleagueExist"  value="0">
+            <input type="hidden" id="QNATAB"  value="0">
+            <input type="hidden" id="QaActiveTagPage"  value="1">
+            <input type="hidden" id="dbeetype_edit" value="<?php echo $this->dbedit_type; ?>"> 
+            <input type="hidden" id="dbid" value="<?php echo $this->dbeeid; ?>"> 
+            <input type="hidden" id="reloadend"> 
+            <input type="hidden" id="profileuser" value="<?php echo $this->userid; ?>">
+            <input type="hidden" id="totalcomments"> 
+            <input type="hidden" id="totaldbees"> 
+            <input type="hidden" id="feedtype">
+            <input type="hidden" name="commentSorting" value="DESC" data-dbeeid="<?php echo $this->dbeeid; ?>" class="commentSorting" />
+            <input type="hidden" id="dbowners" value="<?php echo $this->dbeeOwner; ?>">
+      </div>
+  </div>
+  
+
+<!-- expert create div -->
+
+<!-- expert create div -->
+<!-- expert create div -->
+
+<div id="rightListing" class="twitterRightPart">
+  
+  <!-- post create div -->
+  <div class="rightSideListExpert"></div>
+
+  <div id="postcreater">
+
+  </div>
+
+
+  <div id="dbeeEdvert">
+
+  </div>
+
+  <script type="text/javascript">
+  var polloption = '';
+    $(document).ready(function()
+    {
+      loadComment('','loadfirst','<?php echo $this->dbeeid; ?>');
+      $('body').on('click','.polloption', function() {
+          polloption = $(this).attr('poll-id');
+          sortcommentsPoll(polloption);
+      });
+
+     getexpertAsk('<?php echo $this->dbeeid; ?>');
+     showQaTab('publicQa');
+     showrightPart('<?php echo $this->dbeeid; ?>');
+   });
+
+  </script>
+  <div class="rightSideListTwitter">
+
+  </div>
+
+<!-- right part create div -->
+<div  class="rightSideList"></div>
+<!-- right part create div -->
+ <div style="clear:both"></div>
+
+</div>
+
+ <!-- right twitter part create div -->
+<!-- <div id="rightListing"  class="rightSideListTwitter"></div> -->
+<!-- right part create div -->
+
+<!-- video dbee create div -->
+<?php
+if($this->dbeedetail_row['Type']==6)
+{
+  $specialvideodb = $this->partial('partials/specialvideodb.phtml', array('dbeeid' => $this->dbeeid,'dbeedetail_row'=>$this->dbeedetail_row));
+   echo $specialvideodb;
+}
+?>
+<!-- video dbee create div -->
+
+<!-- video dbee create div -->
+<?php
+if($this->dbeedetail_row['Type']==5)
+{
+  $pollchartjs = $this->partial('partials/pollchartjs.phtml');
+   echo $pollchartjs;
+}
+?>
+<?php if($this->dbeedetail_row['Type']==20){ ?>
+<script type="text/javascript">
+  $(function (){
+QASTARTINT = setInterval("checkQA('<?php echo $this->dbeeid; ?>')", 1000);
+});
+function checkQA(DbeeID)
+{
+  console.log(DbeeID);
+  socket.emit('QAstart', DbeeID,clientID);
+}
+
+function checkEndQA(DbeeID)
+{
+  console.log(DbeeID);
+  socket.emit('QAend', DbeeID,clientID);
+}
+</script>
+<?php } ?>
+<!-- video dbee create div -->
+<?php if($this->dbeedetail_row['Type']==5){ ?>
+<script type="text/javascript">
+  $(function (){
+     $('#PollComment').mentionsInput();
+
+     $('#PollComment').focusin(function(event) {
+      $('#poll-comment #postCommentBtn').fadeIn();
+     });
+     $('body').on('keyup', '#PollComment', function(e){
+        if(e.keyCode==13){
+              $('#poll-comment #postCommentBtn  a').trigger('click');
+        }
+     });
+  });
+</script>
+<?php } ?>
+
+<div class="clearfix"></div>
+</div>
+<?php
+if($this->dbeedetail_row['Type']==15)
+{ ?>
+<div id="player-api" class="player-width player-height off-screen-target player-api" tabIndex="-1"></div>
+ <script>var ytspf = ytspf || {};ytspf.enabled = true;ytspf.config = {'experimental-parse-extract': true,'reload-identifier': 'spfreload'};ytspf.config['cache-max'] = 30;ytspf.config['navigate-limit'] = 60;ytspf.config['navigate-lifetime'] = 64800000;
+ </script>
+<script type="text/javascript" src="<?php echo BASE_URL."/js/yt-core.js";?>"></script>
+<script>yt.setConfig({"VM_BULK_ACTIONS_ENABLED":true,"OWNER_PICKER_REDIRECT_URL":"\/my_videos","DELEGATED_SESSION_ID":null,"HOA_BASE_URI":"\/\/plus.google.com","HL_LOCALE":"en_US","IS_READONLY":false,"CREATOR_CONTEXT":"U","SESSION_INDEX":0});
+</script> 
+<script type="text/javascript" src="<?php echo BASE_URL."/js/videomanager.js";?>"></script>
+<script type="text/javascript" src="<?php echo BASE_URL."/js/myliveevents.js";?>"></script>
+<script>yt.setMsg({'LIVE_WATCHING_NOW': {"case1": "1 watching now", "case0": "0 watching now", "other": "# watching now"}});yt.pubsub.subscribe('init', function() {yt.www.livestreaming.ConcurrentViewers(30000);new yt.www.livestreaming.eventmanager.MyLiveEvents();}); 
+</script>
+<script>
+yt.setConfig({'EVENT_ID': "t6JlVf7oJ9Dt-AWnroLoDQ",'PAGE_NAME': "my_live_events",'LOGGED_IN': true,'SESSION_INDEX': 0,'PARENT_TRACKING_PARAMS': "",'FORMATS_FILE_SIZE_JS': ["%s B","%s KB","%s MB","%s GB","%s TB"],'DELEGATED_SESSION_ID': null,'ONE_PICK_URL': "",'UNIVERSAL_HOVERCARDS': true,'VISITOR_DATA': "CgtJdGpObElETlBDWQ%3D%3D",'GOOGLEPLUS_HOST': "https:\/\/plus.google.com",'PAGEFRAME_JS': "",'JS_COMMON_MODULE': "",'PAGE_FRAME_DELAYLOADED_CSS': "",'GUIDE_DELAY_LOAD': true,'GUIDE_DELAYLOADED_CSS': "\/\/s.ytimg.com\/yts\/cssbin\/www-guide-vfl50N2pm.css",'PREFETCH_CSS_RESOURCES' : ["",''         ],'PREFETCH_JS_RESOURCES': ["",''         ],'PREFETCH_LINKS': false,'PREFETCH_LINKS_MAX': 1,'PREFETCH_AUTOPLAY': false,'PREFETCH_AUTOPLAY_TIME': 0,'PREFETCH_AUTONAV': false,'PREBUFFER_MAX': 1,'PREBUFFER_LINKS': false,'PREBUFFER_AUTOPLAY': false,'PREBUFFER_AUTONAV': false,'WATCH_LATER_BUTTON': "\n\n  \u003cbutton class=\"yt-uix-button yt-uix-button-size-small yt-uix-button-default yt-uix-button-empty yt-uix-button-has-icon no-icon-markup addto-button video-actions spf-nolink hide-until-delayloaded addto-watch-later-button yt-uix-tooltip\" type=\"button\" onclick=\";return false;\" role=\"button\" title=\"Watch Later\" data-video-ids=\"__VIDEO_ID__\"\u003e\u003c\/button\u003e\n",'SAFETY_MODE_PENDING': false,'LOCAL_DATE_TIME_CONFIG': {"formatShortTime":"h:mm a","shortWeekdays":["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],"shortMonths":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"months":["January","February","March","April","May","June","July","August","September","October","November","December"],"formatLongDate":"MMMM d, yyyy h:mm a","formatShortDate":"MMM d, yyyy","formatWeekdayShortTime":"EE h:mm a","firstDayOfWeek":0,"dateFormats":["MMMM d, yyyy h:mm a","MMMM d, yyyy","MMM d, yyyy","MMM d, yyyy"],"amPms":["AM","PM"],"firstWeekCutoffDay":3,"formatLongDateOnly":"MMMM d, yyyy","weekendRange":[6,5],"weekdays":["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]},'PAGE_CL': 94449315,'PAGE_BUILD_TIMESTAMP': "",'VARIANTS_CHECKSUM': "384759dd7f74e0f5c46e6b6a7d98cd5a",'EXP_WEBFONT_ENABLED': true,'CLIENT_PROTOCOL': "h2",'CLIENT_TRANSPORT': "tcp",'MDX_ENABLE_CASTV2': true,'MDX_ENABLE_QUEUE': true,'SANDBAR_ENABLED': true,'SANDBAR_LOCALE': "en-US",'FEEDBACK_BUCKET_ID': "Account",'FEEDBACK_LOCALE_LANGUAGE': "en",'FEEDBACK_LOCALE_EXTRAS': {"logged_in":true,"is_partner":false,"accept_language":"en-US,en;q=0.5","experiments":"","guide_subs":"NA","is_branded":false}}); 
+</script>
+<?php } ?>
+
+
+
+  

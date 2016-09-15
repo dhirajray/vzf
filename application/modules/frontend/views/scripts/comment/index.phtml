@@ -1,0 +1,53 @@
+<?php   
+
+		$commonbynew 	=	new Application_Model_Commonfunctionality();
+	
+        $IDs = '';
+
+    	$startnew =$this->startnew;
+        $end =$this->end;
+        $dbeeList = array();
+        //if($startnew==10)
+
+       
+		if(count($this->dbeecomment) > 0) {
+		if($this->OtherUser!=1 && $this->seemore!=1)
+		{
+		$return.= '<div id="middleWrpBox"><div class="user-name titleHdpad">My comments</div></div>'; 
+	    }
+			$k=1;        
+			if(strlen($row['Text'])>250) $dots='...'; else $dots='';
+			if($k=='1' && $initial=='1') setcookie("CookiePostDate", $row['PostDate'], time()+3600);
+			foreach ($this->dbeecomment as $row) :
+				$IDs .= $row['DbeeID'].',';
+				$return.=$commonbynew->displayLayoutDbs($row,$this->Social_Content_Block,'mycomment',$this->adminpostscore);
+				$k++;
+				$dbeeList[] = $row['DbeeID'];
+			endforeach; 
+			$startnew = (int)$startnew;
+			$return.='<input type="hidden" id="commentsortorder"><input type="hidden" id="currcommentsortorder">';
+		}
+		else {
+
+			if($this->seemore!=1)
+			{
+			$return.= '<div id="middleWrpBox"><div class="user-name titleHdpad">My comments</div>';
+				if($this->dbeenotavailmsg==1) $nomsg = '<div class="noFound"><strong>- no more comment to show -</strong></div>';
+				else 	$return.= '<div class="next-line"></div></div><div class="noFound"><strong>You have not commented yet.</strong></div>';
+			}
+			else
+			{
+				$nomsg = '<div class="noFound"><strong>- no more comment to show -</strong></div>';
+			}
+			$seemorelabel = $nomsg;
+		}
+
+			 $IDs=substr($IDs,0,-1);
+
+$return.='<div id="see-more-feeds'.$startnew.'"><div id="more-feeds-loader" style="cursor:pointer; color:#333333; text-align:center;" >'.$seemorelabel.'</div></div>';
+
+echo $return.'~#~'.$end.'~#~'.$IDs.'~#~'.$startnew.'~#~'.implode(',', $dbeeList);
+
+ ?>
+
+    

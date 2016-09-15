@@ -1,0 +1,49 @@
+<?php      
+
+$this->title = "User group";
+$this->headTitle($this->title);
+
+?>
+<h1 class="pageTitle "><?php echo $this->groupname?></h1>
+<div class="userUpBar"></div>
+<div class="clearfix"></div>	
+
+	<?php if (count($this->paginator)){ ?>
+	<table class="inviteDetailsTable table-border table table-hover table-stripe">
+<thead>
+	 <?php $rowchange	=	0; ?>
+<tr>
+    <td>Name</td>
+    <td>Email</td>
+	<td>Status</td>
+	<td>Action</td>
+
+   <?php /* <th>&nbsp;</th> */?>
+</tr>
+</thead>
+
+<tbody>
+
+<?php foreach($this->paginator as $user) : ?>
+
+<?php if($rowchange%2==1) {$color	=	'#EEE';} else {$color ='#EEE';} ?>
+
+<tr id="userslist_<?php echo $this->escape($user['userid']);?>">
+    <td>
+    	<?php echo $this->escape($user['Username']);?></td>
+    <td><?php echo $this->escape($user['Email']);?></td>
+	<td></td>
+	<td>	<a href="javascript:void(0);" class="btn btn-danger btn-mini grouuserdel"  action="openDialog" userid="<?php echo $this->escape($user['userid']);?>" gname="<?php echo $this->escape($user['ugid']);?>"> <i class="fa-trash"></i>  Delete </a> 
+    </td> 
+</tr>
+
+
+<?php $rowchange++; endforeach; ?>
+</tbody>
+</table>
+	<?php } else { ?>
+	<h2 class="notfound">Users Not Found!</h2>	
+	<?php } ?>
+<?php echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml'); ?>
+</div>	
+

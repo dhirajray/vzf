@@ -1,0 +1,92 @@
+<?php         
+$this->title = "Users Details";
+$this->headTitle($this->title);
+
+$common		=   new Admin_Model_Common();
+$deshboard  =   new Admin_Model_Deshboard();
+
+$userArr 	=	$this->userArr;
+
+$logindate  = 	!(int)($userArr[0]['LastLoginDate']) ? 'Not Available' : date('d-M-Y h:i A',strtotime($userArr[0]['LastLoginDate']));
+$pupddate 	=	!(int)($userArr[0]['LastUpdateDate']) ? 'Not Available' : date('d-M-Y',strtotime($userArr[0]['LastUpdateDate']));
+	
+$ProfilePicpic = $common->checkImgExist($userArr[0]['ProfilePic'],'userpics','default-avatar.jpg');
+
+
+?>
+<script type="text/javascript">
+	$('document').ready(function(){
+
+	 	callglobalajax('renderdbeecontent','user','callingcommonajax','dbee',<?php echo $userArr[0]['UserID']; ?>);
+	});
+</script>
+<style type="text/css">
+	.removeatresult {text-align:center;padding:50px; }
+</style>
+<h1 class="pageTitle ">Users</h1>
+
+<div class="userUpBar"><div>
+	<?php
+  	$ret 	=	'';
+        $ret 	.= '<div>
+		  	<div class="popUserDetails">
+		  		<div class="popUserPic">
+		  			<div class="box_image">
+						<img src="'.IMGPATH.'/users/'.$ProfilePicpic.'" width="160" height="160" border="0"/>
+					</div>
+		  		</div>
+		  		<div class="popColUserDetailsWrapper">
+			  		<div class="popColUserDetails">
+			  			<div class="userdtlrow">
+				  			<div class="userdtlrow105">Name</div>
+				  			<div class="userdtlrow150">&nbsp;'.htmlentities( $userArr[0]['Name']) .'</div>
+			  			</div>
+
+			  			<div class="userdtlrow">
+				  			<div class="userdtlrow105">User Name</div>
+				  			<div class="userdtlrow150">&nbsp;'. htmlentities( $userArr[0]['Username']).'</div>
+			  			</div>
+			  			<div  class="userdtlrow">
+				  			<div class="userdtlrow105">User Email</div>
+				  			<div class="userdtlrow150">&nbsp;'. htmlentities( $userArr[0]['Email']).'</div>
+			  			</div>
+			  			<div  class="userdtlrow" >
+				  			<div class="userdtlrow105">Gender</div>
+				  			<div class="userdtlrow150">&nbsp;'.htmlentities(  $userArr[0]['Gender']).'</div>
+				  		</div>	
+			  			<div class="userdtlrow" >
+				  			<div class="userdtlrow105">Birthdate</div>
+				  			<div class="userdtlrow150">&nbsp;'. date('d-M-Y',strtotime($userArr[0]['Birthdate'])).'</div>
+				  		</div>	
+				  	</div>
+				  	<div class="popColUserDetails">
+				  		<div class="userdtlrow">
+				  			<div class="userdtlrow105">Registration Date</div>
+				  			<div class="userdtlrow150">&nbsp;'.  date('d-M-Y',strtotime($userArr[0]['RegistrationDate'])).'</div>
+				  		</div>	
+				  		<div class="userdtlrow">
+				  			<div class="userdtlrow105">Last Update Date</div>
+				  			<div class="userdtlrow150">&nbsp;'. $logindate .'</div>
+				  		</div>	
+				  		<div class="userdtlrow">
+				  			<div class="userdtlrow105">Last Login Date</div>
+				  			<div class="userdtlrow150">&nbsp;'.  $logindate.'</div>
+				  		</div>	
+			  		</div>
+		  		</div>
+		  	</div>
+				  		
+		  <div id="container" style="margin: 0 auto;"></div>
+		 
+	    </div>';
+	    echo $ret;
+	?>	
+	<div class="dashBlock"  id="id_1"  index="1" >
+		<h2 class="dragHandler">my posts</h2>
+		<div id="renderdbeecontent" class="removeatresult"><span class="notfound"></span></div>
+	</div>
+	<br>
+	<div class="dashBlock"  id="id_2"  index="2" >
+		<h2 class="dragHandler">my comments</h2>
+		<div id="rendercommentcontent" class="removeatresult"><span class="notfound"></span></div>
+	</div>

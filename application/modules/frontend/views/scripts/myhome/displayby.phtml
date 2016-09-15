@@ -1,0 +1,42 @@
+<?php
+
+$return= '<div class="displayby-wrapper1">	
+	<div class="rss-icon"><span style="padding:8px;display:inline-block">Check by type</span></div>
+	<div class="" style="margin-top:15px">
+		<a href="javascript:void(0)" onclick=javascript:seeglobaldbeelist("nouserid",1,"","myhome","mostcommented","mostcommented")>most comments</a>
+	</div>
+	<div class="rss-icon" style="margin-top:15px"><span style="padding:8px;display:inline-block">'.POST_NAME.' type</span></div>
+	<div class="" style="margin-top:10px;">
+	<ul class="dbtypechecked">
+		<li><label class="labelCheckbox"><input type="checkbox" id="text" name="dbtypechecked[]" value="1"><label class="checkbox"></label>text</label></li>
+		<li><label class="labelCheckbox"><input type="checkbox" id="link" name="dbtypechecked[]" value="2"><label class="checkbox"></label>link</label></li>
+		<li><label class="labelCheckbox"><input type="checkbox" id="pic" name="dbtypechecked[]" value="3"><label class="checkbox"></label>pic</label></li>
+		<li><label class="labelCheckbox"><input type="checkbox" id="media" name="dbtypechecked[]" value="4"><label class="checkbox"></label>media</label></li>
+		<li><label class="labelCheckbox"><input type="checkbox" id="polls" name="dbtypechecked[]" value="5" ><label class="checkbox"></label>polls</label></li>
+		<li><label class="labelCheckbox"><input type="checkbox" id="special" name="dbtypechecked[]" value="6" ><label class="checkbox"></label>video events</label></li>
+	</ul>	
+	<a id="postdbee-main" onclick=javascript:seeglobaldisplayby("nouserid",1,"dbtypechecked","myhome","filtertype","filtertype"); class="pull-right btn btn-yellow" href="javascript:void(0)">search</a>
+		
+	
+	</div>
+	<div class="rss-icon" style="margin-top:15px"><span style="padding:8px;display:inline-block">scoring</span></div>
+	<div class="">
+
+		<ul class="dbfeedfilter">
+			<li><label class="labelCheckbox"><input type="checkbox" id="loved" name="dbfeedfilter[]" value="1"><label class="checkbox"></label>loved</label></li>
+			<li><label class="labelCheckbox"><input type="checkbox" id="liked" name="dbfeedfilter[]" value="2"><label class="checkbox"></label>liked</label></li>
+			<li><label class="labelCheckbox"><input type="checkbox" id="fft" name="dbfeedfilter[]" value="3"><label class="checkbox"></label>food for thought</label></li>
+			<li><label class="labelCheckbox"><input type="checkbox" id="disliked" name="dbfeedfilter[]" value="4"><label class="checkbox"></label>disliked</label></li>
+			<li><label class="labelCheckbox"><input type="checkbox" id="hated" name="dbfeedfilter[]" value="5"><label class="checkbox"></label>hated</label></li>
+		</ul>	
+		<a id="postdbee-main" onclick=javascript:seeglobaldisplayby("nouserid",1,"dbfeedfilter","myhome","dbfeedfilter","filterscore"); class="pull-right btn btn-yellow" href="javascript:void(0)">search</a>
+		
+		
+	</div>
+</div>';
+
+
+
+//$return.='<br style="clear:both"></div>';
+$return.='<br /></div><br />';
+echo $return;

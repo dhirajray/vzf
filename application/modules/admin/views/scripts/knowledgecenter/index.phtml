@@ -1,0 +1,192 @@
+<script> 
+
+
+$(function() {      	
+
+});          
+ </script> 
+<link href="<?php echo BASE_URL."/adminraw/css/jquery.tagit.css"; ?>?v=<?php echo filemtime('/adminraw/css/jquery.tagit.css');?>"
+	rel="stylesheet" type="text/css" media="all">
+<link href="<?php echo BASE_URL."/adminraw/css/tagit.ui-zendesk.css"; ?>?v=<?php echo filemtime('/adminraw/css/tagit.ui-zendesk.css');?>"
+	rel="stylesheet" type="text/css" media="all">
+<script type="text/javascript"
+	src="<?php echo BASE_URL."/adminraw/js/tag-it.js"; ?>?v=<?php echo filemtime('/adminraw/js/tag-it.js');?>">
+</script>
+
+<script>
+var usergroupsetadmin = <?php echo $this->usersetdatajson;?>;
+</script>
+
+<?php
+$this->title = "Document library";
+$this->headTitle ( $this->title );
+
+?>
+
+<div id="dialog_confirm" title="Please confirm" style="display: none;">
+	<p id="deletemsg ">Are you sure you want to delete this category?</p>
+</div>
+
+<div id="dialog_confirm_file_delete" title="Please confirm"	style="display: none;">
+	<p id="deletemsg ">Are you sure you want to delete this file?</p>
+</div>
+
+<div id="knowledgecentarDialog" title="Add new category"
+	style="display: none;">
+	<p class="validateTips"></p>
+	<div id="beforecall"></div>
+	<form id="digForm">
+		<fieldset>
+			<label for="name">Name</label> <input type="text" name="ks_catname"
+				id="ks_catname" class="text ui-widget-content ui-corner-all"
+				style="width: 300px; margin-left: 10px" /> <input type="hidden"
+				name="ks_check" id="ks_check" />
+		</fieldset>
+	</form>
+</div>
+
+
+<!--Start container form here-->
+
+<h1 class="pageTitle">Document library</h1>
+<div class="pageSubeTitlevip">Upload files here and link to them via platform posts to enable users to view.</div>
+<div id="pageContainer">
+
+	<!--this is sidebar-->
+	<div class="kcSidebar">
+		<div class="kcSidebarHeader">
+			<a href="javascript:void(0);"
+				class="btn btn-yellow btn-medium kc_addcategory1" id="0"><span>+</span>
+				Add new category </a>
+		</div>
+		<div class="ksfolderlist" style="height:420px; overflow:auto; overflow-x:hidden">
+			<ul></ul>
+		</div>
+	</div>
+	<!--End sidebar-->
+
+	<!--Right panel-->
+	<div class="kcRightPanel">
+		<div class="kcRightHeader clearfix">
+			<div class="kcrightheaderTop clearfix">
+				<div class="pull-left cateName">
+					<i class="kcSprite kcLargFolder"></i><?php echo str_replace('_',' ',$this->parentDir); ?> </div>
+				<a href="javascript:void(0);" class="btn btn-green pull-right"
+					id="addNewFile"><i class="kcSprite kcIconPdf"></i>Add new file</a>
+			</div>
+
+			<div class="addPdfFileWrapper2" id="addFilenew">
+									<?php
+									if (! empty ( $this->parentId )) {
+										?>
+					<input type="hidden" readonly name="folderPid" id="folderPid"
+						value="<?php echo $this->parentId ?>"> <input type="hidden"
+						readonly name="folderdir" id="folderdir"
+						value="<?php echo $this->parentDir ?>">
+									<?php
+									
+} else if (count ( $this->allfolders ) > 0) { 
+										?>
+										<input type="hidden" readonly name="folderPid" id="folderPid"
+						value="<?php echo $this->allfolders[0]['kc_id'] ?>"> <input
+						type="hidden" readonly name="folderdir" id="folderdir"
+						value="<?php echo $this->allfolders[0]['kc_cat_title'] ?>">
+									<?php } else { ?>
+										<input type="hidden" readonly name="folderPid" id="folderPid"
+						value=""> <input type="hidden" readonly name="folderdir"
+						id="folderdir" value="">
+									<?php } ?>
+				<input type="hidden" readonly name="pdffilecnt" id="pdffilecnt" value="">
+									<div class="formRow">
+						<label class="label">Title:</label>
+						<div class="field">
+							<input type="text" name="filetitle" id="filetitle"
+								class="fileTitle" />
+						</div>
+					</div>
+					
+					<div class="formRow">
+						<label class="label"></label>
+						<div class="field appendType">
+							<a href="javascript:void(0);" class="btn btn-yellow browserFilesDrp"></a><span class="maxfile">Max allowed file size: 
+							<span style="color: #999;">50 MB</span><br>Allowed file types: <span
+								style="color: #999;">.pdf, .doc, .xls, .png, .jpeg, .gif</span></span>
+							<div class="hbfile" style="padding:10px;"></div>	
+						</div>
+					</div>
+					<div class="formRow sharefiletitle">
+						Share file with <span
+							style="font-weight: normal; font-style: italic">(Optional)</span>
+					</div>
+					<div class="formRow" id="pdfusersetboxdl">
+						<label class="label">User set</label>
+						<div class="field dropDwonRowSuggestion">
+							<select name="pdfuserset" id="pdfuserset"
+								style="min-width: 165px">
+								<option value='0'>Select a user set</option>
+											<?php
+											foreach ( $this->userset as $row ) :
+												echo "<option value='" . $row ['ugid'] . "'>" . $row ['ugname'] . "</option>";
+											endforeach
+											;
+											?>
+
+										</select> <span class="btn btn-black" style="margin-top: -3px"
+								id="resetusersetr">Reset</span>
+						</div>
+					</div>
+					<span class="orSpan">Or</span>
+					<div class="formRow" id="pdfuserboxdl">
+						<span>
+							<div id="flnright">
+								<label class="label" style="width: 135px">Search user(s)</label>
+								<div class="field dropDwonRowSuggestion">
+									<input id='submit_tag_names' type='hidden' value='' name=''>
+									<ul class='fieldInput' id='myTags'></ul>
+								</div>
+							</div>
+						</span>
+					</div>
+					<span class="orSpan">Or</span>
+					<div class="formRow" id="pdfuserboxdl">
+						<span>
+							<div id="flnright">
+								<label class="label" style="width: 135px">All users</label>		
+								<div class="field checkboxshar">
+								<label class=''><input id='inviteall' class='inviteall' type='checkbox' name='inviteall' value='1'>
+                  <label></label>Share with all platform users</label>
+								
+							</div>
+						</span></div>
+					</div>
+
+					<div class="formRow buttonWrapper">
+						<button type="submit" class="btn btn-green" name="kc_submit"
+							id="kc_submit">
+							<i class="kcSprite kcIconUpload"> </i> Upload
+						</button>
+						<div class="btn btn-gray cancelUploadFile" name="kc_submit_cancle"
+							class="canclebtnuplod">Cancel</div>
+					</div>
+			</div>
+
+		</div>
+		<div id="showdbloding">
+			<ul></ul>
+		</div>
+		<div>
+			<span id="beforecallfile"></span>
+		</div>
+	</div>
+	<!--End Right panel-->
+
+
+</div>
+
+<div id="openfilepdf">
+	
+</div>
+
+<!--end container form here-->
+
+

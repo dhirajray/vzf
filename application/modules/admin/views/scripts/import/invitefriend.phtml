@@ -1,0 +1,49 @@
+<script type="text/javascript">
+$(document).ready(function(){
+	$("#contactinfoid").click(function(){
+                var fname =$("#fname").val();			
+                if(fname==''||fname=='Name' ){
+                     var msg1 ='please enter the name';
+                     $("p.msg1").html(msg1);
+                     return false;
+               }    
+		       var femail =$("#femail").val();
+		       if(femail==''||femail=='Email'){
+		             var msg2 ='please enter the email';
+		             $("p.msg2").html(msg2);
+		             return false;
+		       } 
+			   var password =$("#pass").val();
+		       if(password==''||password=='Password'){
+		             var msg3 ='please enter the password';
+		             $("p.msg3").html(msg3);
+		             return false;
+		       }   
+	})
+});
+function clickclear(thisfield, defaulttext) {
+if (thisfield.value == defaulttext) {
+thisfield.value = "";
+}
+}
+function clickrecall(thisfield, defaulttext) {
+if (thisfield.value == "") {
+thisfield.value = defaulttext;
+}
+}
+</script>
+	
+<?php  if($this->beforesubmit !='submit'){ ?>
+<div>
+<form  action="<?php echo $this->url(array('controller'=>'user','action'=>'invitefriend'));?>" method="post" name="myform" enctype="multipart/form-data">
+<ul>
+<input type="text"  id="femail" name="Email" onclick="clickclear(this,'Email')" onblur="clickrecall(this,'Email')" value='Email'/>
+<p style=color:red margin=left:10px  padding-left: 15px; class="msg2"></p>
+<input type="text"  id="pass" name="Password" onclick="clickclear(this,'Password')" onblur="clickrecall(this,'Password')" value='Password'/>
+<p style=color:red margin=left:10px  padding-left: 15px; class="msg3"></p>
+
+<input id="contactinfoid" name="contactinfo" type="submit" class="submit" value="submit" />
+</ul>
+</form>
+</div>
+<?php } ?>

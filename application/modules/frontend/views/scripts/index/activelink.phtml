@@ -1,0 +1,30 @@
+<link href="<?php echo BASE_URL."/css1/dbee.css";?>?v=<?php echo filemtime('css1/dbee.css');?>" rel="stylesheet" type="text/css" media="all"/>
+
+<?php
+if($this->notificationpage=='on') $redtourl = '/notification/index/notify/group';
+else $redtourl = '/user/'.$this->username ;
+if($this->AlreadyActivated==''){
+?>
+   <script language="javascript" type="text/javascript">
+			setTimeout("window.parent.location='<?php echo BASE_URL.$redtourl ?>'",5000);
+		</script>
+	<div class="emailVerified" style="margin:200px 0px; overflow:hidden; display:block !important;">
+		<h2  style="color: #FFF; background: rgba(25, 165, 10, 0.7); padding: 10px;"> <i class="fa fa-check-circle-o" style="font-size: 60px; margin-right:10px; display: inline-block; vertical-align: middle;"> </i> Congratulations <strong><?php echo $this->fullname;?></strong>, your account has been activated.</h2>
+		<p style="margin-top:10px">You will be redirected to your homepage in 5 seconds.  <a href="<?php echo BASE_URL.$redtourl  ?>" class="normallinks">Click here</a> if you are not automatically redirected.</p>
+	</div>
+<?php 
+}
+if($this->AlreadyActivated){
+?>
+
+	<div class="emailVerified" style="margin:200px 0px; overflow:hidden; display:block !important;"> 
+		<h2 style="color: #FFF; background: rgba(205, 0, 0, 0.7); padding: 10px;">Sorry this activation link is no longer valid!<br><span><a href="<?php echo BASE_URL; ?>">Back to sign in</a></span></h2>
+	</div>
+
+<?php 
+} 
+			
+
+
+?>
+	

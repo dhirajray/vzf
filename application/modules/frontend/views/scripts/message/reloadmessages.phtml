@@ -1,0 +1,46 @@
+<?php
+$this->myclientdetails = new Application_Model_Clientdetails();
+$i=1;
+
+if(count($this->reloadmsg)>0) {
+	//$messagefeed.='<div  class="message-feed-wrapper">';
+	$myclientdetails= new Application_Model_Clientdetails();
+	foreach($this->reloadmsg as $row) :
+		if($this->cookieuser==$row['MessageTo']) {
+			$ChkUser=$row['MessageFrom'];			
+		}
+		else {
+			$ChkUser=$row['MessageFrom'];			
+		}
+		$Msguser = $this->msguserhelper($ChkUser);
+		
+		//print_r($Msguser);
+		$userName=$Msguser['Name'];
+		$userPic=$Msguser['ProfilePic'];
+		$checkImage = new Application_Model_Commonfunctionality();
+        $pic1 = $checkImage->checkImgExist($userPic,'userpics','default-avatar.jpg');	
+		$ago=date('d M', strtotime($row['MessageDate']));
+	if($row['MessageFrom']==$this->cookieuser) // MESSAGE NOT SENT BY PROFILE HOLDER		
+		$messagefeed.='<div class="msgouter"><div class="imgfloatmsg" >
+			<img src="'.IMGPATH.'/users/small/'.$pic1.'" border="0" /></div>
+		<div class="default-speechwrapper-lightgrey speechWrpBox" >
+		<div class="msgTxtboxFeed"><span><b>ME</b></span><span class="msgdate">'.$ago.'</span><br />'.nl2br($row['Message']).'</div>
+		</div></div>';
+		else // MESSAGE SENT BY PROFILE HOLDER
+		
+	$messagefeed.='<div class="msgouter"><div class="imgfloatmsg-right">
+		<img src="'.IMGPATH.'/users/small/'.$this->escape($pic1).'" border="0" /></div>
+		<div class="default-speechwrapper-darkgrey speechWrpBox">
+		<div class="msgTxtbox"><span><b>'.$this->myclientdetails->customDecoding($userName).'</b></span><span class="msgdate">'.$ago.'</span>
+		<br />'.nl2br($row['Message']).'</div>
+		</div></div>';
+		$i++;
+	
+	endforeach;
+	}
+	//$messagefeed.='</div>';
+	// SELECT ALL MESSAGES THAT WERE EXCHANGED BETWEEN THESE USERS
+
+	echo $messagefeed;
+	
+?>

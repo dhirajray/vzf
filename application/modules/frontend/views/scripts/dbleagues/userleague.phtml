@@ -1,0 +1,19 @@
+<?
+/* if(isset($_POST['dbleague'])) $function='seedbleague';
+else $function='seeuserleague';
+ */
+// COLLECT ALL PRIVATE GROUP IDS
+/* $PrivateGroups='';
+$SQL="select ID from tblGroups where GroupPrivacy=2";
+$Res=mysql_query($SQL,$conn);
+while($Row=mysql_fetch_object($Res)) {
+	$PrivateGroups.=$Row->ID.',';
+}
+if($PrivateGroups!='') $PrivateGroups=substr($PrivateGroups,0,-1);
+// COLLECT ALL PRIVATE GROUP IDS
+ */
+if($this->showtabs=='1')
+	$return.='<br style="clear:both; font-size:1px" /></div></div>';
+if(!$this->exist) $this->topthree='<ul class="leaguesLists"><li><div class="noFound">No result found</div></li></ul>';
+echo $this->topthree.'~#~'.$this->afterthree.'~#~'.$this->showtabs.'~#~'.$this->league;
+?>

@@ -1,0 +1,25 @@
+<?php
+ $group=$this->group;
+ $user=$this->user;
+?>
+
+<div class="user-name" style="margin:0px 0 0 0px;">Group Members</div>
+
+<?php
+$return ='';
+$Res = $this->grouptypes->selectgrouptotaluser($group);
+$TotalUsers=count($Res);
+	$return.='<div align="right" style="margin-top:10px; font-size:14px;"><a href="javascript:void(0);" class="pull-right btn btn-yellow" onclick="javascript:refreshInvitetogroup('.$group.');">Invite more users</a></div>';	
+if($TotalUsers>0) {
+	$counter=1;
+	foreach($Res as $key => $Row) {
+		$return.='<div id="group-member-box-'.$Row['UserID'].'" style="border-bottom:1px dashed #CCC; padding:5px 0 5px 0;"><div style="float:left">
+		<a href="profile/user/'.$Row['UserID'].'" target="_parent">
+		<img src="'.IMGPATH.'/users/small/'.$Row['ProfilePic'].'" width="50" height="50" border="0" /></a></div><div style="float:left; margin-left:20px; font-size:12px; font-weight:bold;"><a href="profile.php?user='.$Row['UserID'].'" target="_parent">'.$this->myclientdetails->customDecoding($Row['Name']).'</a><br /><span style="font-size:10px; color:#999; font-weight:normal;">member since '.$Row['GroupJoinDate'].'</span></div><a href="#" rel="removemember-popup" class="poplight" onclick="javascript:removegroupmember('.$group.','.$Row['User'].');"><div class="icon-delete" style="float:right; margin-top:10px;" title="remove member from group"></div></a><br style="clear:both" /></div>';
+		$return.='<div class="next-line"></div>';
+	}
+	$return.='<br style="clear:both" /></div>';
+}
+else $return.='<div align="center" class="noFound" style="margin-top:50px; margin-bottom:50px;">This group has no members.</div>';
+echo '<div style="padding:10px">'.$return.'</div><div id="removemember-popup" class="popup_block"></div>';
+?>

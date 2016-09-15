@@ -1,0 +1,327 @@
+<?php echo $this->doctype() ?>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+    <head>
+
+        <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+
+        <title>dbee.me | the debate n rate social network</title>
+
+        <meta name="description" content="dbee is a real time 'debate and rate' social network enabling you to share views on any subject, in open community or closed groups. Create debate by posting opinions, photos, videos and links, score and be scored on posts, and rise or fall in dbee leagues.">
+
+            <meta property="og:url" content="http://www.dbee.me.com" /> 
+
+            <meta property="og:type" content="article" /> 
+
+            <meta property="og:title" content="dbee.me | the debate n rate social network" /> 
+
+            <meta property="og:site_name" content="dbee" /> 
+
+            <meta property="og:description" content="dbee is a real time 'debate and rate' social network enabling you to share views on any subject, in open community or private groups. Create debate by posting opinions, photos, videos and links, score and be scored on posts, and rise or fall in dbee leagues." /> 
+
+            <meta property="og:image" content="http://www.dbee.me/images/landing-logo.png" />
+
+            <link rel="icon" type="image/png" href="http://dbee.me/images/favicon.png">
+
+
+
+                <?php
+                echo $this->headLink(array('rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => 'http://dbee.me/images/favicon.png'))
+
+                        // ->prependStylesheet(BASE_URL . '/css/bootstrap-responsive.min.css')
+                        ->prependStylesheet(BASE_URL . '/css/style.css')
+                        ->prependStylesheet(BASE_URL . '/css/global.css')
+
+                        // ->prependStylesheet(BASE_URL . '/css/bootstrap.min.css')
+                        ->prependStylesheet(BASE_URL . '/css/speechbubbles.css')
+                        ->prependStylesheet(BASE_URL . '/css/ddcolortabs.css')
+                        ->prependStylesheet(BASE_URL . '/css/tabcontent.css')
+                        ->prependStylesheet(BASE_URL . '/css/styles.css')
+                        ->prependStylesheet(BASE_URL . '/css/dbee.css')
+                        ->prependStylesheet(BASE_URL . '/css/jquery.css')
+                        ->prependStylesheet(BASE_URL . '/css/jquery.blockUI.css')
+                        ->prependStylesheet(BASE_URL . '/css/shadowbox.css')
+                        ->prependStylesheet(BASE_URL . '/css/dbee.css')
+                ?>
+
+                <!-- Scripts -->
+
+                <?php
+                echo $this->headScript()->prependFile(BASE_URL . '/js/html5.js', 'text/javascript', array('conditional' => 'lt IE 9',))
+
+                        // ->prependFile(BASE_URL . '/js/bootstrap.min.js')
+                        ->prependFile(BASE_URL . '/js/smooth.pack.js')
+                        ->prependFile(BASE_URL . '/js/jquery.min.js')
+                        ->prependFile(BASE_URL . '/js/functions.js')
+                        ->prependFile(BASE_URL . '/js/browser_check.js')
+                        ->prependFile(BASE_URL . '/js/ajaxupload.js')
+                        ->prependFile(BASE_URL . '/js/jquery-latest.js')
+                        ->prependFile(BASE_URL . '/js/jquery.min_1.4.4.js')
+                        ->prependFile(BASE_URL . '/js/jquery.min_1.4.js')
+                        ->prependFile(BASE_URL . '/js/jquery.slideto.v1.1.js')
+
+                        //->prependFile(BASE_URL . '/js/shadowbox/show_shadowbox.js')
+                        //->prependFile(BASE_URL . '/js/shadowbox/shadowbox.js')				      
+                        ->prependFile(BASE_URL . '/js/all.js')
+                        ->prependFile(BASE_URL . '/js/ddaccordion.js')
+                        ->prependFile(BASE_URL . '/js/dropdowncontent.js')
+                        ->prependFile(BASE_URL . '/js/dropdowntabs.js')
+                        ->prependFile(BASE_URL . '/js/html5.js')
+                        ->prependFile(BASE_URL . '/js/javascript.js')
+                        ->prependFile(BASE_URL . '/js/jquery.blockUI.js')
+                        ->prependFile(BASE_URL . '/js/tabcontent.js')
+                        ->prependFile(BASE_URL . '/js/speechbubbles.js')
+                        ->prependFile(BASE_URL . '/js/jquery.js')
+                ?>
+
+
+
+
+
+
+
+                <script language="javascript" type="text/javascript">
+
+                    var screenwidth = screen.width;
+
+                    if (screenwidth == 1024) {
+
+                        document.write('<link rel="stylesheet" href="<?php echo BASE_URL . '/css/1024.css' ?>" type="text/css" media="all" />');
+
+                    }
+
+                </script>
+
+
+
+
+
+                <script language="javascript" type="text/javascript" src="<?php echo BASE_URL . '/js/functions.js?1379088342' ?>"></script>
+
+                <script type="text/javascript" src="<?php echo BASE_URL . '/js/browser_check.js' ?>"></script>
+
+                <script type="text/javascript" src="<?php echo BASE_URL . '/js/smooth.pack.js' ?>"></script>
+
+
+
+                <!-- BEGIN INCLUDE SCRIPTS TO CALL SHADOWBOX -->
+
+
+
+                <script type="text/javascript" src="<?php echo BASE_URL . '/js/shadowbox/shadowbox.js' ?>"></script>
+
+                <script type="text/javascript" src="<?php echo BASE_URL . '/js/shadowbox/show_shadowbox.js' ?>"></script>
+
+                <!-- END INCLUDE SCRIPTS TO CALL SHADOWBOX -->
+
+
+
+                <!-- DROPDOWN CONTENT FOR MY GROUP OPTIONS -->
+
+                <script type="text/javascript" src="<?php echo BASE_URL . '/js/dropdowncontent/dropdowncontent.js' ?>"></script>
+
+                <!-- DROPDOWN CONTENT FOR MY GROUP OPTIONS -->
+
+
+
+                <!-- DROPDOWN TOP MENU -->
+
+                <script type="text/javascript" src="<?php echo BASE_URL . '/js/dropdowntab/dropdowntabs.js' ?>"></script>
+
+                <!-- DROPDOWN TOP MENU -->
+
+
+
+                <!-- BEGIN INCLUDE SCRIPTS TO CALL DHTML TOOLTIP -->
+
+                <link rel="stylesheet" type="text/css" href="<?php echo BASE_URL . '/css/speechbubbles.css' ?>" />
+
+                <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+
+                <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+
+                <script src="<?php echo BASE_URL . '/js/speechbubbles.js' ?>"></script>
+
+                <script type="text/javascript">
+
+                    jQuery(function($) { //on document.ready
+
+                        $('.addspeech').speechbubble()
+
+                    })
+
+                </script>
+
+                <script type="text/javascript" src="<?php echo BASE_URL . '/scripts/ajaxupload.js' ?>"></script>
+
+                <script src="http://code.jquery.com/jquery-latest.js"></script>
+
+                <!-- SLIDING BACK TO TOP -->
+
+                <script language="javascript" type="text/javascript" src="<?php echo BASE_URL . '/js/jquery.slideto.v1.1.js' ?>"></script>
+
+
+
+                <style type="text/css">
+
+                    body {background-color:#FFFFFF}
+
+                </style>
+
+                
+
+
+
+                </head>
+
+                <body>
+
+                    <div style="clear:both"></div>
+
+
+
+                    <!---------end header---------------------------->
+
+                    <div>
+
+                        <form id="reg-form" method="post" action="" >
+
+                            <div>
+
+                                <div id="LandingSignup" style="margin-top: 20px; margin-left: 20px;" >
+
+                                    <div class="titleClass" style="margin-bottom:20px;"><?php echo $this->escape($this->title); ?></div>
+
+                                    <div class="formLabel"><?php echo $this->escape($this->label_fname); ?></div><div class="fieldClass"><input id="fullname" class="textfield" type="text"></div>
+
+                                    <div style="clear:both"></div>
+
+                                    <div class="formLabel"><?php echo $this->escape($this->label_uname); ?></div><div class="fieldClass"><input id="username" class="textfield" type="text"></div>
+
+                                    <div style="clear:both"></div>
+
+                                    <div class="formLabel"><?php echo $this->escape($this->label_email); ?></div><div class="fieldClass"><input id="email" class="textfield" type="text"></div>
+
+                                    <div style="clear:both"></div>
+
+                                    <div style="clear:both"></div>
+
+                                    <div class="formLabel"><?php echo $this->escape($this->label_pass); ?></div><div class="fieldClass"><input id="password" class="textfield" type="password"></div>
+
+                                    <div style="clear:both"></div>
+
+                                    <div class="formLabel"><?php echo $this->escape($this->label_gender); ?></div>
+
+                                    <div class="fieldClass">
+
+                                        <select id="gender" class="textfield90">
+
+                                            <option value="0">- Select -</option>
+
+                                            <option value="Male">Male</option>
+
+                                            <option value="Female">Female</option>
+
+                                        </select>
+
+                                    </div>
+
+                                    <div style="clear:both"></div>
+
+                                    <div class="formLabel"><?php echo $this->escape($this->label_birthday); ?></div>
+
+                                    <div class="fieldClass">
+
+                                        <select id="birthday" class="textfield90" style="float:left; margin-right:10px;">
+
+                                            <option value="0" selected="selected">- Day -</option>
+
+<? for ($i = 1; $i <= 31; $i++) { ?>
+
+                                                <option value="<?= $i; ?>"><?= $i; ?></option>
+
+<? } ?>
+
+                                        </select>
+
+                                        <select id="birthmonth" class="textfield90" style="float:left; margin-right:10px;">
+
+                                            <option value="0" selected="selected">- Month -</option>
+
+                                            <option value="01">Jan</option>
+
+                                            <option value="02">Feb</option>
+
+                                            <option value="03">Mar</option>
+
+                                            <option value="04">Apr</option>
+
+                                            <option value="05">May</option>
+
+                                            <option value="06">June</option>
+
+                                            <option value="07">July</option>
+
+                                            <option value="08">Aug</option>
+
+                                            <option value="09">Sep</option>
+
+                                            <option value="10">Oct</option>
+
+                                            <option value="11">Nov</option>
+
+                                            <option value="12">Dec</option>
+
+                                        </select>
+
+                                        <select id="birthyear" class="textfield90" style="float:left;">
+
+                                            <option value="0" selected="selected">- Year -</option>
+
+<? for ($i = date('Y'); $i >= 1940; $i--) { ?>
+
+                                                <option value="<?= $i; ?>"><?= $i; ?></option>
+
+<? } ?>
+
+                                        </select>
+
+                                    </div>
+
+                                    <div style="clear:both"></div>
+
+                                    <div style="margin-left:105px;"><a href="javascript:void(0);" onclick="javascript:openwhybirthday();">Why do I need to provide my birthday?</a></div>
+
+                                    <div style="clear:both"></div>
+
+                                    <div class="formLabel"></div>
+
+                                    <div class="fieldClass" style="margin-top:10px;"><input id="termscheck" type="checkbox">&nbsp;I accept terms and conditions.</div>
+
+                                    <div style="clear:both"></div>
+                                    <div class="formLabel"></div>
+
+                                    <div class="fieldClass" style="margin-top:10px;"><input id="cookiescheck" type="checkbox">&nbsp;I accept the use of cookies on this site.</div>
+
+                                    <div style="clear:both"></div>
+
+
+                                    <div style="height:10px; margin-left:115px; float:left; padding-top:8px;">	
+                                        <div style=""><div id="SignupErr">All fields mandatory</div><div id="signuploader" style="display:none; float:right; padding-top:13px; padding-right:10px;"><img src="/images/ajaxloader.gif" border="0"></div></div>
+
+
+                                        <div style=""><div id="TermscheckErr">Please accept the terms and conditions</div></div>
+
+                                        <div style=""><div id="CookiesErr">Please accept the usage of cookies</div></div>
+                                        <div class="button" style="margin-left:10px; margin-top:10px; margin-bottom:20px; float:left;" onclick="javascript:signup()">join in</div>
+
+                                    </div>
+                                </div>
+
+                            </div>	
+
+                        </form>	
+
+                    </div>
+

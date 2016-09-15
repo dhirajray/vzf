@@ -1,0 +1,82 @@
+<?php echo $this->headLink(array('rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => 'http://dbee.me/images/favicon.png'))
+
+                        ->prependStylesheet(BASE_URL . '/css/style.css')                                  
+
+						->prependStylesheet(BASE_URL . '/css/styles.css')											
+
+						->prependStylesheet(BASE_URL . '/css/jquery.css')
+
+									
+
+?>
+
+<!-- Scripts -->
+
+<?php echo $this->headScript()->prependFile(BASE_URL . '/js/html5.js', 'text/javascript', array('conditional' => 'lt IE 9',))
+
+                     // ->prependFile(BASE_URL . '/js/bootstrap.min.js')
+
+					  ->prependFile(BASE_URL . '/js/smooth.pack.js')
+
+                      ->prependFile(BASE_URL . '/js/jquery.min.js')
+
+				      ->prependFile(BASE_URL . '/js/functions.js')
+
+				      ->prependFile(BASE_URL . '/js/browser_check.js')				      
+
+				      ->prependFile(BASE_URL . '/js/jquery-latest.js')
+
+				      ->prependFile(BASE_URL . '/js/jquery.min_1.4.4.js')
+
+				      ->prependFile(BASE_URL . '/js/jquery.min_1.4.js')
+
+				      ->prependFile(BASE_URL . '/js/jquery.slideto.v1.1.js')					    	      
+
+				      ->prependFile(BASE_URL . '/js/javascript.js')				    
+
+				      ->prependFile(BASE_URL . '/js/jquery.js')
+
+				    				   
+
+ ?>
+
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.0/jquery.min.js"></script>	
+
+<style type="text/css">
+
+body {background-color:#FFFFFF}
+
+</style>
+
+
+<div>
+
+<form name="abuseform" action="<?php echo $this->url(array('controller'=>'dbeedetail','action'=>'processreporabuse'),'default',true)?>" method="post" style="margin-left:63px;">
+
+<strong><h3>Please fill below to report abuse </h3></strong>
+
+<div style="margin-left: -35px;"><?php echo $this->form->captcha; ?></div>	
+
+<input type="hidden" id="db" name="db" value="<?php echo $this->dbee; ?>">
+
+<input type="hidden" id="comment" name="comment" value="<?php echo $this->comment; ?>">
+
+<input type="hidden" id="type" name="type" value="<?php echo $this->type; ?>">
+
+<?php if(!$this->error==''){?>
+
+<div style="width:150px; font-size:12px; padding:5px; border:1px solid #FF0000; background-color:#FFFF99; color:#FF0000;">Incorrect code entered</div>
+
+<?php } ?>
+
+<div onclick="javascript:document.abuseform.submit();" style="margin:10px 0 0 170px;" class="button-yellow">send</div>
+
+</form>
+
+</div>

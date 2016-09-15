@@ -1,0 +1,234 @@
+<?php
+
+$return='';
+
+$counter=1;
+
+$user=$_GET['user'];
+
+$cookieuser=$_COOKIE['user'];
+
+// SELECT USER NAME
+
+$uName=$this->uName;
+
+// SELECT USER NAME
+
+// CHECK INDIVIDUAL SCORES
+
+$loveScore=$this->loveScore;
+
+$likeScore=$this->likeScore;
+
+$philosopherScore=$this->philosopherScore;
+
+$dislikeScore=$this->dislikeScore;
+
+$hateScore=$this->hateScore;
+
+?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+
+<title>Untitled Document</title>
+
+
+
+<style type="text/css">
+
+<!--
+
+body {
+
+	background-color: #FFFFFF;
+
+	margin-left: 0px;
+
+	margin-top: 0px;
+
+	margin-right: 0px;
+
+	margin-bottom: 0px;
+
+}
+
+.style3 {font-size: 12px;
+
+	font-weight: bold;
+
+}
+
+figure { display: block; width: 100%; height: 100%; margin: 5px 0 0 10px; font-size:24px; }
+
+.league-smallfont { font-size:12px }
+
+-->
+
+</style>
+
+
+
+</head>
+
+
+
+<body>
+
+<div style="padding:20px;">
+
+	<div class="user-name" style="margin-bottom:20px; float:left;">Mutual Scores</div>
+
+	<div class="next-line"></div>
+
+	<div style="margin-bottom:20px; float:left; font-weight:bold;">You scored <?php echo $uName[0]['Name']?></div>
+
+	<div class="next-line"></div>
+
+	<div align="center" style="float:left; width:120px;">
+
+		<div class="leaguepop-count-bg"><?=$loveScore[1]?></div>
+
+		<div class="leaguepop-love"></div>
+
+		<div style="display:inline-block">loved</div>
+
+	</div>
+
+	
+
+	<div align="center" style="float:left; width:120px;">
+
+		<div class="leaguepop-count-bg"><?=$likeScore[1]?></div>
+
+		<div class="leaguepop-like"></div>
+
+		<div style="display:inline-block">liked</div>
+
+	</div>
+
+	
+
+	<div align="center" style="float:left; width:120px;">
+
+		<div class="leaguepop-count-bg"><?=$dislikeScore[1]?></div>
+
+		<div class="leaguepop-dislike"></div>
+
+		<div style="display:inline-block">disliked</div>
+
+	</div>
+
+	
+
+	<div align="center" style="float:left; width:120px;">
+
+		<div class="leaguepop-count-bg"><?=$hateScore[1]?></div>
+
+		<div class="leaguepop-hate"></div>
+
+		<div style="display:inline-block">hated</div>
+
+	</div>
+
+	
+
+	<div align="center" style="float:left; width:120px;">
+
+		<div class="leaguepop-count-bg"><?=$philosopherScore[1]?></div>
+
+		<div class="leaguepop-fft"></div>
+
+		<div style="display:inline-block">food for thought</div>
+
+	</div>
+
+	
+
+	<div class="next-line"></div>
+
+	
+
+	<div class="solid-separator"></div>
+
+
+
+	<div class="next-line"></div>
+
+
+
+	<div style="margin-bottom:20px; float:left; font-weight:bold;"><?php echo $uName[0]['Name']; ?> scored you</div>
+
+	<div class="next-line"></div>
+
+	<div align="center" style="float:left; width:120px;">
+
+		<div class="leaguepop-yourcount-bg"><?=$loveScore[0]?></div>
+
+		<div class="leaguepop-love"></div>
+
+		<div style="display:inline-block">loved</div>
+
+	</div>
+
+	
+
+	<div align="center" style="float:left; width:120px;">
+
+		<div class="leaguepop-yourcount-bg"><?=$likeScore[0]?></div>
+
+		<div class="leaguepop-like"></div>
+
+		<div style="display:inline-block">liked</div>
+
+	</div>
+
+	
+
+	<div align="center" style="float:left; width:120px;">
+
+		<div class="leaguepop-yourcount-bg"><?=$dislikeScore[0]?></div>
+
+		<div class="leaguepop-dislike"></div>
+
+		<div style="display:inline-block">disliked</div>
+
+	</div>
+
+	
+
+	<div align="center" style="float:left; width:120px;">
+
+		<div class="leaguepop-yourcount-bg"><?=$hateScore[0]?></div>
+
+		<div class="leaguepop-hate"></div>
+
+		<div style="display:inline-block">hated</div>
+
+	</div>
+
+	
+
+	<div align="center" style="float:left; width:120px;">
+
+		<div class="leaguepop-yourcount-bg"><?=$philosopherScore[0]?></div>
+
+		<div class="leaguepop-fft"></div>
+
+		<div style="display:inline-block">food for thought</div>
+
+	</div>
+
+</div>	
+
+</body>
+
+</html>
+
+
+

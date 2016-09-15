@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<title>Profile Photo</title>
+
+
+
+<script type="text/javascript" src="<?php echo BASE_URL.'/scripts/ajaxupload.js'?>"></script>
+
+<style type="text/css">
+
+<!--
+
+.style3 {font-size: 12px;
+
+	font-weight: bold;
+
+}
+
+body {
+
+	margin-left: 0px;
+
+	margin-top: 0px;
+
+	margin-right: 0px;
+
+	margin-bottom: 0px;
+
+	background-color: #FFFFFF;
+
+}
+
+-->
+
+</style>
+
+
+</head>
+
+<body>
+
+<div class="user-name" style="padding:10px;">Change my profile picture</div>
+
+<div class="next-line"></div>
+
+<div id="ShadowBoxDiv">
+
+  <div align="center" id="AjaxWaitingDiv" style="display:none; margin-top:20px;"><img src="images/ajax_loader.gif" width="100" height="100" border="0" /></div>
+
+  <div id="editProfilePicDiv" style="padding:10px;">
+
+  	<div style="float:left; color:#999999; width:140px;"><div id="upload_area">current picture<br /><img src="<?php echo BASE_URL_IMAGES ?>/show_thumbnails.php?ImgName=<?=$this->currpic;?>&ImgLoc=userpics&Width=130&Height=130" border="0" style="margin-top:5px;" /></div></div>
+
+	<div style="float:left; margin-left:20px; color:#999999;">
+
+		select new<br />
+
+		<form action="/dbupload/add" method="post" name="sleeker" id="sleeker" enctype="multipart/form-data">
+
+									<input type="hidden" name="maxSize" value="9999999999" />
+
+									<input type="hidden" name="maxW" value="600" />
+
+									<input type="hidden" name="fullPath" value="<?php echo IMGPATH;?>/users/" />
+
+									<input type="hidden" name="relPath" value="userpics" />
+
+									<input type="hidden" name="colorR" value="255" />
+
+									<input type="hidden" name="colorG" value="255" />
+
+									<input type="hidden" name="colorB" value="255" />
+
+									<input type="hidden" name="maxH" value="600" />
+
+									<input type="hidden" name="filename" value="filename" />
+
+									<p><input type="file" id="ajaxfilename" class="filefield-big" name="filename" onchange="ajaxUpload(this.form,'<?php echo BASE_URL;?>/myhome/dbupload','upload_area','Generating Preview...&lt;br /br /&gt;&lt;img src=\'/images/ajaxloader.gif\' width=\'16\' height=\'16\' border=\'0\' /&gt;','&lt;img src=\'images/error.gif\' width=\'16\' height=\'16\' border=\'0\' /&gt; Error in Upload, check settings and path info in source code.'); return false;" /><br /><font color="#666666">(Only .jpeg/.gif allowed)</font></p>
+
+									<p><div id="changebutton" style="display:none;"><div class="buttonSmall" style="float:left; margin-top:10px; padding:5px; color:#000000;" onclick="javascript:changeprofilepic(<?=$this->user;?>);">change</div><div style="float:left; margin:20px 0 0 30px"><a href="javascript:parent.Shadowbox.close();">cancel</a></div></div></p>
+
+								</form>
+
+	</div>
+
+  </div>
+
+  <div align="center" id="profile-change-message" style="font-family:Verdana, Arial, Helvetica, sans-serif; font-size:14px; font-weight:bold; color:#999999; margin-top:60px;"></div>
+
+</div> 
+
+</body>
+
+</html>
+

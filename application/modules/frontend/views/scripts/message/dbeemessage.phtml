@@ -1,0 +1,116 @@
+<?php
+
+$this->myclientdetails = new Application_Model_Clientdetails();
+$CurrDate=date('Y-m-d H:i:s');
+$i=1;
+$messages = $this->messages;
+$myclientdetails= new Application_Model_Clientdetails();
+
+$cookieuser= $this->userid;
+$startnew = $this->startnew;
+$start = $this->star; 
+if(count($messages)>0) {
+	if(isset($_GET['reload'])) $startnew=$end;
+	else $startnew=$start+5;
+	if(count($messages)<5) {
+		$startnew=$start;
+		$seemorelabel='- no more feeds to show -';
+	}
+	else $seemorelabel='see more';
+	
+	foreach($messages as $rowMsg):		
+		//print_r(adminID);die;
+		$ago= date("M d,y", strtotime($rowMsg['MessageDate']));
+		
+		$userName=$rowMsg['Name'].' '.$rowMsg['lname'];;
+		$userPic=$rowMsg['ProfilePic'];
+		if($rowMsg['MessageFrom']=='10') $msglink=false; else $msglink=true;
+		if($msglink) $cursor='style="cursor:pointer"'; else $cursor='';
+		$common_obj =  new Application_Model_Commonfunctionality();
+        $userTypenal = $common_obj->checkuserTypetooltip($rowMsg['usertype']);
+		if($rowMsg['MessageTo']==$cookieuser) {
+			$ChkUser=$rowMsg['MessageFrom'];
+			$ChkUsername = $common_obj->getredbeedetail($rowMsg['MessageFrom']);
+			$sendlabel='<font size="1" color="#999">from</font>&nbsp;';
+		}
+		else {
+			$ChkUser=$rowMsg['MessageTo'];
+			$ChkUsername = $common_obj->getredbeedetail($rowMsg['MessageTo']);
+			$sendlabel='<font size="1" color="#999">sent to</font>&nbsp;';
+		}
+		if($rowMsg['Fromadmin']=='1') {	
+			$ChkUser=adminID;
+			$ChkUsername = $common_obj->getredbeedetail(adminID);
+			$sendlabel='<font size="1" color="#999">sent by admin</font>&nbsp;';
+		}
+		$Msguser = $this->msguserhelper($ChkUser);
+		$userName=$Msguser['Name'].' '.$Msguser['lname'];
+		$userPic=$Msguser['ProfilePic'];	
+	
+		 if(!$msglink) {
+		$archiveDiv='<div style="float:left; margin-left:10px; cursor:pointer; color:#666666;" onclick="javascript:archivemessage('.$ChkUser.','.$rowMsg['ID'].',1);" title="delete message">[delete message]</div>';
+		}
+		else {
+		$archiveDiv='';
+		}		
+		//$archiveDiv='<div id="archivemessage" user="'.$ChkUser.'" rowid="'.$rowMsg['ID'].'" style="float:left; margin-left:10px; cursor:pointer; color:#666666;" title="delete message">[delete message]</div>';
+		$archiveDiv='<div id="archivemessage" user="'.$ChkUser.'" rowid="'.$rowMsg['ID'].'" style="float:left; margin-left:10px; cursor:pointer; color:#666666;" title="delete message">[delete message]</div>';
+		// CHECK IF THIS USER IS BLOCKED BY PROFILE OWNER
+//		if($rowMsg['MessageFrom']!='32' && $rowMsg['MessageTo']!=$cookieuser) {
+		if($rowMsg['MessageFrom']!=adminID) {
+			if($this->Blockuserhelper($cookieuser,$ChkUser)==0)
+				//$blockDiv='<div style="float:left; margin-left:10px; cursor:pointer; color:#666666;" title="block '.$userName.' from messaging you" '.$ChkUser.',\''.$userName.'\','.$rowMsg['ID'].');" id="blockmessage" user="'.$ChkUser.'" rowid="'.$rowMsg['ID'].'" name="'.$userName.'">[block '.$userName.']</div>';
+				$blockDiv='<div style="float:left; margin-left:10px; cursor:pointer; color:#666666;" title="block '.$this->myclientdetails->customDecoding($userName).' from messaging you" '.$ChkUser.',\''.$this->myclientdetails->customDecoding($userName).'\','.$rowMsg['ID'].');" class="blockmessage" user="'.$ChkUser.'" rowid="'.$rowMsg['ID'].'" name="'.$this->myclientdetails->customDecoding($userName).'">[block '.$this->myclientdetails->customDecoding($userName).']</div>';
+			else
+				$blockDiv='<div style="float:left; margin-left:10px; color:#CC0000;" title="'.$this->myclientdetails->customDecoding($userName).' is blocked from messaging you">['.$this->myclientdetails->customDecoding($userName).' is blocked]</div>';
+		} else $blockDiv='';
+		$newmsgrow = 'newmsgrow';
+		
+		if($this->userid!=adminID){
+		if($rowMsg['Fromadmin']==1 || $rowMsg['MessageFrom']==adminID){
+			$newmsgrow = '';
+		}
+		}
+
+		if($rowMsg['Unread']=='1' && $rowMsg['MessageFrom']!=$cookieuser && $rowMsg['MessageFrom']!='100000') {
+			//$highlightBox='dbcomment-speechwrapper1-over';
+			$highlightBox='msgRowUnread';
+		} else { 
+			//$highlightBox='dbcomment-speechwrapper1';
+			$highlightBox='';
+		};		
+		
+		if($rowMsg['Status']=='1')
+		 $profileLinkStart='<a href="'.BASE_URL.'/user/'.$this->myclientdetails->customDecoding($ChkUsername['Username']).'">';
+		else
+		 $profileLinkStart='<a href="javascript:void(0)" class="profile-deactivated" title="'.DEACTIVE_ALT.'" onclick="return false;">';
+		$ago = $this->agohelper($this->escape($rowMsg['MsgDate']));
+		$checkImage = new Application_Model_Commonfunctionality();
+        $pic1 = $checkImage->checkImgExist($userPic,'userpics','default-avatar.jpg');
+		$return.='<li id="message-'.$rowMsg['ID'].'" class="'.$highlightBox.' '.$newmsgrow.' msgblockndelete msgRow" ChkUser="'.$ChkUser.'" read="'.$rowMsg['Unread'].'" search="'.$this->search.'" from="'.$this->dateFrom.'" to="'.$this->dateTo.'"><div style="float:left; width:50px; height:50px;">'.$profileLinkStart.'<img src="'.IMGPATH.'/users/small/'.$pic1.'" width="50" height="50" border="0" /></a></div>
+		<div id="dbcomment-speechwrapper1" '.$cursor;
+	
+		
+		if($msglink)
+			$return.='';
+		$return.='><div class="msgTxtbox">
+		<div class="messageTextTop"> 
+			<div style="float:left">'.$sendlabel.'<b rel="dbTip" title="'.$userTypenal.'">'.$this->myclientdetails->customDecoding($userName).'</b></div>'.$archiveDiv.'<div id="blockuser-div-'.$rowMsg['ID'].'" class="pull-left">'.$blockDiv.'</div>
+		</div>
+		<div class="messageTextList bb">'.$rowMsg['Message'].'</div></div><div style="float:right; width:auto; font-size:10px; color:#666">'.date('M - d', strtotime($rowMsg['MsgDate'])).'</li>';
+		$i++;
+	endforeach;
+	$notfound=0;
+
+	
+}
+else {
+	$startnew=$start;
+	$seemorelabel='- no more messages -';
+	$return='';
+	$notfound = 1;
+}
+
+echo $return.'~'.$notfound;
+
+

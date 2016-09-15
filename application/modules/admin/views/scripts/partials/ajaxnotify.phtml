@@ -1,0 +1,155 @@
+<?php $videobroadcast = ''; if($this->type == 109 || $this->type == 16 || $this->type == 17 || $this->type == 18){ ?>
+<div style="float:right;">
+<select name="filtervideo" class="filtervideo" >
+<option value="109"  <?php if($this->type==109) echo 'selected'; ?>>All</option>
+<option value="16"  <?php if($this->type==16) echo 'selected'; ?>>Open</option>
+<option value="17" <?php if($this->type==17) echo 'selected'; ?>>Request</option>
+<option value="18"  <?php if($this->type==18) echo 'selected'; ?>>Private</option>
+</select>
+</div>
+<div style="clear:both;"></div>
+<?php $videobroadcast = 'videobroadcast';} ?>
+<?php if(count($this->result)!=0)  {?>
+<div class="responsiveTable">
+<table class="table-border2 userListTable table table2 table-hover <?php echo $videobroadcast; ?>">
+     <tbody>
+      <?php foreach ($this->result as $value) { ?>
+           <?php 
+           switch ($this->type) 
+           {
+      
+             case '20':
+              $rawdata = $this->deshboard->selectgroup($value['act_typeId']);
+                       $postTitle = '<a href="'.BASE_URL.'/group/groupdetails/group/'.$rawdata['ID'].'">'.$rawdata['GroupName'].'</a>';
+              ?>
+              <tr>  
+                <td width="60"><?php echo '<img src="'.IMGPATH.'/users/small/'.$value['ProfilePic'].'" width="40" height="40/>'; ?></td>
+                <td><?php echo '<strong>'.$this->myclientdetails->customDecoding($value['Name']).' '.$this->myclientdetails->customDecoding($value['lname']).'</strong> '.$this->activityaMsg[$value['act_message']].' '.$postTitle; ?>
+                </td>
+                <td width="120" class="dateCol"><?php echo ''. date('d M, Y', strtotime($value['act_date'])) .''; ?></td>
+              </tr>
+              <?php
+
+             break;
+
+             case '19':
+              $db_url = $this->socialInvite->getdburltitle($value['act_typeId']);
+                      $postTitle = '<a href="'.BASE_URL.'/admin/survey/surveyreport/id/'.$db_url['DbeeID'].'/'.$db_url['dburl'].'">'.$db_url['surveyTitle'].'</a>';
+             ?>
+               <tr>  
+                <td width="60"><?php echo '<img src="'.IMGPATH.'/users/small/'.$value['ProfilePic'].'" width="40" height="40" />'; ?></td>
+                <td><?php echo '<strong>'.$this->myclientdetails->customDecoding($value['Name']).' '.$this->myclientdetails->customDecoding($value['lname']).'</strong>'.$this->activityaMsg[$value['act_message']].'<br/>'.$postTitle; ?> </td>
+                <td  width="120" class="dateCol"><?php echo ''. date('d M, Y', strtotime($value['act_date'])) .''; ?></td>
+              </tr>
+
+             <?php 
+
+
+             break;
+
+             case '30':
+
+             $postTitle = "";
+            $db_url = $this->socialInvite->getdburltitle($value['act_typeId']);
+            if($db_url['Type']==5)
+              $postTitle = '<a href="'.BASE_URL.'/admin/dashboard/post/id/'.$db_url['DbeeID'].'">'.$db_url['PollText'].'</a>'; 
+            else
+              $postTitle = '<a href="'.BASE_URL.'/admin/dashboard/post/id/'.$db_url['DbeeID'].'">'.$db_url['Text'].'</a>';
+
+             ?>
+             <tr>
+                <td width="60"><?php echo '<img src="'.IMGPATH.'/users/small/'.$value['ProfilePic'].'" width="40" height="40" />'; ?></td>
+                <td><?php echo '<strong>'.$this->myclientdetails->customDecoding($value['Name']).' '.$this->myclientdetails->customDecoding($value['lname']).'</strong> '.$this->activityaMsg[$value['act_message']].'<br/> '.$postTitle; ?> </td>
+                <td width="120" class="dateCol"><?php echo ''. date('d M, Y', strtotime($value['act_date'])) .''; ?></td>
+                 <td width="120" ><a href="<?php echo BASE_URL;?>/admin/dashboard/post/id/<?php echo $db_url['DbeeID'];?>" class="addbutton btn btn-green pull-left">See post</a></td>
+             </tr>
+             <?php 
+             break;
+
+            case '2':
+
+            $comment = $this->deshboard->getComment($value['act_typeId'],'','');
+            $rawdata = $this->socialInvite->getdburltitle($value['act_typeId']);
+
+            $title = $rawdata['Text'];
+
+            if ($rawdata['Type'] == '5')
+              $title = $rawdata['polltext'];
+            
+            $postTitle = '<br><a href="'.BASE_URL.'/dbee/'.$rawdata['dburl'].'">'.$title.'</a>';
+            ?>
+            <tr>  
+              <td width="60" style=" vertical-align: top;"><?php echo '<img src="'.IMGPATH.'/users/small/'.$value['ProfilePic'].'" width="40" height="40" />'; ?></td>
+              <td><?php echo '<strong>'.$this->myclientdetails->customDecoding($value['Name']).' '.$this->myclientdetails->customDecoding($value['lname']).'</strong> '.$this->activityaMsg[$value['act_message']].' '.$postTitle; ?> 
+                <div class="commentBlock"><strong>Comment:</strong> <?php echo $comment; ?> </div>
+              </td>
+              <td width="120" class="dateCol" style=" vertical-align: top;"><?php echo ''. date('d M, Y', strtotime($value['act_date'])) .''; ?></td>
+            </tr>
+            <?php
+
+
+            break;
+
+            case '44':
+                $db_url = $this->socialInvite->getdburltitle($value['act_typeId']);
+                $postTitle = '<a href="'.BASE_URL.'/admin/dashboard/postreport/m_-_xxp=t/'.base64_encode($db_url['DbeeID']).'">'.$db_url['PollText'].'</a>';
+            ?>
+            <tr>  
+              <td width="60"><?php echo '<img src="'.IMGPATH.'/users/small/'.$value['ProfilePic'].'" width="40" height="40" />'; ?></td>
+              <td><?php echo '<strong>'.$this->myclientdetails->customDecoding($value['Name']).' '.$this->myclientdetails->customDecoding($value['lname']).'</strong>'.$this->activityaMsg[$value['act_message']].'<br/>'.$postTitle; ?> </td>
+              <td  width="120" class="dateCol"><?php echo ''. date('d M, Y', strtotime($value['act_date'])) .''; ?></td>
+            </tr>
+            <?php
+
+            break;
+
+            case '15':
+              if($value['act_type']==15){
+                $feedArray = $this->deshboard->getFeedBack($value['act_typeId']);
+                $name = $feedArray['name'];
+              }else
+                $name = '';
+            ?>
+            <tr>
+              <td width="60"><?php echo '<img src="'.IMGPATH.'/users/small/'.$value['ProfilePic'].'" width="40" height="40" />'; ?></td>
+              <td><?php echo '<strong>'.$this->myclientdetails->customDecoding($value['Name']).' '.$this->myclientdetails->customDecoding($value['lname']).'</strong> '.$this->activityaMsg[$value['act_message']].'  <strong>'.$name.'</strong>'; ?>  
+                <div class="commentBlock"><strong>Message:</strong> <?php echo $feedArray['text']; ?></div>
+              </td>
+              <td width="120" class="dateCol"><?php echo ''. date('d M, Y', strtotime($value['act_date'])) .''; ?></td>
+            </tr>
+
+            <?php 
+
+            default:
+
+            if($value['act_type']==16)
+              $type="Open";
+            else if($value['act_type']==17)
+            {
+              $type="Request";
+              $accReject ='<div class="notifyAccptBtnAdmin"><a data-id="'.$value['act_typeId'].'" user-id ="'.$value['UserID'].'" href="javascript:void(0);" data-act_id ="'.$value['act_id'].'" class="acceptVideoJoin acceptnotibutton btn btn-green">Accept</a><a href="javascript:void(0);" data-id="'.$value['act_typeId'].'" data-act_id ="'.$value['act_id'].'" user-id ="'.$value['UserID'].'"  class="rejectVideoJoin decinenotibutton btn btn-red">Reject</a></div>';
+            }
+            else if($value['act_type']==45)
+            {
+              $type="Request";
+            }
+            else if($value['act_type']==18)
+              $type="Private";
+            $db_url = $this->socialInvite->getdburltitle($value['act_typeId']);
+            $postTitle = '<a href="'.BASE_URL.'/dbee/'.$db_url['dburl'].'">'.$db_url['VidDesc'].'</a>   ('.$type.') '.$accReject;
+             ?>
+            <tr id="remove_<?php echo $value['act_id']; ?>" >
+            <td width="60"><?php echo '<img src="'.IMGPATH.'/users/small/'.$value['ProfilePic'].'" width="40" height="40" />'; ?></td>
+            <td><?php echo '<strong>'.$this->myclientdetails->customDecoding($value['Name']).' '.$this->myclientdetails->customDecoding($value['lname']).'</strong> '.$this->activityaMsg[$value['act_message']].'<br/> '.$postTitle; ?> </td>
+            <td width="120" class="dateCol"><?php echo ''. date('d M, Y', strtotime($value['act_date'])) .''; ?></td>
+            </tr>
+            <?php  
+            $type = $accReject = '';
+
+            break;
+           }
+       } ?>
+     </tbody>
+</table>
+</div>
+<?php } else { echo '<div class="notfound">No notifications</div>'; }?>

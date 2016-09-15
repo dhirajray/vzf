@@ -1,0 +1,325 @@
+<h1 class="pageTitle"><strong>Reports</strong></h1>
+<?php
+$filterSaveChartHtml = $this->common_model->filterSaveChartHtml();
+
+$countarr = count(json_decode($this->SocialProvidersdata, true));
+$countarr2 = count(json_decode($this->socialdbProvidersdata, true));
+
+$catArrcategoryCount =  count(json_decode($this->catArrcategory, true)); 
+
+$dateRange = DATE('F, Y');
+
+$monthArr = cal_info(0);
+$months = '';
+
+$months[date('m')] = date("F, Y", strtotime( date( 'Y-m-d' )));
+
+for ($i = 0; $i < 12; $i++) {
+	$dateVarKey = date("m", strtotime( date( 'Y-m-01' )." -$i months"));
+    $months[$dateVarKey] = date("F, Y", strtotime( date( 'Y-m-01' )." -$i months"))."~".date("Y-m", strtotime( date( 'Y-m-01' )." -$i months"));
+}
+//echo "<pre>"; print_r($months);
+
+//foreach ($monthArr['months'] as $key => $value) {
+foreach ($months as $key => $value) {
+	//$selected = (DATE('m')==$key)?"selected":'';
+	$dt = explode("~", $value);
+	$months .= '<option monthRange="'.$dt[1].'" value="'.$key.'" '.$selected.' >'.$dt[0].'</option>';
+}
+//exit;
+?>
+
+<div class="clearfix"></div>
+<style type="text/css">
+.tabContent{display: none;}
+</style>
+ 
+<script>
+
+	//chartforemailproviders(<?php echo $this->providersdata ?>,'emailreportchart',"email providers");
+
+	$("document").ready(function(){
+
+
+			$('.tabBar li').click(function(){
+		        $('#reportWrapper').hide();
+		        $('#previousReport').show();
+		        $(this).closest('.tabBar').find('.active').removeClass('active');
+		       // $(this).addClass('active');
+
+		        var index  = $(this).index('.tabBar li');
+		        var tabData  = $('a', this).attr('href');
+		        	tabData = tabData.split('#');
+		        var closest = $(this).closest('.tabBar').next('.tabContainer');
+		        var offest =   $(this).closest('.tabBar').offset();
+		        var mainTitle = $('a', this).attr('mainTitle');
+		        var subTitle = $('a', this).attr('subTitle');
+		        
+		        //$('.pageSubeTitle').html(subTitle).siblings('strong').html(mainTitle);
+		         $('.pageTitle').find('strong').html(mainTitle);
+				
+		         closest.find('.tabContent').hide();
+		         closest.find('.tabContent[dataTab="'+tabData[1]+'"]').show();
+		         <?php if($countarr>0) {?>
+		        piechartproviders(<?php echo $this->SocialProvidersdata ?>,'socialreportchart',"",' Social shares','totalsocialusers','socialusers','pie');
+		        <?php } else {?> 
+					$('#socialreportchart').prev('.dragHandler').find('span').remove();
+					$('#socialreportchart').addClass('notfoundContainer').html('<div class="notfound">social sharing stats not found</div>'); 
+				<?php }   
+					if($countarr2>0) { ?>
+		       	chartforbrowsersproviders(<?php echo $this->socialdbProvidersdata ?>,<?php echo $this->socialproviderscategory ?>,'mostsocialcontainer',"",'Post author','Share count','socialusers','socialusers','  shares','',<?php echo $this->dburlProvidersdata ?>,<?php echo $this->userImageProvidersdata ?>,<?php echo $this->dbDescrProvidersdata ?>,'Post creator');
+		       	<?php } else {?> 
+					$('#mostsocialcontainer').prev('.dragHandler').find('span').remove();
+					$('#mostsocialcontainer').addClass('notfoundContainer').html('<div class="notfound">top shared posts not found</div>'); <?php }  ?> 
+		        
+		        //visiting post users
+		        callglobalajax('visitingcontainer','index','callingajaxcontainers', 'postvisiting','topdebateusers','','',0,5); 
+		        
+		        //emails
+
+
+		        chartforemailproviders(<?php echo $this->emailProvidersdata ?>,'emailreportchart',"Email providers");
+
+				chartforbrowsersproviders(<?php echo $this->browserProvidersdata ?>,<?php echo $this->browserproviderscategory?>,'browserprovidercontainer',"Browser sources",'Platform on browsers','No. of users','browers','browserusers','users have used this browser');
+
+				chartforbrowsersproviders(<?php echo $this->osProvidersdata ?>,<?php echo $this->osArrcategory?>,'osprovidercontainer',"Operating systems",'platform on operating systems','No. of users','osusers','osusers','users have used this os');
+
+				chartforbrowsersproviders(<?php echo $this->deviceProvidersdata ?>,<?php echo $this->deviceArrcategory?>,'deviceprovidercontainer',"User devices",'platform on devices','No. of users','deviceusers','deviceusers','users');
+
+				<?php if($catArrcategoryCount>0 ){ ?>
+				chartforcategories(<?php echo $this->catProvidersdata ?>,<?php echo $this->catArrcategory?>,'catprovidercontainer',"‘User breakdown by category interest’",'users interest on categories','No. of users','categoryusers','categoryusers','',<?php echo $this->catArrPoints ?>);
+				<?php } else {?> 
+					$('#catprovidercontainer').prev('.dragHandler').find('span').remove();
+					$('#catprovidercontainer').addClass('notfoundContainer').html('<div class="notfound">no results found</div>'); <?php }  ?> 
+
+		         $('html, body').animate({scrollTop: offest.top-120});
+
+		         $('#previousReport').click(function(){
+					//$('.tabContent:eq('+index+')').hide();
+					$('.tabContent[dataTab="'+tabData[1]+'"]').hide();
+					$('#reportWrapper').show();
+					$('.pageSubeTitle').html('').siblings('strong').text('Reports');
+					location.hash='';
+					
+				});
+				
+		  });
+
+
+		var hLoc = location.hash;
+
+		if(hLoc!=''){
+			$('#reportWrapper a[href="'+hLoc+'"]').trigger('click');
+		}
+		
+		$('body').on('change','#changevisiting',function(){
+			var thisVal = $(this).val();
+			var dateRange = $('option[value="'+thisVal+'"]',this).attr('monthrange');
+			
+			callglobalajax('visitingcontainer','index','callingajaxcontainers', 'postvisiting','topdebateusers','month',dateRange,0,5); 
+		})
+
+	});
+
+	</script>	
+	<?php // echo $this->url(array('controller'=>'Reporting', 'action'=>'emailtypes'));?>
+
+	<div id="reportWrapper" class="tabBar">
+		<ul>
+			<li class="emailStatsIcon">
+				<a href="<?php echo BASE_URL ?>/admin/message/report" class="reportBlock" mainTitle="Email Stats" subTitle="">
+					<div class="rpTitle">Email Stats</div>
+				</a>
+			</li>
+
+			
+			<li class="rptagsIcon">
+				<a href="<?php echo BASE_URL ?>/admin/reporting/hashtag"  class="reportBlock" class="reportBlock" mainTitle="Hashtag Report " subTitle="">
+					<div class="rpTitle">Matching hashtags</div>
+				</a>
+			</li>
+
+			<li class="rpPostVisitedIcon">
+				<a href="#visited" class="reportBlock" mainTitle="Posts visited" subTitle="">
+					<div class="rpTitle">Posts visited</div>
+				</a>
+			</li>
+
+			<li class="rpScoreLeaugeIcon">
+				<a href="<?php echo BASE_URL ?>/admin/leaguescore" class="reportBlock" mainTitle="Leagues and Scoring" subTitle="">
+					<div class="rpTitle">Scoring</div>
+				</a>
+			</li>
+
+			<!-- <li class="rpPostreportIcon">
+				<a href="#" class="reportPost reportBlock" mainTitle="Post report" subTitle="">
+					<div class="rpTitle">Post report </div>
+				</a>
+			</li> -->
+			<li class="rpInterestIcon">
+				<a href="#category" class="reportBlock" mainTitle="Users with similar category interests" subTitle="">
+					<div class="rpTitle">Similar interest based </div>
+				</a>
+			</li>
+			
+			
+			<li class="rpSocialShareIcon">
+				<a href="#social" class="reportBlock" mainTitle="Social sharing" subTitle="">
+					<div class="rpTitle">Social sharing</div>
+				</a>
+			</li>
+
+			<li class="rpSavedChartIcon">
+				<a href="<?php echo BASE_URL ?>/admin/savedcharts/listing" class="reportBlock" mainTitle="Saved reports" subTitle="">
+					<div class="rpTitle">Saved reports </div>
+				</a>
+			</li>
+
+			<li class="rpInfluenceIcon">
+				<a href="<?php echo BASE_URL ?>/admin/reporting/trackingvisits" class="reportBlock" mainTitle="User logins" subTitle="">
+					<div class="rpTitle">Track  Logins</div>
+				</a>
+			</li>
+
+
+			<li class="rpTwitterCmntIcon">
+				<a href="<?php  echo BASE_URL.'/admin/reporting/twittercomments' ;?>" class="reportBlock" mainTitle="Twitter Comments " subTitle="">
+					<div class="rpTitle">Twitter usage</div>
+				</a>
+			</li>
+            <li class="rpHistoryIcon">
+				<a href="<?php  echo BASE_URL.'/admin/reporting/topusers' ;?>" class="reportBlock" mainTitle="User cross referencing" subTitle="">
+					<div class="rpTitle">User cross referencing</div>
+				</a>
+			</li>
+			<li class="rpLocationIcon">
+				<a href="<?php  echo BASE_URL.'/admin/reporting/locations' ;?>" class="reportBlock" mainTitle="User location" subTitle="">
+					<div class="rpTitle">User location</div>
+				</a>
+			</li>			
+			<!-- <li class="emailTypeIcon">
+				<a href="#email" class="reportBlock" mainTitle="Email providers" subTitle="">
+					<div class="rpTitle">Email providers</div>
+				</a>
+			</li>
+
+			<li class="browserTypeIcon">
+				<a href="#browser" class="reportBlock" mainTitle="Browser sources" subTitle=""> 
+					<div class="rpTitle">Browser sources</div>
+				</a>
+			</li>
+			
+			<li class="rpOsIcon">
+				<a href="#os" class="reportBlock" mainTitle="Users OS" subTitle="">
+					<div class="rpTitle">Users OS</div>
+				</a>
+			</li> 
+
+			<li class="rpUserDevicesIcon">
+				<a href="#device" class="reportBlock" mainTitle="User devices" subTitle="">
+					<div class="rpTitle">User devices</div>
+				</a>
+			</li>-->				
+		</ul>
+		<div class="clearfix"></div>		
+	</div>
+	<div class="tabContainer" id="rpTabContainer">
+		<div class="tabContent" dataTab="social">
+			<div class="dashBlock" calltype="socialreportchart">
+				<h2 class="dragHandler">Social sharing stats
+					<span>Click on chart for user details</span> 
+					<?php echo $filterSaveChartHtml ?>
+				</h2>
+				<div id="socialreportchart" class="signedupContent"></div>
+			</div>
+			<div class="dashBlock" calltype="socialreportBARchart">
+				<h2 class="dragHandler">Most popular shared posts<span style="float:right;cursor:pointer" id="seeallsocialsharedpost" >See all shared posts</span><span >Click on graph bars to see user details </span> <?php echo $filterSaveChartHtml ?></h2>
+				<div id="mostsocialcontainer" class="signedupContent"></div>
+			</div>
+			<div style="clear:both"></div>
+			
+			<div id="socialusers"></div>
+		</div>
+		<div class="tabContent" dataTab="visited">
+			<div class="dashBlock_full" style="margin-bottom:15px;" >
+				<h2 class="dragHandler"> 
+					<span style="display:inline-block;">Click an area on chart to see user details</span>
+					   <div class="trackSelectdrop" style="float:right; margin: -5px -15px 0 0;">
+							<select name="changevisiting" id="changevisiting" >	<?php echo $months;	?></select>
+					   </div>
+					   <div class="reportCharts"  calltype="postvisiting"><?php echo $filterSaveChartHtml ?></div>
+					
+				</h2>
+				
+			<div class="clearfix"></div>
+				<div id="visitingcontainer"></div>
+				
+			</div>			
+			<div style="clear:both"></div>
+			<div id="visitingusers"></div>
+		</div>
+		<div class="tabContent" dataTab="email">
+			<div class="dashBlock_full" style="margin-bottom:15px;" >
+				<h2 class="dragHandler"> <span>Click an area on pie chart to see user details</span></h2>
+				<div id="emailreportchart"></div>
+			</div>			
+			<div style="clear:both"></div>
+			<div id="searchprovidercontainer"></div>
+		</div>
+		<div class="tabContent" dataTab="browser">
+			<div class="dashBlock_full" style="margin-bottom:15px;" >
+				<h2 class="dragHandler"> <span>Click on graph bars to see user details</span></h2>
+				<div id="browserprovidercontainer"></div>
+			</div>	
+			<div style="clear:both"></div>
+			<div id="browserusers"></div>
+		</div>
+		
+		<div class="tabContent" dataTab="os">
+			<div class="dashBlock_full" style="margin-bottom:15px;" >
+				<h2 class="dragHandler"> <span>Click on graph bars to see user details</span></h2>
+				<div id="osprovidercontainer"></div>
+			</div>	
+			<div style="clear:both"></div>
+			<div id="osusers"></div>
+		</div>
+
+		<div class="tabContent" dataTab="device">
+			<div class="dashBlock_full" style="margin-bottom:15px;" >
+				<h2 class="dragHandler"> <span>Click on graph bars to see user details</span></h2>
+				<div id="deviceprovidercontainer"></div>
+			</div>	
+			<div style="clear:both"></div>
+			<div id="deviceusers"></div>
+		</div>
+		
+		<div class="tabContent"  dataTab="category">
+			<div class="categoryListCart">
+				<?php 
+					$pointer  = json_decode($this->catArrcategory); 
+					$category = json_decode($this->catArrPoints); 
+
+					foreach ($category as $key => $value) {
+						echo '<span class="cateWrp">'. $pointer[$key].' : '. $value .'</span>';
+					} 
+
+				?>
+			</div>
+			<div class="dashBlock_full" style="margin-bottom:15px;" dataTab="category">
+				<h2 class="dragHandler"> <span>Click on graph bars to see user details</span><div class="reportCharts"  calltype="similarinterest"><?php echo $filterSaveChartHtml ?></div></h2>
+				<div id="catprovidercontainer"></div>
+			</div>
+			<div style="clear:both"></div>
+			<div id="categoryusers"></div>	
+		</div>
+
+		<div class="tabContent" ></div>
+
+		<div class="tabContent" ></div>
+		<!--<div class="tabContent"></div>-->
+
+
+
+
+	</div>
+

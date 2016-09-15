@@ -1,0 +1,43 @@
+<?php 
+$deshboard		= new Admin_Model_Deshboard(); 
+$filterSaveChartHtml = $this->common_model->filterSaveChartHtml('');
+?>
+
+
+<script>
+
+	//chartforemailproviders(<?php echo $this->providersdata ?>,'emailreportchart',"Email Providers Sources");
+
+	$("document").ready(function(){
+
+		chartforbrowsersproviders(<?php echo $this->osProvidersdata ?>,<?php echo $this->osArrcategory?>,'locationprovidercontainer',"Platform users by continent",'platform users across the world','No. of users ','countrycontainer','countryprovidercontainer','users');
+		//chartforbrowsersproviders(<?php echo $this->osProvidersdata ?>,<?php echo $this->osArrcategory?>,'countryprovidercontainer',"Dbee on Continents",'dbee over the World','dbee uses all over','countrycontainer','countryprovidercontainer','users are here');
+	});
+
+	</script>
+
+<h1 class="pageTitle ">User locations</h1>
+<div class="clearfix"></div>
+
+
+<div class="tabContent" dataTab="email">
+	<div class="dashBlock_full" style="margin-bottom:15px;" >
+		<h2 class="dragHandler"> <span>Click graph bar to see ‘by country’ breakdown</span><div class="reportCharts"  calltype="continents"><?php echo $filterSaveChartHtml ?></div></h2>
+		<div id="locationprovidercontainer"></div>
+	</div>			
+	<div style="clear:both"></div>
+	
+</div>
+
+<div class="tabContent" dataTab="email">
+	<div class="dashBlock_full contryopenonclick" style="margin-bottom:15px;display:none" >
+		<h2 class="dragHandler"> <span>Click an area on chart to see details</span><div class="reportCharts"  calltype="country"><?php echo $filterSaveChartHtml ?></div></h2>
+		<div id="countryprovidercontainer"></div>
+	</div>			
+	<div style="clear:both"></div>
+	<div id="searchprovidercontainer"></div>
+</div>
+
+<div class="tabContent1">
+	<div id="countryusers"></div>
+</div>

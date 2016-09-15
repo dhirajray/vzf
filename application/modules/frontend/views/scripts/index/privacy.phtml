@@ -1,0 +1,311 @@
+<?php echo $this->doctype() ?>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+
+<title>dbee.me | the debate n rate social network</title>
+
+<meta name="description" content="dbee is a real time 'debate and rate' social network enabling you to share views on any subject, in open community or private groups. Create debate by posting opinions, photos, videos and links, score and be scored on posts, and rise or fall in dbee leagues.">
+
+<meta property="og:url" content="http://www.dbee.me.com" /> 
+
+<meta property="og:type" content="article" /> 
+
+<meta property="og:title" content="dbee.me | the debate n rate social network" /> 
+
+<meta property="og:site_name" content="dbee" /> 
+
+<meta property="og:description" content="dbee is a real time 'debate and rate' social network enabling you to share views on any subject, in open community or private groups. Create debate by posting opinions, photos, videos and links, score and be scored on posts, and rise or fall in dbee leagues." /> 
+
+<meta property="og:image" content="http://www.dbee.me/images/landing-logo.png" />
+
+<link rel="icon" type="image/png" href="http://dbee.me/images/favicon.png">
+
+
+
+<?php echo $this->headLink(array('rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => 'http://dbee.me/images/favicon.png'))
+
+                       // ->prependStylesheet(BASE_URL . '/css/bootstrap-responsive.min.css')
+
+                        ->prependStylesheet(BASE_URL . '/css/style.css')
+
+                        ->prependStylesheet(BASE_URL . '/css/global.css')
+
+                       // ->prependStylesheet(BASE_URL . '/css/bootstrap.min.css')
+
+						->prependStylesheet(BASE_URL . '/css/speechbubbles.css')					
+
+						->prependStylesheet(BASE_URL . '/css/ddcolortabs.css')					
+
+						->prependStylesheet(BASE_URL . '/css/tabcontent.css')
+
+						->prependStylesheet(BASE_URL . '/css/styles.css')
+
+						->prependStylesheet(BASE_URL . '/css/dbee.css')						
+
+						->prependStylesheet(BASE_URL . '/css/jquery.css')
+
+						->prependStylesheet(BASE_URL . '/css/jquery.blockUI.css')
+
+						->prependStylesheet(BASE_URL . '/css/shadowbox.css')
+
+						->prependStylesheet(BASE_URL . '/css/dbee.css')						
+
+						?>
+
+<!-- Scripts -->
+
+<?php echo $this->headScript()->prependFile(BASE_URL . '/js/html5.js', 'text/javascript', array('conditional' => 'lt IE 9',))
+
+                     // ->prependFile(BASE_URL . '/js/bootstrap.min.js')
+
+					  ->prependFile(BASE_URL . '/js/smooth.pack.js')
+
+                      ->prependFile(BASE_URL . '/js/jquery.min.js')
+
+				      ->prependFile(BASE_URL . '/js/functions.js')
+
+				      ->prependFile(BASE_URL . '/js/browser_check.js')
+
+				      ->prependFile(BASE_URL . '/js/ajaxupload.js')
+
+				      ->prependFile(BASE_URL . '/js/jquery-latest.js')
+
+				      ->prependFile(BASE_URL . '/js/jquery.min_1.4.4.js')
+
+				      ->prependFile(BASE_URL . '/js/jquery.min_1.4.js')
+
+				      ->prependFile(BASE_URL . '/js/jquery.slideto.v1.1.js')	
+
+				      //->prependFile(BASE_URL . '/js/shadowbox/show_shadowbox.js')
+
+				      //->prependFile(BASE_URL . '/js/shadowbox/shadowbox.js')				      
+
+				      ->prependFile(BASE_URL . '/js/all.js')				
+
+				      ->prependFile(BASE_URL . '/js/ddaccordion.js')
+
+				      ->prependFile(BASE_URL . '/js/dropdowncontent.js')
+
+				      ->prependFile(BASE_URL . '/js/dropdowntabs.js')	
+
+				      ->prependFile(BASE_URL . '/js/html5.js')
+
+				      ->prependFile(BASE_URL . '/js/javascript.js')
+
+				      ->prependFile(BASE_URL . '/js/jquery.blockUI.js')
+
+				      ->prependFile(BASE_URL . '/js/tabcontent.js')
+
+				      ->prependFile(BASE_URL . '/js/speechbubbles.js')
+
+				      ->prependFile(BASE_URL . '/js/jquery.js')
+
+				    				   
+
+				      ?>
+
+
+
+
+
+
+
+<script language="javascript" type="text/javascript">
+
+var screenwidth = screen.width;
+
+if (screenwidth == 1024) {
+
+	document.write('<link rel="stylesheet" href="<?php echo BASE_URL.'/css/1024.css'?>" type="text/css" media="all" />');
+
+}
+
+</script>
+
+
+
+
+
+<script language="javascript" type="text/javascript" src="<?php echo BASE_URL.'/js/functions.js?1379088342'?>"></script>
+
+<script type="text/javascript" src="<?php echo BASE_URL.'/js/browser_check.js'?>"></script>
+
+<script type="text/javascript" src="<?php echo BASE_URL.'/js/smooth.pack.js'?>"></script>
+
+
+
+<!-- BEGIN INCLUDE SCRIPTS TO CALL SHADOWBOX -->
+
+
+
+<script type="text/javascript" src="<?php echo BASE_URL.'/js/shadowbox/shadowbox.js'?>"></script>
+
+<script type="text/javascript" src="<?php echo BASE_URL.'/js/shadowbox/show_shadowbox.js'?>"></script>
+
+<!-- END INCLUDE SCRIPTS TO CALL SHADOWBOX -->
+
+
+
+<!-- DROPDOWN CONTENT FOR MY GROUP OPTIONS -->
+
+<script type="text/javascript" src="<?php echo BASE_URL.'/js/dropdowncontent/dropdowncontent.js'?>"></script>
+
+<!-- DROPDOWN CONTENT FOR MY GROUP OPTIONS -->
+
+
+
+<!-- DROPDOWN TOP MENU -->
+
+<script type="text/javascript" src="<?php echo BASE_URL.'/js/dropdowntab/dropdowntabs.js'?>"></script>
+
+<!-- DROPDOWN TOP MENU -->
+
+
+
+<!-- BEGIN INCLUDE SCRIPTS TO CALL DHTML TOOLTIP -->
+
+<link rel="stylesheet" type="text/css" href="<?php echo BASE_URL.'/css/speechbubbles.css'?>" />
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+
+<script src="<?php echo BASE_URL.'js/speechbubbles.js'?>"></script>
+
+<script type="text/javascript">
+
+jQuery(function($){ //on document.ready
+
+ $('.addspeech').speechbubble()
+
+})
+
+</script>
+
+<script type="text/javascript" src="<?php echo BASE_URL.'/scripts/ajaxupload.js'?>"></script>
+
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+
+<!-- SLIDING BACK TO TOP -->
+
+<script language="javascript" type="text/javascript" src="<?php echo BASE_URL.'/js/jquery.slideto.v1.1.js'?>"></script>
+
+
+
+<style type="text/css">
+
+body {background-color:#FFFFFF}
+
+</style>
+
+
+
+
+
+</head>
+
+<body>
+
+<div style="clear:both"></div>
+
+<!---------end header---------------------------->
+
+<div style="background-color:white;">
+
+<div>
+
+	<div id="about" class="medium-font" style="float:left; margin-bottom:30px; cursor:pointer;" onclick="javascript:refreshabout();">About</div>
+
+	<div id="privacy" class="medium-font-bold" style="float:left; margin:0 0 30px 25px;">Privacy Policy</div>
+
+	<div id="terms" class="medium-font" style="float:left; margin:0 0 30px 25px; cursor:pointer;" onclick="javascript:refreshterms();">Terms & Conditions</div>
+
+	<div id="feedback" class="medium-font" style="float:left; margin:0 0 30px 25px; cursor:pointer;" onclick="javascript:refreshfeedback();">Feedback</div>
+
+</div>
+
+<h2><img src="<?php echo BASE_URL ?>./images/logo.png" width="211" height="101" /><strong><br />
+
+  <br />
+
+<u>USER PRIVACY POLICY</u></strong></h2>
+
+<p><strong>  for www.dbeelife.com</strong><br />
+
+  <a href="http://www.Dbeelife.com">www.Dbeelife.com</a> is dedicated to protecting your privacy when you visit or communicate with our  site or personnel.&nbsp; <br />
+
+  <br />
+
+The Privacy Policy offered here, along with our terms of use offers an  explanation regarding any personal data you may provide to us or that we garner  from you.</p>
+
+<p>The Policy is changed  occasionally to update you regarding any changes, so please make sure you  review the Privacy Policy.</p>
+
+<h3><strong>1.&nbsp;Data and  Information Collected</strong></h3>
+
+<p>&nbsp;To  operate our website it is essential to collect or process certain data, such as  the following:<br />
+
+  1.1&nbsp;Information regarding  your visits to our website, any resources you used such as traffic data,  location data, weblogs, and any communication data (these items are included,  but not limited to those specified).<br />
+
+  1.2&nbsp;Forms filled out on our  website allow us to collect information about you regarding registration or personal  profile creation.<br />
+
+  1.3&nbsp;Any data collected from  communications to us from you, for any reason.&nbsp;</p>
+
+<h3><strong>2.&nbsp;How we use  Cookies</strong></h3>
+
+<p> &nbsp;It is possible that we may  gather information regarding your computer for our services.&nbsp; This  collection of data is used for statistical analysis about our website for use  by us or our advertisers.<br />
+
+  Any information shared will not  identify who you are, but rather be mathematical data about our visitors and  their use on our site.&nbsp; The data does not give out any personal details.<br />
+
+  Cookies may be used to gather  this general internet data.&nbsp; When used, cookies are downloaded to your  computer without prompting.&nbsp; The cookie file is stored on your hard drive,  where files are transferred to.&nbsp; This information helps us improve our  site and services to you.<br />
+
+  All computers can block cookies  by activating proper browser settings.&nbsp; There is a place to enable you to  decline cookies under the options menu.&nbsp; Please note if you decline  cookies you may experience limited access to certain areas of our site.<br />
+
+  Advertisers can use cookies,  which we do not control.&nbsp; If cookies are used they will be downloaded if  you click on any advertisement we have on this site.&nbsp;</p>
+
+<h3><strong>3.&nbsp;Information  Use</strong></h3>
+
+<p> Any information collected and  stored regarding you is to enable us to offer better services to you.&nbsp; We  may also use the data collected for the following:&nbsp;<br />
+
+  3.1&nbsp;We may use data you  provided in order to offer you information you asked for from our site, in  direct relation to our services or products.&nbsp; We may also send information  on products we feel might interest you, as long as you have consented to such  communications in the settings area of your profile page, upon registration or  with our our terms and conditions of use.<br />
+
+  3.2&nbsp;Any commitments we made  to you may require use of your information, used only to fulfill your request.<br />
+
+  3.3&nbsp;We may use your  information to explain any changes our website has undergone such as structural  or service/ product modifications, which could affect our service to you.<br />
+
+  3.4&nbsp;We may use your data or  allow third parties to use the data, in order to give you information about  unrelated goods or services you may find of interest.&nbsp; We may contact you  about these services or goods if you consented to the contact.&nbsp;<br />
+
+  3.5&nbsp;Please understand that  we do not share information that is going to identify you to our advertisers.  However, on occasion we may provide them with statistics about our site&rsquo;s  visitors. &nbsp;</p>
+
+<h3><strong>4.&nbsp;Personal  Data Storage</strong></h3>
+
+<p> 4.1&nbsp;Data you provide us  with will be stored on secure servers.&nbsp; Any password or personal details  will be encrypted to provide you with security.<br />
+
+  4.2&nbsp;Transmission of data  via the internet is never completely secure, thus a guarantee of data sent  electronically or transmitted cannot be given.&nbsp; Information offered is  therefore at your own risk.&nbsp; If given a password or chosen to obtain a  password, you can access the secure section, requiring the password to remain  confidential by you, as your responsibility. &nbsp;</p>
+
+<h3><strong>5.&nbsp;Sharing Your  Information</strong></h3>
+
+<p> 5.1&nbsp;If&nbsp;applicable, we  may share your personal information to any group member.&nbsp; This will  include subsidiaries or holding companies we may work with, as well as their  subsidiaries if any.<br />
+
+  5.2&nbsp;Personal Information may be shared with third parties:<br />
+
+  5.2.1&nbsp;If we sell part or  all of our business or assets we may share personal information to a third  party.<br />
+
+  5.2.2&nbsp;When legally requested, we may share your information.</p>
+
+<h3><strong>6.&nbsp;Third Party  Links</strong></h3>
+
+<p> Third Party Links to websites on  our website are not included in our privacy policy.&nbsp; You will need to  check their privacy policy regarding data.&nbsp; We do not accept liability or  responsibility for third party links and their privacy policies.&nbsp;</p>
+
+<h3><strong>7.&nbsp;Information  Access</strong></h3>
+
+<p> The Data Protection Act 1998  provides you with rights to access any information we may collect and store  about you.&nbsp; If you wish to have access to this information it may be  subject to a &pound;10 payment fee, used to cover our costs regarding the information  you requested.&nbsp; If you wish to access this data please provide contact  details below. &nbsp;</p>
+
+<h3><strong>8.&nbsp;Contacting  Us</strong></h3>
+
+<p> We are happy to receive any queries, comments, or  requests you may have regarding our Privacy Policy.&nbsp; Feel free and do not  hesitate to use the following email to contact us: <a href="mailto:privacy@dbeelife.com">privacy@dbeelife.com</a></p>
+
+</div>

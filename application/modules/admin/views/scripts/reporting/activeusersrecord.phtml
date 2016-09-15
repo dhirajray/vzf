@@ -1,0 +1,67 @@
+<?php 
+ $deshboard		= new Admin_Model_Deshboard(); 
+ $defaultimagecheck = new Admin_Model_Common();
+ ?>
+
+
+
+<h1 class="pageTitle">
+	Most active platform users
+
+	<?php 	  echo "<span class='pull-right'>Total : ".($this->totUsers).'<input type="hidden" value="'.($this->totUsers).'" id="totalfield" ></span>'; ?>
+</h1>
+
+<!--<div class="pull-right topStar">
+	Top <span class="topStarIcon">5</span>Users
+</div> -->
+<div class="clearfix"></div>
+
+<div id="pageContainer">					
+	
+	<div id="dashboardWrapper">
+	
+
+	
+	<div class="listCompare">
+		
+		
+				<?php 
+				if (count($this->liveDbeeData)){ ?>
+				<div id="liveDbee" class="historyUserList ">
+					<ul>
+				<?php 
+				// echo "<pre>";
+				// print_r($this->liveDbeeData);
+
+				foreach($this->liveDbeeData as $liveDbee) : 
+                $liveDbeedbeepic = $defaultimagecheck->checkImgExist($liveDbee->image,'userpics','default-avatar.jpg');
+                $postCount 		=  $liveDbee->postCount;
+                $commentCount 	=  $liveDbee->commentCount;
+                $postCount 		= ($postCount== 1)? $postCount.' post' : $postCount.' posts';
+                $commentCount 	= ($commentCount==1)? $commentCount.' comment' : $commentCount.' comments';
+				?>
+				<li userid="<?php echo $this->escape($liveDbee->UserID);?>" class="show_details_user">
+					<div class="userPic">
+						<img src="<?php echo IMGPATH.'/users/medium/'.$liveDbeedbeepic ?>" width="70" height="70" border="0" />
+					</div>
+					<div class="userDetails">
+						<div class="usertitle">
+							<span class="username oneline"><?php echo $this->escape($this->myclientdetails->customDecoding($liveDbee->username)).' '.$this->escape($this->myclientdetails->customDecoding($liveDbee->lname));?></span>
+							<h3><strong><?php echo $this->escape($liveDbee->total);?></strong> <i class="actUserPost"> <?php echo $postCount;?><span class="actUserComnt"><?php echo $commentCount;?></span></i></h3>
+						</div>
+						
+					</div>
+
+				</li>
+			<?php  endforeach; ?>
+				</ul>
+				
+			</div>
+			<?php } else { ?>
+			<div class="notfound">Users Not Found!</div>
+			<?php } ?>	
+		<div class="clearfix"></div>
+	</div>
+
+</div>
+</div>

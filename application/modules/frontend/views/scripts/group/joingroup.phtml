@@ -1,0 +1,78 @@
+<?php
+$group=$this->group;
+$owner=$this->owner;
+$user=$this->user;
+$remind=$this->remind;
+$JoinDate=date('Y-m-d H:i:s');
+$return='';
+
+// CHECK IF USER HAS SENT A REQUEST ALREADY
+	$groupval = new Application_Model_Groups();
+	$selectgroup = $groupval->selectsearchgroup($group,$owner,$user);
+	$userNum=count($selectgroup);
+	if($userNum==0){$AddRecord=true;}else{$AddRecord=false;}
+// CHECK IF USER HAS SENT A REQUEST ALREADY
+
+// SELECT GROUP AND USER DETAILS
+	$groupname = $groupval->grouprow($group);
+	$GroupName=$groupname['GroupName'];
+	
+	$userval = new Application_Model_DbUser();
+	$userdetails = $userval->userdetailall($user);
+	$userName=$userdetails[0]['Name'];
+	$userlname=$userdetails[0]['lname'];
+	$ownedetails = $userval->userdetailall($owner);
+	$ownerName=$ownedetails[0]['Name'];
+	$ownerlname=$ownedetails[0]['lname'];
+    $ownerEmail=$ownedetails[0]['Email'];
+// SELECT GROUP AND USER DETAILS
+	
+if($AddRecord || $remind=='0') {
+	if($AddRecord) {
+		// INSERT RECORD IN DATABASE
+		$data	=	array('GroupID'=>$group,'Owner'=>$owner,'User'=>$user,'JoinDate'=>$JoinDate,'SentBy'=>'Self');	
+		$success = $groupval->insertingroupmem($data);
+		// INSERT RECORD IN DATABASE
+		
+		// SEND EMAIL TO GROUP OWNER NOTIFYING OF NEW INTEREST
+ 
+
+        $EmailTemplateArray = array('Email' => $ownerEmail,
+                                    'GroupName' => $GroupName,
+                                    'ownerName' => $ownerName,
+                                    'ownerlname' => $ownerlname,
+                                    'userName'=> $userName,
+                                    'lname' => $userlname,
+                                    'case'=>26);
+        $bodyContentmsgall = $this->dbeeComparetemplateOne($EmailTemplateArray);
+        /****for email ****/
+
+		// SEND EMAIL TO GROUP OWNER NOTIFYING OF NEW INTEREST
+	}
+}
+else
+{
+	// UPDATE RECORD IN DATABASE
+	$groupval = new Application_Model_Groups();
+	$success = $groupval->upadategroupallval($JoinDate,$group,$owner,$user);
+	// UPDATE RECORD IN DATABASE
+
+	// SEND REMINDER EMAIL TO GROUP OWNER
+	if($remind=='1') {
+	
+        $EmailTemplateArray = array('Email' => $ownerEmail,
+                                    'GroupName' => $GroupName,
+                                    'ownerName' => $ownerName,
+                                    'ownerlname' => $ownerlname,
+                                    'userName'=> $userName,
+                                    'lname' => $userlname,
+                                    'case'=>27);
+        $bodyContentmsgall = $this->dbeeComparetemplateOne($EmailTemplateArray);
+        /****for email ****/
+
+	}
+	// SEND REMINDER EMAIL TO GROUP OWNER
+}
+if($success){echo '1';}else{echo '0';}
+?>
+

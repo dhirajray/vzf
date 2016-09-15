@@ -1,0 +1,70 @@
+
+
+<?php
+
+//echo $relPath;
+
+/* $form = $this->form;
+
+$form->setAttribute('action',
+
+                    $this->url('Dbupload/dbupload', //your route name ...
+
+                               array('controller'=>'dbupload', 'action' => 'add'))); 
+
+$form->prepare();
+
+
+
+echo $this->form()->openTag($form);
+
+//echo $this->formRow($form->get('dbuploadname'));
+
+
+
+echo $this->formRow($form->get('fileupload'));
+
+
+
+echo $this->formSubmit($form->get('submit'));
+
+echo $this->form()->closeTag(); */
+
+ //echo $this->relPath;
+
+if($this->relPath=='imageposts')
+
+		echo '<img src="'.BASE_URL_IMAGES.'/show_thumbnails.php?ImgName='.$this->upload_image.'&ImgLoc=imageposts&Width=80&Height=80" border="0" /><input type="hidden" id="PostPix" value="'.$this->upload_image.'">';
+
+	elseif($this->relPath=='grouppics')
+
+	echo '<img src="'.BASE_URL_IMAGES.'/show_thumbnails.php?ImgName='.$this->upload_image.'&ImgLoc=grouppics&Width=70&Height=70" border="0" style="margin-top:5px;" /><input type="hidden" id="group-pic" value="'.$this->upload_image.'">';
+
+	elseif($this->relPath=='userpics') {
+
+		echo 'new picture preview<br /><img src="'.BASE_URL_IMAGES.'/show_thumbnails.php?ImgName='.$this->upload_image.'&ImgLoc=userpics&Width=130&Height=130" border="0" style="margin-top:5px;" /><input type="hidden" id="UserProfilePic" value="'.$this->upload_image.'">';
+
+		?>
+
+           <script language="javascript" type="text/javascript">window.parent.document.getElementById('changebutton').style.display='block';</script>
+
+<?
+
+}
+
+if($error) {
+
+echo '<img src="/php_ajax_image_upload/images/error.gif" width="16" height="16px" border="0" style="marin-bottom: -3px;" /> Error(s) Found: ';
+
+foreach($error as $value){
+
+echo $value.', ';
+
+}
+
+} elseif($this->picerr) {
+
+	echo '<div style="margin-top:3px"><img src="'.BASE_URL_IMAGES.'/images/error_button.png" width="16" height="16px" border="0" style="marin-bottom: -3px; position:absolute" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Error!</div><div style="margin-top:5px">Please upload .jpeg/.gif only.</div>';
+
+	echo '<input type="hidden" id="PostPix" value="'.$this->upload_image.'">';
+}

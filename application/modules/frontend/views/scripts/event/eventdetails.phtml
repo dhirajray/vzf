@@ -1,0 +1,229 @@
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyDXdTKWaNO-2wcXWL8N3Jy-Q4XI5qXyazg&sensor=false"></script>
+<script type="text/javascript">
+
+function creatMap (mapid,latitude,longitude){
+   var myLatlng = new google.maps.LatLng(latitude,longitude);
+  var mapOptions = {
+    zoom: 15,
+    center: myLatlng,
+    disableDefaultUI: true
+  }
+  var map = new google.maps.Map(document.getElementById(mapid), mapOptions);
+
+  var marker = new google.maps.Marker({
+      position: myLatlng,
+      map: map,
+      title: 'Hello World!'
+  });
+
+  google.maps.event.addDomListener(window, 'load', creatMap);
+
+}
+
+ $(document).ready(function(){
+  $('body').on('click','.postInGroup', function(){
+        hideIconsInCreatePost = true;
+        var EventType = $('.postInGroup').attr('data-EventType');
+        EventType = typeof(EventType) != 'undefined' ? EventType : '';
+        //$('#startdbHeaderBtn').attr("controlname","clickfromevent");
+        $('#startdbHeaderBtn').trigger('click');
+        if(EventType==3)
+        {
+          $('#postinuserset').hide();
+         //$('#startdbHeaderBtn').attr("controlname","event");
+            $.ajax({
+              type: "POST",
+              dataType: 'json',
+              data: {
+                  "DbArray": 2,"id": '<?php echo $this->id; ?>'                   
+              },
+              url: BASE_URL + "/ajax/usermentionpost",
+              success: function(response) {
+                  var datares = response.html.userlist;
+                   $('#mentionpostuser').val(datares);    
+              }
+          });
+        }
+  });
+<?php if(!empty($this->session_data)) {  ?>
+  fetchspecificadvert(<?php echo $this->id; ?>,7);// get specific post advert
+<?php } ?>
+
+  $dbLoader('#group-highlighted', 1);
+  $dbLoader('#memboxgr', 1);
+  $dbLoader('#eventlocation', 1);
+
+  $.ajax({
+        type: "POST",
+        dataType : 'json',
+        url: BASE_URL+"/event/aeventdetails",
+        data: {
+            "id": '<?php echo $this->id; ?>'          
+        },
+        success: function (data) 
+        {             
+            $('#group-highlighted').html(data.content);
+             
+            $('#memboxgr').html(data.member);
+            
+            if(parseInt(data.totalMember)==1)
+              $('#attendiedCount').html(data.totalMember+' attendee');
+            else if(parseInt(data.totalMember)==0)
+              $('#attendiedCount').html(data.totalMember+' attendees');
+            else
+              $('#attendiedCount').html(data.totalMember+' attendees'); 
+
+            if(data.totalMember!=0 && data.totalMember>4)
+            { 
+                $('#memboxgr').flexslider({
+                     animation: "slide",
+                    animationLoop: false,
+                    itemMargin: 5,
+                    slideshow: false,
+                    controlNav: false,
+                    prevText: '',
+                    nextText: ''
+                });
+              $dbTip();
+            }
+
+            if(data.eventAddition!='')
+            {
+              $('#eventAddition').html(data.eventAddition);
+            }
+
+            $('#eventlocation').html(data.detail);  
+            $('#EventDate').html(data.EventDate);  
+            if(data.latitude!='' && data.longitude!='')
+            {
+              $('#eventLocation').show();
+              creatMap('map',data.latitude,data.longitude);
+              $('.enlargeMap').show();
+              $('.enlargeMap').click(function(event) {
+                /* Act on the event */
+                 $.dbeePopup('<div id="enlargeMapPopup"></div>');
+                 creatMap('enlargeMapPopup',data.latitude,data.longitude);
+              });
+             
+            }
+            else if(data.address=="")
+                $('#eventLocation').remove();
+            else if(data.address!="")
+            {
+             $('#eventLocation').show();
+             $("#map").remove();
+            }
+            $dbTip();
+        },
+        error: function (error) {
+            loadError(error);
+        }
+  
+  });
+  eventFeeds('<?php echo $this->id; ?>');
+ });
+ var busy = 1;
+ function eventFeeds(id) 
+ {
+    str = $('.listingTypeMedia').last().attr('id');
+    if(typeof str != 'undefined')
+      lastID = parseInt(str.replace(/\D/g,''));
+    else
+      lastID = '';
+
+    busy = 0;
+    $.ajax({
+        type: "POST",
+        dataType:'json',
+        url: BASE_URL+"/event/loadeventdbee",
+        data: {
+            "id": id,"lastID":lastID
+        },
+        success: function (result) 
+        {
+            if(result.noFound==true)
+              $('#noFound').remove();
+            $('#dbee-feeds').append(result.contents);
+            getMentionUser(result.dbArray);
+            busy = 1;  
+        }
+    });
+ }
+ 
+ function loadeventFeeds(id) 
+ {
+    $.ajax({
+        type: "POST",
+        dataType:'json',
+        url: BASE_URL+"/event/loadsingleeventdbee",
+        data: {
+            "id": id
+        },
+        success: function (result) {
+            
+            if(result.noFound==true)
+              $('#noFound').remove();
+
+            $('#dbee-feeds').prepend(result.contents);
+            getMentionUser(id);
+        },
+        error: function (error) {
+            loadError(error);
+        }
+    });
+}
+
+</script>
+
+<script type="text/javascript">
+jQuery(document).ready(function()
+{
+   $(window).scroll(function () 
+     {
+       if ($(window).scrollTop() == $(document).height() - $(window).height() && busy==1)
+       {
+           eventFeeds('<?php echo $this->id; ?>');
+       }
+   });
+  $('.postInGroup').css('display','none');
+  $('.grpMemberCnt .rboxContainer').perfectScrollbar({ wheelSpeed: 100,includePadding:true});
+});
+</script>
+<!--this is page listing-->
+
+ <input type="hidden" id="lastID" value="" name="lastID" >
+ <input type="hidden" id="eventid" name="eventid" value="<?php echo $this->id; ?>">
+ <div class="leftSideCnt">
+    <div id="group-highlighted" class="groupHighlightedWrp"></div>
+    <ul class="postListing" id="dbee-feeds"></ul>
+  </div>
+	 <div id="rightListing">
+      <div class="whiteBox noCollapse active" >
+        <h2>Event details</h2>
+        <div class="rboxContainer EventDate" id="EventDate">         
+        </div>
+      </div>
+      <div class="whiteBox noCollapse active" id="eventLocation" style="display:none;">
+        <h2>Location</h2>
+        <div class="rboxContainer" id="eventlocation">            
+        </div>
+        <div id="map"></div>
+      </div>
+      <div id="eventAddition">
+
+      </div>
+      <div class="whiteBox noCollapse active" id="memboxgrpr">
+        <h2 id="attendiedCount"></h2> 
+        <div class="rboxContainer attendeesBox" id="memboxgr">
+        </div>
+      </div>
+      
+      <div id="eventAdvert">
+
+      </div>
+	</div>
+	<div class="clearfix"></div>
+
+<!--End page listing-->
+</div>
+</div>

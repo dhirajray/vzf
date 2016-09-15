@@ -1,0 +1,313 @@
+
+<?php         
+   $this->title = "Posts";
+   $this->headTitle($this->title);
+   $deshObj= new Admin_Model_Deshboard();
+   $defaultimagecheck = new Admin_Model_Common();
+   $layoutsObj  = new Admin_Model_Layouts();  
+
+   ?>
+
+<script type="text/javascript">
+
+   $('document').ready(function() { 
+
+          $.ajax({
+              type: "POST",
+              dataType: 'json',
+              data: {
+                  "DbArray": 1                  
+              },
+              url: BASE_URL + "/admin/dashboard/usermentionpost",
+              success: function(response) {
+                  var datares = response.html.userlist;
+                   $('#mentionpostuser').val(datares);    
+              }
+          }); 
+       
+       $("#date_text").datepicker();
+
+   <?php
+      if (Zend_Controller_Front::getInstance()->getRequest()-> getParam('task') == 'create') { ?>
+           $('#searchContainer').show();
+           <?php
+      } else { ?>
+            $('#openCreateBtn').hide();
+            $('#searchContainer').hide();
+         <? } ?>
+   
+       <?php
+      if (Zend_Controller_Front::getInstance()->getRequest()->getParam('error') == 1) { ?>
+   
+           $messageError('No tweets found for keyword. Please change or remove in order to continue with the post. ');
+           $('#searchContainer').show();
+           $('#twitter-tag-text').focus();
+           window.history.pushState("string", "Title", "<?php echo BASE_URL; ?>/admin/dashboard/post");
+   
+           <?php
+      } ?>
+   
+       <?php
+      if (Zend_Controller_Front::getInstance()->getRequest()->getParam('error') == 2) { ?>
+   
+           $messageError('Please enter maximum 3 #hashtags/keywords.');
+           $('#searchContainer').show();
+           $('#twitter-tag-text').focus();
+           window.history.pushState("string", "Title", "<?php echo BASE_URL; ?>/admin/dashboard/post");
+   
+           <?php
+      } ?>
+   
+       <?php
+      if (Zend_Controller_Front::getInstance()->getRequest()->getParam('sucess') == 1) { ?>
+           $messageSuccess('Post added sucessfully !.');          
+           window.history.pushState("string", "Title", "<?php echo BASE_URL; ?>/admin/dashboard/post");
+           
+           <?php
+      } ?>
+   
+   
+   
+      // scheduling post later
+      $("#scheduledate" ).datetimepicker({dateFormat: "dd-mm-yy",minDate: 0});
+      $('#postlater').click(function(){
+         var thisEl = $(this);
+
+         var chked = thisEl.attr('checked');
+          if(chked=='checked')
+         {
+            $('.postLaterclass').show();
+            $('.addConditionWrapper .helponoff').hide();
+              
+         }
+         else
+         {
+            $('#scheduledate').val('');
+            $('.postLaterclass').hide();
+            $('.addConditionWrapper .helponoff').show();
+         }
+      });
+
+      $('#posttimings').change(function(){
+         var thisEl = $(this);
+
+         var chked = thisEl.val();
+         if(chked=='99')
+         {
+            $('.postlaterCal').show();
+         } else
+         {
+            $('#scheduledate').val('');
+            $('.postlaterCal').hide();
+         }
+      });
+   
+   });
+</script>
+
+<?php
+if($this->task=='create')
+{
+  $heading='Create post';
+}
+else
+{
+   $heading='Posts';
+}
+
+ ?>
+
+<input type="hidden" name="mentionpostuser" id="mentionpostuser">
+<h1 class="pageTitle dbeeViewAll"><?=$heading?> <a id="openCreateBtn" href="#" class="btn btn-yellow btn-large openSearchBlock"><i class="fa fa-pencil"></i>  Create post</a>
+</h1>
+<div  id="searchWrapper" class="spSdbsSearchBox">
+   <?php echo $deshObj->postdbform('',$this->userid);    ?>
+
+   <div class="clearfix"></div>
+</div>
+<script type="text/javascript">
+$('document').ready(function() { 
+
+    //$('#PrivatePost').hide();
+     $.mentionInt();
+
+    var k =  $('#PostText').prev('.mentions').find('.mentionATag').text(); 
+            
+            if(k!=''){              
+             $('#PrivatePost').closest('.select').show();
+            }else 
+            {              
+              $('#PrivatePost').closest('.select').hide();
+            } 
+
+    $showPrivateOption = function (thisEl){
+          
+          var k =  $('#addTextWrp .mentionATag').text();           
+        
+           if($('#userset').val()!='')
+           {
+            $('#PrivatePost').closest('.select').show();
+           }else if(k!='' ){
+            $('#PrivatePost').closest('.select').show();
+           }
+           else
+           {
+
+           $('#PrivatePost').closest('.select').hide();
+           }  
+         }
+
+         
+        $('#PostText').keyup(function(event) {          
+           $showPrivateOption();
+        }).focusin(function(){
+          $showPrivateOption();
+        });
+
+        $('#userset').on('change', function() {        
+          $showPrivateOption(); 
+        });
+});
+</script>
+<div  id="searchWrapper2" style="display:none" >
+   <div id="searchContainer2">
+      <div class="searchTopBar clearfix">
+         <div  class="addcondition" >
+            <a href="#" class="btn btn-yellow btn-large pull-left" id="add_condition">+ Add New Search Criteria</a>
+            <span id="load_filter_cls" class="loadfilter_cls">
+               <select name="loadFilter" id="loadFilter">
+                  <option value=''>Load Saved Filter</option>
+                  <?php
+                     foreach ($this->filters as $key => $value) {
+                     	echo "<option value='".$value['filter_id']."'>".$value['filter_name']."</option>";
+                     }
+                     ?>
+               </select>
+            </span>
+         </div>
+      </div>
+      <div id="exp_condition" class="expenddcondition" >
+         <div class="whiteBox addConditionWrapper">
+            <div class="formCondition">
+               <div class="searchField">
+                  <label>Search</label>
+                  <select id="search_fields">
+                     <option value="user">Users</option>
+                     <option value="title">Posts</option>
+                     <option value="date">Date Range</option>
+                  </select>
+               </div>
+               <div id="exp_criteria"  class="pull-left ">
+                  <div id="open_user" class="attributs" style="display:none">
+                     <div class="searchField searchUsername">
+                        <label class="label">Search in : User Name <input type="radio" id="user_name" name="chktype" value=" User Name" ><label class="radio" ></label> </label>
+                        <label class="label">User Email <input type="radio" id="user_email" name="chktype" value=" User Email" ><label class="radio" ></label> </label>
+                     </div>
+                     <span>Matching: </span>
+                     <select id="usercondition">
+                        <option value="eq">Exactly</option>
+                        <option value="like">Similar To</option>
+                     </select>
+                     <div class="searchField">Keyword: </span> <input type="text" id="user_text" name="user_text" ></div>
+                  </div>
+                  <div id="open_title" class="attributs searchField" style="display:none">
+                     <input type="hidden" id="title_name" name="chkdbee" value=" Dbee Title" >	
+                     <label class="label">Description <input type="radio" id="description" name="chkdbee" value=" Description"><label class="radio" ></label> </label>
+                     <!--<div class="searchField">
+                        <label>Search in DBEE </label><input type="hidden" id="title_name" name="chkdbee" value=" Dbee Title" >							
+                        <label class="label">Description <input type="radio" id="description" name="chkdbee" value=" Description"><label class="radio" ></label> </label>		
+                        </div>-->
+                     <div class="searchField">
+                        <select id="dbeecondition">
+                           <option value="eq">Exactly</option>
+                           <option value="like">Similar To</option>
+                        </select>
+                     </div>
+                     <div class="searchField">
+                        <span>Keyword: </span> <input type="text" id="dbee_text" >
+                     </div>
+                  </div>
+                  <div class="searchField">
+                     <label>For post type: </label>
+                     <span id="dbeetypechk"></span>
+                     <select id="dbeetype">
+                        <option value="1">Text</option>
+                        <option value="2">Link</option>
+                        <option value="3"> Pix</option>
+                        <option value="4">Media</option>
+                        <option value="5">Polls</option>
+                     </select>
+                  </div>
+                  <div id="open_date" class="attributs" style="display:none">
+                     <div class="searchField">
+                        <label class="label">Same as <input type="radio" id="sameas" name="chkdate" value="date Same as" ><label class="radio" ></label> </label>
+                        <label class="label">Before <input type="radio" id="before" name="chkdate" value="date Before"><label class="radio" ></label> </label>							
+                        <label class="label">After <input type="radio" id="after" name="chkdate" value="date After"><label class="radio" ></label> </label>							
+                        <input type="hidden" id="datefield" value="date">
+                     </div>
+                     <div class="searchField"><span>Date : </span> <input type="text" id="date_text"  > </div>
+                  </div>
+               </div>
+               <div class="clearfix"></div>
+            </div>
+            <a href="#" id="stepcondition" class="addbutton btn btn-green btn-medium pull-right">+ Add </a>
+            <div class="clearfix"></div>
+         </div>
+      </div>
+      <form id="search_form" >
+         <div id="conditions" class="addedcondition" > </div>
+         <div  id="saveFtWrapper">
+            <div id="save_filter" class="savefilter pull-left"  style="display:none"  > 
+               <input type="button" name="gosave" id="gosave" value="Save As Filter"  class="btn btn-yellow btn-medium">
+            </div>
+            <div id="save_filterName" class="savefiltername whiteBox addConditionWrapper"   style="display:none" >
+               <input type="text"  name="filtname[]" id="filtname" placeholder="type a filter name">
+               <input type="button" name="gosavefilter" id="gosavefilter" class="btn btn-yellow btn-small" value="Save" style="margin-left:10px;">
+               <div class="clearfix"></div>
+            </div>
+         </div>
+         <div class="searchBottomBar clearfix">
+            <div id="search_button" class="searchbutton" style="display: none;" > 
+               <button type="button" name="gosearch" id="gosearch" value="SEARCH" class="btn btn-yellow btn-large pull-right"><i class="searchSprite searchIcon"></i> Search</button>
+            </div>
+         </div>
+         <div class="savefiltername" style="display:none"  id="save_filterMsg"></div>
+      </form>
+      <div class="clearfix"></div>
+   </div>
+   <div class="clearfix"></div>
+</div>
+<div class="box-body" id="box_body">
+<div id="listingTotalResults" style="float:right;margin: 10px 35px 0 0;"></div>
+<div id="beforecall" style=""></div>
+<div class="clearfix"></div>
+<div id="searchresultvis" style="display:none"></div>
+<div id="showmore" style="display:none;text-align: center;">
+   <img src="<?php echo BASE_URL ?>/images/show.png" style="border:0" title="Show More" alt="Show More">
+</div>
+
+<?php if (count($this->paginator)){
+   echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml');  ?>
+<div class="pageheadinusr" style="font-size:15px;">
+   <?php echo "Page ". $this->page." of ".$this->totalpage;?> 
+</div>
+<div class="pageheadinusrlft" style="font-size:15px;">
+   <?php echo $this->total." posts";?> 
+</div>
+<?php } ?>
+<ul class="listing scoredList colStyle" id="searchresulthide">
+   <?php  
+   if (count($this->paginator)){ 
+      echo $layoutsObj->dbeeresultstemplate($this->paginator,'post');// coming whole layout from layouts model 
+    ?>
+</ul>
+<?php } else { ?>
+<p style="position:relative; top:100px;" class="dashBlockEmpty" >no posts found</p>
+<?php } ?>
+<?php 
+   /*
+    * Print the pagination of type
+    */
+   echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml');  ?>
+   
+

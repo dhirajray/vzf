@@ -1,0 +1,410 @@
+
+<script type="text/javascript" src="<?php echo BASE_URL."/adminraw/js/strength.js";?>"></script>
+<script> 
+        $(document).ready(function() {
+            $('#newPwd').strength({
+                strengthClass: 'strength',
+                strengthMeterClass: 'strength_meter',
+                strengthButtonClass: 'button_strength',
+                strengthButtonText: 'Show password',
+                strengthButtonTextToggle: 'Hide Password'
+            });
+
+            if(location.hash =='#config'){
+            	$('.config').trigger('click');
+            }
+
+            $('body').on('click','.category a', function(){                
+           	 $.ajax(
+       				    {
+       				        type : "POST",
+       				        dataType : 'json',
+       				        url : BASE_URL + 'admin/myaccount/ajaxcategorylist', 
+       				        
+       				        success : function(response) 
+       				        {               
+       				           $('#category-items').html(response.content); 
+       						},
+       				        error : function(error) {
+
+       				        }
+
+       				    });
+                
+            });
+            var oldValue='';
+            $('body').on('keyup','#category', function(){                 
+            	   var maxLength = 20;            	
+            	   var rty =$(this);
+            	   var ccjar = $('#category').val();
+            	   if(ccjar.length > maxLength) {                	  
+            		   rty.val(ccjar.substr(0,20)); 
+            		   $messageError('Maximum 20 characters allowed');
+            		   return false; 
+                	 //  rty.closest('.formRow').append('<span>Maximum charactor 20 limit</span>');
+            	   }else{                  	   
+                	   var oldValue = $('#category').val();
+                	  
+                	   }
+            	                
+            }); 
+             
+          
+            $('body').on('click','#catsubmit', function(){      
+            	
+               var catname = $('#category').val();
+               var priority = $('#priority').val();
+              
+               if(catname==''){
+            	   $messageError('please add category name');
+            	   $('#category').focus();
+            	   return false;            	  
+               }
+               if(priority==''){
+            	   $messageError('please add priority');
+            	   $('#priority').focus();
+            	   return false;            	  
+                   }else{
+                	   if($.isNumeric(priority) == false){
+                		   $messageError('Only numeric value allowed');
+                		   $('#priority').focus();
+                	        return false;
+                	    }
+
+                       }
+               
+               $.ajax(
+      				    {
+      				        type : "POST",
+      				        dataType : 'json',
+      				        data:{'catname':catname,'priority':priority},
+      				        url : BASE_URL + 'admin/myaccount/addcat',      				        
+      				        success : function(response) 
+      				        {               
+      				        	$messageSuccess('Category added successfully');
+      				        	$('.category a').trigger('click'); 
+      				        	$('#category').val(''); 
+      				        	$('#priority').val('');     				        	
+      						},
+      				        error : function(error) {
+
+      				        }
+
+      				    });
+              
+            }); 
+
+            
+            $('body').on('click','.catdelete', function(){  
+			
+            var catid 	=	$(this).attr('catid');
+    		var delteUser  ='<div id="deleteUserPopup" title="Please confirm">\
+    							<p>Are you sure you want delete this category?</p>\
+    							<div class="buttonWrapper"><a href="javascript:void(0);"  class="btn btn-green delcat">Yes</a> <a href="javascript:void(0);"  class="btn closeDialog">No\</a></div>\
+    						</div>';
+
+
+    	
+    			$('#deleteUserPopup').remove();
+    			$('body').append(delteUser);
+    			$('#deleteUserPopup').dialog({minHeight:'auto'});
+    			
+    			$('body').on('click', '.delcat', function (){	
+        			
+    				$.ajax(
+          				    {
+          				        type : "POST",
+          				        dataType : 'json',
+          				        data:{'cat':catid},
+          				        url : BASE_URL + 'admin/myaccount/delcat',      				        
+          				        success : function(response) 
+          				        {
+          				        	        
+          				        $messageSuccess('Category delete successfully');
+          				      $('#deleteUserPopup').dialog( "close" );
+          				        	$('.category a').trigger('click');      				        	
+          						},
+          				        error : function(error) {
+
+          				        }
+
+          				    });
+    				
+    			});
+			
+            });
+    
+         $('body').on('click', '.editcat', function (){	
+        	 if ($('#update_cat').length>0) {
+        	//  $('#update_cat').trigger('click');
+        	$messageError('update not allow to multipe field');
+        	  return false;
+        	 }        	      		
+        		 var catname 	=	$(this).attr('name');
+        		 var closetli = $(this).closest('li');
+        		 var closetspan = $(this).closest('span');
+        		 var catid 	=	closetli.attr('id');  
+        		 var Priority 	=	$(this).attr('priority');          		 
+        		 closetli.html('<input id="updatecat" type="text" value="'+catname+'" /><input id="updatepriority" type="text" width="20px" value="'+Priority+'" /><span><a id="update_cat" class="btn btn-green btn-mini"><i class="fa fa-repeat"></i> update category</a></span>');
+        		// closetspan.html('');
+         		 $('#updatecat').focus();
+         		
+        });
+
+         $('body').on('click','#update_cat',function () {
+        	 var catname 	=	$('#updatecat').val();     
+        	 var priority 	=	$('#updatepriority').val();   
+        	 if(catname==''){
+          	   $messageError('please add category name');
+          	   $('#category').focus();
+          	   return false;            	  
+             }
+             if(priority==''){
+          	   $messageError('please add priority');
+          	   $('#priority').focus();
+          	   return false;            	  
+                 }else{
+	              	   if($.isNumeric(priority) == false){
+	              		   $messageError('Only numeric value allowed');
+	              		   $('#priority').focus();
+	              	        return false;
+	              	    }
+                     }     	   	
+    		 var closetli = $(this).closest('li');
+    		 var catid 	=	closetli.attr('id');    
+        	 $.ajax(
+   				    {
+   				        type : "POST",
+   				        dataType : 'json',
+   				        data:{'cat':catid,'catname':catname,'priority':priority},
+   				        url : BASE_URL + 'admin/myaccount/addcat',      				        
+   				        success : function(response) 
+   				        {               
+   				        	$messageSuccess('Updated successfully');
+   				        	$('.category a').trigger('click');      				        	
+   						},
+   				        error : function(error) {
+
+   				        }
+
+   				    });
+         });
+        	
+			var hasValue = location.hash;
+        	$('.accountTabLink a[href="'+hasValue+'"]').trigger('click');
+        }); 
+ </script> 
+
+<h1 class="pageTitle">Account settings</h1>
+
+<!--Container -->
+						<div class="accountTabLink">
+							<ul>
+								<li class="active" ><a href="#accountsetting">Account settings</a></li>
+								<li><a href="#changepassword">Change password</a></li>
+								<li><a href="#globalsettng">Global setting</a></li>
+								<li><a href="#sessionexpirytime">Session expiry time</a></li>
+							</ul>
+						</div>
+						<div class="accountContainer">
+							<!--tab content-->
+							<div class="accountContent" style="display:block">
+								<form name="myaccount"  class="right grid" id="myAccount" enctype="multipart/form-data" method="post">
+								<div class="formRow">
+									<label class="label">Name</label>
+									<div class="field passstrength">
+										<input type="text" name="fname" id="fname"  placeholder="Profile Name" value="<?php echo $this->profileRec['name']; ?>" >
+									</div>
+								</div>
+								<div class="formRow">
+									<label class="label">Email</label>
+									<div class="field">
+										<input type="text" name="email" id="email" placeholder="Profile Email" value="<?php echo $this->myclientdetails->customDecoding($this->profileRec['email']); ?>" >
+									
+									</div>
+								</div>
+								<div class="formRow secretQuestion" >
+									<label class="label">Secret Question</label>
+									<div class="field">
+										<ul class="">
+											<li>
+												<select name="question" id="question">
+												<?php
+												require_once 'includes/globalfileadmin.php';
+												foreach ($securityquetion as $key => $value) {
+													$checked = ($this->profileRec['secretquestion']==$key)? "selected" : '';
+													echo '<option value="'.$key.'" '.$checked.'>'.$value.'</option>';
+												}
+												?>		
+
+												</select>
+												
+											</li>
+										</ul>	<br>
+										<input type="password" name="answer" id="answer" placeholder="Secret answer" value="<?php echo $this->profileRec['answer']; ?>" >
+									</div>
+								</div>
+								<div class="formRow">
+									<label class="label">Profile picture</label>
+									<div class="field appendType">
+										 
+											<input type="text" readonly="" name="" class="uploadType">
+												<a href="javascript:void(0);" class="btn btn-black">Browse<input type="file" name="profilepicture" class="fileType">
+												</a>
+											<?php 
+												$this->defaultimagecheck = new Admin_Model_Common();
+												$checkownerpic = $this->defaultimagecheck->checkImgExist($this->profileRec['picture'],'profilepic','default-avatar.jpg');		 
+											?>									
+											<div class="clearfix"></div>
+											<div id="newpic" class="proPic">
+
+	     <img  src="<?php echo BASE_URL .'/timthumb.php?src=/profilepic/'.$this->profileRec['picture']; ?>&q=100&w=100&h=100" class="imgStyle">												
+											</div>
+											<input type="hidden" name="picture" id="picture" value="<?php echo $this->profileRec['picture']; ?>" > 
+									</div>
+								</div>
+								<div class="formRow">
+									<div class="field">
+									<button type="submit" class="btn btn-green" value="SUBMIT">Submit</button>
+								</div>
+								</div>
+								
+							  </form>
+							</div>
+							<!--end tab content-->
+							<!--tab content-->
+							<div class="accountContent">
+								<form class="right grid">
+								<div id="currentPwdForm">
+									<div class="formRow">
+										<label class="label">Current Password</label>
+										<div class="field">
+											<input  type="password" name="currentPwd" id="currentPwd"  placeholder="Current Password" value="" autocomplete="off"> 
+											<input  type="hidden" name="currentPwdchked" id="currentPwdchked"> 
+										</div>
+									</div>
+									<div class="formRow">
+										<div class="field">
+											<button type="submit" class="btn btn-green" value="SUBMIT" id="checkpass">Go</button>
+										</div>
+									</div>
+
+								</div>
+								<div  id="changePwdForm" style="display:none"> 
+									<div class="formRow">
+										<label class="label">New Password</label>
+										<div class="field">
+											<input  name="newPwd"  type="password" id="newPwd" placeholder="New Password"  > </span>
+										</div>
+									</div>
+									<div class="formRow">
+										<label class="label">Confirm Password</label>
+										<div class="field">
+											<input  name="confirmPwd"  type="password" id="confirmPwd" placeholder="Confirm Password" >
+										</div>
+									</div>
+									<div class="formRow">
+										<div class="field">
+											<button type="submit"  id="changepassword"  class="btn btn-green" value="SUBMIT">Submit</button>
+										</div>
+									</div>
+								</div>
+							</form>
+							</div>
+							<!--end tab content-->
+							<!--tab content-->
+							<div class="accountContent">
+								<div class="formRow" id="makePrivate">
+									<label class="label">Make platform private</label>
+									<div class="field">
+										<div class="helponoff socialAction2" id="socialAction" > 
+											<input type="checkbox" id="socialTarget" <?php if($this->globalSettingVal==1){echo'checked="checked"';} ?> caller="social" />
+											<label for="socialTarget">
+												<div class="onHelp"></div>
+												<div class="onHelptext">
+													<span>No</span>
+													<span>Yes</span>
+												</div>
+											</label>
+										</div>
+									</div>
+								</div>
+								<div class="formRow" id="plateformscoring" >
+									<label class="label">Platform scoring </label>
+									<div class="field">
+										<div class="helponoff socialAction2" id="socialAction" > 
+											<input type="checkbox" id="socialTarget2" <?php if($this->plateform_scoring==1){echo'checked="checked"';} ?>  caller="scoringoff" />
+											<label for="socialTarget2">
+												<div class="onHelp"  on="On" off="Off"></div>
+												<div class="onHelptext">
+													<span>On</span>
+													<span>Off</span>
+												</div>
+											</label>
+										</div>
+									</div>
+								</div>
+								<div class="formRow" id="googleidexing">
+									<label class="label">Google indexable</label>
+									<div class="field">
+										<div class="helponoff socialAction2" id="socialAction" > 
+											<input type="checkbox" id="socialTarget3" <?php if($this->google_spider==1){echo'checked="checked"';} ?>  caller="gspider" />
+											<label for="socialTarget3">
+												<div class="onHelp"  on="No" off="Yes"></div>
+												<div class="onHelptext">
+													<span>No</span>
+													<span>Yes</span>
+												</div>
+											</label>
+										</div>
+									</div>
+								</div>
+								<div class="formRow" id="semantriaseen">
+									<label class="label">Semantria display</label>
+									<div class="field" >
+										
+										<div class="helponoff socialAction2" id="socialAction" > 
+											<input type="checkbox" id="socialTarget4" <?php if($this->semantria_seen==1){echo'checked="checked"';} ?>  caller="semantria_seen" />
+											<label for="socialTarget4">
+												<div class="onHelp"  on="No" off="Yes"></div>
+												<div class="onHelptext">
+													<span>No</span>
+													<span>Yes</span>
+												</div>
+											</label>
+										</div>
+										<div style="margin-top:10px">This option allows you to display generated sentiment to all users.</div>
+									
+									</div>
+									
+								</div>							</div>
+							<!--end tab content-->
+							<!--tab content-->
+							<div class="accountContent">
+								<div class="formRow" id="makePrivate">
+									<label class="label">Admin session timeout</label>
+									<div class="field">
+										<div class="helponoff" id="socialAction"> 
+											<div class="fieldInput">
+											<select name="globalTimeSetting">
+													<option value='0'  <?php if($this->expireTime==0){echo'selected=selected';}?>>NEVER</option>
+													<option value='5'  <?php if($this->expireTime==5){echo'selected=selected';}?>>after 5 minutes</option>
+													<option value='10' <?php if($this->expireTime==10){echo'selected=selected';}?>>after 10 minutes</option>
+													<option value='30' <?php if($this->expireTime==30){echo'selected=selected';}?>>after 30 minutes</option>
+													<option value='60' <?php if($this->expireTime==60){echo'selected=selected';}?>>after an hour</option>
+											</select>
+
+											</div>
+											<div class="fieldInput">
+												<button class="gTimeSet btn btn-green" style="margin-top:10px" name="Submit" type="submit">
+												  <i class="fa fa-chevron-sign-right"> </i>Set
+												</button>
+											</div>
+											
+										</div>
+									</div>
+								</div>
+							</div>
+							<!--end tab content-->	
+						</div>
+					<!--End Container-->

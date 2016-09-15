@@ -1,0 +1,312 @@
+<h1 class="pageTitle">Invite social users </h1>
+<div class="socialInviteWrp">
+<?php 
+
+if($this->facebookLogined==true)
+	$descDisplay ='<div class="listCompare">
+					<h2 class="">
+						<i class="fa dbFacebookIcon socialIcon"></i> Facebook <span class="alreadyInvitedSocial">previously invited users</span>
+						<a href="javascript:void(0);" class="btn btn-mini btn-green pull-right socialfriends" data-uniqueValue ="0"  data-title="" data-for ="socialinvite" data-type="facebook">Invite</a>
+					</h2>
+					<div class="historyUserList " id="fbInvitedUser">
+						<ul></ul>
+					</div>
+					<div class="clearfix"></div>
+				</div>';
+else
+	$descDisplay ='<div class="listCompare">
+					<h2 class="">
+						<i class="fa dbFacebookIcon socialIcon"></i> Facebook <span class="alreadyInvitedSocial"> previously invited users</span>
+					</h2>
+					<div class="historyUserList " id="fbInvitedUser">
+						<ul></ul>
+					</div>
+					<div class="clearfix"></div>
+				</div>';
+
+if($this->twitterLogined==true)
+	$descDisplay .=	'<div class="listCompare">
+						<h2 class=""> 
+						<i class="fa dbTwitterIcon  socialIcon"></i> Twitter <span class="alreadyInvitedSocial">previously invited users</span>
+							<a href="javascript:void(0);" class="btn btn-mini btn-green pull-right socialfriends" data-uniqueValue ="0"  data-title="" data-for ="socialinvite" data-type="twitter">Invite</a>
+						</h2>
+						<div class="historyUserList " id="twInvitedUser">
+							<ul></ul>
+						</div>
+						<div class="clearfix"></div>
+					</div>';
+else
+	$descDisplay .=	'<div class="listCompare">
+					<h2 class=""> 
+						<i class="fa dbTwitterIcon  socialIcon"></i> Twitter <span class="alreadyInvitedSocial">previously invited users</span>
+						</h2>
+						<div class="historyUserList " id="twInvitedUser">
+							<ul></ul>
+						</div>
+						<div class="clearfix"></div>
+					</div>';
+
+
+
+echo $descDisplay;
+?>
+</div>
+
+<?php if($this->invite=='twitter'){  ?>
+<script type="text/javascript">
+	$('document').ready(function(){
+	twitterUser('<?php echo $this->type; ?>');
+		});
+</script>
+<?php } ?>
+
+
+<?php if($this->invite=='facebook'){ ?>
+<script type="text/javascript">
+	$('document').ready(function(){
+		facebookUser('<?php echo $this->type; ?>');
+	});
+</script>
+<?php } ?>
+
+<script type="text/javascript">
+
+	facebookUser('preinvited');
+	twitterUser('preinvited');
+
+
+function Disconnect(type)
+{
+	$.ajax({
+		type : "POST",
+		dataType : 'json',
+		data:{'type':type},
+		url : BASE_URL + '/admin/social/disconnect',
+		success : function(response){
+			window.location.reload();
+		}
+	});	
+}
+
+
+
+
+function twitterUser(type)
+{
+		
+         if(type=='preinvited'){
+         	   $.ajax({
+			        type : "POST",
+			        dataType : 'json',
+			        data:{'type':type},
+			        url : BASE_URL + '/admin/social/twitteruser',
+			        success : function(response) { 
+			        		 if(response.content==''){
+				        	 	$('#twInvitedUser').prepend('<div class="dashBlockEmpty">You have not invited anyone</div>');
+				       		 }else{
+								$('#twInvitedUser ul').html(response.content);
+								$('#twInvitedUser ul li .userPic img').imageLoader();
+							}
+			        }
+			    });
+
+         }else{
+         $('#detailsDialog').remove();
+	 	var htmlLightbox = '<div id="detailsDialog"  title="Twitter Followers">\
+	 							<div class="srcUsrWrapper">\
+										<div class="sprite searchIcon2"></div>\
+										<input type="text" id="userFatchList" class="userFatchList" onkeyup="javascript:filtersocailuser()"\ socialFriendlist="true"  placeholder="enter user name">\
+									<div class="srcUsrtotal" style="display:none;">43 <i>total</i></div>	\
+								</div>\
+                                <div id="datacollect" style="float:none"></div>\
+                                <div id="userInfoContainer"></div>\
+                            </div>';           
+        $('body').append(htmlLightbox);
+        $("#detailsDialog").dialog({
+            dialogClass:'detailsDialogBox',             
+            width:800,
+            title:'Invite Twitter followers',
+            height:500,             
+            open:function(){                
+              	//$fluidDialog();
+				$("#datacollect").html('');      
+				$('.ui-dialog-content').append('<div class="loaderOverlay2"></div>'); 									
+               $.ajax({
+			        type : "POST",
+			        dataType : 'json',
+			        data:{'type':type},
+			        url : BASE_URL + '/admin/social/twitteruser',
+			        success : function(response) { 
+			        	$('.ui-dialog-title').html('Invite Twitter followers');					
+		        		$('#userInfoContainer').html(response.content);
+		        		$('#userInfoContainer .follower-box .usImg img').imageLoader();			        	
+						$('.loaderOverlay2').remove();
+						$('.ui-dialog-buttonset').before(htmlCheckAll);
+			        }
+				});
+
+            },
+            buttons: {
+		        "Invite": function() {
+		        	
+					thisEl = $(this);
+					var userInfo = [];
+					$('input:checkbox[name=twitter]').each(function() 
+					{    
+						if($(this).is(':checked'))
+						userInfo.push($(this).val());
+					});
+					var stringuserInfo = userInfo.join();
+					
+					if(userInfo.length==0){
+						$messageError('Please select a user');
+						return false
+					}
+					
+					$.ajax({
+						type : "POST",
+						dataType : 'json',
+						data:{'stringuserInfo':stringuserInfo,'type':type},
+						url : BASE_URL + '/admin/social/twitterinvitation',
+						timeout : 3000,
+						success : function(response) {
+							$messageSuccess(response.message);
+							thisEl.dialog("close");
+							window.location.href=BASE_URL + "/admin/user/invitesocial";
+						}
+					});
+		        }
+		      }
+		});	
+	}
+
+}
+var htmlCheckAll = '<label class="checkAllUser">\
+							<input type="checkbox" value="" class="checkAllUser" name="checkAllUser" id="checkAllUser">\
+							<label for="checkAllUser"></label> Select All\
+						</label>\
+					<div class="pull-left" id="totalCheckUserPop">\
+						Total Selected: <span>0</span>\
+					</div>';
+
+function filtersocailuser()
+{
+        var sorting = $("input[socialFriendlist='true']").val();
+		var id = $("input[socialFriendlist='true']").attr('id');
+		$('input.checkAllUser').attr('checked', false);
+		var count = 0;
+			$("."+id).each(function(index) {		
+				if($(this).attr('title'))
+				{
+					 if($(this).attr('title').match(new RegExp(sorting, "i")))
+					 {
+						$(this).show("slow"); 
+						count++;
+					 }
+					 else{
+						$(this).hide("fast");
+					}
+				}
+			});
+
+			$('.srcUsrtotal').show();
+			$(".srcUsrtotal").html(count+' <i>total</i>');
+}	
+
+function facebookUser(type) {
+	 if(type=='preinvited'){
+	 			$.ajax({
+				        type: "POST",
+				        dataType : 'json',
+				        url: BASE_URL + "/admin/social/facebookfriends",
+				        data:{"type": type},
+				        success:function(result){
+				        if(result.return==''){
+				        	 $('#fbInvitedUser').prepend('<div class="dashBlockEmpty">You have not invited anyone</div>');
+				        }else{       
+					       $('#fbInvitedUser ul').html(result.return);
+					       $('#fbInvitedUser ul li .userPic img').imageLoader();
+					       }
+					          
+				        }   
+				    });
+	        	
+
+	        }else{
+	        	$('#detailsDialog').remove();
+	        	var htmlLightbox = '<div id="detailsDialog"  title="Facebook Friends">\
+	 							<div class="srcUsrWrapper">\
+										<div class="sprite searchIcon2"></div>\
+										<input type="text" id="userFatchList" class="userFatchList" onkeyup="javascript:filtersocailuser()"\ socialFriendlist="true"  placeholder="enter user name">\
+									<div class="srcUsrtotal" style="display:none;">43 <i>total</i></div>	\
+								</div>\
+                                <div id="datacollect" style="float:none"></div>\
+                                <div id="userInfoContainer"></div>\
+                            </div>';
+
+	        $('body').append(htmlLightbox);
+
+	        $( "#detailsDialog" ).dialog({
+	                dialogClass:'detailsDialogBox',             
+	                width:800,
+	                height:500,
+	                title:'Invite Facebook friends',           
+	                open:function(){                
+	                    //$fluidDialog();
+	                     $('.ui-dialog-content').append('<div class="loaderOverlay2"></div>'); 	     
+	                    $.ajax({
+						        type: "POST",
+						        dataType : 'json',
+						        url: BASE_URL + "/admin/social/facebookfriends",
+						        data:{"type": type},
+						        success:function(result){        
+							       $("#datacollect").html('');      
+				                                   
+						        	 $('#userInfoContainer').html(result.return);				                     
+				                     $('.loaderOverlay2').remove();
+				                     $('.ui-dialog-buttonset').before(htmlCheckAll);
+				                     $('#userInfoContainer .follower-box .usImg img').imageLoader();
+							          
+						        }   
+						    });
+	                    
+	                },
+	                buttons: {
+				        "Invite": function() {
+				        	
+				        	var facebookUserid = $('#facebookUserid').val();
+				        	var facebookUsername = $('#facebookUsername').val();
+							var userInfo = [];
+							var thisEl = $(this);
+							$('input:checkbox[name=FacebookInvite]').each(function() 
+							{    
+							if($(this).is(':checked'))
+								userInfo.push($(this).val());
+							});
+							var stringuserInfo = userInfo.join();
+							
+							if(userInfo.length==0){
+								$messageError('Please select a user');
+								return false
+							}
+							
+							$.ajax({
+								type : "POST",
+								dataType : 'json',
+								data:{'stringuserInfo':stringuserInfo,'type':type,'facebookUserid':facebookUserid,'facebookUsername':facebookUsername},
+								url : BASE_URL + '/admin/social/facebookinvite',
+								success : function(response) {
+									$messageSuccess("Invitation sent successfully");
+									thisEl.dialog("close");								
+									window.location.href=BASE_URL + "/admin/user/invitesocial";
+								}
+							});
+
+				        }
+				      }
+	        	});
+	        }
+   
+}
+
+</script>

@@ -1,0 +1,63 @@
+<h1 class="pageTitle">
+	
+	Admin user sets
+</h1>
+
+<div class="pageSubeTitlevip">This section allows you to create folders and add users from across the platform to them. Once you have identified users you wish to group you can create targeted advertising specificity for these users, directly message, invite to video broadcasts or events and invite them to take part in specific surveys or posts.</div>
+
+<div id="pageContainer" style="clear:both">
+
+	<div class="kcSidebar" id="grpUser">
+		<div class="kcSidebarHeader">
+		<h2><i class="fa fa-users fa-lg grpIconLarge"></i>Sets <a href="#"  class="pull-right btn btn-yellow btn-mini addnewgroup"><i class="fa fa-plus"></i> Add new</a></h2>
+		</div>
+		<div class="ksfolderlist">
+			<ul class="groupbox">
+			<?php 
+			if(count($this->data)>0){
+
+			foreach($this->data as $row): 
+				
+			echo '<li usergroupdetailId="'.$this->escape($row['ugid']).'" class="dgrpUrsName" id="grpid_'. $this->escape($row['ugid']).'">'. $this->escape(trim($row['ugname'])).' <div class="kcFolderOption"> <a href="javascript:void(0);" class="editFolder kc_editgroup"> <i class="fa fa-pencil"> </i>  </a> <a href="javascript:void(0);" class="removeFolder deleteList"> <i class="fa fa-times"> </i> </a> </div> </li>';
+
+			 endforeach;
+				}
+			?>	
+			</ul>
+		
+		</div>
+	</div>
+	<div class="kcRightPanel" id="grpRightListing">
+		<div class="kcRightHeader clearfix">
+			<div class="kcrightheaderTop clearfix">
+				<div class="pull-left cateName">
+				<i class="fa fa-folder-open fa-2x kcLargFolderGrp"></i> <span></span> 				
+				</div><div class="totalrec" style="float:right;"></div>
+			</div>			
+		</div>
+		<ul id="grpRightListinguL"></ul>
+	
+</div>
+
+	
+</div>
+<div id="dialog_confirm_group_delete" title="Remove Group"  style="display:none;">
+  <p id="Yes " style="color:red"><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 20px 0;color:red"></span>
+  	This set will be permanently deleted and cannot be recovered. Are you sure?</p>
+</div>
+<div id="usergroupDialog" title="Set"  style="display:none;">
+ 	<div id="beforecall"></div>
+	<form id="digForm">
+	<div class="formRow">	
+		<label class="label">set name</label>
+		<input type="text" name="ks_groupname" id="ks_groupname" class="fluid" />
+		<input type="hidden" name="ks_check" id="ks_check"   />
+	</div>
+	
+	</form>
+</div>
+<script type="text/javascript">
+var jsonuserdetails = '<?php echo $this->userdetails; ?>';
+//alert(jsonuserdetails);
+
+</script>

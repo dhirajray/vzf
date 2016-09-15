@@ -1,0 +1,103 @@
+<?php         
+$this->title = "Comments";
+$this->headTitle($this->title);
+$deshObj= new Admin_Model_Deshboard();
+$defaultimagecheck = new Admin_Model_Common();
+?>
+<style type="text/css">
+  
+</style>
+<h1 class="pageTitle dbeeViewAll">Twitter Comments   <!--<a href="#" class="btn btn-yellow btn-large" id="openSearchBlock"><i class="searchSprite searchIcon"></i> Search</a>--></h1>
+  
+
+<div class="box-body" id="box_body">
+  <div id="listingTotalResults" style="float:right;margin: 10px 35px 0 0;"></div>
+  <div id="beforecall" style=""></div>
+  <div class="clearfix"></div>
+  <div id="searchresultvis" style="display:none"></div>
+  <div id="showmore" style="display:none;text-align: center;">
+    <img src="<?php echo BASE_URL ?>/images/show.png" style="border:0" title="Show More" alt="Show More">
+  </div>
+  <?php if (count($this->paginator)) { echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml');  ?>
+      <div class="pageheadinusr">
+      <?php echo "Showing Page ". $this->page." of ".$this->totalpage;?> 
+      </div>
+      <div class="pageheadinusrlft">
+      <?php echo "Total Record ".$this->total;?> 
+      </div><?php }?>
+    <ul class="listing twitterComment scoredList" id="searchresulthide" >
+          <?php if (count($this->paginator)){ ?>
+
+          <?php foreach($this->paginator as $latestComment) :  ?>
+          <li>
+          <?php 
+              $viewcmm = '<a href="'.BASE_URL.'/admin/dashboard/postreport/m_-_xxp=t/'.base64_encode($latestComment['DbeeID']).'"> - Post Report </a>';  
+            $dbtype ='';  
+            $descDisplay  ='';
+          
+            $descDisplay  = '<div  class="dbTextPoll">'.$latestComment['DbeeText'].'</div>';//substr($latestComment->Comment,0,100).'</div>';
+           
+           
+             $checkcomuserpic = $defaultimagecheck->checkImgExist($latestComment['ProfilePic'],'userpics','default-avatar.jpg');
+            ?>
+            
+
+              <div class="listUserPhoto">
+    <img src="<?php echo IMGPATH.'/users/medium/'.$checkcomuserpic ?>" width="70" height="70" border="0" class="recievedUsePic"/>
+                <!--End User profile pic  who scored someone -->
+              </div>
+              <div class="dataListWrapper">
+                <div class="dataListbox">
+                  <div class="scoredListTitle">
+                    <a href="javascript:void(0)" class="show_details_user" userid="<?php echo $this->escape($latestComment['UserID']);?>"><?php echo $this->myclientdetails->customDecoding($this->escape($latestComment['Name'])).' '.$this->myclientdetails->customDecoding($this->escape($latestComment['lname']));?></a>
+                   </span><?php echo $viewcmm ?>                    
+                  </div>
+                  <div class="scoredData"><?php echo $descDisplay;?></div>
+                </div>
+                <div class="scoredPostDate">Total tweets - <?php echo $latestComment['totCommnets']; ?></div>
+                <?php
+
+                $TwitterCnts =  $this->myclientdetails->getfieldsfromjointable(array( 'CommentID','Comment','TwitterComment'),'tblDbeeComments',array('DbeeID'=>$latestComment['DbeeID']),array('UserID','Name','ProfilePic'),'tblUsers','UserID','UserID');
+
+                foreach($TwitterCnts as $val) {
+                  //print_r($val);
+                  if($val['TwitterComment']!='')
+                  {
+                    $comuserpic = $defaultimagecheck->checkImgExist($latestComment['ProfilePic'],'userpics','default-avatar.jpg');
+                    ?>
+
+                      <div class="comment-list" id="comment-block-461">
+                        <div class="cmntPrpic">
+                          <a class="cmntuserLink" title="" ><img border="0" src="<?php echo IMGPATH.'/users/small/'.$comuserpic ?>" width="42" height="42"></a>
+                        </div>
+                        <div class="dbcomment-speechwrapper" id="dbcomment-speechwrapper">
+                        <div class="cmntPrpLnks"><strong><?php echo $this->myclientdetails->customDecoding($val['Name']) ?></strong>&nbsp;<?php echo $val['Comment'] ?>
+                        </div>
+                        <div class="next-line"></div><br style="clear:both">
+                        <div class="twitter-post-tag-comments" id="tweet-block-461">
+                          <i class="fa dbTwitterIcon fa-3x"></i>
+                          <div class="twitterCommentReplyBox">
+                              <?php echo $val['TwitterComment'] ?>                           
+                          </div><br style="clear:both">
+                        </div>
+                        <div class="next-line"></div>
+                        </div></div>
+                    <?php
+                  }
+                }
+                ?> 
+      
+          </li>
+          <?php $rowchange++; endforeach; ?>
+          
+  <?php } else { ?>
+  <p style="position:relative; top:100px;" class="dashBlockEmpty">no comments found</p>
+  <?php } ?>
+  </ul>
+</div>  
+
+<?php 
+  /*
+   * Print the pagination of type
+   */
+ echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml');  ?>

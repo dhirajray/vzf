@@ -1,0 +1,212 @@
+<?php
+/**
+ * Login page view
+ *  
+ * @author Deepak Nagar
+ */
+$form = $this->chkform;
+if($form=='registration' && $this->accountexist==0)
+{
+	?>
+	<h3 class="registrationTitle">Admin account registration</h3>
+	<?php 
+	if (!empty($this->message)) {
+		echo '<font color="red">';
+		echo $this->escape($this->message[0]);
+		echo '</font>';
+	}
+
+	$this->form->setName('login')
+	           ->setAction(BASE_URL.'/admin/registration')
+	           ->setMethod('post')
+	           ->setAttrib('enctype', 'multipart/form-data');
+	echo $this->form; 
+	?> 
+	
+	<div class="clearfix"> </div>
+	<style type="text/css">
+	.confirmdetails{ padding: 10px; font-size: 14px;	}
+	.confirmdetails span{font-size: 12px; color:#ccc; font-style:italic;}
+	</style>
+	<script type="text/javascript" src="<?php echo BASE_URL ?>/js/strength.js"></script>
+	<script type="text/javascript">
+
+		function IsEmail(email) {
+		  var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+		  return regex.test(email);
+		}
+
+		function validateDate(dob) {
+		  var regex2 = /^([0-9]{2})-([0-9]{2})-([0-9]{4})$/;
+		  return regex2.test(dob);
+		}
+		
+		$(document).ready(function(){
+			
+			 $('#password').strength({
+                strengthClass: 'strength',
+                strengthMeterClass: 'strength_meter',
+                strengthButtonClass: 'button_strength',
+                strengthButtonText: '',
+                strengthButtonTextToggle: ''
+            });
+
+			$('.registrationTitle').closest('.LoginWrapper').addClass('registrationOneTimeBlock');
+			$('.registrationOneTimeBlock button[type="submit"]').show().html('<i class="fa fa-user fa-lg"></i> Register');
+			$('.registrationOneTimeBlock button[type="submit"]').click(function(){
+					var errorTotal  = $('.registrationOneTimeBlock .errors').size();
+					var errorRegistration = 0;
+					$('#detailsDialog').remove();
+					//alert($('#username').val());
+					 
+					uname = $.trim($('#username').val());// ? '<span >can not be empty </span>' : $('#username').val();
+					email = $.trim($('#email').val()); // ? '<span >can not be empty </span>' : $('#email').val();
+					pwd = $.trim($('#password').val()); // ? '<span >can not be empty </span>' : '<span >as set by you </span>';
+					cpwd = $.trim($('#password_confirm').val());
+					gender = $.trim($('#Gender option:selected').text()); // ? '<span >can not be empty </span>' : $('#Gender option:selected').text();
+					dob = $.trim($('#dob').val()); // ? '<span >can not be empty </span>' : $('#dob').val();
+
+					quetion = $.trim($('#quetion option:selected').text());//=='') ? '<span >can not be empty </span>' : $('#quetion option:selected').text();
+					answer = $.trim($('#answer').val());//=='') ? '<span >can not be empty </span>' : $('#answer').val();
+					
+					if(uname!='')
+					{
+						ulen = uname.length;
+						if(ulen<5)
+						{
+							uMsg ='<span >username should 5 characters long </span >';
+							errorRegistration++;
+						} else
+						{
+							var hasSpace = uname.indexOf(' ')>=0;
+							if(hasSpace) {errorRegistration++; uMsg ='<span >Username has space </span >';}
+							else uMsg = uname;
+
+						}
+					} else { errorRegistration++;uMsg ='<span >can not be empty </span>';}
+					
+					if(email!='')
+					{
+						elen = IsEmail(email);
+						if(elen==false)
+						{
+							eMsg ='<span >email not valid </span >';
+							errorRegistration++;
+						} else
+						{
+							eMsg = email;
+						}
+					} else { errorRegistration++; eMsg ='<span >can not be empty </span>';}
+					
+					if(pwd!='' && cpwd!='')
+					{
+						plen = pwd.length;
+						if(plen<5)
+						{
+							pMsg ='<span >min length is 5 </span >';
+							errorRegistration++;
+						} else
+						{
+							if(pwd==cpwd) pMsg = '<span >as set by you </span>';
+							else { errorRegistration++; pMsg = '<span >password does not matched </span>';}
+						}
+					} else { errorRegistration++; pMsg ='<span >can not be empty </span>';}
+					
+					if(answer!='')
+					{
+
+						alen = answer.length;
+						if(alen<1)
+						{
+							aMsg ='<span >Answer can not be empty </span >';
+							errorRegistration++;
+						} else
+						{
+							var hasSpace = answer.indexOf(' ')>=0;
+							if(hasSpace) {errorRegistration++; aMsg ='<span >Answer has space </span >';}
+							else aMsg = answer;
+						}
+					} else { errorRegistration++; aMsg ='<span >can not be empty </span>';}	
+
+					if(dob!='')
+					{
+						mdob = validateDate(dob);
+						if(mdob==false)
+						{
+							dMsg ='<span >should be in DD-MM-YYYY format </span >';
+							errorRegistration++;
+						} else dMsg = dob;
+						
+					} else { errorRegistration++; dMsg ='<span >can not be empty </span>'};		
+
+					//return false;
+	    			var htmlLightbox = '<div id="detailsDialog"  title="Confirm details">\
+		                <div id="userInfoContainer"><div class="confirmdetails"> <strong>Username</strong> - '+uMsg+'</div><div class="confirmdetails"> <strong>Email</strong> - '+eMsg+'</div><div class="confirmdetails"> <strong>Password</strong> - '+pMsg+'</div><div class="confirmdetails"> <strong>Security Question</strong> - '+quetion+'</div><div class="confirmdetails"> <strong>Answer</strong> - '+aMsg+'</div><div class="confirmdetails"> <strong>Gender</strong> - '+gender+'</div><div class="confirmdetails"> <strong>D O B</strong> : '+dMsg+'</div></div>\
+		              </div>';
+
+
+  					$('body').append(htmlLightbox);
+  					var errorClass = '';
+  					var titlePopup ='Please confirm your details';
+  					if(errorRegistration!=0){
+  						errorClass = 'registrationDialogboxError';
+  						titlePopup ='Oops,  something has gone wrong with your registration';
+  					}
+
+				  	$("#detailsDialog" ).dialog({
+				        dialogClass:'registrationDialogbox '+errorClass,             
+				        width:430,
+				        modal: true,
+				        height:400,
+				        resizable:false,  
+				        title:titlePopup,
+				        open:function(){                
+				        	if(errorRegistration!=0){
+			  						$('.ui-dialog-buttonset button:first').remove();
+			  					}
+				        },
+				        buttons: {
+				          "Confirm": function() {
+				          	$( this ).dialog( "close" );
+				          	   $('#mesageNotfiOverlay').remove();
+				        		$('body').append('<div id="mesageNotfiOverlay" class="loaderOverlay3"> </div>')	;				        		
+				    			$('#mesageNotfiOverlay').html('<div class="msgNoticontent">\
+				    				<div class="loaderShow">\
+				    					<span class="loaderImg"></span><br>\
+				    					Verifying...\
+				    				</div>\
+				    			Your details are being verified.<br><strong></strong>You will be redirected to your dashboard on successful verification.<br>\
+				    				<div class="progressBarWrp" style="margin-top:20px;" data-loaded=""><div class="progressBar" ></div></div>\
+				    			</div>');
+				    			$('#mesageNotfiOverlay .progressBar').animate({width: '100%'}, 5000,function(){$('#mesageNotfiOverlay .progressBarWrp').attr('data-loaded', '100%')});
+				        	setTimeout(function(){
+				        		$('#login').submit();
+				        	}, 5000)
+				        	
+
+				          },
+				          Close: function() {
+				            $( this ).dialog( "close" );
+				             
+
+				          }
+				        }
+				  	});
+				return false;
+			})
+
+		});
+	</script>
+	<?php 
+} else { ?>
+	<script type="text/javascript">
+			$(function(){
+				$('.LoginWrapper').addClass('accountAlreadyCreated');
+			});
+	</script>
+	<h3>Administrator account already created.</h3>
+	
+	<div class="forgetPass"><a href="<?php echo BASE_URL ?>/admin/login" class="forgetPass bcktopLogin" style=" margin-top: 9px;"> << Back to log in</a></div>
+	<div class="clearfix"> </div>
+
+<?php } ?>

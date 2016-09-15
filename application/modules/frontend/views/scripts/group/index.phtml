@@ -1,0 +1,185 @@
+<script>
+$(function() {
+dashboardprofile('<?php echo $this->userid;?>',1);
+
+<?php if(Zend_Controller_Front::getInstance()->getRequest()->getParam('viewall')==1){ ?>
+
+loadallgroups('<?php echo $this->userid ;?>',<?php echo $this->member;?>,<?php echo $this->vip;?>);
+<?php } else { ?>	
+loadmygroups('<?php echo $this->userid ;?>',<?php echo $this->member;?>,<?php echo $this->vip;?>);
+<?php } ?>
+fetchadvert();
+$('#toggle-twitter-asearch').click(function(){
+	$(".slidingTwitterSearch").slideToggle('fast');
+	if(document.getElementById('toggle-twitter-asearch').className=='twitter-search-arrow-closed')
+		document.getElementById('toggle-twitter-asearch').className='twitter-search-arrow-open';
+	else
+		document.getElementById('toggle-twitter-asearch').className='twitter-search-arrow-closed'
+});
+});
+
+// Create the tooltips only on document load
+function createdrop(start,end) {
+	for(i=start;i<=end;i++) {
+		dropdowncontent.init("scorecomment"+i, "left-bottom", 100, "mouseover");
+	}
+}
+	$(window).scroll(function(){
+		//var feedtype=document.getElementById('feedtype').value;
+		if  ($(window).scrollTop() == $(document).height() - $(window).height()) {
+			if(feedtype=='mydbs') {
+				var totaldbees=document.getElementById('totaldbees').value;
+				if(totaldbees>5) {
+					var mystart=document.getElementById('startnewmydb').value;
+					seemoremyfeeds(mystart,5);
+				}
+			}
+			else if(feedtype=='myredbs') {
+				var totalredbees=document.getElementById('totalredbees').value;
+				if(totalredbees>5) {
+					var mystart=document.getElementById('startnewmyredb').value;
+					seemoremyfeeds(mystart,5); 
+				}
+			}
+			else if(feedtype=='mycomments') {
+				var mystart=document.getElementById('startnewmycomments').value;
+				seemoremycomments(mystart,5,<?php echo $this->userid;?>);
+			}
+		}
+		
+	});
+
+// Create the tooltips only on document load
+function load_qtip(apply_qtip_to)
+{
+   // Notice the use of the each() method to acquire access to each elements attributes
+   $(apply_qtip_to).each(function()
+   {
+      $(this).qtip({
+         content: $(this).attr('tooltip'), // Use the tooltip attribute of the element for the content
+         style: 'dark' // Give it a crea mstyle to make it stand out
+      });
+   });
+}
+</script>
+
+<input
+	type="hidden" id="groupsec" value="groupsec0">
+<input
+	type="hidden" id="profileuser" value="<?php echo $this->userid;?>">
+<div id="filtercat" value="" style="float: left;margin-left: 21px;padding-top: 0;width: 49.5%;"></div>
+<div id="leftListing" class="groupViewListing">
+<?php if(Zend_Controller_Front::getInstance()->getRequest()->getParam('viewall')!=1){ ?>
+	<div class="dashboarprofleWrp" id="dashboarduserDetails"></div>
+	<div class="tabLinks">
+		<?php
+
+		if(Zend_Controller_Front::getInstance()->getRequest()->getParam('member')==1)
+		{
+			$cratedactive='';
+		    $memberactive='active';
+		}else
+		{
+			$cratedactive='active';
+		    $memberactive='';
+		}
+		?>
+		<ul>
+			<!-- <li>
+			<a href="<?=BASE_URL?>Group/index/viewall/1" id="AllGroups" class="pull-left">All Groups</a>
+			</li> -->
+			<li>
+			<a href="<?=BASE_URL?>/Group" id="xxgrpCreated" class="pull-left <?=$cratedactive?>">Created</a>
+			</li>
+			<li>
+			<a href="<?=BASE_URL?>/Group/index/member/1" id="grpmemberof" class="group-memgroups pull-left <?=$memberactive?>">Member of</a>
+			</li>
+		</ul>
+		
+		<!-- <a href="<?=BASE_URL?>/Group" class="pull-left active"><span>Created</span></a> -->   
+		<?php 
+		$sessionrole = $_SESSION['Zend_Auth']['storage']['role'];
+		if($this->creategrpglobal==1 || $sessionrole==1) { ?>
+		<a href="javascript:void(0);" style="margin-left:5px;"  class="group-creategroups btn btn-yellow btn-mini pull-right"><span><i class="fa fa-plus"></i> Create a Group</a</span></a>
+		<?php } ?>
+
+		<a href="javascript:void(0);" id="search-groups" class="btn btn-yellow btn-mini pull-right"><span><i class="fa fa-search"></i> Search</span></a>&nbsp;&nbsp;
+		
+	</div>
+   <?php } ?>
+
+	<ul class="postListing" id="my-dbees"></ul>
+</div>
+<div id="rightListing" class="rssFeedRightContainer" style="">
+<?php 
+if($this->userid){
+$rightmenu = $this->partial('partials/rightmenu.phtml', array('userid' => $this->dbeeuser,'myclientdetails' => $this->myclientdetails,'eventglobal'=>$this->eventglobal));
+			echo $rightmenu; 
+ }
+?>
+</div>
+<div class="clearfix"></div>
+<?php
+$redirection_name_space = new Zend_Session_Namespace('User_Session');
+$groupid = $redirection_name_space->mygroupid;
+if($_GET['invite']=='twitter'){
+	?>
+<script type="text/javascript">
+$(function() {
+ TwitterInviteFriendsprofilegroup(<?php echo $groupid ;?>);
+ });
+</script>
+<?php }  ?>
+<?php if($_GET['invite']=='linkedin') { 
+	$groupid = $redirection_name_space->mygroupid;
+	?>
+
+<script type="text/javascript">
+
+$(function() {
+  linkedinUserProfilegroup('#test',<?php echo $groupid ;?>);  
+
+});
+
+</script>
+
+<?php } ?>
+<script type="text/javascript">
+
+$(function() {
+    
+  $('body').on('click','.show_more_main',function(){
+  
+        var thisEl  = $(this);       
+        var moreEl = $('.show_more', thisEl);
+        var ID = moreEl.attr('id'); 
+        moreEl.hide();
+        $('.loding').show();
+
+        var URL = BASE_URL + '/group/allgroups';
+        $.ajax({
+            type:'POST',
+            url:URL,
+            data: {'lastId': ID},
+            data: {
+            "user": "<?php echo $this->userid ;?>",
+            "memberof": 0,
+            "type": 0,
+            'lastId': ID
+       		 },
+            success:function(response){
+                
+	            $('#xxgrpCreated').removeClass('active');
+	            $('#grpmemberof').removeClass('active');
+	            $('#AllGroups').addClass('active');	            
+	            $('#my-dbees').append(response.content);
+	            $('body').addClass('activeAllGroups');
+                thisEl.remove();                 
+            }
+        }); 
+    });
+
+});
+
+</script>
+<input type="hidden" id="feedtype">

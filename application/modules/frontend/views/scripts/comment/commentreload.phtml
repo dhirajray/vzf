@@ -1,0 +1,307 @@
+<?
+$sen_comments	= new Application_Model_Comment();
+$commonbynew 	=	new Application_Model_Commonfunctionality();
+
+$loggedin=true;
+
+if(!$this->user) 
+	$loggedin=false;
+
+$user=$this->user;
+
+if($seemore=='1') setcookie("CookieFeedEndOnReload", $startnew, time()+3600);
+
+$return='';
+
+$isPoll=false;
+
+// CHECK IF DB IS BEING VIEWED BY DB OWNER
+
+$i=1;
+
+	$row=$this->row;
+    //echo'<pre>';print_r($row);die;
+	$dbeeUser=$row['User'];
+
+	if($row['Type']=='5') $isPoll=true;	
+
+	// CHECK IF DB OWNER
+
+	$cookieuser=$this->user;
+
+	if($cookieuser==$dbeeUser) $DbOwner=true;
+
+	else $DbOwner=false;	
+
+$i=1;
+
+$startnew = $this->startnew;
+
+if($this->commenttotal) {
+
+	$startnew = $this->startnew;
+
+	$counter=1;
+
+	$return.='';
+	if(!isset($this->reload)) $return.='';
+
+	foreach($this->commentrow as $row):
+		 $userinfo = $this->msguserhelper($row['UserID']);
+		if($row['UserID']==$user) $ProfileHolder=true;
+
+		else $ProfileHolder=false;
+		/***********************for comment scoring*************************/
+
+				 $profile= new Application_Model_Profile();
+
+				 $totalLikecmm = $profile->totalikesdbeecmm($row['CommentID'],'2',$row['DbeeID']);
+
+				 $totalLovecmm = $profile->totalikesdbeecmm($row['CommentID'],'1',$row['DbeeID']);
+
+				 $totalPhilcmm = $profile->totalikesdbeecmm($row['CommentID'],'3',$row['DbeeID']);
+
+				 $totalDislikecmm = $profile->totalikesdbeecmm($row['CommentID'],'4',$row['DbeeID']);
+
+				 $totalHatecmm = $profile->totalikesdbeecmm($row['CommentID'],'5',$row['DbeeID']);
+
+				$commentScore='';
+
+				if($totalLovecmm>0) $commentScore.=$totalLovecmm.' '.$this->myclientdetails->ShowScoreIcon($this->post_score_setting[1]['ScoreIcon1']);
+				if($totalLikecmm>0) $commentScore.=$totalLikecmm.' '.$this->myclientdetails->ShowScoreIcon($this->post_score_setting[2]['ScoreIcon2']);
+				if($totalPhilcmm>0) $commentScore.=$totalPhilcmm.' '.$this->myclientdetails->ShowScoreIcon($this->post_score_setting[4]['ScoreIcon4']);
+				if($totalDislikecmm>0) $commentScore.=$totalDislikecmm.' '.$this->myclientdetails->ShowScoreIcon($this->post_score_setting[3]['ScoreIcon3']);
+
+		$myScore='';
+
+			if($loggedin) 
+			{
+	            $scoringRow = $this->Scoringhelper($row['CommentID'],$user);
+				if($scoringRow) { 
+					if($scoringRow['Score']=='1') $myScore='you scored&nbsp;&nbsp;<i class="scoreSprite scrollSmallIcons scoreLove"></i> | ';
+					if($scoringRow['Score']=='2') $myScore='you scored&nbsp;&nbsp;<i class="scoreSprite scrollSmallIcons scoreLike"></i> | ';
+					//if($scoringRow['Score']=='3') $myScore='you scored&nbsp;&nbsp;<i class="scoreSprite scrollSmallIcons scorePhilosopher"></i> | ';
+					if($scoringRow['Score']=='4') $myScore='you scored&nbsp;&nbsp;<i class="scoreSprite scrollSmallIcons scoreDislike"></i> | ';
+					if($scoringRow['Score']=='5') $myScore='you scored&nbsp;&nbsp;<i class="scoreSprite scrollSmallIcons scoreHate"></i> | ';
+				}
+			}
+
+
+				$where      = array(
+                        'DbeeID' => $row['DbeeID']
+                    );
+                    $dbeedetail = $this->myclientdetails->getRowMasterfromtable('tblDbees', array(
+                        'events',
+                        'GroupID'
+                    ), $where);
+                    
+                    
+                    $ParrentId   = $row['DbeeID'];
+                    $ParrentType = 0;
+                    
+                    if ($dbeedetail['events'] != 0 && $dbeedetail['events'] != '') {
+                        $ParrentId   = $dbeedetail['events'];
+                        $ParrentType = '2';
+                    }
+                    if ($dbeedetail['GroupID'] != 0 && $dbeedetail['GroupID'] != '') {
+                        $ParrentId   = $dbeedetail['GroupID'];
+                        $ParrentType = '1';
+                        
+                    }
+                    
+                    $ArticleId   = $row['DbeeID'];
+                    $UserID      = $row['UserID'];
+                    $ArticleType = 1;
+                    $CommentId   = $row['CommentID'];
+                    
+                    $dbeeobj     = new Application_Model_Dbeedetail();
+                    $recordfound = $dbeeobj->CheckInfluence($UserID, $ParrentId, $ParrentType, $ArticleId, $ArticleType, $userid, $CommentId);
+                    
+                    
+                    if (count($recordfound) < 1) {
+                        $bulb = '<i class="fa fa-lightbulb-o comntBulb" rel="dbTip" title="Add to my Influence list" style="display:none"></i>';
+                    } else {
+                        $bulb = '<i class="fa fa-lightbulb-o comntBulb" rel="dbTip" title="Remove from my Influence list" style="display:none"></i>';
+                    }
+                    
+                    $bulb = '';	
+
+				$ago =  $commonbynew->Commentagohelper($this->escape($row['CommentDate']));
+				$profilelinkstart=''; $profilelinkend='';
+
+				$qantype = '';
+				$qanHtml = '';
+				$propqa = '';
+				if($row['QNATYPE']==1)
+				{
+					$qantype ='moveAantype';
+					$propqa =' propqa ';
+					$qanHtml= '<span class="moveQaIconBox">Q&A</span>';
+					$anstxt='<span style="font-weight:bold;">answered:</span>';
+				} else $anstxt='';
+
+				if($row['Status']==1 && $loggedin) 
+			 	{ 
+					$profilelinkstart='<a href="'.BASE_URL.'/user/'.$this->myclientdetails->customDecoding($row['Username']).'" class="cmntuserLink">';
+					$profilelinkend='</a>';
+				} 
+				else if($loggedin)
+				{ 
+					$profilelinkstart='<a href="javascript:void(0)" class="profile-deactivated" title="'.DEACTIVE_ALT.'" onclick="return false;">';
+					$profilelinkend='</a>';
+				} 
+		 
+		 
+				if($counter%2==0) $oddeven='commenteven'; else $oddeven='commentodd';
+	
+			
+				$checkImage = new Application_Model_Commonfunctionality();
+                $pic1 = $checkImage->checkImgExist($userinfo['ProfilePic'],'userpics','default-avatar.jpg');
+				if($row['usertype']==100 && $session['usertype']!=100) {
+				$return.='<div id="comment-block-'.$row['CommentID'].'" class="comment-list notqa '.$qantype.'  " '.$no_bottom_border.'>'.$qanHtml.'<div class="cmntPrpic"><img src="'.IMGPATH.'/users/small/'.VIPUSERPIC.'" width="42" height="42" border="0" /></div>';
+			 }
+			 else
+			 {
+			 	$return.='<div id="comment-block-'.$row['CommentID'].'" class="comment-list notqa '.$qantype.'  " '.$no_bottom_border.'>'.$qanHtml.'<div class="cmntPrpic">'.$profilelinkstart.'<img src="'.IMGPATH.'/users/small/'.$pic1.'" width="42" height="42" border="0" />'.$profilelinkend.'</div>';
+			 }
+
+				 if (($user != $UserID && $user != '' && $UserID != adminID && $row['QNATYPE'] == 0) || ($UserID == adminID && $user && $row['QNATYPE'] == 0)) // if user see ur self post or comment
+                        {
+                        $return .= '<div class="comntRelBox"><a style="margin-left:15px; margin-top:10px;" href="javascript:void(0);" onclick="influence(' . $UserID . ',' . $ParrentId . ',' . $ParrentType . ',' . $ArticleId . ',' . $ArticleType . ',' . $CommentId . ',this);">' . $bulb . '<span class="comntInflTxt" style="display:none">Influential</span><a/></div>';
+             }
+
+
+                $userTypenal = $commonbynew->checkuserTypetooltip($userinfo['usertype']);
+                if($row['usertype']==100 && $session['usertype']!=100) {
+				$return.='<div id="dbcomment-speechwrapper" class="dbcomment-speechwrapper"><div class="cmntPrpLnks '.$propqa.'" title="'.$userTypenal.'"><strong>'.VIPUSER.'</strong>'.$anstxt;
+			}else
+			{
+				$return.='<div id="dbcomment-speechwrapper" class="dbcomment-speechwrapper"><div class="cmntPrpLnks '.$propqa.'" title="'.$userTypenal.'">'.$profilelinkstart.$this->myclientdetails->customDecoding($row['Name']).' '.$this->myclientdetails->customDecoding($row['lname']).$profilelinkend.$anstxt;
+			}
+				if($isPoll)	$return.='&nbsp;<span style="font-weight:bold;">voted '.$this->optiontxthelper($row['UserID'],$row['DbeeID']).'</span>';
+
+				if($row['Comment']!='') 
+				{
+					if($isPoll && $this->PollComments_On_Option==5)
+                    {
+                     $return.='&nbsp;';
+                    }
+                    else
+                    {
+                      $return.='&nbsp;'.$sen_comments->convert_clickable_links($row['Comment']);
+                    }
+                    $return .='</div>';
+					
+					if($row['parentid']!=0)
+					{	
+						$divcontainer = $sen_comments->getallcommentsfromcommentid($row['parentid'],$row['CommentID'],$row['QNATYPE']);
+						$return.='<div class="parentcomment" >'.$divcontainer.'</div>';
+					}
+				}
+				if($row['Pic']!='') {
+					$checkImage = new Application_Model_Commonfunctionality();
+                    $pic2 = $checkImage->checkImgExist($row['Pic'],'imageposts','default-avatar.jpg');
+							$return.='<div class="clear"> </div><div class="cmntPhotoWrp" popup="true"  popup-image="'.$row['Pic'].'" style="position:relative; "><img src="'.IMGPATH.'/imageposts/small/' . $Pic2 . '" /><i class="fa fa-search-plus"></i></div>';
+					}
+				if($row['LinkTitle']!='') {
+					$checkImage = new Application_Model_Commonfunctionality();
+                    $pic3 = $checkImage->checkImgExist($row['LinkPic'],'results','linkimage.png');
+						$return.='<div class="clear"> </div><div class="makelinkWrp">
+						        	<img border="0" src="'.BASE_URL.'/timthumb.php?src=/results/'.$pic3.'&amp;q=100&amp;w=80&amp;h=80">
+						        	<div class="makelinkDes">
+							        	<h2>'.$row['LinkTitle'].'</h2>
+							       	 	<div class="desc">'.$this->myclientdetails->dbSubstring($this->myclientdetails->escape($row['LinkDesc']),'100','...').'</div>
+							        	<div class="makelinkshw"><a href="'.$row['Link'].'" target="_blank">'.$row['Link'].'</a></div>
+						        	</div>
+						        </div>';
+					}
+					if($row['Vid']!='') 
+					{
+							if($row['VidSite']=='Youtube')
+								$VideoThumbnail='
+							<div class="youTubeVideoPost" popup="true">
+								<a class="yPlayBtn" href="#">
+									<i class="fa fa-play-circle-o fa-5x"></i>
+								</a>
+								<a href="javascript:void(0);">
+									<img src="http://i.ytimg.com/vi/'.$row['VidID'].'/1.jpg" video-id="'.$row['VidID'].'" width="80" height="80" border="0" />
+								</a>
+							</div>
+							';
+
+							$return.='<div class="clear"></div><div class="makelinkWrp">
+							
+						        	'.$VideoThumbnail.'
+						        	<div class="makelinkDes">
+							        	<h2>'.$row['VidTitle'].'</h2>
+							       	 	<div class="desc">'.$this->myclientdetails->dbSubstring($this->myclientdetails->escape($row['VidDesc']),'100','...').'</div>
+						        	</div>
+						        </div>';
+					}	
+				
+				if($row['Audio']!='') {
+					$atag='<a href="javascript:seeaudio(\''.$row['CommentID'].'\');">';
+					$VideoThumbnail='<img src="/images/soundcloud.png">';
+					$mediaicon='<div class="icon-soundcloud" style="margin:3px 20px 0 -30px; height:30px;"></div>';
+				}
+			if($row['TwitterComment']!='') {
+				$return.="<div class='next-line'></div><div id='tweet-block-".$row['CommentID']."' class='twitter-post-tag-comments'><div style='float:left; color:#29b2e4'><i class='fa dbTwitterIcon fa-4x'></i></div>".str_replace('%26','&',$row['TwitterComment'])."";
+				$return.="<br style='clear:both'></div>";
+			}
+			$return.='<div class="next-line"></div><div class="ftrCmnt"><div style="float:left;">'.$ago.'</div>';
+			if($this->plateform_scoring==0){
+			$return.='<div class="cmntScreFt">'.$commentScore.'</div>';
+		}
+
+				if(!$ProfileHolder && $row['QNATYPE']==0) 
+				{
+					if($loggedin) 
+					{
+						$scoroff = '<span class="commentscore scroreDivOnTop  dropDown" commentID="' . $row['CommentID'] . '" id="scorecomment' . $counter . '" >
+							score <ul class="dropDownList right">
+	                               
+	                                <li> <a href="javascript:void(0)" onclick="javascript:scoredbee(2,\'like\',2,' . $row['CommentID'] . ');" id="like-dbee"><i class="fa fa-thumbs-up fa-flip-horizontal fa-lg"></i> like <strong class="pull-right"></strong></a></li>
+	                                <li> <a href="javascript:void(0)" onclick="javascript:scoredbee(4,\'dislike\',2,' . $row['CommentID'] . ');" id="dislike-dbee"><i class="fa fa-thumbs-down fa-flip-horizontal fa-lg"></i> dislike <strong class="pull-right"></strong></a></li></ul></span>';
+	                                
+							$scoreme = ($this->plateform_scoring==0)? $scoroff : '';
+							$return.='<div class="ftrCmntRight">';
+
+							if($isPoll && $this->PollComments_On_Option==5)
+		                    {
+		                     $return.='&nbsp;';
+		                    }
+		                    else
+		                    {
+							$return.=$scoreme.'<a href="javascript:void(0);" class="report-abusetwo" dbid="'.$row['DbeeID'].'" type="2" commentID="'.$row['CommentID'].'" >report</a> ';
+						    }
+
+							if($isPoll==0)
+								$return.=' <a href="javascript:void(0);" class="replytocomment"  cmntowner="'.$row['UserID'].'" dbid="'.$row['DbeeID'].'" commentID="'.$row['CommentID'].'">reply</a>';
+					
+							$return.='</div><div id="comment-score'.$row['CommentID'].'" class="ftyscre">'.$myScore.'</div>';
+
+							if($isPoll==0)
+								$return.='<div class="replymebox" id="replymebox'.$row['CommentID'].'"></div>';
+					}
+				}
+				else if((!$isPoll && $row['QNATYPE']==0 && $this->user == $row['UserID'] && $this->user!='') || (adminID == $this->user && $this->user!='') || ($row['QNATYPE']==1 && $this->user ==$dbeeUser && $this->user!='')) 
+				{ 
+					$return.='<div class="ftrCmntRight"><a href="javascript:void(0)" islatestComment="'.$counter.'" class="removeComment"  comment_ids ="'.$row['CommentID'].'" >remove</a></div>';
+				}
+				else $return.='<br style="clear:both; font-size:1px;" /></div>';
+
+				$return.='</div><input type="hidden" id="commentsortorder"><input type="hidden" id="currcommentsortorder"></div></div></div>';
+		$counter++;
+	endforeach;
+
+		$return.='<div id="see-more-comments'.$startnew.'"><div id="more-comments-loader" style="padding:10px; cursor:pointer; color:#333333; text-align:center;" onclick="javascript:seemorecomments(20,20,'.$db.');">'.$seemorelabel.'</div></div>';
+}
+
+else 
+	$return.='<div class="noMoreComments">This post has no comments.</div>';
+if(!$this->reload==1)
+	echo $return.'~#~'.$startnew.'~#~'.$this->order.'~#~'.$this->order.'~#~'.$this->commenttotalNew;
+else
+	echo $return;
+
+?>

@@ -1,0 +1,531 @@
+<?php
+
+$sen_comments = new Application_Model_Comment(); // created for sentiments, @Deepak
+$commonbynew  = new Application_Model_Commonfunctionality();
+
+if ($this->checkdbeeexist > 0 && $this->Active == 1) {
+    $storage        = new Zend_Auth_Storage_Session();
+    $data           = $storage->read();
+    $userlogincheck = $data['UserID'];
+    $loggedin       = true;
+    if (!$this->loginid)
+        $loggedin = false;
+    if ($loggedin)
+        $userloggedin = '1';
+    else
+        $userloggedin = '0';
+    $userid = $this->loginid;
+    if ($loggedin) {
+        $userdet    = new Application_Model_DbUser();
+        $rowuserall = $userdet->userdetailall($userid);
+        //echo'<pre>';print_r($rowuserall[0]['ProfilePic']);
+    }
+    $dbeeUser      = $this->row['User'];
+    $noTwitterFeed = '';
+    $row           = $this->row;
+    if ($row['TwitterTag'] != '' && $this->Social_Content_Block != 'block') {
+        $TwiTagval = '<span class="twitterlistingHas"><i class="sprite twlistingHasIcon"></i>' . htmlentities($row['TwitterTag']) . '</span>';
+    }
+    
+    $userStatus = $this->row['Status'];
+    $imgH       = '183px';
+    $db         = $this->db;
+    
+    setcookie('dbforusrsrch', $db, time() + 3600);
+    if ($this->db == '')
+        $db = 0;
+    $user   = $this->row['UserID'];
+    $return = '';
+    $video  = false;
+    $audio  = false;
+    $isPoll = 0;
+    if ($userid == $dbeeUser) {
+        $ProfileHolder = true;
+    } else {
+        $ProfileHolder = false;
+    }
+    if (!$ProfileHolder && $loggedin) {
+        if ($this->followedby) {
+            $follow       = 1;
+            $followstring = "Unfollow";
+        } else {
+            $follow       = 0;
+            $followstring = "Follow";
+        }
+    } else
+        $follow = -1;
+    //$ago= $this->agohelper($this->escape($row['CommentDate']));
+    // CALCULATE DBEE AGE
+    if (strlen($ProfileUser) > 15)
+        $smallfont = ' font-size:14px;';
+    else
+        $smallfont = '';
+    // CALCULATE PROFILE PIC DIMENTIONS FOR IMAGE DIV
+    if ($this->TotalComments > 0)
+        $commentsText = $this->TotalComments . ' ';
+    else
+        $commentsText = $this->TotalComments . ' ';
+    // INITIALIZE SCORE DBEE DIV
+    // INITIALIZE SCORE DBEE DIV
+    $scoreDiv = '<div><div style="width:392px;margin-top:10px;">';
+    
+    //***************************************for group***********************************************************************************   
+    
+    if (isset($this->GroupID) && !empty($this->GroupID)) {
+        $grouptypes   = new Application_Model_Groups();
+        $groupdetails = $grouptypes->selectgroup($this->GroupID);
+        $userdetails  = $grouptypes->selectuser($groupdetails[0]['User']);
+        
+        include "functions.php";
+        if (!isset($this->userid)) {
+            $loggedin = false;
+        }
+        if ($loggedin) {
+            $userloggedin = '1';
+        } else {
+            $userloggedin = '0';
+        }
+        $return = '';
+        
+        $group    = $groupdetails[0]['ID'];
+        $owner    = $groupdetails[0]['User'];
+        $joinlink = $this->joinlink;
+        $dbpage   = $this->dbpage;
+        
+        $thisgroupowner = false;
+        if ($userid == $owner)
+            $thisgroupowner = true;
+        // CHECK IF PROFILE HOLDER
+        
+        // SELECT GROUP DETAILS     
+        $rowval = $grouptypes->selectgroupdetails($group);
+        // SELECT GROUP DETAILS
+        
+        // CHECK IF LOGGED IN USER IS A MEMBER OF THIS GROUP, IF REQUEST TO JOIN
+        
+        $requestGroup = false;
+        
+        if (!$thisgroupowner && $userid != '') 
+        {
+            $groupRow = $grouptypes->selectgroupprivacy($group);
+            if ($groupRow[0]['GroupPrivacy'] == '2') 
+            { // IF PRIVATE GROUP
+                $memberRes = $grouptypes->selectpvtgroupmem($group, $userid);
+                if (count($memberRes) == 0) 
+                {
+                    $requestGroup  = true;
+                    $requestStatus = 3;
+                }
+            } 
+            elseif ($groupRow[0]['GroupPrivacy'] == '3' && $loggedin == true) 
+            { 
+                $memberRes = $grouptypes->selectgroupmem($group, $userid);
+                if (count($memberRes) == 0) {
+                    $requestGroup  = true;
+                    $requestStatus = 0;
+                } elseif ($memberRes[0]['Status'] == 0 && $memberRes[0]['SentBy'] == 'Self') {
+                    $requestGroup  = true;
+                    $requestStatus = 1;
+                } elseif ($memberRes[0]['Status'] == 0 && $memberRes[0]['SentBy'] == 'Owner') {
+                    $requestGroup  = true;
+                    $requestStatus = 2;
+                }
+            }
+        }
+        
+        if (!$thisgroupowner && $requestStatus == 0) {
+            $linkstart  = "<a href='javascript:void(0)'  onclick='javascript:joingroupreq(" . $rowval[0]['ID'] . "," . $rowval[0]['User'] . "," . $userid . ");'>";
+            $linkend    = "</a>";
+            $dbeeGroup  = $rowval[0]['ID'];
+            $groupowner = $rowval[0]['User'];
+        } else {
+            $linkstart = '';
+            $linkend   = '';
+        }
+        
+        
+        // GROUP PRIVACY
+        if ($rowval[0]['GroupPrivacy'] == '1')
+            $grpPrivacy = 'Open Group';
+        elseif ($rowval[0]['GroupPrivacy'] == '2')
+            $grpPrivacy = 'Private Group';
+        elseif ($rowval[0]['GroupPrivacy'] == '3')
+            $grpPrivacy = $linkstart . 'Request to join Group' . $linkend;
+        elseif ($rowval[0]['GroupPrivacy'] == '4')
+            $grpPrivacy = 'Vip Group';
+        // GROUP PRIVACY
+        
+        // CALCULATE GROUP PIC DIMENTIONS
+        $imgDim    = image_dimentions($rowval[0]['GroupPic'], 'grouppics', '190', '190');
+        $imgDimArr = explode('~', $imgDim);
+        $imgW      = $imgDimArr[0];
+        $imgH      = $imgDimArr[1];
+        // CALCULATE GROUP PIC DIMENTIONS
+        
+        // CALCULATE GROUP PIC DIMENTIONS
+        $imgDimOw    = image_dimentions($rowval[0]['ProfilePic'], 'userpics', '55', '55');
+        $imgDimArrOw = explode('~', $imgDimOw);
+        $imgWOw      = $imgDimArrOw[0];
+        $imgHOw      = $imgDimArrOw[1];
+        // CALCULATE GROUP PIC DIMENTIONS
+        
+        // SELECT GROUP MEMBERS
+        $members      = '';
+        $totalmembers = '';
+        $Res          = $grouptypes->selectgroupmembers($group);
+        $TotalMembers = count($Res);
+        
+        if ($TotalMembers > 0) {
+            $totalmembers = '<span class="small-font-bold">Members: ' . $TotalMembers . '</span>';
+            if ($TotalMembers > 12)
+                $totalmembers .= ' - <span class="small-font"><a href="javascript:void(0);" onclick="javascript:OpenShadowbox(\'groupmembers/group/' . $group . '\',\'\',\'400\',\'400\');">see all</a></span>';
+            $counter = 1;
+            foreach ($Res as $key => $Row) {
+                //echo'<pre>';print_r($Row);
+                $members .= '<div class="follower-box-profile"><a href="' . BASE_URL . '/profile/user/' . $Row['UserID'] . '">
+                    <img src="' . BASE_URL_IMAGES . '/show_thumbnails.php?ImgName=' . $Row['ProfilePic'] . '&ImgLoc=userpics&Width=35&Height=35" border="0" /></a></div>';
+                if ($counter % 12 == 0)
+                    $return .= '<div class="next-line"></div>';
+                $counter++;
+            }
+        }
+        
+        // SELECT GROUP MEMBERS
+        
+        $dbeeObj     = new Application_Model_Myhome();
+        $profileuser = $this->userid;
+        
+        if ($rowval[0]['Status'] == 1) {
+            // MESSAGE ME
+            if ($ProfileHolder) {
+                $profile_message .= '<a style="cursor:pointer" onclick="javascript:opensendmessage(' . $rowval[0]['UserID'] . ',\'' . $fName[0] . '\',this);" class="btn">message </a>';
+            }
+        }
+        
+        
+        $profileofuser = '<a style="cursor:pointer" href="/user/' . $rowval[0]['Username'] . '" class="btn">Profile</a>';
+        
+        $group_highlighted .= '<div class="dbUserPic" style="margin-top: 2px;""><div style="margin:5 0 5px -14px; width:100%; height:' . $imgH . 'px; background-position: center top; background-image:url(' . BASE_URL_IMAGES . '/show_thumbnails.php?ImgName=' . $rowval[0]['GroupPic'] . '&ImgLoc=grouppics&Width=245&Height=175); background-repeat:no-repeat;"></div></div>';
+        
+        $group_highlighted .= '<div class="dbDetailsBox">
+                                    <!--this is details top bar-->
+                                <div class="dbDetailsTopBar" style="margin-top: 0px;">
+                                    ' . $profileofuser . ' ' . $profile_message . ' ' . $reg . '
+                                    <h2 href="#" class="pull-right">' . $grpPrivacy . '</h2>
+                                </div>
+                                <!--End from here details top bar-->
+
+                                <!-- db content bar-->
+                                <div class="userPrDetailsWrapper">
+                                    <h2>Created By : <a href="/user/' . $this->myclientdetails->customDecoding($rowval[0]['Username']) . '"> ' . $this->myclientdetails->customDecoding($rowval[0]['Name']) . '</a></h2>
+
+                                    <div>
+                                    <span style="font-weight:bold;margin-top:5px; margin-bottom:12px;">' . $grplinkstart . $rowval[0]['GroupName'] . $grplinkend . '</span>';
+        
+        if ($rowval[0]['GroupDesc'] != '')
+            $group_highlighted .= '<div style="margin-bottom:20px"><span class="medium-font" >' . $rowval[0]['GroupDesc'] . ' </span></div>';
+        
+        if ($groupcats != '')
+            $group_highlighted .= '<div class="medium-font-bold">Categories: <span class="medium-font">' . $groupcats . '</span></div>';
+        
+        $group_highlighted .= '<div style="float:left" class="medium-font-bold" style="margin:10px 25px 10px 0;"></div><div>' . $totalmembers . '</div><div >' . $members . '</div></div></div></div></div></div>';
+        
+        $return = $group_highlighted;
+ 
+?>                
+        <?php
+    }
+
+    if ($userid == $dbeeUser) {
+        $scoreDiv .= '<div id="dbee-score" style="float:left; margin:15px 20px 0 0;font-size:14px;font-weight:bold" >score ' . POST_NAME . '</div>';
+        $scoreDiv .= '<div style="margin:0 5px 0 0;"><span id="loveTotalDB" style="float:left">' . $this->totalLove . '</span><div id="love-dbee" rel="" title="you cannot score your own ' . POST_NAME . '" style="float:left; cursor:default; margin-left:-8px;"></div></div><div class="scLink"><span id="likeTotalDB" style="float:left">' . $this->totalLike . '</span><div id="like-dbee" rel="" title="you cannot score your own ' . POST_NAME . '" style="float:left; cursor:default; margin-left:-8px;"></div></div><div class="scLink"><span id="philosopherTotalDB" style="float:left">' . $this->totalPhil . '</span><div id="philosopher-dbee" rel="" title="you cannot score your own ' . POST_NAME . '" style="float:left; cursor:default; margin-left:-8px;"></div></div><div class="scLink"><span id="dislikeTotalDB" style="float:left">' . $this->totalDislike . '</span><div id="dislike-dbee" rel="" title="you cannot score your own ' . POST_NAME . '" style="float:left; cursor:default; margin-left:-8px;"></div></div><div class="scLink"><span id="hateTotalDB" style="float:left;">' . $this->totalHate . '</span><div id="hate-dbee" rel="" title="you cannot score your own ' . POST_NAME . '" style="float:left; cursor:default; margin-left:-8px;"></div></div></div></div></div></div><br style="clear:both;" />';
+        $followDiv = '';
+    } elseif ($userid == '') {
+        $scoreDiv .= '';
+        $followDiv = '';
+    } else 
+    {
+        
+        $ParrentId   = '0';
+
+        $ParrentType = '0';
+
+        if($this->GroupID != 0 && $this->GroupID != '') 
+        {
+            $ParrentId   = $this->GroupID;
+            $ParrentType = '1';
+        }
+        if ($this->EventID != 0 && $this->EventID != '') 
+        {
+            $ParrentId   = $this->EventID;
+            $ParrentType = '2';
+        }
+        
+        $scoreDiv .= '<div id="dbee-score" style="float:left; margin:15px 20px 0 0;font-size:14px;font-weight:bold">score ' . POST_NAME . '</div>';
+        $scoreDiv .= '<div style="margin:0 5px 0 0;" ><span id="loveTotalDB" style="float:left">' . $this->totalLove . '</span><div id="love-dbee" style="float:left; margin-left:-8px;" rel="" title="love this ' . POST_NAME . '" onclick="javascript:scoredbee(1,\'love\',1,' . $db . ',' . $ParrentId . ',' . $ParrentType . ');"></div></div><div class="scLink"><span id="likeTotalDB" style="float:left">' . $this->totalLike . '</span><div id="like-dbee" style="float:left; margin-left:-8px;" rel="" title="like this ' . POST_NAME . '" onclick="javascript:scoredbee(2,\'like\',1,' . $db . ',' . $ParrentId . ',' . $ParrentType . ');"></div></div><div class="scLink"><span id="dislikeTotalDB" style="float:left">' . $this->totalDislike . '</span><div id="dislike-dbee" style="float:left; margin-left:-8px;" rel="" title="dislike this ' . POST_NAME . '" onclick="javascript:scoredbee(4,\'dislike\',1,' . $db . ',' . $ParrentId . ',' . $ParrentType . ');"></div></div><div class="scLink"><span id="hateTotalDB" style="float:left;">' . $this->totalHate . '</span><div id="hate-dbee" style="float:left; margin-left:-8px;" rel="" title="hate this ' . POST_NAME . '" onclick="javascript:scoredbee(5,\'hate\',1,' . $db . ',' . $ParrentId . ',' . $ParrentType . ');"></div></div></div></div></div></div><br style="clear:both;" />';
+        if ($dbeeUser != adminID)
+            $followDiv = '<a href="javascript:void(0)" class="poplight" onclick="javascript:followme(' . $dbeeUser . ',this);" id="follow-user"><div id="followme-label">' . $followstring . '</div></a>';
+        
+    }
+    
+    // INITIALIZE SCORE DBEE DIV 
+    
+    if ($loggedin) {
+        $reportabuse = '<a href="javascript:void(0);" class="report-abusetwo" dbid="' . $db . '" type="1" class="dbee-feed-titlebar-smallFont" style="font-weight:normal" >Report abuse</a>|
+                            <a href="javascript:void(0);" id="report-abuse" dbid="' . $db . '" class="dbee-feed-titlebar-smallFont" style="font-weight:normal" >Report a bug</a>';
+        
+        
+        
+        
+        if ($ProfileHolder && $this->TotalComments == 0)
+            $reportabuse .= '<span id="hideonreload">| <a href="javascript:void(0);" class="dbee-feed-titlebar-smallFont" style="font-weight:normal" onclick="javascript:openeditdbee();"><span id="edit-db">edit ' . POST_NAME . '</span></a></span>&nbsp;&nbsp;&nbsp;<span id="msg-db-updated">Dbee Updated</span>';
+    } else
+        $reportabuse = '';
+    
+    // SOCIAL ICONS
+    $social = '';
+    if ($row['SocialFB'] != '' || $row['SocialTwitter'] != '' || $row['SocialLinkedin'] != '')
+        $social .= '<div align="center" style="text-align:center; margin:10px 10px 0 0;"><div style="margin-bottom:5px; font-size:12px">My other social links</div><div style="margin-bottom:5px;"><img src="/img/findme.png"> </div><div class="next-line"></div>';
+    if ($row['SocialFB'] != '')
+        $social .= '<a href="' . $row['SocialFB'] . '" target="_blank"><div class="profilesocial-fb" ></div></a>';
+    if ($row['SocialTwitter'] != '')
+        $social .= '<a href="http://twitter.com/' . $row['SocialTwitter'] . '" target="_blank"><div class="profilesocial-twitter" ></div></a>';
+    if ($row['SocialLinkedin'] != '')
+        $social .= '<a href="' . $row['SocialFB'] . '" target="_blank"><div class="profilesocial-linkedin"></div></a>';
+    if ($row['SocialFB'] != '' || $row['SocialTwitter'] != '' || $row['SocialLinkedin'] != '')
+        $social .= '</div>';
+    // SOCIAL ICONS
+    if ($this->loginid) {
+        $showLinks = true;
+    }
+    
+    
+    $userStatus = $row['Status'];
+    if ($row['Status'] == 1) {
+        if ($showLinks) {
+            $profileLinkStart = '<a href="' . BASE_URL . '/user/' . $row['Username'] . '">';
+        }
+    } else {
+        $profileLinkStart = '<a href="javascript:void(0)" class="profile-deactivated" title="' . DEACTIVE_ALT . '" onclick="return false;">';
+        $showLinks        = false;
+        $followDiv        = '';
+    }
+    if ($row['Clientdiscription'] != '')
+        $readmore = '<div onclick="openpdflinkdetail(' . $row['DbeeID'] . ')" class="readmore">readmore</div>';
+    
+    
+    $dbee_content = '';
+    
+    
+    
+    if ($row['Type'] == '1') {
+        $dbeeType = 1;
+        if ($row['RssFeed'] != '')
+            $rssfeed = '<div class="dbRssWrapper dbRssWrapperMain" style=" display:block; margin:10px 0 0 0">' . $row['RssFeed'] . '</div>';
+        else
+            $rssfeed = '';
+        
+
+        $dbee_content = '<div id="non-editable" style="margin-bottom:15px">' . nl2br(strip_tags($row['Text'], '<a>')) . '</div>' . $rssfeed . '
+                                    <div id="editable" style="margin-bottom:15px">
+                                        <div>
+                                            <textarea id="PostText1" class="roundedge-textbox fieldtext" style="width:500px; height:100px; margin-top:5px;" onKeyDown="limitText(\'PostText1\',500,\'dbtextcountdown\');" onKeyUp="limitText(\'PostText1\',500,\'dbtextcountdown\');" onblur="javascript:editdbee()">' . htmlentities($row['Text']) . '</textarea>
+                                        </div>
+                                        <div class="next-line"></div>
+                                        <div id="dbtextcountdown" class="dbtextcountdown" style="margin:5px; color:#000; font-size:12px">500 limit</div>
+                                    </div>';
+        
+    } elseif ($row['Type'] == '2') {
+
+        $checkImage   = new Application_Model_Commonfunctionality();
+        $pic1         = $checkImage->checkImgExist($row['LinkPic'], 'results', 'linkimage.png');
+        $dbee_content = ' <div id="non-editable" class="dbtpcnt">' . nl2br(strip_tags($row['UserLinkDesc'], '<a>')) . '</div>
+                                    <div id="editable" style="margin-bottom:15px">
+                                    <textarea id="PostLinkDesc1" class="dbee-post-textarea" style="height:50px; width:490px; margin-top:0;" onKeyDown="limitText(\'PostLinkDesc1\',500,\'dblinkcountdown\');" onKeyUp="limitText(\'PostLinkDesc1\',500,\'dblinkcountdown\');" onblur="javascript:editdbee()">' . htmlentities($row['UserLinkDesc']) . '</textarea><br />
+                                    <div id="dblinkcountdown" class="dbtextcountdown">500 limit</div>
+                                    <br />
+                                    </div>
+                                    <div class="link-desc-maindb">
+                                        <div style="width:120px; padding:3px; border:1px solid #FFF; margin-right:10px; float:left;">
+                                        <a href="' . BASE_URL_IMAGES . '/results/' . $row['LinkPic'] . '" rel="popupbox"><img src="' . BASE_URL . '/timthumb.php?src=/results/' . $pic1 . '&q=100&w=100&h=100" border="0"></a></div>
+                                        <div style="float:left">
+                                            <div style="font-weight:bold">' . $row['LinkTitle'] . '</div><div><a href="' . $row['Link'] . '" target="_blank">' . $row['Link'] . '</a></div>
+                                            <div style="margin-top:10px;">' . $row['LinkDesc'] . '</div>' . $readmore . '
+                                        </div>
+                                        
+                                    <div class="next-line"></div></div>';
+    } elseif ($row['Type'] == '3') {
+        $dbeeType   = 3;
+        $checkImage = new Application_Model_Commonfunctionality();
+        $pic1       = $checkImage->checkImgExist($row['Pic'], 'imageposts', 'default-avatar.jpg');
+        if ($showLinks)
+            $dbee_content = ' <div style="width:auto; padding:3px; border:1px solid #FFF; float:left; margin-right:10px;">
+                                                <a href="' . IMGPATH . '/imageposts/' . $row['Pic'] . '" rel="popupbox">
+                                                    <img src="'.IMGPATH.'/imageposts/small/' . $pic1 . '" border="0" />
+                                                </a>
+                                            </div>
+                                            <div id="non-editable" style="float:left;width:800px">' . nl2br(strip_tags($row['PicDesc'], '<a>')) . '</div>
+                                            <div id="editable">
+                                                <textarea id="PostPixDesc1" class="dbee-post-textarea" style="height:50px; width:490px; margin-top:0;" onKeyDown="limitText(\'PostPixDesc1\',500,\'dbpixcountdown\');" onKeyUp="limitText(\'PostPixDesc1\',500,\'dbpixcountdown\');" onblur="javascript:editdbee()">' . htmlentities($row['PicDesc']) . '</textarea><br />
+                                                <div id="dbpixcountdown" class="dbtextcountdown" style="margin:5px; font-size:12px">500 limit</div>
+                                            </div><div class="next-line"></div>' . $readmore . '';
+    } elseif ($row['Type'] == '4') {
+        $dbeeType = 4;
+        if ($row['Vid'] != '') {
+            $video = true;
+            if ($row['VidSite'] == 'Youtube')
+                $VideoThumbnail = '<img src="http://i.ytimg.com/vi/' . $row['VidID'] . '/0.jpg" width="120" height="100" border="0" />';
+            elseif ($row['VidSite'] == 'Vimeo') {
+                $url      = 'http://vimeo.com/api/v2/video/' . $row['VidID'] . '.php';
+                $contents = @file_get_contents($url);
+                $thumb    = @unserialize(trim($contents));
+                
+                $VideoThumbnail = "<img src=" . $thumb[0][thumbnail_small] . ">";
+            } elseif ($row['VidSite'] == 'Dailymotion')
+                $VideoThumbnail = '<img src="http://www.dailymotion.com/thumbnail/video/' . $row['VidID'] . '" width="120" height="100" border="0" />';
+        } else {
+            $audio          = true;
+            $VideoThumbnail = $row['Audio'];
+        }
+        
+        
+        if ($video)
+            $inc_v_type = '<div class="icon-youtube" style="float:left; height:30px;"></div><div class="next-line"></div><div style="margin-top:5px; width:120px; padding:3px; border:1px solid #FFF; margin-right:10px; float:left;"><a href="javascript:seevideo(\'' . $row['VidID'] . '\');">' . $VideoThumbnail . '</a></div><div id="non-editable" style="float:left">' . nl2br(strip_tags($row['VidDesc'], '<a>')) . '</div>' . $readmore . '';
+        elseif ($audio)
+            $inc_v_type = '<div class="icon-soundcloud" style="float:left; height:30px;"></div><div style="margin-top:5px; border:3px solid #F9C10C">' . $row['Audio'] . '</div><div id="non-editable" style="width:705px; margin-top:10px">' . $row['VidDesc'] . '</div>';
+
+        $dbee_content = $inc_v_type . '
+                                        <div id="editable">
+                                            <textarea id="PostVidzDescComm1" class="dbee-post-textarea" style="height:50px; width:490px; margin-top:0;" onKeyDown="limitText(\'PostVidzDescComm1\',500,\'dbvidzcountdown\');" onKeyUp="limitText(\'PostVidzDescComm1\',500,\'dbvidzcountdown\');" onblur="javascript:editdbee();">' . htmlentities($row['VidDesc']) . '</textarea>
+                                            <br />
+                                            <div id="dbvidzcountdown" class="dbtextcountdown" style="margin:5px; font-size:12px">500 limit</div>
+                                        </div>
+
+                                        <div class="next-line"></div>' . $TwiTagval . ' 
+                                        <!--<span class="twitterlistingHas"><i class="sprite twlistingHasIcon"></i> ' . $row['TwitterTag'] . '</span>-->';
+    } elseif ($row['Type'] == '5') 
+    {
+        $myvoterow = $this->myvoterow;
+        $cntr      = 1;
+        $dbeeType  = 5;
+        $isPoll    = 1;
+        foreach ($this->poRes as $pollrow):
+            ${'pollopt' . $cntr}         = $pollrow['OptionText'];
+            ${'pollopt' . $cntr . 'num'} = $this->Polloptionlhelper($db, $pollrow['ID'], $userid);
+            $cntr++;
+        endforeach;
+        $totalvotesexist  = $this->totalvotesexist;
+        $ProfilePic       = $commonbynew->checkImgExist($row['ProfilePic'], 'userpics', 'default-avatar.jpg');
+        $dbee_highlighted = '';
+        $dbee_highlighted .= '<div class="dbDetailsBox">
+            <!--this is details top bar-->
+            <div class="dbDetailsTopBar">
+            <div class="dbUserPic">' . $profileLinkStart . '<img src="'.IMGPATH.'/users/small/' . $ProfilePic . '" width="60" height="60" border="0"></a></div>
+            
+            <div class="pull-left userProfilFollow">
+            <span class="dbUserName">' . $this->myclientdetails->customDecoding($row['Name']) . ' ' . $this->myclientdetails->customDecoding($row['lname']) . '</span>';
+        if ($loggedin)
+            $dbee_highlighted .= '<a href="' . BASE_URL . '/user/' . $row['Username'] . '" class="btn ">Profile</a>
+                ' . $followDiv;
+        if ($this->GroupID != '' && $this->GroupID != '0') {
+            $dbee_highlighted .= '<div style="clear:both"></div><span style="font-weight:bold;float:left">Group: </span><span style="float:left; margin-left:5px">' . $rowval[0]['GroupName'] . '</span>';
+            if ($loggedin)
+                $dbee_highlighted .= '<span style="float:left; margin:0 5px 0 5px">-</span><span style="float:left">' . $grplinkstart . 'Back to main Group' . $grplinkend . '</span>';
+        }
+        $dbee_highlighted .= '</div>';
+        if ($loggedin)
+            $dbee_highlighted .= '</div>
+            <!--End from here details top bar-->
+            
+            <!-- db content bar-->
+            <div class="dbTopContentWrapper">' . $this->Polldetailhelper($row, $scoreDiv, $followstring, $followDiv, $ago, $myvoterow, $this->userid) . '</div>
+            <!--End from here db content -->
+            
+            <div class="dbtpftr">
+            <div class="pull-left postHist">
+            <span class="pstCmtsCount " id="total_comments"><i class="sprite pstCmtsIcon"></i>' . $commentsText . '</span>
+            </div>' . $TwiTagval . '
+            
+            
+            <div class="pull-right dbtphdrLinks">';
+            if(clientID!=55) {
+                $dbee_highlighted .= '<a href="javascript:void(0);"  class="dropDown gtranslator">Translate |';
+            }
+            $dbee_highlighted .= '<div class="dropDownList"><li> </li></div>
+            
+            </a> |<a href="#" class="bookMarksShare">Share</a> |
+            ' . $add_to_fav . '| ' . $reportabuse . '
+            </div>
+            </div>
+            </div>';
+    }
+    
+    if ($row['Type'] != '5') 
+    {
+        if (!$requestGroup) 
+        {
+            $ProfilePic = $commonbynew->checkImgExist($rowuserall[0]['ProfilePic'], 'userpics', 'default-avatar.jpg');
+            if ($loggedin)
+                $userlogin = 1;
+            else
+                $userlogin = 0;
+            $ownerPic = $commonbynew->checkImgExist($rowuserall[0]['ProfilePic'], 'userpics', 'default-avatar.jpg');
+            // check event member 
+             $eventComment = true;
+            if ($this->session_data['UserID'] != '' && $this->EventID != '' && $row['Type'] == 9 && $this->EventID!= 0) 
+            {
+                $eventModel  = new Application_Model_Event();
+                $eventResult = $eventModel->getEvent($row['events']);
+                $memberData  = $eventModel->checkEventMember($this->session_data['UserID'], $row['events']);
+                if (empty($memberData) && $eventResult['type'] != 1) 
+                    $eventComment = false;
+            }
+            // end check event member 
+            if ($loggedin && $row['Type']!=20) 
+            {    
+                
+                $dbee_reply = '<div class="miniPostWraper " userlogin="' . $userlogin . '">';
+                $dbee_reply .= "<input type='hidden' name='hiddenpicName' id='hiddenpicName' value = '" . $rowuserall[0]['ProfilePic'] . "' />";
+                $dbee_reply .= "<input type='hidden' name='hiddenUserName' id='hiddenUserName' value = '" . $this->myclientdetails->customDecoding($rowuserall[0]['Username']) . "' />";
+                $dbee_reply .= "<input type='hidden' name='hiddentwittername' id='hiddentwittername' value = '' />";
+                $dbee_reply .= "<input type='hidden' name='HName' id='HName' value = '" . $this->myclientdetails->customDecoding($rowuserall[0]['Name']) . "' typevalue = '" . $commonbynew->checkuserTypetooltip($rowuserall[0]['usertype']) . "'/>";
+                $dbee_reply .= "<div class='minPostTopBar'><div class='pfpic'>";
+                $dbee_reply .= '<img src="'.IMGPATH.'/users/small/' . $ProfilePic . '" width="56" height="56" border="0" /> ';
+                $dbee_reply .= "</div>";
+                $dbee_reply .= '<div class="dbpostWrp">
+                                        <div class="cmntBntsWrapper clearfix">
+                                            <span class="cmntLoderbg"><i class="fa fa-spinner fa-spin fa-1x"></i></span>
+                                            <textarea  value="" class="mentionme" placeholder="Have your say..." name="dbee_comment" id="dbee_comment"> </textarea>
+                                            <a href="javascript:void(0)" class="cmntBtnContent" data-type="CommentPix"><i class="fa fa-lg fa-camera"></i><form action="/file-upload" class="dropzone" id="uploadCoommentDropzone">
+                                                   <div class="fallback">
+                                                    <input type="file" name="file"  />
+                                                  </div>
+                                                </form></a>
+                                            <a href="javascript:void(0)" class="cmntLinkBtn"><i class="fa fa-link"></i></a>                                         
+                                        </div> 
+                                    </div> 
+                                </div>
+                                    <div style="display:none" id="twitter-reply-box">
+                                    <div style="float:left; color:#29b2e4"><i class="fa dbTwitterIcon fa-4x"></i></div>
+                                    <div id="twitter-db-reply"></div><br style="clear:both">
+                                </div>      
+                                <input type="hidden" id="hiddentwitterreply">
+                                <input type="hidden" id="hiddendb" value="' . $db . '">
+                                <div id="postCommentBtn"><a class="btn btn-yellow" href="javascript:void(0)" data-click="true">Comment</a></div>
+                            </div>';
+            }
+        }
+    }
+    $dbee_comments .= '<div class="comment-feed2"></div>';
+    $i++;
+    $dbee_highlighted .= '<input type="hidden" name="dbid" value="' . $db . '"  ><input type="hidden" name="dbeetype_edit" value="' . $this->dbedit_type . '"  >';
+    $return = $dbee_highlighted1 . '~#~' . $dbee_reply . '~#~' . $dbee_comments . '~#~' . $this->myDBScore . '~#~' . $follow . '~#~' . $userName . '~#~' . $this->NewTotalComments . '~#~' . $userloggedin . '~#~' . $isPoll . '~#~' . $pollopt1 . '~#~' . $pollopt2 . '~#~' . $pollopt3 . '~#~' . $pollopt4 . '~#~' . $pollopt1num . '~#~' . $pollopt2num . '~#~' . $pollopt3num . '~#~' . $pollopt4num . '~#~' . $totalvotesexist . '~#~' . $myvoterow['Vote'] . '~#~' . $sendNotify . '~#~' . $dbeeType;
+    echo $return;
+    
+} else
+    echo $return = '<span style=" display: block;font-size: 20px;padding: 30px;text-align: center;">The post you are trying to view does not exist any more.</span>';
+
+
+?>
+
+        

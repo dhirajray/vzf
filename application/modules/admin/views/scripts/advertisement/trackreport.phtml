@@ -1,0 +1,140 @@
+<script type="text/javascript" src="<?php echo BASE_URL; ?>/adminraw/js/jquery.tokeninput.js"></script>
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>/adminraw/css/token-input.css" type="text/css" />
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>/adminraw/css/token-input-facebook.css" type="text/css" />
+
+<script>
+$(function(){
+  $('body').on('click','.ViewAllClickedUsers a.btn-mini', function(){
+    
+
+    var bannerid = '';
+    var gaobj = $(this);
+    var bannerid = $(this).attr('data-bannerid');
+    
+     $( "#surveyDialog1" ).remove();
+
+    var htmlLightbox = '<div id="surveyDialog1"  title="Platform users"><div id="grouplist"></div>\
+      <div id="userInfoContainer"></div>\
+              </div>';
+    var checkHtml = '<label class="surveychkall">\
+              <input type="checkbox" value="1" id="grpchkall" class="goupuser" name="commentduring" >\
+              <label for="grpchkall"></label>\
+              Select all\
+            </label>';
+
+      $('body').append(htmlLightbox);
+      $( "#surveyDialog1" ).dialog({
+          dialogClass:'surveyDialog',             
+          width:800,
+          height:500,  
+          title:'Click-thru breakdown',
+          open:function(){                
+              $fluidDialog();
+               $("#datacollect").html('');      
+               $('#userInfoContainer').append('<div class="loaderOverlay2"></div>'); 
+              
+                // $('.ui-dialog-buttonset').before(htmlCheckAll);
+            $.ajax({
+              type : "POST",
+              dataType : 'json',
+              data:{'bannerid':bannerid},
+              url : BASE_URL + '/admin/advertisement/showuserlist',        
+              success : function(response) 
+              {   
+
+
+               $('.loaderOverlay2').remove();
+                      $('#surveyDialog1 #userInfoContainer').html(response.content);
+                      
+                      if(response.grouplist!=null && response.grouplist!='')
+                      {
+                      $('#surveyDialog1 #grouplist').html(response.grouplist+checkHtml);
+                      }
+                
+          }
+
+          });
+          }
+    });
+    
+  });
+
+  
+})
+
+
+</script>
+
+<h1 class="pageTitle ">Ad tracking</h1>
+
+  <div id="messageWrapper" class="dbtabContainer advWrpMain"> 
+    
+      
+
+        <div id="trackadvert" style="display:block">
+          
+         
+          <?php 
+          $defaultimagecheck = new Admin_Model_Common();
+          $result = $this->advert->getclickAdvertRecord();  
+
+
+          if(!empty($result)){ ?>
+          <div class="responsiveTable">
+             <table class="table-border table-center userListTable table table-hover table-stripe">
+                     <thead>
+                        <tr>
+                           <td>Ad title</td>
+                           <td>Image</td>
+                            <td>Position</td>
+                           <td>No. of click-thrus</td>
+                           <td>No. of unique users who clicked</td>
+                           <td></td>
+                        </tr>
+                     </thead>
+                     <tbody> 
+                       <?php 
+                   
+                     foreach ($result as $value) { 
+
+
+                      $checkdbpic = $defaultimagecheck->checkImgExist($value['image'],'ads','default-avatar.jpg');
+                      ?>
+                         <tr id="<?php echo $value['id']; ?>" >
+                           <td><?php echo $value['advertTitle']; ?></td>
+                           <td>
+                            <img src="<?php echo BASE_URL; ?>/timthumb.php?src=/ads/<?php echo $checkdbpic;?>&q=100&w=90&h=35" border="0" /></td>
+                           <td><?php echo $value['position']; ?></td>
+                           <td><?php echo $value['totalclick']; ?></td>
+                           <td><?php echo $value['totalclickuser']; ?></td>
+
+
+                           <td>
+
+                             <!-- <a class="ViewAllClickedUsers btn btn-green btn-mini" data-bannerid="<?php echo $value['BannerId']; ?>" href="javascript:void(0);">View All Clicked Users</a> -->
+                              
+                              
+                                <div class="ViewAllClickedUsers">
+                               
+                                <a class="btn btn-mini btn-yellow" href="#" data-bannerid="<?php echo $value['BannerId']; ?>" >
+                                <i class="fa fa-user"> </i>
+                               Click-thru breakdown
+                                </a>
+                                </div>
+                           </td>
+                        </tr>
+                        <?php } ?>
+                     </tbody>
+               </table>
+             </div>
+             <?php }else{ echo '<div class="notfound">No results found</div>'; } ?>
+        </div>
+
+
+
+
+
+       
+  </div>
+
+

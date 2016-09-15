@@ -1,0 +1,823 @@
+
+<script type="text/javascript" src="<?php echo BASE_URL."/adminraw/js/platforminterface.js"; ?>"></script>
+
+<script type="text/javascript">
+
+var fontFamilyList='';
+  WebFontConfig = {
+     google: { families: [ 'Oswald::latin', 'Lato::latin', 'Source+Sans+Pro::latin', 'Montserrat::latin', 'Raleway::latin', 'Arimo::latin', 'Dosis::latin', 'Hind::latin', 'Josefin+Sans::latin' ] }
+  };
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+   
+  })(); 
+
+
+ var fileName;
+   $(document).ready(function(){
+    fontFamilyList +='<option style="font-family:Arial, Helvetica, sans-serif; " value="" >Arial, Helvetica, sans-serif</option>';
+   $.each(WebFontConfig.google.families, function (i, value){
+          var fontFamily = value.split('::')[0].replace(/\+/gi, ' ');
+          var selected = '';
+          if(fontFamily =='<?php echo $this->getThemeConfiguration['fontFamily']; ?>'){
+              selected = 'selected="selected"';
+          }          
+          fontFamilyList += '<option style="font-family:'+fontFamily+'; "  value="'+fontFamily+'" '+selected+' >'+fontFamily+'</option>';
+         });
+
+          $(window).load(function() {
+            $('#fontFamily').html('<select name="fontFamily" >'+fontFamilyList+'</select>');
+            $select('#fontFamily select')
+          $('.popimgList').flexslider({
+              animation: "slide",
+              slideshow:false,
+              smoothHeight:false,
+              useCSS:true,
+
+            }); 
+          });
+
+           $('body').on('click','.screenPopup', function(){
+             var globalRel = $(this).attr('rel');       
+             var globalTitle =$(this).attr('data-title');         
+               $('#'+ globalRel).dialog({width:1000,title:globalTitle});           
+               var sd = $('.popimgList').data('flexslider');
+               sd.resize();  
+               $(window).resize();   
+           });
+          var myDropzoneBannerval = new Dropzone("#loginBgUpload",{
+            url: BASE_URL+'/admin/platformsettings/ajaxbackground',        
+            addRemoveLinks: true,
+            uploadMultiple:true,
+            parallelUploads: 1,
+            acceptedFiles: '.png, .jpg, .jpeg, .gif'
+          });
+
+          myDropzoneBannerval.on("error", function (file, serverFileName) {
+              $messageError(serverFileName);
+             // $('#loginBgUpload').removeClass('dz-started');
+          });          
+
+          myDropzoneBannerval.on("success", function (file, serverFileName) {
+              //$('#hiddengroundimage').html('');
+              $('#hiddengroundimage').append('<input type="hidden" name="hiddenloginbackgroundimage[]" value="'+serverFileName.filename+'" class="hiddenloginbackgroundimage">');
+                //fileName = serverFileName.filename;
+          });
+
+          myDropzoneBannerval.on("removedfile", function (file, error) { 
+          if(file.status!="canceled"){
+           var v = $.parseJSON(file.xhr.response);
+          // if(typeof(v.filename)){    
+      
+            $('.hiddenloginbackgroundimage').each(function(){
+                  if(v.filename==$(this).val())
+                      $(this).remove();
+               });
+            }
+         
+            
+          });          
+
+
+   });
+
+
+  
+           // wait for the DOM to be loaded 
+          
+           $(document).ready(function() {        
+             
+              $('.genericBg').click(function (){
+                $('#genericBgPop').dialog();
+              });
+
+               $('.bgPositionClick').click(function (){
+                $('#bgPositionPop').dialog();
+              });
+
+              $('.faviconPopup').click(function (){
+                $('#faviconPopup').dialog();
+              }); 
+
+              $('.hideIconsPopup').click(function (){
+                $('#hideIconsPopup').dialog();
+              }); 
+              
+
+            var colorPicker =   $('.colpicker').colpick({
+                                  layout:'hex',
+                                  submit:0,
+                                  colorScheme:'dark',
+                                  color:'<?php echo $this->getThemeConfiguration["backgroundColor"]; ?>',
+                                  onChange:function(hsb,hex,rgb,el,bySetColor) {
+                                    var colorType =  $(el).siblings('input').attr('name');
+                                    $(el).siblings('input').css('background','#'+hex).val('#'+hex);           
+                                  }
+                                });
+   
+        var colorPicker =   $('.colpicker backgroundsignColor').colpick({
+            layout:'hex',
+            submit:0,
+            colorScheme:'dark',
+            color:'<?php echo $this->getThemeConfiguration["SigninColor"]; ?>',
+            onChange:function(hsb,hex,rgb,el,bySetColor) {
+              var colorType =  $(el).siblings('input').attr('name');
+              $(el).siblings('input').css('background','#'+hex).val('#'+hex);           
+            }
+          });
+   
+            $('.colorPickerWrapper input').focusin(function(event) {
+              $(this).siblings('.colpicker').click();
+            });
+
+            $('body').on('click','.removeimage', function(){
+              var type = $(this).attr('type');
+              var imagename = $(this).attr('image-name');
+              bgnameArray = [];
+              Tthis = $(this);
+               $('.hiddenloginbackgroundimage').each(function(){
+                  if(imagename!=$(this).val())
+                    bgnameArray.push($(this).val());
+               });
+                var bgnameString = bgnameArray.join(); 
+                $.ajax({
+                  type : "POST",
+                  dataType : 'json',
+                  data:{'type':type,bgnameString:bgnameString},
+                  url :BASE_URL+ '/admin/platformsettings/ajaxremoveimage',
+                  success : function(response) 
+                  { 
+                      //alert(response);exit;  
+                      if(response.sitelogo=='remove')
+                      {
+                        $('.sitelogoimage').hide();
+                        $('#hiddensitelogo').val('');
+                        $('.sitelogoupload').val('');
+                      }
+                      if(response.faviconlogo=='remove')
+                      {
+                        $('.faviconlogoimage').hide();
+                        $('#hiddenfaviconlogo').val('');
+                        $('.faviconeupload').val('');
+                      }
+                      if(response.backgroundImage=='remove'){
+                        $('.imagebackground').hide();
+                        $('#hiddenbackgroundimage').val('');
+                      }  
+                      if(response.loginbackgroundImage=='remove'){
+                        Tthis.closest('.acntImgThumb').remove();
+                        $('#hiddengroundimage').html('');
+                        $.each(bgnameArray,function(index,value){
+                           $('#hiddengroundimage').append('<input type="hidden" name="hiddenloginbackgroundimage[]" value="'+value+'" class="hiddenloginbackgroundimage">');
+                         });
+                      }
+                      if(response.loginlogoimage=='remove'){
+                        $('.loginlogoimage').hide();
+                        $('#hiddenSigninImage').val('');
+                      }  
+                      $('#dbTipWrapper ').remove();
+                  }
+              });
+             });
+             
+   
+   
+              $.cookie("themepreview", 'hide', {
+                expires : 1,           //expires in 10 days
+                path    : '/', 
+                domain  : 'onserro.com',
+                secure  : false
+              });
+              $.cookie("adshide", 'no', {
+                      expires : 1,           //expires in 10 days
+                      path    : '/', 
+                      domain  : 'onserro.com',
+                      secure  : false
+                    });
+               // bind 'myForm' and provide a simple callback function 
+                $('#ajaxseo').ajaxForm(function() { 
+   
+                  $messageSuccess("updated successfully");
+                });
+   
+                $('#ajaxstaticpages').ajaxForm(function() { 
+   
+                  $messageSuccess("updated successfully");
+                });
+   
+          
+          $('body').on('click','.SigninOnly', function(){ 
+              $('#configuration').ajaxForm(function() { 
+                  $saveLoginTheme();
+                });
+          });
+
+         $('body').on('click','.Signin2PupPreview', function(){
+
+          $('#configuration').ajaxForm(function() { 
+                    
+                  $.cookie("themepreview", 'show', {
+                      expires : 1,           //expires in 10 days
+                      path    : '/', 
+                      domain  : 'onserro.com',
+                      secure  : false
+                    });
+
+                   $.cookie("adshide", 'yes', {
+                      expires : 1,           //expires in 10 days
+                      path    : '/', 
+                      domain  : 'onserro.com',
+                      secure  : false
+                    });
+
+
+                  $('#detailsDialog').remove();
+            var htmlLightbox = '<div id="detailsDialog"  title="Facebook Friends">\
+                                   <div id="datacollect" style="float:none"></div>\
+                                   <div id="userInfoContainer"></div>\
+                               </div>';
+               var htmlPreview = '<div class="seeLargeView loader dashBlock">\
+               <h2>\
+                Preview\
+                <a class="closePupPreview pull-right" href="javascript:void(0);">\
+                  <i class="fa fa-times"></i>\
+                </a>\
+                <a class="pull-right btn btn-green SavePupPreview" href="javascript:void(0);" style="margin-right:10px;">Save modification</a>\
+               </h2>\
+               <div><iframe id="previewFrontend" src="<?php echo BASE_URL; ?>" width="100%" height="100%"></iframe></div></div>';
+               $('.seeLargeView').remove();
+            $('body').append(htmlPreview);
+            $('.overlayPopup').fadeIn();
+            
+             $('#previewFrontend').load(function() {
+                $(this).closest('.seeLargeView').removeClass('loader');
+              });
+
+             var popHeight = $('.seeLargeView').height();
+             $('.seeLargeView iframe').height(popHeight-50);
+             
+             $('body').on('click','.closePupPreview', function(){
+                $('.overlayPopup, .seeLargeView').fadeOut();
+                 $.cookie("themepreview", 'hide', {
+                  expires : 1,           //expires in 10 days
+                  path    : '/', 
+                  domain  : 'onserro.com',
+                  secure  : false
+                 });
+             });
+        });
+            $('body').on('click','.SavePupPreview', function(){
+                $('.overlayPopup, .seeLargeView').fadeOut();
+                 $.cookie("themepreview", 'hide', {
+                  expires : 1,           //expires in 10 days
+                  path    : '/', 
+                  domain  : 'onserro.com',
+                  secure  : false
+                });
+                $saveLoginTheme();
+            });
+      });
+   
+     $saveLoginTheme = function(from){
+        $.ajax({
+            type : "POST",
+            dataType : 'json',
+            url : BASE_URL+'/admin/platformsettings/ajaxsaveconfiguration',
+            cache : false,
+            data:{checkedtrue:from},
+            success : function(response) {               
+                $messageSuccess(response.message);
+                window.location.href=BASE_URL+"/admin/platformsettings/themesetting";
+               location.reload();
+                
+            }
+        });
+      }
+
+
+      $('body').on('click','.SigninOnlytwo', function(){ 
+              $('#configuration').ajaxForm(function() { 
+                  $saveLoginTheme();
+                });
+          });
+
+
+       $('body').on('click','.SigninPupPreview', function(){
+    
+               $('#configuration').ajaxForm(function() { 
+                  $('#detailsDialog').remove();
+                  $.cookie("themepreview", 'show', {
+                    expires : 1,           //expires in 10 days
+                    path    : '/', 
+                    domain  : 'onserro.com',
+                    secure  : false
+                  });
+                  
+                  $.cookie("themepreview", 'show', {
+                    expires : 1,           //expires in 10 days
+                    path    : '/', 
+                    domain  : 'onserro.com',
+                    secure  : false
+                  });
+
+                      var htmlLightbox = '<div id="detailsDialog"  title="Facebook Friends">\
+                                   <div id="datacollect" style="float:none"></div>\
+                                   <div id="userInfoContainer"></div>\
+                               </div>';
+               var htmlPreview = '<div class="seeLargeView loader dashBlock">\
+               <h2>\
+                Preview\
+                <a class="closePupPreview pull-right" href="javascript:void(0);">\
+                  <i class="fa fa-times"></i>\
+                </a>\
+                <a class="pull-right btn btn-green SavePupPreview" href="javascript:void(0);" style="margin-right:10px;">Save modification</a>\
+               </h2>\
+               <div><iframe id="previewFrontend2" src="<?php echo BASE_URL; ?>/findex" width="100%" height="100%"></iframe></div></div>';
+               $('.seeLargeView').remove();
+            $('body').append(htmlPreview);
+            $('.overlayPopup').fadeIn();
+            
+             $('#previewFrontend2').load(function() {
+              $(this).closest('.seeLargeView').removeClass('loader');
+            });
+             var popHeight = $('.seeLargeView').height();
+             $('.seeLargeView iframe').height(popHeight-50);
+             
+             $('body').on('click','.closePupPreview', function(){
+              $('.overlayPopup, .seeLargeView').fadeOut();
+               $.cookie("themepreview", 'hide', {
+                expires : 1,           //expires in 10 days
+                path    : '/', 
+                domain  : 'onserro.com',
+                secure  : false
+            });
+             });
+   
+              $('body').on('click','.SavePupPreview', function(){
+              $('.overlayPopup, .seeLargeView').fadeOut();
+               $.cookie("themepreview", 'hide', {
+                expires : 1,           //expires in 10 days
+                path    : '/', 
+                domain  : 'onserro.com',
+                secure  : false
+            });
+                 
+
+
+                $saveLoginTheme();
+
+              });
+   
+               });
+   
+       });
+
+
+    // for bg changer
+    
+      $('body').on('click', '.bgListing li a', function(e){
+        e.preventDefault();
+         var parentEl =  $(this).closest('.dropDown');
+        
+         var dataName  = $(this).attr('data-name');
+        
+          //$('.active', parentEl).removeClass('active');
+          $(this).toggleClass('active');
+
+
+           
+       
+
+          if($('.bgListing', parentEl).attr('data-type')=='signBg'){
+            if( $('#signinBgDone',parentEl).is(':visible')== false){
+              $('.btnGroups',parentEl).prepend('<a href="#" class="btn btn-green" id="signinBgDone">Done</a>');              
+            }
+
+          }
+      }); 
+
+      $('body').on('click', '#signinBgDone', function(e)
+      {
+         e.preventDefault();
+         var parentEl =  $(this).closest('.dropDown');
+         var parentEl2 =  $(this).closest('.signinBgRow');
+          //$('#hiddengroundimage').html('');
+          $('.bgListing li a.active').each(function(){
+           var dataName  = $(this).attr('data-name');
+            $('#hiddengroundimage').append('<input type="hidden" name="hiddenloginbackgroundimage[]" value="'+dataName+'" class="hiddenloginbackgroundimage">');
+            $('.resetValueUpload', parentEl2).trigger('click');
+         });
+         parentEl.removeClass('on');
+      });   
+
+       $('body').on('click', '#signinBgReset', function(e)
+       {
+          e.preventDefault();
+          var parentEl =  $(this).closest('.dropDown');
+          $('#hiddengroundimage').html('');
+          $('#signinBgDone',parentEl).remove();
+       });   
+
+
+      $('.SigninReset').click(function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        var thisEl  = $(this);
+       
+
+         var msg = 'Are you sure you want to reset to the default Log in theme?';
+        $('#dialogConfirmSetting').remove();
+        $('body').append('<div id="dialogConfirmSetting">' + msg + '</div>');
+
+          $("#dialogConfirmSetting").dialog({
+              resizable: false,
+              title: 'Please confirm',
+              modal: true,
+              buttons: {
+                  "Yes": function(e) {
+                     var p = thisEl.closest('#configuration');
+                      $('input', p).val('').attr('checked', false);
+                      $('.colorPickerWrapper input[type="text"]', p).removeAttr('style');
+                      $('.acntImgThumb', p).remove();
+                     $saveLoginTheme('reset');
+                  }
+              }
+          });
+        });
+  }); 
+    
+</script> 
+<h1 class="pageTitle">Theme Configuration</h1>
+<!--Container -->
+<div class="accountContainer" style="margin-left:0px; overflow:initial">
+<div class="accountContent" style="display:block">
+<div id="hashTagSelectedWrapper" style="display: block;">
+   <form name="configuration" action ="<?php echo BASE_URL ?>/admin/platformsettings/ajaxconfiguration" class="right grid" id="configuration" enctype="multipart/form-data" method="post">
+      <ul>
+         <li >
+            <div class="hashUrsrDetails">
+               <h2>
+                  Log in theme settings
+                  <a class="hasTagDetails" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
+               </h2>
+               <div  class="listing" style="display:none">
+                  <div class="formRow signinBgRow">
+                     <label class="label">Background image<br /><br /><span class="noteText">Add a single, or multiple rotating, log in background images</span></label>
+                     <div class="field">
+                <div class="overdropRel">
+                       <div id="loginBgUpload" class="dropzone">
+                           <div class="fallback">
+                              <input name="file" type="file" multiple />
+                          </div>
+                       </div>      
+                      <div class="clearfix"></div>
+                </div>  
+
+                        <?php if($this->getThemeConfiguration['loginbackgroundimage']!='')
+                        { 
+                         
+                        $variableData = explode(',', $this->getThemeConfiguration['loginbackgroundimage']); 
+                        foreach ($variableData as $valuedata) {  ?>
+                        <div class="acntImgThumb">
+                           <div id="newpic" class="proPic loginbackgroundimage">
+                              <img  src="<?php echo BASE_URL .'/img/'.$valuedata; ?>" class="imgStyle ">
+                              <a href="javascript:void(0);"  rel="dbTip" title="Clicking this link will only remove this image from the preview. Save modifications from the preview to remove it from the platform." image-name="<?php echo $valuedata; ?>" type="loginbackgroundimage" class="removeimage removeCompare">x</a>                     
+                           </div>
+                        </div>
+                        <?php } } ?>
+                        <div id="hiddengroundimage">
+                          <?php 
+                          if(count($variableData) > 0) {
+                          foreach ($variableData as $key => $value) { ?>
+                          <input type="hidden" name="hiddenloginbackgroundimage[]" value="<?php echo $value; ?>" class="hiddenloginbackgroundimage">   
+                         <?php } } ?>
+                         </div> 
+                        <div class="clearfix"></div>
+
+                     </div>
+                  </div>
+                  <div class="formRow">
+                      <label class="label">Background Image Position</label>
+                      <div class="field">
+                          <select name="backgroundImagePosition">
+                              <option <?php if($this->getThemeConfiguration['backgroundImagePosition']=='cover') echo 'selected'; ?> value="cover">Cover</option>
+                              <option <?php if($this->getThemeConfiguration['backgroundImagePosition']=='contain') echo 'selected'; ?> value="contain">Contain</option>
+                          </select>
+                          <a href="javascript:void(0)" class="bgPositionClick"><i class="media_hide_320">what is this?</i><i class="fa fa-exclamation-circle fa-2x media_320"></i></a>
+
+                      </div>
+                  </div>
+                  <div class="formRow logoMax">
+                     <label class="label">Logo
+                      <br><br>
+                <span class="noteText">
+                <strong>Max pixel size</strong>
+                <br>
+                225px x 230px
+                </span></label>                
+                     <div class="field appendType">
+                        <input type="text" readonly="" name="" class="uploadType">
+                        <a href="javascript:void(0);" class="btn btn-black">Browse<input type="file" name="signinlogo" class="fileType">
+                        </a>
+                         <div class="acntImgThumb">
+                         <?php if($this->getThemeConfiguration['SigninImage']!='') { ?>
+                       
+                           <div id="newpic" class="proPic loginlogoimage">
+                              <img  src="<?php echo BASE_URL .'/img/'.$this->getThemeConfiguration['SigninImage']; ?>" class="imgStyle ">
+                              <a href="javascript:void(0);"  rel="dbTip" title="Clicking this link will only remove this image from the preview. Save modifications from the preview to remove it from the platform." type="loginlogoimage" class="removeimage removeCompare">x</a>
+                           </div>
+                             <?php } ?>
+                           <input type="hidden" name="hiddenSigninImage" value="<?php echo $this->getThemeConfiguration['SigninImage']; ?>" id="hiddenSigninImage">
+                        </div>
+                        <div class="clearfix"></div>                       
+                     </div>
+                  </div>
+                  <div class="formRow">
+                     <label class="label">Background color</label>
+                     <div class="field">
+                        <div class="colorPickerWrapper" style ="display: inline-block;">
+                        <input type="text" name="backgroundsignColor" style="background:<?php echo $this->getThemeConfiguration['SigninColor']; ?>" class="" readonly id="bacgroColor" value="<?php echo $this->getThemeConfiguration['SigninColor']; ?>">
+                        <button type="button" class="colpicker backgroundsignColor"><i></i></button> 
+                      </div>
+                        <div class="clearfix"></div>
+                     </div>
+                  </div>
+                   <div class="formRow genericBackgroundRow">
+                     <label class="label">Generic icon/button background</label> 
+                     <div class="field">
+                      <div class="colorPickerWrapper" style ="display: inline-block;">
+                        <input type="text" name="highlightsColor" style="background:<?php echo $this->getThemeConfiguration['highlightsColor']; ?>" class="" readonly id="highlightsColor" value="<?php echo $this->getThemeConfiguration['highlightsColor']; ?>">
+                        <button type="button" class="colpicker backgroundsignColor"><i></i></button>
+                      </div>
+                        <a href="javascript:void(0)" class="genericBg"><i class="media_hide_320">what is this?</i><i class="fa fa-exclamation-circle fa-2x media_320"></i></a>
+                        <div class="clearfix"></div>
+                     </div>
+                  </div><!-- 
+                  <div class="formRow">
+                     <label class="label">Hide icons</label> 
+                     <div class="field">
+                        <div class="clearfix changeintheam">
+                         <label style ="display: inline-block;">
+                            <input type="checkbox" name="hideIcons" id="hideIcons" value="1" <?php if($this->getThemeConfiguration['hideIcons']==1) echo 'checked=checked'; ?> >
+                            <label for="hideIcons"></label>Yes
+                          </label>
+                          <a href="javascript:void(0)" class="hideIconsPopup">what is this?</a>
+                        </div>
+                     </div>
+                  </div> -->
+                  <div class="formRow">
+                     <div class="field">
+                        <button class="btn btn-green SigninOnly" data-id="logins">Save</button>
+                        <button class="btn btn-green SigninPupPreview" data-id="login">Preview &amp; Save</button>
+                        <button class="btn btn-yellow SigninReset">Reset</button>
+                     </div>
+                  </div>
+         </li>
+         <li>
+           <div class="hashUrsrDetails">
+             <h2>
+              Platform theme settings
+             <a class="hasTagDetails" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
+             </h2>
+           <div style="display: none;"  class="listing" >
+             <div class="formRow">
+               <label class="label">Platform logo
+                <br><br>
+                <span class="noteText">
+                <strong>Suggested max width</strong>
+                <br>
+                230px
+                </span>
+               </label>
+               <div class="field appendType">
+               <input type="text" readonly="" name="" class="uploadType sitelogoupload" value="<?php echo $this->getThemeConfiguration['SiteLogo']; ?>">
+               <a href="javascript:void(0);" class="btn btn-black">Browse<input type="file" name="sitelogo" class="fileType"></a><input type="hidden" name="hiddensitelogo" value="<?php echo $this->getThemeConfiguration['SiteLogo']; ?>" id="hiddensitelogo">
+               <div class="clearfix"></div>
+               <div class="acntImgThumb">
+                 <div id="newpic" class="proPic sitelogoimage">
+                 <img  src="<?php echo BASE_URL .'/img/'.$this->getThemeConfiguration['SiteLogo']; ?>" class="imgStyle ">
+                 <a href="javascript:void(0);" rel="dbTip" title="Clicking this link will only remove this image from the preview. Save modifications from the preview to remove it from the platform." type="sitelogo" class="removeimage removeCompare">x</a>
+                 </div>
+               </div>
+               <div class="clearfix"></div>
+               </div>
+             </div>
+
+             <div class="formRow">
+               <label class="label">Favicon logo
+                <br><br>
+                <span class="noteText">
+                <strong>Suggested size</strong>
+                <br>
+                16px x 16px
+                </span></label>
+               <div class="field appendType">
+               <input type="text" readonly="" name="" class="uploadType faviconeupload" value="<?php echo $this->getThemeConfiguration['FaviconLogo']; ?>" >
+               <a href="javascript:void(0);" class="btn btn-black">Browse<input type="file" name="faviconlogo" class="fileType"></a><input type="hidden" name="hiddenfaviconlogo" value="<?php echo $this->getThemeConfiguration['FaviconLogo']; ?>" id="hiddenfaviconlogo">
+
+                <a href="javascript:void(0)" class="faviconPopup">what is this?</a>
+               <div class="clearfix"></div>
+               
+               <div class="acntImgThumb">
+                 <?php if($this->getThemeConfiguration['FaviconLogo']!='') { ?>
+                 <div id="newpic" class="proPic faviconlogoimage">
+                 <img  src="<?php echo BASE_URL .'/images/'.$this->getThemeConfiguration['FaviconLogo']; ?>" class="imgStyle ">
+                 <a href="javascript:void(0);" rel="dbTip" title="Clicking this link will only remove this image from the preview. Save modifications from the preview to remove it from the platform." type="faviconlogo" class="removeimage removeCompare">x</a>
+                 </div>
+                 <?php } ?>
+               </div>
+              
+               <div class="clearfix"></div>
+               </div>
+             </div>
+              <div class="formRow highlighteddRow">
+                     <label class="label">Highlight color </label> 
+                     <div class="field">
+                      <div class="colorPickerWrapper" style ="display: inline-block;">
+                        <input type="text" name="highlightsColorPlatform" style="background:<?php echo $this->getThemeConfiguration['highlightsColorPlatform']; ?>" class="" readonly id="highlightsColorPlatform" value="<?php echo $this->getThemeConfiguration['highlightsColorPlatform']; ?>">
+                        <button type="button" class="colpicker backgroundsignColor"><i></i></button>
+                      </div>
+                        <a href="javascript:void(0)" rel="hightlightColorPop" class="screenPopup"><i class="media_hide_320">what is this?</i><i class="fa fa-exclamation-circle fa-2x media_320"></i></a>
+                        <div class="clearfix"></div>
+                     </div>
+                </div>
+                <div class="formRow highlighteddRow">
+                     <label class="label">Highlight foreground text </label> 
+                     <div class="field">
+                      <div class="colorPickerWrapper" style ="display: inline-block;">
+                        <input type="text" name="highForegroundPlatform" style="background:<?php echo $this->getThemeConfiguration['highForegroundPlatform']; ?>"  readonly id="highForegroundPlatform" value="<?php echo $this->getThemeConfiguration['highForegroundPlatform']; ?>">
+                        <button type="button" class="colpicker backgroundsignColor"><i></i></button>
+                      </div>
+                        <a href="javascript:void(0)" rel="hightlightForgroundColorPop" class="screenPopup"><i class="media_hide_320">what is this?</i><i class="fa fa-exclamation-circle fa-2x media_320"></i></a>
+                        <div class="clearfix"></div>
+                     </div>
+                </div>
+                <div class="formRow">
+                     <label class="label">Platform font</label> 
+
+                     <div class="field">
+                      <div id="fontFamily"></div>
+                        <!-- <div class="dropDown">
+                            <a href="#" class="dropDownTarget">Select fonts</a>
+                            <ul class="dropDownList" id="fontFamily"></ul>
+                        </div> -->
+                     </div>
+                </div>
+               <div class="formRow">
+               <div class="field"><button class="btn btn-green SigninOnly" data-id="login">Save</button>
+               <button class="btn btn-green Signin2PupPreview" data-id="login">Preview & Save</button></div>
+               </div>     
+           </div>
+           </div>
+         </li> 
+         <li>
+            <div class="hashUrsrDetails" id="platformInterfaceWrp">
+              <h2>
+                Functionality theme settings 
+                <a class="hasTagDetails" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
+              </h2>
+               <div class="listing" style="display:none">
+
+                <div id="toolboxPlatform" class="bounceInLeft animate">
+                    <span id="closeImgFile"></span>
+                    <?php if(ismobile==''){ ?>
+                       <h2 class="titleEditingType"><span>Body container</span> <i class="fa pull-right fa-minus"></i></h2>
+                    <?php } else { ?>
+                   
+                    <div class="titleEditingType"><span>Body container</span> <i class="fa pull-right fa-times"></i> </div>
+                    <?php }?>
+                    <ul>
+                       <div class="conclusion">Click each button in window (right) to change and save.</div>
+                      <li id="BgImageRow">
+                        <div  class="dropzone" id="BgImage" >
+                          <div class="fallback">
+                            <input type="file" name="file" value="Browse" />
+                          </div>
+                        </div>
+                      </li>
+                      <li id="activeElement" style="display:none">
+                          <a href="javascript:void(0);" class="active">Open </a>
+                          <a href="javascript:void(0);" class="activeState">Closed</a>
+                        </li>
+                        <li id="fillColorsRow">
+                            <input type="checkbox" id="fillColorGradiantInput"  checked>
+                            <div class="tabTool">
+                              <label for="fillColorGradiantInput"  id="gradientFill">Gradient</label>
+                              <label for="fillColorGradiantInput" id="solidFill">Solid</label>
+                            </div>
+                            <h4> 
+                              <span>Fill colors</span>
+                              <a href="javascript:void(0);" class="colorFill" date-type="start" ></a>
+                              <a href="javascript:void(0);" class="colorFill" date-type="end"></a>
+                            </h4>
+                        </li>
+                        <li id="borderColorsRow">
+                            <h4><span>Border color</span> <a href="javascript:void(0);" class="colorFill" date-type="borderColor"></a></h4>
+                        </li>
+                         <li id="fontColorsRow">
+                            <h4><span>Font color</span> <a href="javascript:void(0);" class="colorFill" date-type="buttonTextColor"></a></h4>
+                        </li>
+                        <li id="hoverFontColorRow">
+                            <h4><span>Hover color</span> <a href="javascript:void(0);" class="colorFill" date-type="hoverFontColor"></a></h4>
+                        </li>
+                        <li id="iconColorRow">
+                            <h4><span>Icon color</span> <a href="javascript:void(0);" class="colorFill" date-type="iconColor"></a></h4>
+                        </li>
+
+                         <li id="borderWidthRow">
+                            <h4>Border width <strong></strong></h4>
+                            <input type="range"  data-type="borderWidth" value="0" min="0" max="10">
+                        </li>
+                        <li id="borderRadiusRow">
+                            <h4>Border radius <strong></strong></h4>
+                            <input type="range" data-type="radius" value="0" min="0" max="20">
+                        </li>
+                        <li id="chooseTexture" class="chooseTexture">
+                            <input type="checkbox" name="" id="txture" value="">
+                            <label for="txture">Background texture</label>
+                            <div>
+                               <ul>
+                                  <li><a href="#" rel="dbTip" title="no texture" class="noTexture"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/0.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/1.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/2.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/3.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/4.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/5.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/6.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/7.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/8.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/9.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/10.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/11.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/12.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/13.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/14.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/15.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/16.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/17.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/18.png"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/19.jpg"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/20.jpg"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/21.jpg"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/22.jpg"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/23.jpg"></a></li>
+                                  <li><a href="#"><img src="<?php echo BASE_URL ?>/adminraw/img/bgs/24.jpg"></a></li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li>
+                          <a href="#" class="btn btn-yellow btn-mini" id="resestToDefault">Reset theme</a>
+                        </li>
+                    </ul>
+                    
+                </div>
+                <iframe id="platformInterface" src="<?php echo BASE_URL; ?>/admin/platformsettings/platforminterface" ></iframe>
+               </div>
+            </div>
+         </li>
+      </ul>
+      </div>
+   </form>
+   </div>
+   <!--end tab content-->
+
+   <div id="genericBgPop" style="display:none" title="Generic icon/button background">
+    <img src="<?php echo BASE_URL; ?>/img/genericBackground.jpg">
+   </div>
+   <div id="bgPositionPop" style="display:none" title="Background Positions">
+    <img src="<?php echo BASE_URL; ?>/img/background-position.jpg">
+   </div>
+   <div id="bgPositionPop" style="display:none" title="Background Positions">
+    <img src="<?php echo BASE_URL; ?>/img/background-position.jpg">
+   </div>
+
+   <div class="setPopimg" id="hightlightColorPop">
+     <div class="popimgList flexslider">
+         <ul class="slides">
+            <li><img src="<?php echo BASE_URL; ?>/img/hightlight-color.jpg"/></li>
+            <li><img src="<?php echo BASE_URL; ?>/img/hightlight-color2.jpg"/></li>
+         </ul>
+      </div>
+  </div>
+
+  <div class="setPopimg" id="hightlightForgroundColorPop">
+     <div class="popimgList flexslider">
+         <ul class="slides">
+            <li><img src="<?php echo BASE_URL; ?>/img/hightlight-foreground.jpg"/></li>
+            <li><img src="<?php echo BASE_URL; ?>/img/hightlight-foreground2.jpg"/></li>
+         </ul>
+      </div>
+  </div>
+
+ <div class="setPopimg" id="hideIconsPopup"><img src="<?php echo BASE_URL; ?>/img/hideIcons-popup.png"/></div>
+ <div class="setPopimg" id="faviconPopup"><img src="<?php echo BASE_URL; ?>/img/favicon-popup.png"/></div>
+
+</div>
+<!--End Container-->
+

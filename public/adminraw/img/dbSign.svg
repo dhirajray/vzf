@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 14.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 43363)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" [
+	<!ENTITY ns_flows "http://ns.adobe.com/Flows/1.0/">
+	<!ENTITY ns_extend "http://ns.adobe.com/Extensibility/1.0/">
+	<!ENTITY ns_ai "http://ns.adobe.com/AdobeIllustrator/10.0/">
+	<!ENTITY ns_graphs "http://ns.adobe.com/Graphs/1.0/">
+]>
+<svg version="1.1" id="Layer_1" xmlns:x="&ns_extend;" xmlns:i="&ns_ai;" xmlns:graph="&ns_graphs;"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:a="http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/"
+	 x="0px" y="0px" width="42.5px" height="43px" viewBox="0 0 42.5 43" enable-background="new 0 0 42.5 43" xml:space="preserve">
+<symbol  id="New_Symbol" viewBox="-52.647 -52.531 105.294 105.062">
+	<g>
+		<path fill="#F9ED33" d="M47.072-35.17c3.875,23.048-1.672,44.423-19.562,62.1C9.625,44.609-11.476,50.472-34.474,46.331
+			L-46.818,0.006c13.688,2.462,22.716-0.42,33.357-10.944C-2.804-21.456,2.288-33.218-0.002-46.936L47.072-35.17z"/>
+	</g>
+	<path fill="#FFCB0C" d="M47.072-38.65c3.875,23.052-3.41,46.165-21.303,63.842C7.888,42.866-16.701,49.605-39.7,45.462
+		L-52.036-1.737c13.688,2.467,26.192-1.283,36.836-11.811C-4.546-24.067,2.288-37.566-0.002-51.287L47.072-38.65z"/>
+	<g>
+		<path fill="none" stroke="#010101" stroke-width="10.7032" stroke-linecap="round" d="M-34.234,46.079
+			c21.423,3.855,44.313-2.42,60.968-18.868c16.648-16.462,23.203-39.28,19.604-60.739"/>
+		<path fill="none" stroke="#010101" stroke-width="7.1354" stroke-linecap="round" d="M-43.142,22.136
+			C-25.696,25.279-7.04,20.167,6.529,6.76C20.095-6.649,25.442-25.247,22.507-42.732"/>
+		<path fill="none" stroke="#010101" stroke-width="5.3516" stroke-linecap="round" d="M-49.971-2.458
+			c12.757,2.297,26.385-1.439,36.291-11.236c9.924-9.797,13.827-23.384,11.687-36.161"/>
+	</g>
+</symbol>
+<use xlink:href="#New_Symbol"  width="105.294" height="105.062" x="-52.647" y="-52.531" transform="matrix(0.3617 0 0 -0.3617 21.4409 22)" overflow="visible"/>
+</svg>

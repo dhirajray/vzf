@@ -1,0 +1,8 @@
+<?php 
+foreach($this->data as $row): ?>
+<div class="usergroupcontent">
+<ul class="groupbox">
+<a href="<?php echo BASE_URL;?>/admin/usergroup/usergroupdetail/id/<?php echo $this->escape($row['ugid']);?>"><li><?php echo $this->escape($row['ugname']);?></li></a>
+</ul>
+</div>
+<?php endforeach; ?>

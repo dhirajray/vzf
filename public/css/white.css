@@ -1,0 +1,16 @@
+body {
+	background-color:#FFF;
+	
+	/* Firefox 3.6+ */
+	background: -moz-linear-gradient(100% 100% 90deg, #FFF, #FFF);
+	
+	/* Safari 4-5, Chrome 1-9 */
+	/* -webkit-gradient(<type>, <point> [, <radius>]?, <point> [, <radius>]? [, <stop>]*) */
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FFF), to(#FFF));
+	
+	/* Safari 5.1+, Chrome 10+ */
+	background: -webkit-linear-gradient(#FFF, #FFF);
+	
+	/* Opera 11.10+ */
+	background: -o-linear-gradient(#FFF, #FFF);
+}

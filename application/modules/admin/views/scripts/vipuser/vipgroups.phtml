@@ -1,0 +1,281 @@
+<script type="text/javascript" src="<?php echo BASE_URL."/adminraw/js/vipgroups.js";?>"></script>
+<?php   
+$gruSucc = $this->request['response'];   
+
+if($gruSucc!='')
+{
+	?>
+	<script type="text/javascript">
+
+		$('document').ready(function(){
+			var suRes = '<?php echo $gruSucc ?>'
+			$messageSuccess( "custom VIP group "+suRes+" successfully" );
+		})  
+		</script>
+	<?php	
+}   
+$this->title = "Custom User Groups";
+$this->headTitle($this->title);
+$deshboard = new Admin_Model_Deshboard();
+?>
+<div id="fb-root"></div>
+<script type="text/javascript">
+ 
+$('body').on('keypress','#invietvipuser',function(e){   
+	
+	  keyword = $.trim($(this).val());
+	    if (e.which==13){
+	       if(keyword.length>=2){	    
+
+	        data ='keyword='+keyword+'&from=vipgroup';	        
+	       $.ajax({
+	          url:BASE_URL+"/admin/usergroup/dbeeuser",
+	          data:data,
+	          dataType : 'json',			
+	          type :"POST",
+	          beforeSend:function(){
+	          	$('#userInfoContainer2').html('<div class="loader"></div>');
+	      		//$('#userInfoContainer').html('<div class="loaderOverlay2"></div>');	         
+	          },
+	          success:function(responce){
+	        	           
+	             $('#userInfoContainer2').html(responce.content);	             
+	             $('#userInfoContainer2').flexslider({
+	                      animation: "slide",
+	                      animationLoop: false,
+	                      itemWidth:150,
+	                      itemMargin: 5
+	                  });
+	          		}
+	       });	    
+
+	       $(this).removeClass('error');
+	       return false;   
+
+	       }else{
+	          $messageError('Please type minimum 2 characters')
+	        }
+	    }
+	  
+	  
+	 });
+
+
+$('body').on('change','input:radio',function(e){
+  	var radid = $(this).attr('id');
+  	//alert(radid)
+  	if(radid=='nonsiteusers')
+  	{
+  		$('.nonsiteusers').show();
+  		$('.siteusers').hide();
+  	}
+  	else
+  	{
+  		$('.siteusers').show();
+  		$('.nonsiteusers').hide();
+  	}
+
+});
+
+</script>
+ 
+<?php										
+	//require_once '/Zend/Locale.php';
+	//$locale = new Zend_Locale();
+	//$timezonelist = $locale->getTranslationList("TimezoneToTerritory");										 
+?>
+
+<h1 class="pageTitle" >
+	VIP user groups<a href="javascript:void(0)" class="btn btn-yellow btn-large openSearchBlock pull-right" id="" >Create VIP user group</a>
+</h1>
+
+<div class="pageSubeTitlevip">Create groups of VIP users in a private space, invisible to the rest of the platform (with the exception of other VIP users), and where they can interact with each other privately (within the confines of the group). As with any ‘private’ group, a VIP Group will not be visible in a Group search other than when searched for by VIP users.</div>
+<div  id="searchWrapper" class="spSdbsSearchBox">
+	
+		<div id="searchContainer" style="display :none">	
+			<div id="exp_condition" class="expenddcondition1"  >				
+				<div class="whiteBox addConditionWrapper"> 
+					<form name="vipgroup" id="vipgroup" method="post" action="<?php echo BASE_URL?>/admin/vipuser/createvipgroup" enctype="multipart/form-data">
+									<div class="searchField"> 
+										<label class="label">Group name: </label>
+										<div class="fieldInput"><input type="text" id="grp_name" name="grp_name"></div>
+									</div>
+									<div class="searchField"> 
+										<label class="label">Group description: </label>
+										<div class="fieldInput"><textarea class="textarea" name="grp_des" id="grp_des" ></textarea></div>
+									</div>
+									<div class="searchField"> 
+										<label class="label">Group picture: </label>
+										<div class="fieldInput appendType">
+											<input type="text" readonly="" name="" class="uploadType" id="rogrouppicture">
+											<a href="javascript:void(0);" class="btn btn-black">Browse<input type="file" name="grouppicture" class="fileType"></a>
+											<input type="hidden" readonly="" name="oldpicture" id="roupdategrouppicture" >
+										</div>		
+								    </div>
+									<div class="searchField"> 
+										<label class="label">Invite VIP users: </label>
+										<div class="fieldInput">
+											<label for="siteusers">
+										<input name="addinvite" id="siteusers" class="goupuser" value="1" type="radio" checked><label for="siteusers"></label>(existing VIP users)<span style="color:#999"></span></label>
+										<label for="nonsiteusers">
+										<input name="addinvite" id="nonsiteusers" class="goupuser" value="1" type="radio" ><label for="nonsiteusers"></label>('new users' - add & invite as VIPs)<span style="color:#999"></span></label>
+										<input type="hidden"  id="membersofgroup" name="membersofgroup">
+										<input type="hidden"  id="grp_id" name="grp_id">
+										</div>
+									</div>
+									
+								    <div class="searchField siteusers" style="display:block"> 
+										<label class="label"></label>
+										<div class="fieldInput ">
+											<div class="srcUsrWrapper" data-search="users">	
+												<div class="sprite searchIcon2"></div>
+												<input type="text" placeholder="type user name and press enter" socialfriendlist="true" class="userFatchList" id="invietvipuser">
+												<div style="display:none;" class="srcUsrtotal"><i>total</i></div>
+
+											</div>
+											<div id="userInfoContainer2"></div>
+										</div>		
+								    </div>
+								    <div class="searchField nonsiteusers" style="display:none"> 
+										<label class="label"></label>
+										<div class="fieldInput ">
+											<div class="row"><input type="text" placeholder="add a name or add multiple names separated by a comma" socialfriendlist="true" class="userFatchList" name="vipusersname" id="vipusersname"></div>
+												<div class="row">
+											<input type="text" placeholder="add an email or add multiple emails separated by a comma" socialfriendlist="true" class="userFatchList" name="vipusersemail" id="vipusersemail"></div>
+											<div class="row">- OR - </div>
+										
+										<div class="row appendType">
+											<input type="text" readonly="" name="" class="uploadType" placeholder="upload CSV" >
+											<a href="javascript:void(0);"  class="btn btn-black">Browse<input type="file" name="uploadvipcsv" class="fileType" ></a>
+										</div>
+										
+										<div class="row ">
+											<label class="label">custom users type: </label>
+											<?php echo $this->getvipuserdropdown; ?>
+										</div>	
+										</div>		
+								    </div>
+
+									 <div class="searchField"> 
+									 <label class="label"> </label>
+										<div class="fieldInput">
+										<label>
+										<input name="restrict" id="restrict" class="goupuser" value="1" type="checkbox"><label for="restrict"></label>Restrict posting to admin only<span style="color:#999"></span></label>
+										</div>
+									</div>
+
+									<div class="searchField"> 
+									 	<label class="label"> </label>
+										<div class="fieldInput">
+											<label>
+											<input name="expert" id="expert" class="goupuser" value="1" type="checkbox"><label for="expert"></label>Only admin can invite an expert<span style="color:#999"></span></label>
+										</div>
+									</div>	
+									
+									<div class="searchField"> 
+										<label class="label">&nbsp;</label>
+										<div class="fieldInput">
+											<input type="submit" id="vipgroupsubmit" class="addbutton btn btn-green btn-medium pull-left" value="+ Create group"> 
+
+											<input type="submit" id="vipgroupedit" class="addbutton btn btn-green btn-medium pull-left" value="+ Edit group" style="display:none"> 
+											&nbsp;
+											<input type="submit" id="" class="btn btn-medium openSearchBlock " value="Close" style=""> 
+										</div>
+									</div>
+							<div class="clearfix"></div>
+							
+
+						</div>
+						<div class="clearfix"></div>
+					</form>
+			</div>
+
+
+			<div class="clearfix"></div>
+		</div>
+
+		<div class="clearfix"></div>
+	
+</div>
+<div class="box-body" id="box_body">
+	<div id="listingTotalResults" style="float:right;margin: 10px 35px 0 0;"></div>
+	<div id="beforecall" style=""></div>
+	<div class="clearfix"></div>
+	<div id="searchresultvis" style="display:none"></div>
+	<div id="showmore" style="display:none;text-align: center;">
+		<img src="<?php echo BASE_URL ?>/images/show.png" style="border:0" title="Show More" alt="Show More">
+	</div>
+		<?php if (count($this->paginator)) { //echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml');  ?>
+	
+	<div class="pageheadinusr">
+	<?php echo "Showing Page ". $this->page." of ".$this->totalpage;?> 
+	</div>
+	<div class="pageheadinusrlft">
+	<?php echo "Total Record ".$this->total; } ?> 
+	</div>
+		<ul class="listing listingGroup scoredList grpVipuser" id="searchresulthide">
+					<?php if (count($this->paginator)){ ?>
+					<?php foreach($this->paginator as $liveGroup) :
+					 $defaultimagecheck = new Admin_Model_Common(); 
+                     $liveGrouppic = $defaultimagecheck->checkImgExist($liveGroup->GroupPic,'grouppics','','admin');
+                     //echo $liveGroup->image ;
+					?>
+					<li>
+						<div class="listUserPhoto">
+								<!--User profile pic  who scored someone-->		
+						<?php
+						if($liveGrouppic!='')
+						{
+						?>
+							<input type="hidden" id="up_grouppicture" value="<?php echo $liveGrouppic ?>"> 							
+							<img src="<?php echo IMGPATH.'/grouppics/medium/'.$liveGrouppic ?>" width="90" height="90" border="0"/>
+							<?php
+						}
+						else 
+						{
+							echo '<div class="noGroupImage"><span style="display:none;">VIP Group</span></div>';
+						}
+						?>
+							
+								<!--End User profile pic  who scored someone-->
+							</div>
+							<div class="dataListWrapper">
+								<div class="dataListbox">
+									<div class="scoredListTitle">
+										<a class="show_details_user" userid="<?php echo $this->escape($liveGroup->UserID);?>" href="javascript:void(0)" style="font-weight:normal"><?php echo htmlentities($this->escape($liveGroup->GroupName));?></a>	
+										<input type="hidden" id="up_grp_name" value="<?php echo htmlentities($this->escape($liveGroup->GroupName)); ?>"> 
+										created by&nbsp;<a class="show_details_user" userid="<?php echo $this->escape($liveGroup->UserID);?>" href="javascript:void(0)"><?php echo $this->myclientdetails->customDecoding($this->escape($liveGroup->username)).' '.$this->myclientdetails->customDecoding($this->escape($liveGroup->lname)); ?></a> <span class="titleListDate">On <?php echo date('d M Y',strtotime($this->escape($liveGroup->Gdate))); ?></span>
+										    <a href="<?php echo BASE_URL ?>/group/groupdetails/group/<?php echo $liveGroup->ID ?>"> - view</a>								
+									</div>
+
+										<input type="hidden" id="up_grp_des" value="<?php echo htmlentities($this->escape($liveGroup->description)); ?>"> 
+										<?php if($this->escape($liveGroup->description)) {?>
+										<div class="scoredData">	
+
+											<?php echo $this->escape($liveGroup->description);//echo htmlentities(substr($this->escape($liveGroup->description),0,100));?>						
+											</div>
+										<?php } ?>
+										
+										<div id="groupmember"></div>
+										<input type="hidden" id="up_restrict" value="<?php echo htmlentities($this->escape($liveGroup->GroupRes)); ?>"> 
+										<input type="hidden" id="up_expert" value="<?php echo htmlentities($this->escape($liveGroup->Invitetoexpert)); ?>">
+				
+									</div>
+								
+								<div class="scoredPostDate">
+									<span  gid="<?php echo $this->escape($liveGroup->ID) ?>" class="updatevipgroup btn btn-green btn-mini">update group </span>
+									<a href="javascript:void(0)"  class="btn btn-black btn-mini" onclick="callglobalajax('groupmember','vipuser','vipgroupmembers','vipmembers','<?php echo $liveGroup->ID ?>','','','')">group members</a>
+									<?php //echo  $this->escape($liveGroup->TypeName);?>
+								</div>
+							</div>
+
+					</li>	
+					<?php $rowchange++; endforeach; ?>
+			
+		<?php } else { ?>
+		<!-- <li><div class="dataListWrapper"><div class="dashBlockEmpty">Custom User Groups not found!</div></div></li> -->
+		<?php } ?>
+		</ul>
+	</div>	
+
+<?php if(count($this->paginator)) echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml');  ?>

@@ -1,0 +1,52 @@
+<?php 
+$read = 0;
+$commonmodel_obj      = new Application_Model_Commonfunctionality();
+
+?>
+<script>
+
+fetchadvert();
+$(function() {  
+	messagefeed('<?php echo $this->user;?>','<?php echo $read;?>','<?php echo $this->msgid;?>','<?php echo $this->dateFrom;?>','<?php echo $this->dateTo;?>','<?php echo $this->search;?>');
+
+});
+</script>
+
+<div id="leftListing">
+
+	<div id="dbees-feeds-wrapper" style="margin-top:0">
+			<!-- <div>
+				<div id="send-message" class="backmsgbtn" style="float:right; margin:-15px 0 5px 0;"><a href="<?php echo BASE_URL; ?>/message"><< back to my messages</a></div>
+			</div>
+			<div class="next-line"></div> -->
+			
+			<div id="message-feed"></div>
+			<br style='clear:both; font-size:1px;' />
+	</div>	
+</div>	
+<div id="rightListing">
+	<?php //echo $commonmodel_obj->displaybroadcastdbs();?>
+	<!-- <div class="whiteBox" id="messageSearchCont"></div> -->
+<?php $rightmenu = $this->partial('partials/rightmenu.phtml', array('userid' => $this->loginuser,'myclientdetails' => $this->myclientdetails,'eventglobal'=>$this->eventglobal));
+			echo $rightmenu; ?>
+</div>
+<div class="clearfix"> </div>
+<!--End page listing-->
+
+
+
+<div id="joingroup-popup" class="popup_block">Request sent to group admin.</div>
+<div id="follow-popup" class="popup_block"></div>
+
+<input type="hidden" id="dbeeuser" value="<?php echo $this->$userid?>">
+
+<input type="hidden" id="dbeepopchk" value="1">
+<input type="hidden" id="frompop" value="0">
+<input type="hidden" id="startnewmsg" value="5">
+<!-- SCRIPT FOR FADE POPUP -->
+<div id="blockusermsg-popup" class="popup_block"></div>
+<script type="text/javascript">
+var jsonData = '<?php echo $this->msguser->list; ?>';
+var jsonCompany = '<?php echo $this->msguser->company; ?>';	
+
+</script>

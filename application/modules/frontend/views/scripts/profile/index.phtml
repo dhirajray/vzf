@@ -1,0 +1,209 @@
+<?php
+$storage 	= new Zend_Auth_Storage_Session();
+$data	  	= $storage->read();
+$userlogincheck = $data['UserID'];
+if($this->userid==$userlogincheck) $profileHolder=true; else $profileHolder=false;
+?>	
+<script>
+$(document).ready(function(){
+	<?php if($this->userid==$userlogincheck){ ?>
+		fetchspecificadvert(<?php echo $this->userid; ?>,4);
+	<?php }  if($this->invite=='linkedin') { ?>
+		linkedinUserProfile();
+	<?php } ?>
+});
+</script>
+<?php if($this->userexiest==1){?>
+	<!--this is page listing-->
+		<div id="leftListing">
+
+			<div class="dashboarprofleWrp" id="dashboarduserDetails">
+			<!-- db content bar-->
+				<!--End from here details top bar-->
+			</div>
+			<div class="profileStatsWrp">
+				<div class="profileStats">
+					<div class="prstTitle">Linked accounts</div>
+					<div class="prolinks">
+						<span>+60%</span>
+						<a id="" username="" class="facebookconnected linkedIcons linkedIcon" href="javascript:void(0);"></a>
+						<a id="" username="jones.adam4" class="facebookconnected linkedIcons twitIcon" href="javascript:void(0);"></a>
+						<a id="AdamDbee" username="jones.adam4" class="twitterconnected linkedIcons faceIcon" href="javascript:void(0);"></a>
+						<a id="" username="" class="facebookconnected linkedIcons okIcon" href="javascript:void(0);"></a>
+					</div>
+					<div class="progressBar"><span class="progressComplete" style="width:60%" ></span></div>
+				</div>
+				<div class="profileStats">
+					<div class="prstTitle">Profile completed </div>
+					<div class="prolinks"><span>+60%</span></div>
+					<div class="progressBar"><span class="progressComplete" style="width:60%" ></span></div>
+				</div>
+				<div class="profileStats">
+
+					<div class="prstTitle">You have posted</div>
+					<div class="prolinks">
+						<a href="#" class="posticons pstTxt"></a>
+						<a href="#" class="posticons pstLnk"></a>
+						<a href="#" class="posticons pstPic"></a>
+						<a href="#" class="posticons pstVd"></a>
+						<a href="#" class="posticons pstPll"></a>
+					</div>
+				</div>
+			</div>
+			<ul class="postListing" id="my-dbees"></ul>
+			
+			<input type="hidden" id="dbid" value="0">
+			<input type="hidden" id="reloadend">
+			<input type="hidden" id="profileuser" value="<?php echo $this->userid;?>">
+			<input type="hidden" id="totalcomments">
+			<input type="hidden" id="totaldbees">
+			<input type="hidden" id="totalredbees">
+			<input type="hidden" id="feedtype">
+			<input type="hidden" id="startnew" value="<?php echo PAGE_NUM;?>">
+			<input type="hidden" id="startnewmydb" value="<?php echo PAGE_NUM;?>">
+			<input type="hidden" id="startnewmyredb" value="<?php echo PAGE_NUM;?>">
+			<input type="hidden" id="startnewmycomments" value="<?php echo PAGE_NUM;?>">
+
+
+		</div>
+		<div id="rightListing">
+			<div class="whiteBox" >
+				<h2>Personal info <a href="#" class="fa fa-pencil"></a></h2>
+				<div class="rboxContainer" id="dashboardpersonalinfo">
+					
+				</div>
+			</div>
+			<div class="whiteBox">
+				<h2>Contact Info <a href="#" class="fa fa-pencil"></a></h2>
+				<div class="rboxContainer"  id="dashboardcontactinfo">
+					
+				</div>
+			</div>
+			<div class="whiteBox">
+				<h2>Upcoming Event<a href="#">View...</a></h2>
+				<img src="<?php echo BASE_URL;?>/img/addver.png">
+			</div>
+
+		</div>		
+	<div class="clearfix"> </div>
+	<!--End page listing-->
+
+
+
+
+
+
+<link href="<?php echo BASE_URL;?>/css/liteaccordion.css" rel="stylesheet" />
+<script src="<?php echo BASE_URL;?>/js/liteaccordion/liteaccordion.jquery.js"></script>
+<!-- SCRIPT FOR FADE POPUP -->
+<?php
+$redirection_name_space = new  Zend_Session_Namespace('User_Session');
+if(isset($redirection_name_space->screen_name) && !empty($redirection_name_space->screen_name)){
+if($_GET['invite']=='twitter'){
+?>
+<script type="text/javascript">
+$(function(){
+ TwitterInviteFriendsprofile();
+ });
+</script>
+<?php
+//$redirection_name_space->screen_name ='';
+//unset($redirection_name_space->screen_name);
+} } ?>
+<div id="redb-popup" class="popup_block"><?php echo POST_NAME;?> successfully posted on your profile</div>
+<script type="text/javascript">
+
+$(document).ready(function(){
+	fadepopup();
+	
+});
+							
+$(function() {	
+	dashboardprofile('<?php echo $this->userid;?>',0);
+
+	//seedbeelist('<?php echo $this->userid;?>');
+<?php  if($this->vip==0) fillgroupfeedoptions('<?php echo $this->userid;?>'); ?>
+		
+
+
+	$('#toggle-twitter-asearch').click(function(){
+
+		$(".slidingTwitterSearch").slideToggle('fast');
+
+		if(document.getElementById('toggle-twitter-asearch').className=='twitter-search-arrow-closed')
+
+			document.getElementById('toggle-twitter-asearch').className='twitter-search-arrow-open';
+
+		else
+
+			document.getElementById('toggle-twitter-asearch').className='twitter-search-arrow-closed'
+
+	});
+
+});
+
+
+
+function createdrop(start,end) {
+
+	for(i=start;i<=end;i++) {
+
+		dropdowncontent.init("scorecomment"+i, "left-bottom", 100, "mouseover");
+
+	}
+
+}
+
+function changeHistory() {
+
+	var box=document.getElementById('historyMonths');
+
+	var month=box.options[box.selectedIndex].value;                    
+
+	seehistorylist(<?php echo $this->userid;?>,month);
+
+}
+
+	$(window).scroll(function(){		
+
+		var feedtype=$('#feedtype').val();
+
+		
+		if  ($(window).scrollTop() == $(document).height() - $(window).height()) {
+
+			if(feedtype=='mydbs') {
+
+				var totaldbees=document.getElementById('totaldbees').value;				
+
+					var mystart=document.getElementById('startnewmydb').value;
+					
+					seemoremyfeeds(mystart,'<?php echo PAGE_NUM;?>');
+				
+			}
+
+			else if(feedtype=='myredbs') {
+
+				var totalredbees=document.getElementById('totalredbees').value;				
+					var mystart=document.getElementById('startnewmyredb').value;
+					seemoreredbee(mystart,'<?php echo PAGE_NUM;?>'); 			
+			}
+
+			else if(feedtype=='mycomments') {
+
+				var mystart=document.getElementById('startnewmycomments').value;
+
+				seemoremycomments(mystart,'<?php echo PAGE_NUM;?>',<?php echo $this->userid;?>);
+
+			}
+
+		}
+
+	});
+		
+</script>
+<input type="hidden" id="dbeeuser" value="<?php echo $this->$userid?>">
+<input type="hidden" id="dbeepopchk" value="1">
+<input type="hidden" id="frompop" value="0">
+
+<?php } ?>
+

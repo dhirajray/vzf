@@ -1,0 +1,168 @@
+<script language="javascript" type="text/javascript">
+$(document).ready(function() {
+	
+	fetchdbeeleague('<?php echo $this->leaguedbee;?>');	
+
+
+	
+});
+
+$(window).load(function() {
+	$('.dbSliderBox ul').dbThumbSlider({visibleThumb:5});
+});
+
+</script>
+<?php 
+$commonfunctionality = new Application_Model_Commonfunctionality();
+
+$infoleague = $this->leageinfo; 
+$userName = $this->myclientdetails->customDecoding($infoleague['Username']); 
+$enddatearray = date('jS F Y H:i',strtotime($infoleague['EndDate']));
+
+if(substr($enddatearray, strrpos($enddatearray, ' ') + 1)=='00:00')
+$enddate = date('jS F Y ',strtotime($infoleague['EndDate']));
+else 
+$enddate = date('jS F Y H:i',strtotime($infoleague['EndDate']));
+
+$leagueOwnerPic = $commonfunctionality->checkImgExist($infoleague['ProfilePic'],'userpics','default-avatar.jpg'); 
+$myPic = $commonfunctionality->checkImgExist($_SESSION['Zend_Auth']['storage']['ProfilePic'],'userpics','default-avatar.jpg'); 
+
+?>
+
+
+<div class="dbDetailsWrapper leagueMemberWrp" >
+	<div class="dbDetailsContent">
+		<div id="group-highlighted"><div class="dbUserPic" >
+			<a href="<?php echo BASE_URL ?>/user/<?php echo $userName; ?>"><div style="margin:5 0 5px -14px; width:100%; height:146px; background-position: center top; background-image:url(<?php echo IMGPATH.'/users/'.$leagueOwnerPic ?>); background-repeat:no-repeat;  background-size:contain"></div></a>
+			</div>
+			<div class="dbDetailsBox">
+				<div class="leaHiLeft">
+					<!--this is details top bar-->
+					<div class="dbDetailsTopBar"  style="margin-bottom:10px;">
+
+						<a href="<?php echo BASE_URL ?>/user/<?php echo $userName; ?>" class="btn">Profile</a>
+											
+						
+					</div>
+					<!--End from here details top bar-->
+
+					<!-- db content bar-->
+					<div class="userPrDetailsWrapper">
+						<h2><?php echo $infoleague['Title']; ?></h2>
+						<div> 
+							<div style="margin-top:5px; margin-bottom:12px;">
+								<?php echo substr($infoleague['Discription'],0,90);
+								
+							if(strlen($infoleague['Discription']) > 90) {
+  							echo	'<strong class="expandparentcomment"  cid="'.$infoleague['LID'].'" id="expandparentcomment'.$infoleague['LID'].'" >[+]</strong>
+  							<span style="display:none" id="parentexpende_'.$infoleague['LID'].'">'.substr($infoleague['Discription'],90).'</span>
+  							 <strong class="collespparentcomment" id="collespparentcomment'.$infoleague['LID'].'" cid="'.$infoleague['LID'].'">[-]</strong> '; 
+  							}?>
+							</div>
+							<div style="float:left" class="medium-font-bold"></div>
+						</div>
+					</div>
+					<!--End from here db content -->						
+		             <div class="lgusersWrapper">
+						<?php 
+						if(count($this->lgusers)>0)
+						{
+						?>
+						<h2 style="margin-bottom:5px;">league members</h2>
+						<div class="dbSliderBox">
+							<ul>
+								<?php
+								foreach ($this->lgusers as $key => $value) {
+									$ProfilePic =$commonfunctionality->checkImgExist($value['ProfilePic'],'userpics','default-avatar.jpg');
+									echo '<li>
+											<a rel="dbTip" title="'.$this->myclientdetails->customDecoding($value['Name']).'" href="'.BASE_URL.'/user/'.$this->myclientdetails->customDecoding($value['Username']).'">
+												<img border="0" src="'.IMGPATH.'/users/small/'.$ProfilePic.'" width="35" height="35">
+											</a>
+									</li>';	
+										}
+								?>
+							</ul>
+						</div>
+							<?php
+							} ?>
+					</div>
+
+
+
+
+				</div>
+				<div class="leaHiRight">
+					<?php	
+				$curentdate = date('Y-m-d H:i:s');				
+				if(strtotime($curentdate) > strtotime($infoleague['EndDate'])){ ?>
+					<h2 class="leaHiRightTitle">League closed on <?php echo $enddate;?></h2>
+				<?php }else{ ?>	
+					<h2 class="leaHiRightTitle">League closes on <?php echo $enddate;?></h2>
+				<?php 
+
+			     } ?>	
+					<p><strong>league owner  :</strong> <a href="<?php echo BASE_URL ?>/user/<?php echo $userName; ?>"> <?php echo $this->myclientdetails->customDecoding($infoleague['Name']); ?></a></p>
+					<p><strong>posts in this league : </strong><?php echo $this->dbsinlg; ?></p>
+					<div class="lgTitleHright">My positions within league</div>
+					<div class="leageHiPos">
+						<div class="leaHiUspic">
+							<a href="#" rel="dbTip" title="<?php echo $this->myclientdetails->customDecoding($_SESSION['Zend_Auth']['storage']['Name']);?>"><img src="<?php echo IMGPATH.'/users/small/'.$myPic;?>" width="62" height="62"></a>
+						</div> 
+						<div class="lgpRightPos">
+							<?php 
+							echo '<h2>'.$this->positionlove.'<span class="mypsnTitle">'.$this->score->score1.'</span></h2>'; 
+							echo '<h2>'.$this->positionhate.'<span class="mypsnTitle">'.$this->score->score2.'</span></h2>'; 
+							echo '<h2>'.$this->positionfot.'<span class="mypsnTitle">'.$this->score->score3.'</span></h2>'; 
+							?>
+						</div>	
+					</div>			
+				</div>
+			
+                    
+			</div>
+			
+		</div>
+	</div>
+</div>
+<!--this is page listing-->
+
+<div class="clear:both"></div>
+
+<div class="leftSideCnt">		
+	<div id="leftListing" class="leagueLeftCnt">		
+			<ul id="dbee-feeds_league" class="postListing"></ul>
+	</div>	
+</div>	
+
+<div id="rightListing" class="leaguePositionRightWrapper">
+	 <div class="whiteBox leagueRSPosition">
+    <h2>League Positions <a href="#" class="clseSideBr"></a></h2>
+      <ul class="dbAccordion">
+        <li class="active">
+          <h3><?php echo $this->score->score1; ?> </h3>
+          <ul class="dbAccordionData">
+            <?php echo $this->mostlove; ?>
+          </ul>
+        </li>
+        <li>
+          <h3><?php echo $this->score->score2; ?></h3>
+           <ul class="dbAccordionData">
+            <?php echo $this->mosthate; ?>
+          </ul>
+        </li>
+        <li>
+          <h3><?php echo $this->score->score3; ?></h3>
+           <ul class="dbAccordionData">
+            <?php echo $this->mostfot; ?>
+          </ul>
+        </li>
+      </ul>
+  </div>
+</div>
+<div class="clearfix"></div>
+</div>
+<!--End page listing-->
+</div>
+
+</body>
+</html>

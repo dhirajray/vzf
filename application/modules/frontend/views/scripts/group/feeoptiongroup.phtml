@@ -1,0 +1,31 @@
+<?php 
+
+
+
+if($this->cookieuser==$this->user) $ProfileHolder=true;
+
+else $ProfileHolder=false;
+
+// CHECK IF PROFILE HOLDER
+
+
+
+// GROUP OWNER NAME
+
+$grpOwnerRow=$this->grpOwnerRow;
+
+$fName=explode(' ',$grpOwnerRow['Name']);
+
+// GROUP OWNER NAME
+
+
+
+if(!$ProfileHolder) $name=$grpOwnerRow['Name']."'s"; else $name='My';
+
+
+
+echo '<ul style="font-weight:normal"><li>
+<a id="my-groups-profile-sublink1" href="javascript:loadmygroups('.$this->user.');">'.$name.' groups</a></li>
+<li><a id="my-groups-profile-sublink2" href="javascript:loadmygroups('.$this->user.',1);">Member of groups</a></li></ul>';
+
+?>

@@ -1,0 +1,2517 @@
+<script type="text/javascript">
+var jsonusertype = '<?php echo $this->usertype; ?>';
+var jsonuserdetails = '<?php echo $this->userdetails; ?>';
+</script>
+
+<script type="text/javascript" src="<?php echo BASE_URL."/adminraw/js/strength.js";?>"></script>
+<script type="text/javascript" src="<?php echo BASE_URL."/adminraw/js/usergroup.js";?>"></script>
+
+<script> 
+
+   $(document).ready(function() {
+     userlist('twitter');
+     $(window).load(function() {
+      $('.popimgList').flexslider({
+          animation: "slide",
+          slideshow:false,
+          smoothHeight:false,
+          useCSS:true,
+
+        }); 
+      });
+
+     $('body').on('click','.screenPopup', function(){
+       var globalRel = $(this).attr('rel');       
+       var globalTitle =$(this).attr('data-title');         
+         $('#'+ globalRel).dialog({width:1000,title:globalTitle});           
+         var sd = $('.popimgList').data('flexslider');
+         sd.resize();  
+         $(window).resize();   
+
+         /*$('.flex-control-nav a, .flex-direction-nav a').click(function (){
+            $('#'+ globalRel).resize();
+         });  */
+       //$('.setPopimg').prev('.ui-dialog-titlebar').addClass('dialogTitlebar');
+     });
+
+
+
+     $('#newPwd').strength({
+       strengthClass: 'strength',
+       strengthMeterClass: 'strength_meter',
+       strengthButtonClass: 'button_strength',
+       strengthButtonText: 'Show password',
+       strengthButtonTextToggle: 'Hide Password'
+     });
+     
+     if (location.hash == '#config') {
+       $('.config').trigger('click');
+     }
+     
+     $('body').on('click', 'a[categories-data]', function() {
+       var categoriesType = $(this).attr('categories-data');
+       if (categoriesType == 'post categories') var url = BASE_URL + '/admin/myaccount/ajaxcategorylist';
+       else if (categoriesType == 'group categories') var url = BASE_URL + '/admin/myaccount/groupcategorylist';
+       $.ajax({
+         type: "POST",
+         dataType: 'json',
+         url: url,
+         success: function(response) {
+          if (categoriesType == 'post categories') var dataInsertId = $('#category-items');
+          //else if (categoriesType == 'group categories') var dataInsertId = $('#groupCategoryList .glist');
+           dataInsertId.html(response.content);
+         }
+       });
+       
+     });
+      $('body').on('click', 'a[groupcat-data]', function() {
+       var url = BASE_URL + '/admin/myaccount/groupcategorylist';
+       $.ajax({
+         type: "POST",
+         dataType: 'json',
+         url: url,
+         success: function(response) { 
+           $('#glist').html(response.content);
+         }
+       });
+       
+     });
+     
+     
+     
+     $("#ScoreIcon1 li").click(function() {
+       $("#ScoreIconText1").val($(this).attr('data-value'));
+       
+       $(".dropDown").removeClass('on');
+       
+     });
+     
+     $("#ScoreIcon2 li").click(function() {
+       $('#ScoreIconText2').val($(this).attr('data-value'));
+       $(".dropDown").removeClass('on');
+       
+     });
+     
+     $("#ScoreIcon3 li").click(function() {
+       $('#ScoreIconText3').val($(this).attr('data-value'));
+       $(".dropDown").removeClass('on');
+       
+     });
+     
+     $("#ScoreIcon4 li").click(function() {
+       $('#ScoreIconText4').val($(this).attr('data-value'));
+       $(".dropDown").removeClass('on');
+       
+     });
+     
+     $("#ScoreIcon5 li").click(function() {
+       $('#ScoreIconText5').val($(this).attr('data-value'));
+       $(".dropDown").removeClass('on');
+       
+     });
+     //scoreHiddenVal
+     
+     $(".defaultScoreIcon").click(function() {
+       var defaultIcon = $('i', this).attr('class');
+       var parent = $(this).closest(".formRow");
+       var scoreIconID = $(this).attr('data-id');
+       parent.find('.scoreHiddenVal').val(scoreIconID);
+       parent.find('.selectedScoreIcon  i').attr('class', defaultIcon);
+       $(this).fadeOut();
+       
+     });
+     
+     var oldValue = '';
+     $('body').on('keyup', '#category', function() {
+       var maxLength = 20;
+       var rty = $(this);
+       var ccjar = $('#category').val();
+       if (ccjar.length > maxLength) {
+         rty.val(ccjar.substr(0, 20));
+         $messageError('Maximum 20 characters allowed');
+         return false;
+         //  rty.closest('.formRow').append('<span>Maximum charactor 20 limit</span>');
+       } else {
+         var oldValue = $('#category').val();
+         
+       }
+       
+     });
+     
+     $('#ajaxseo').ajaxForm(function() {
+       $messageSuccess("updated successfully");
+     });
+     
+     $('#ajaxsociallogo').ajaxForm(function() {
+       $messageSuccess("updated successfully");
+       location.reload();
+     });
+
+      $('#ajaxAfterLoginTC').ajaxForm(function() {
+       $messageSuccess("updated successfully");
+     });
+     
+     $('#ajaxstaticpages').ajaxForm(function() {
+       $messageSuccess("updated successfully");
+     });
+     $('#ajaxsocialshare').ajaxForm(function() {
+       $messageSuccess("updated successfully");
+     });
+     $('#ajaxexpert').ajaxForm(function() {
+       $messageSuccess("updated successfully");
+     });
+     $('#ajaxscore').ajaxForm(function() {
+       $messageSuccess("updated successfully");
+     });
+     
+    
+     
+     
+    
+     <?php if(!empty($this->linkedinconnect) && false) { ?>
+       $.ajax({
+         type: "POST",
+         dataType: 'json',
+         url: BASE_URL + '/admin/social/linkedingroup',
+         success: function(response) {
+            // console.log(response); 
+             dataJosn = $.parseJSON(response.getnetwork);
+             dropdownlist = '<option value="">Select Linkedin group</option>';
+             $.each(dataJosn.values, function(key, value) {
+               dropdownlist+='<option value="'+value.group.id+'">'+value.group.name+'</option>';
+             });
+             dropdown = '<div class="clear"></div><div class="selectPagesFb"\
+             id="inContDet"><div class="socFeedTitle">To protect your privacy we would rather not share your personal feeds, therefore you are only allowed to connect your LinkedIn group.</div><select name="linkedingrouplist" id="linkedingrouplist">'+dropdownlist+'</select><a href="javascript:void(0)" class="clicklinkedinpagestatus btn btn-green">Save</a></div>';
+             $('#linkedingroup').html(dropdown);
+             $select('#linkedingrouplist');
+             var linkedinGroupID = response.linkedinGroupID;
+             $("#linkedingrouplist").val(linkedinGroupID);
+             $select('#linkedingrouplist');
+             $('.clicklinkedinpagestatus').click(function() 
+             { 
+                 var pageid = $('#linkedingrouplist option:selected').val();
+                 if(pageid==''){
+                   $messageError('Please select linkedin group');
+                   return false;
+                 }
+                 formData =  'pageid='+pageid+'&type=linkedin';
+                 url   = BASE_URL+"/admin/myaccount/updatefacebookpageinfo";
+               $.ajax({                                      
+                 url: url,                  //the script to call to get data          
+                 data: formData,                        //you can insert url argumnets here to pass to api.php
+                 type: 'POST',  
+                 success: function(data)          //on recieve of reply
+                 {
+                   $messageSuccess('LinkedIn group feed updated successfully');
+                 }
+                 });
+             });
+         }
+     });
+     <?php } ?>
+    
+     
+     
+     
+     
+     $('#AjaxPostLiveConf').ajaxForm(function() {
+       $messageSuccess("Verify posts setting saved successfully");
+     });
+     
+     
+     $('body').on('click', '.removeSociallogoimage', function() {
+       $('.Sociallogoimage').hide();
+       $('#hiddenSocialLogo').val('');
+       $('#dbTipWrapper ').remove();
+     });
+     
+     
+     $('body').on('click', '#biofieldsubmit', function() {
+       
+       var biofield = $('#biofield').val();
+       var priority = $('#priority2').val();
+       
+       
+       if (biofield == '') {
+         $messageError('please add field name');
+         $('#biofield').focus();
+         return false;
+       }
+       if (priority == '') {
+         $messageError('please add priority');
+         $('#priority').focus();
+         return false;
+       } else {
+         if ($.isNumeric(priority) == false) {
+           $messageError('Only numeric value allowed');
+           $('#priority').focus();
+           return false;
+         }
+         
+       }
+       
+       $.ajax({
+         type: "POST",
+         dataType: 'json',
+         data: {
+           'biofield': biofield,
+           'priority': priority
+         },
+         url: BASE_URL + '/admin/myaccount/biofield',
+         success: function(response) {
+           $messageSuccess('Field added successfully');
+           $('.biofields a').trigger('click');
+           $('#biofield').val('');
+           $('#priority2').val('');
+         },
+         error: function(error) {
+           
+         }
+         
+       });
+       
+     });
+     
+     
+     $('body').on('click', 'a[biofields-data]', function() {
+       
+       var url = BASE_URL + '/admin/myaccount/ajaxbiofieldlist';
+       
+       $.ajax({
+         type: "POST",
+         dataType: 'json',
+         url: url,
+         success: function(response) {
+           
+           $('#biofields-items').html(response.content);
+         }
+       });
+       
+     });
+     
+     $('body').on('click', '.editbio', function() {
+       var thisEl = $(this);
+       var type = thisEl.attr('type');
+       var name = thisEl.attr('name');
+       var closetli = thisEl.closest('li');
+       var closetUL = thisEl.closest('ul');
+       var closetspan = thisEl.closest('span');
+       var id = closetli.attr('id');
+       var Priority = thisEl.attr('priority');
+       if (closetUL.find('li').hasClass('editedRow') == true) {
+         var thisEditedRow = closetUL.find('.editedRow');
+         var updateCate = $('#update_cat', thisEditedRow).attr('data-bioename');
+         var updatePriority = $('#update_cat', thisEditedRow).attr('data-priority');
+         var updateCatId = $('#update_cat', thisEditedRow).attr('data-catid');
+         
+         var btns = '<a href="javascript:void(0)" priority="' + updatePriority + '" name="' + updateCate + '" type="post" class="btn btn-green btn-mini editcat"><i class="fa fa-repeat"></i> Edit</a>';
+         btns += ' <a href="javascript:void(0);" type="post" catid="' + updateCatId + '" class="btn btn-danger btn-mini catdelete"><i class="fa fa-trash"></i> Delete</a>';
+         
+         $('span', thisEditedRow).before(updateCate + '<div class="priority">Priority: ' + updatePriority + '</div><span>' + btns + '</span>');
+         closetUL.find('li').removeClass('editedRow');
+         $('input', thisEditedRow).remove();
+         $('#update_cat', thisEditedRow).remove();
+       }
+       
+       closetli.addClass('editedRow');
+       
+       
+       closetli.html('<input id="updatebiofields" type="text" value="' + name + '" /><input style="margin-top: 2px;" id="updatepriority" type="text" width="20px" value="' + Priority + '" /><span><a id="update_biofields" type="' + type + '" data-id="' + id + '" data-priority="' + Priority + '" data-name="' + name + '" class="btn btn-green btn-mini"><i class="fa fa-repeat"></i> update </a></span>');
+       // closetspan.html('');
+       $('#updatecat').focus();
+       
+     });
+     
+     
+     $('body').on('click', '#update_biofields', function() {
+       
+       
+       var biofield = $('#updatebiofields').val();
+       var priority = $('#updatepriority').val();
+       var closetli = $(this).closest('li');
+       var id = closetli.attr('id');
+       
+       var urldata = BASE_URL + '/admin/myaccount/biofield';
+       var pdata = {
+         'id': id,
+         'biofield': biofield,
+         'priority': priority
+       };
+       
+       
+       if (biofield == '') {
+         $messageError('Please add field name');
+         $('#updatebiofields').focus();
+         return false;
+       }
+       if (priority == '') {
+         $messageError('Please add priority');
+         $('#priority').focus();
+         return false;
+       } else {
+         if ($.isNumeric(priority) == false) {
+           $messageError('Only numeric value allowed');
+           $('#priority').focus();
+           return false;
+         }
+       }
+       
+       $.ajax({
+         type: "POST",
+         dataType: 'json',
+         data: pdata,
+         url: urldata,
+         success: function(response) {
+           $messageSuccess('Updated successfully');
+           $('.biofields a').trigger('click');
+           
+         },
+         error: function(error) {
+           
+         }
+         
+       });
+     });
+     
+     $('body').on('click', '.biodelete', function() {
+       
+       var bioid = $(this).attr('bioid');
+       var type = $(this).attr('type');
+       
+       var tridata1 = 'this field';
+       var delteUser = '<div id="deleteUserPopup" title="Please confirm"><p>Are you sure you want delete ' + tridata1 + '?</p><div class="buttonWrapper"><a href="javascript:void(0);" type="' + type + '"  class="btn btn-green biofielddelete">Yes</a> <a href="javascript:void(0);"  class="btn closeDialog">No</a></div></div>';
+       
+       $('#deleteUserPopup').remove();
+       $('body').append(delteUser);
+       $('#deleteUserPopup').dialog({
+         minHeight: 'auto'
+       });
+       
+       $('body').on('click', '.biofielddelete', function() {
+         
+         $.ajax({
+           type: "POST",
+           dataType: 'json',
+           data: {
+             'bioid': bioid
+           },
+           url: BASE_URL + '/admin/myaccount/delbiofield',
+           success: function(response) {
+             $messageSuccess('Field deleted successfully');
+             $('#deleteUserPopup').dialog("close");
+             $('.biofields a').trigger('click');
+           }
+         });
+         });
+       
+     });
+     
+     
+     
+     
+     $('body').on('click','#catsubmit', function(){      
+      
+       var catname = $('#category1').val();
+       var priority = $('#priority1').val();
+       
+       if(catname==''){
+         $messageError('please add category name');
+         $('#category').focus();
+         return false;               
+       }
+       if(priority==''){
+         $messageError('please add priority');
+         $('#priority').focus();
+         return false;               
+       }else{
+         if($.isNumeric(priority) == false){
+           $messageError('Only numeric value allowed');
+           $('#priority').focus();
+           return false;
+         }
+         
+       }
+       
+       $.ajax(
+         {
+           type : "POST",
+           dataType : 'json',
+           data:{'catname':catname,'priority':priority},
+           url : BASE_URL + '/admin/myaccount/addcat',                     
+           success : function(response) 
+           {               
+             $messageSuccess('Category added successfully');
+             $('.groupcategory a','.accountTabLink').trigger('click');             
+             //$('#category-items').prepend(response.content); 
+             $('#category1').val('');  
+             $('#priority1').val('');                      
+           },
+           error : function(error) {
+             
+           }
+           
+         });
+       
+     }); 
+     
+     $('body').on('click','#grpcatsubmit', function(){      
+       
+       var catname = $('#groupcatname').val();
+       var priority = $('#grouppriority').val();
+       
+       if(catname==''){
+         $messageError('please add category name');
+         $('#groupcatname').focus();
+         return false;               
+       }
+       if(priority==''){
+         $messageError('please add priority');
+         $('#grouppriority').focus();
+         return false;               
+       }else{
+         if($.isNumeric(priority) == false){
+           $messageError('Only numeric value allowed');
+           $('#grouppriority').focus();
+           return false;
+         }
+         
+       }
+       
+       $.ajax(
+         {
+           type : "POST",
+           dataType : 'json',
+           data:{'groupcatname':catname,'grouppriority':priority},
+           url : BASE_URL + '/admin/myaccount/groupcat',                     
+           success : function(response) 
+           {               
+             $messageSuccess('Category added successfully');
+             $('.dbtab a[groupcat-data="group categories"]').trigger('click'); 
+             $('#groupcatname').val(''); 
+             $('#grouppriority').val('');                      
+           },
+           error : function(error) {
+             
+           }
+           
+         });
+       
+     }); 
+     
+     
+     $('body').on('click','.catdelete', function(){  
+       
+       var catid   = $(this).attr('catid');
+       var type = $(this).attr('type');
+       if(type=='post'){       
+         var tridata1 = 'this post category';
+       }
+       else if(type=='group'){
+         var tridata1 = 'this group category';
+       }
+       var delteUser  ='<div id="deleteUserPopup" title="Please confirm"><p>Are you sure you want delete '+tridata1+'?</p><div class="buttonWrapper"><a href="javascript:void(0);" type="'+type+'"  class="btn btn-green delcat">Yes</a> <a href="javascript:void(0);"  class="btn closeDialog">No</a></div></div>';
+       
+       $('#deleteUserPopup').remove();
+       $('body').append(delteUser);
+       $('#deleteUserPopup').dialog({minHeight:'auto'});
+       
+       $('body').on('click', '.delcat', function (){ 
+         
+         var type = $(this).attr('type');
+         if(type=='post'){         
+           var tridata = $('.category a');
+         }
+         else if(type=='group'){             
+           var tridata = $('.groupcategory a');
+         }
+         
+         $.ajax(
+           {
+             type : "POST",
+             dataType : 'json',
+             data:{'cat':catid,'type':type},
+             url : BASE_URL + '/admin/myaccount/delcat',                     
+             success : function(response) 
+             {                                   
+               $messageSuccess('Category deleted successfully');
+               $('#deleteUserPopup').dialog( "close" );
+               $('#'+catid).remove();                       
+             },
+             error : function(error) {
+               
+             }
+             
+           });
+         
+       });
+       
+     });
+     
+     $('body').on('click', '.editcat', function (){  
+   
+       var thisEl = $(this);
+       var type  = thisEl.attr('type');                  
+       var catname   = thisEl.attr('name');
+       var closetli = thisEl.closest('li');
+       var closetUL = thisEl.closest('ul');
+       var closetspan = thisEl.closest('span');
+       var catid   = closetli.attr('id');  
+       var Priority =  thisEl.attr('priority'); 
+       if(closetUL.find('li').hasClass('editedRow')==true){
+         var thisEditedRow =  closetUL.find('.editedRow');
+         var updateCate = $('#update_cat',thisEditedRow).attr('data-catename');
+         var updatePriority = $('#update_cat',thisEditedRow).attr('data-priority');
+         var updateCatId = $('#update_cat',thisEditedRow).attr('data-catid');
+         
+         var btns = '<a href="javascript:void(0)" priority="'+updatePriority+'" name="'+updateCate+'" type="post" class="btn btn-green btn-mini editcat"><i class="fa fa-repeat"></i> Edit</a>';
+         btns += ' <a href="javascript:void(0);" type="post" catid="'+updateCatId+'" class="btn btn-danger btn-mini catdelete"><i class="fa fa-trash"></i> Delete</a>';
+         
+         $('span', thisEditedRow).before(updateCate+'<div class="priority">Priority: '+updatePriority+'</div><span>'+btns+'</span>');
+         closetUL.find('li').removeClass('editedRow');
+         $('input',thisEditedRow).remove();
+         $('#update_cat',thisEditedRow).remove();
+       }
+       
+       closetli.addClass('editedRow');
+       
+       
+       closetli.html('<input id="updatecat" type="text" value="'+catname+'" /><input id="updatepriority" type="text" width="20px" value="'+Priority+'" /><span><a id="update_cat" type="'+type+'" data-catid="'+catid+'" data-priority="'+Priority+'" data-catename="'+catname+'" class="btn btn-green btn-mini"><i class="fa fa-repeat"></i> update category</a></span>');
+       // closetspan.html('');
+       $('#updatecat').focus();
+       
+     });
+     
+     $('body').on('click','#update_cat',function () { 
+       
+       var type  = $(this).attr('type');  
+       var catname   = $('#updatecat').val();     
+       var priority  = $('#updatepriority').val(); 
+       var closetli = $(this).closest('li');
+       var catid   = closetli.attr('id');    
+       
+       if(type=='group'){
+         var urldata   = BASE_URL + '/admin/myaccount/groupcat';   
+         var pdata =  {'typeID':catid,'groupcatname':catname,'grouppriority':priority};   
+         
+       }
+       else if(type=='post'){
+         var urldata   = BASE_URL + '/admin/myaccount/addcat';
+         var pdata =  {'cat':catid,'catname':catname,'priority':priority};
+       }  
+       
+       if(catname==''){
+         $messageError('please add category name');
+         $('#category').focus();
+         return false;               
+       }
+       if(priority==''){
+         $messageError('please add priority');
+         $('#priority').focus();
+         return false;               
+       }else{
+         if($.isNumeric(priority) == false){
+           $messageError('Only numeric value allowed');
+           $('#priority').focus();
+           return false;
+         }
+       }           
+       
+       $.ajax(
+         {
+           type : "POST",
+           dataType : 'json',
+           data: pdata,
+           url : urldata,                      
+           success : function(response) 
+           {               
+             $messageSuccess('Updated successfully');
+             if(type=='post'){
+               $('.groupcategory a','.accountTabLink').trigger('click');   
+             }
+             else if(type=='group'){ 
+              $('.dbtab a[groupcat-data="group categories"]').trigger('click'); 
+             }                     
+           },
+           error : function(error) {
+             
+           }
+           
+         });
+     });
+     
+     var hasValue = location.hash;
+     $('.accountTabLink a[href="'+hasValue+'"]').trigger('click');
+     
+     
+     
+     $('.chooseScoreIconsBtn li a').click(function(event) {
+       var thisIcon = '<div class="selectedScoreIcon">'+$(this).html()+'</div>';
+       $(this).closest('.scoreIcons').find('.selectedScoreIcon').remove();
+       $(this).closest('.scoreIcons').find('label').append(thisIcon);
+       var defaultScoreIconID = $(this).closest('.formRow').find('.defaultScoreIcon').attr('data-id');
+       var defaultBtn = $(this).closest('.formRow').find('.defaultScoreIcon');
+       if($(this).closest('li').attr('data-value')==defaultScoreIconID){
+         defaultBtn.fadeOut();
+       }else{
+         defaultBtn.fadeIn();
+       }
+       
+     });
+     $('.chooseScoreIconsBtn li.active a').trigger('click');
+     
+  
+     
+     $('body').on('click','#addNewfeed',function () {
+       $('#addfeedsnc').slideToggle();
+      
+       
+
+       
+     });
+    
+
+      $('body').on('click','#feedcancle',function(e){
+            $('#addNewfeed').trigger('click');
+      });
+     $('body').on('click','#addfeed',function(e){
+       e.preventDefault();
+       var feedtitle = $('#feedtitle').val();
+       var feedurl = $('#feedurl').val();
+       var country = '1';
+      // var filename = $('#feedimghidden').val(); 
+      
+       if(feedtitle=='') {
+         $messageError('Please add a title'); 
+         return false;
+       }             
+       if(feedurl=='') {
+         $messageError('Please add a feed URL'); 
+         return false;
+       }
+       /*if($.trim(filename)=='') {
+         $messageError('Please upload a logo for the feed'); 
+         return false;
+       }   */ 
+      
+               
+       $.ajax(
+         {
+           type : "POST",
+           dataType : 'json',
+           data:{'feedtitle':feedtitle,'feedurl':feedurl,'country':country},
+           url : BASE_URL + '/admin/myaccount/addfeed',                     
+           success : function(response) 
+           {  
+             if(response.status=='notexit'){
+               
+               $messageError('Oops, this is not a valid URL'); 
+               return false;
+             }
+             if(response.status=='notexitlogo'){
+               
+               $messageError('Oops, this is not a valid URL'); 
+               return false;
+             }
+             
+             $('#addNewfeed').trigger('click');                               
+             $messageSuccess('Feed added successfully'); 
+             location.reload();
+           },
+           error : function(error) {
+             
+           }
+           
+         });
+
+
+       
+     });
+     
+     $('body').on('click','#updatechkfeed',function(e){
+       e.preventDefault();
+       var chk =  $('.check').val();
+       var feed = new Array();
+       var n = $(".check").length;
+       
+       if (n > 0){
+         $(".check:checked").each(function(){
+           feed.push($(this).val());
+         });
+       }
+       
+       // var feedtitle = $('#feedtitle').val();
+       $.ajax(
+         {
+           type : "POST",
+           dataType : 'json',
+           data:{'feed':feed},
+           url : BASE_URL + '/admin/myaccount/updatefeed',                     
+           success : function(response) 
+           {                                                        
+             $messageSuccess('updated successfully'); 
+           },
+           error : function(error) {
+             
+           }
+           
+         });      
+       
+     }); 
+
+  $('body').on('click','#updatefeedalldective',function(e){
+       e.preventDefault();
+
+       var action =  $(this).attr('action');
+      
+       $.ajax(
+         {
+           type : "POST",
+           dataType : 'json',
+           data:{'action':action},
+           url : BASE_URL + '/admin/myaccount/updatefeedalldective',                     
+           success : function(response) 
+           {            
+              if(response.message=='active'){
+                $('.rssrow input[type="checkbox"]').attr('checked', true); 
+                $messageSuccess('Feed active successfully');   
+              }else{
+                $('.rssrow input[type="checkbox"]').attr('checked', false);   
+                $messageSuccess('Feed deactive successfully'); 
+              } 
+                         
+            
+           },
+           error : function(error) {
+             
+           }
+           
+         });      
+       
+     });      
+
+
+
+ $('body').on('click','.rssrow input[type="checkbox"]',function(e){ 
+   
+        var E1 = $(this);
+     
+ var isactive = E1.closest(".rssrow").find(".defaultrss");
+ var rssiddel =   E1.val();
+              
+                   if(isactive.hasClass('active')){
+                    e.preventDefault();
+                     var chefeedgrp ='<div id="chkpopup" title="Please confirm"><p>Deactivating this feed will also remove \'Default\' status from it. Do you want to continue?</p><div class="buttonWrapper"><a href="javascript:void(0);" class="btn btn-green chkactmsgid">Yes</a></div></div>';
+                     
+                     $('#chkpopup').remove();
+                     $('body').append(chefeedgrp);
+                     $('#chkpopup').dialog({minHeight:'auto'});
+                     //E1.addClass('active'); 
+                    // closetUL.attr('checked',true);
+
+       $('body').on('click', '.chkactmsgid', function (){ 
+         
+        
+          $.ajax(
+             {
+               type : "POST",
+               dataType : 'json',
+               data:{'feedid':rssiddel,'active':0},
+               url : BASE_URL + '/admin/myaccount/activefeed',                     
+               success : function(response) {                                                   
+                 $messageSuccess('updated successfully');   
+                 // var closetUL = E1.closest(".rssrow").find(".check");
+                   $('.defaultrsssn').dialog('close');
+                   if( response.active =='0'){
+                    isactive.removeClass('active'); 
+                    E1.attr('checked', false);
+                    $('i',E1).removeClass('fa-circle').addClass('fa-circle-o');  
+                    $('#chkpopup').dialog( "close" );           
+                   }else{
+                     //E1.removeClass('active');
+                     
+                     //closetUL.attr('checked',false);
+                   }
+                  
+                     $('.defaultrsssn').remove();
+               }
+               
+             });
+       });
+       
+
+
+    }else{
+      if(E1.is(':checked')==true){
+      var active = 1;
+      }else{
+         var active = 0;        
+      }
+
+
+          $.ajax(
+             {
+               type : "POST",
+               dataType : 'json',
+               data:{'feedid':rssiddel,'active':active,'activesn':'1'},
+               url : BASE_URL + '/admin/myaccount/activefeed',                     
+               success : function(response) {                                                   
+                 $messageSuccess('updated successfully');   
+                 // var closetUL = E1.closest(".rssrow").find(".check");
+                   //$('.defaultrsssn').dialog('close'); 
+                   if(response.active==1){
+                    E1.attr('checked', true);  
+                    $('#chkpopup').dialog( "close" );           
+                 }else{                   
+                    E1.attr('checked', false);  
+                    $('#chkpopup').dialog( "close" );   
+                 }
+                  
+                     $('.defaultrsssn').remove();
+               }
+               
+             });
+                    
+      }
+ 
+}); 
+
+$('body').on('click','.delrss',function(e){
+       
+       e.preventDefault();
+       var rssiddel =  $(this).attr('rssid');
+       var E1 = $(this);
+       var deltefeed  ='<div id="deltefeed" title="Please confirm">\
+                  <p>Are you sure you want to delete this RSS feed?</p>\
+          <div class="buttonWrapper"><a href="javascript:void(0);"  class="btn btn-green delrss2" id="'+rssiddel+'">\Yes</a> <a href="javascript:void(0);"  class="btn closeDialog">No\</a></div>\
+                </div>';
+
+
+      
+          $('#deltefeed').remove();
+          $('body').append(deltefeed);
+          $('#deltefeed').dialog({minHeight:'auto'});
+
+          $('body').on('click', '.delrss2', function (){
+
+           $.ajax(
+             {
+               type : "POST",
+               dataType : 'json',
+               data:{'feedid':rssiddel},
+               url : BASE_URL + '/admin/myaccount/deletefeed',                     
+               success : function(response) 
+               {         
+                 $('#deltefeed').dialog( "close" );                                               
+                 $messageSuccess('RSS feed deleted successfully'); 
+                 // $('#feedcontent').html('');
+                 //location.reload();
+                 E1.closest('tr').remove(); 
+               },
+               error : function(error) {
+                  
+               }
+               
+             });
+       });
+      
+   });    
+
+$('body').on('click','.defaultrss',function(e){
+    //alert();
+       e.preventDefault();
+       var rssiddel =  $(this).attr('rssid');
+
+       var active =  '0';
+       var E1 = $(this);
+        var prRow = E1.closest(".rssrow");
+       var _p =  E1.closest('.accountContent');
+       var msg = '';
+       var title = 'Please confirm'; 
+       var msg2 = "remove";      
+        var activeCount = $('.defaultrss.active', _p).size();  
+
+        if(E1.hasClass('active')==false){
+             title = 'Please confirm';
+             var msg2 = "set";  
+              active =  '1';
+        }            
+        
+                  if(activeCount>=4 && active!=0){
+                    msg='<div style="line-height:22px;font-size:14px;text-align:justify">\<p>A maximum of four feeds can be set as default.</p></div><br>';
+       title = 'Please note';
+       E1.removeClass('active');
+
+                  }else{
+                    msg = '<p>Are you sure you want to '+msg2+' this feed as default?</p>\
+                  <div class="buttonWrapper"><a href="javascript:void(0);"  class="btn btn-green defaultrss2" id="'+rssiddel+'" active="'+active+'">\
+                  Yes</a>';
+
+                  }
+       var defaultrsssn  ='<div class="defaultrsssn" title="'+title+'">\
+                '+msg+'\
+                  </div>\
+                </div>';
+          $('.defaultrsssn').remove();
+          $('body').append(defaultrsssn);        
+          $('.defaultrsssn').dialog({minHeight:'auto'});
+          if(activeCount==5 && active==1)
+          return false;
+
+          $('.defaultrss2').click(function (){
+           $.ajax(
+             {
+               type : "POST",
+               dataType : 'json',
+               data:{'feedid':rssiddel,'active':active},
+               url : BASE_URL + '/admin/myaccount/activefeed',                     
+               success : function(response) {                                                   
+                 $messageSuccess('updated successfully');   
+                  var closetUL = $('.check', prRow);
+                   $('.defaultrsssn').dialog('close');
+                   if( response.active =='1'){
+                     E1.addClass('active'); 
+                     $('i',E1).removeClass('fa-circle-o').addClass('fa-circle');
+                     closetUL.attr('checked',true);
+                   }else{
+                     E1.removeClass('active');   
+                     $('i',E1).removeClass('fa-circle').addClass('fa-circle-o'); 
+                    
+                   }
+                  
+                     $('.defaultrsssn').remove();
+               }
+               
+             });
+       });
+
+      $('#defaultrss2no').click(function (){
+        //E1.toggleClass('active');        
+        //$('.defaultrss').unbind();
+        $('.defaultrsssn').dialog('close');
+       
+    });
+   });  
+
+ 
+
+$('body').on('click','#chkallfeed',function(e){
+  var E1 = $(this);
+  
+  var parentEl2 =  E1.closest('.accountContent');
+
+   if($(this).is(':checked')==true){
+    parentEl2.find('.check').attr('checked', true); 
+    $('#updatechkfeed').fadeIn();                
+   }else{
+    parentEl2.find('.check').attr('checked', false);
+     $('#updatechkfeed').fadeOut();     
+   }       
+  
+});
+
+ 
+
+
+
+$('body').on('click','#delfeedall',function(e){
+       
+       e.preventDefault();
+       
+       var msg = '';
+       var title = 'Please confirm';
+                 
+                    msg = '<p>Are you sure you want to delete all RSS feeds?</p>\
+          <div class="buttonWrapper"><a href="javascript:void(0);"  class="btn btn-green defaultrss2" id="rssdeleteall" >\
+          Yes</a>';
+
+                  
+       var defaultrsssn  ='<div class="deleteallns" title="'+title+'">\
+                '+msg+'\
+                  </div>\
+                </div>';
+          $('.deleteallns').remove();
+          $('body').append(defaultrsssn);        
+          $('.deleteallns').dialog({minHeight:'auto'});
+         
+
+          $('#rssdeleteall').click(function (){
+           $.ajax(
+             {
+               type : "POST",
+               dataType : 'json',
+               data:{'feedid':''},
+               url : BASE_URL + '/admin/myaccount/deleteall',                     
+               success : function(response) {                                                   
+                 $messageSuccess('deleted successfully');   
+                   $('.deleteallns').dialog('close');
+                
+                     $('.deleteallns').remove();
+               }
+               
+             });
+       });
+      
+   });
+$('body').on('change', '.adminProfileimage', function(e) {
+  var  evt = e;
+    var  html = '<div class="cropImgAdminProfileWrp"></div>';
+    $('.cropImgAdminProfileWrp').remove();
+    $('body').append(html)
+   $('.cropImgAdminProfileWrp').dialog({
+    minHeight:'auto',
+    title:'Crop profile photo',
+    width:500,
+    buttons:{
+      "Save": function (){
+       // console.log(getCropDataUrl());
+         $('input[name="profilePicData"]').val(getCropDataUrl());
+      $(this).dialog('close');
+      }
+    },
+    open:function (){
+       $.dbCropImage({element:'.cropImgAdminProfileWrp', event:evt, load:function(){
+          $(window).trigger('resize');
+
+       } });
+    }
+ });
+  /* $.dbeePopup('<div></div>', {
+              otherBtn: '<a href="javascript:void(0);" style="display:none;" class="pull-right btn btn-yellow"  id="upload-picture">Save picture</a>',
+              load:function (){
+                 $.dbCropImage({element:'.dbeePopContent', event:e, load:function(){
+                    $('#upload-picture').show()
+                 }});
+              }
+          });*/
+    
+});
+
+ });        
+</script> 
+<div class="jointElement">
+    <ul>
+      <li><a href="<?php echo BASE_URL.'/admin/myaccount/globalsettings';?>">Global Settings</a></li>
+      <li  class="active"><a href="#">General Settings</a></li>
+    </ul>
+ </div>
+<h1 class="pageTitle">General Settings</h1>
+<!--Container -->
+<div class="accountTabLink" style="display:block">
+   <ul>
+      <li class="active"><a href="#accountsetting">Account settings</a></li>
+     <!--  <li ><a href="#securityquetionsetting">Security quetion</a></li> -->
+     <!--  <li ><a href="#PostLive" >Admin post control</a></li> -->
+      <li class="biofields"><a href="#biofields"  biofields-data="Manage Biography">User biography fields</a></li>
+      <!-- <li><a href="#changepassword">Change password</a></li> -->
+      <!-- <li ><a href="#expert" >Expert / Speaker</a></li> -->
+      <li class="groupcategory"><a href="#groupCategoryList" categories-data="post categories">Platform categories</a></li>
+     <!--  <li ><a href="#pollcompliance">Poll compliance</a></li> -->
+      <!-- <li class="category"><a href="#category"  categories-data="post categories">Post categories</a></li> -->
+      <li><a href="#Managefeed">RSS feeds</a></li>
+      <!-- <li><a href="#sessionexpirytime">Session expiry time</a></li> -->
+      <li class="socialconnect"><a href="#socialconnect">Social</a></li>
+      <li style="display:none"><a href="#staticpages"  >Static pages</a></li>
+      <li style="display:none"><a href="#AfterLoginTC">User login message alert</a></li>
+     
+   </ul>
+</div>
+<div  class="accountContainer configrationAccountSetting" style="min-height:750px;">
+   <div class="accountContent" data-id="accountsetting" style="display:block">
+        <div class="dbtabContainer">
+          <ul class="dbtab">
+            <li class="active"><a href="#accountsetting-account">Account</a></li>
+            <li><a href="#securityquetionsetting">Security question</a></li>
+            <li><a href="#changepassword">Change password</a></li>
+            <li><a href="#seosetting">SEO settings</a></li><!-- 
+            <li><a href="#sessionexpirytime">Session expiry time</a></li> -->
+          </ul>
+          <div class="dbTabContainerDiv">
+              <div id="accountsetting-account" class="dbtabContent" style="display:block">
+                <div class="smallDescription">Here you as the administrator can change your account name (first and last) and profile picture - both of which are displayed to users on the platform - and your associated email address.
+                  <br><a rel="accountSettingPop" class="screenPopup" data-title="Account">Show me</a>
+                </div>
+                 <form name="myaccount"  class="right " id="myAccount"  method="post">
+                   <div class="formRow">
+                      <label class="label">Name</label>
+                      <div class="field passstrength">
+                         <input type="text" name="fname" id="fname"  placeholder="Profile Name" value="<?php echo $this->myclientdetails->customDecoding($this->profileRec['Name']); ?>" >
+                      </div>
+                   </div>
+                    <div class="formRow">
+                      <label class="label">Last Name</label>
+                      <div class="field passstrength">
+                         <input type="text" name="lname" id="lname"  placeholder="Last Name" value="<?php echo $this->myclientdetails->customDecoding($this->profileRec['lname']); ?>" >
+                      </div>
+                   </div>
+                   <div class="formRow">
+                      <label class="label">Email</label>
+                      <div class="field">
+                         <input type="text" name="email" id="email" placeholder="Profile Email" value="<?php echo $this->myclientdetails->customDecoding($this->profileRec['Email']); ?>" >
+                      </div>
+                   </div>
+                   <!-- <div class="formRow secretQuestion" >
+                      <label class="label">Secret question</label>
+                      <div class="field">
+                         <ul class="">
+                            <li>
+                               <select name="question" id="question">
+                               <?php
+                                 /* require_once 'includes/globalfileadmin.php';
+                                  foreach ($securityquetion as $key => $value) {
+                                    $checked = ($this->profileRec['secretquestion']==$key)? "selected" : '';
+                                    echo '<option value="'.$key.'" '.$checked.'>'.$value.'</option>';
+                                  }*/
+                                  ?>    
+                               </select>
+                            </li>
+                         </ul>
+                      </div>
+                   </div>
+                   <div class="formRow">
+                      <label class="label">Answer</label>
+                      <div class="field passstrength">
+                         <input type="password" name="answer" id="answer" placeholder="Secret answer" value="<?php echo $this->profileRec['answer']; ?>" >
+                      </div>
+                   </div> -->
+                   <div class="formRow">
+                      <label class="label">Profile picture</label>
+                      <div class="field appendType">
+                         <input type="hidden" readonly="" name="profilePicData"  value="">
+                         <input type="text" readonly="" name="" class="uploadType" value="">
+                         <a href="javascript:void(0);" class="btn btn-black">Browse<input type="file" name="profilepicture" adminid="<?php echo $this->adminid;?>" class="fileType adminProfileimage">
+                         </a>
+                         <?php 
+                            $this->defaultimagecheck = new Admin_Model_Common();
+                            $checkownerpic = $this->defaultimagecheck->checkImgExist($this->profileRec['ProfilePic'],'profilepic','default-avatar.jpg');    
+                            ?>                  
+                         <div class="clearfix"></div>
+                         <div id="newpicconfig" class="proPic">
+                            <img  src="<?php echo IMGPATH.'/users/medium/'.$this->profileRec['ProfilePic']; ?>" width="100" height="100" class="imgStyle">                       
+                         </div>
+                         <input type="hidden" name="picture" id="picture" value="<?php echo $this->profileRec['ProfilePic']; ?>" > 
+                      </div>
+                   </div>
+                   <div class="formRow">
+                      <div class="field">
+                         <button type="submit" class="btn btn-green" value="SUBMIT">Save</button>
+                      </div>
+                   </div>
+                </form>
+
+              </div>
+              <div id="securityquetionsetting" class="dbtabContent">
+                   <div id="securityQueset">
+                      <div class="formRow right secretQuestion" >
+                        <div class="smallDescription">Set your secret question and answer if you ever forget your password when trying to login into the administration area.
+                        </div><br>
+                        <label class="label">Secret question</label>
+                        <div class="field">
+                           <ul class="">
+                              <li>
+                                 <select name="questionsecque" id="question">
+                                    <?php
+                                    require_once 'includes/globalfileadmin.php';
+                                    foreach ($securityquetion as $key => $value) {
+                                      echo $this->profilefromUserTable['secretquestion'].'-----'.$key;
+                                      $checked = ($this->profilefromUserTable['secretquestion']==$key)? "selected" : '';
+                                      echo '<option value="'.$key.'" '.$checked.' questionsecqueval="'.$value.'">'.$value.'</option>';
+                                    }
+                                    ?>     
+                                 </select>
+                              </li>
+                           </ul>
+                        </div>
+                     </div>
+                     <div class="formRow right">
+                        <label class="label">Answer</label>
+                        <div class="field passstrength">
+                           <input type="password" name="answer" id="answer" placeholder="Secret answer" value="<?php echo $this->profilefromUserTable['answer'];?>" >
+                        </div>
+                     </div>
+                     <div class="formRow">
+                        <div class="field">
+                           <button type="submit" class="btn btn-green" value="SUBMIT" id="securityQuesetval">Save</button>
+                        </div>
+                     </div>
+                   </div>
+              </div>
+              <div id="changepassword" class="dbtabContent">
+                  <div class="smallDescription">Change your administrator password here.
+                  <!-- <br><a rel="biographyPop" class="screenPopup" data-title="Change password">Show me</a> -->
+                </div>
+
+                   <form class="right ">
+                     <div id="currentPwdForm" style="margin-top:10px">
+                        <div class="formRow">
+                           <label class="label">Current password</label>
+                           <div class="field">
+                              <input  type="password" name="currentPwd" id="currentPwd"   value="" autocomplete="off"> 
+                              <input  type="hidden" name="currentPwdchked" id="currentPwdchked"> 
+                           </div>
+                        </div>
+                        <div class="formRow">
+                           <div class="field">
+                              <button type="submit" class="btn btn-green" value="SUBMIT" id="checkpass">Go</button>
+                           </div>
+                        </div>
+                     </div>
+                     <div  id="changePwdForm" style="display:none">
+                        <div class="formRow">
+                           <label class="label">New password</label>
+                           <div class="field">
+                              <input  name="newPwd"  type="password" id="newPwd" /> </span>
+                           </div>
+                        </div>
+                        <div class="formRow">
+                           <label class="label">Confirm password</label>
+                           <div class="field">
+                              <input  name="confirmPwd"  type="password" id="confirmPwd" />
+                           </div>
+                        </div>
+                        <div class="formRow">
+                           <div class="field">
+                              <button type="submit"  id="changepassword"  class="btn btn-green" value="SUBMIT">Submit</button>
+                           </div>
+                        </div>
+                     </div>
+                  </form>
+              </div>
+              <div id="seosetting" class="dbtabContent">
+                <div class="smallDescription" style="margin-bottom:20px;">
+                     Here you can edit the title and description text that will appear in search engine listings for your platform.
+                </div>
+                <form name="ajaxseo" action ="<?php echo BASE_URL;?>/admin/myaccount/ajaxseo" class="right " id="ajaxseo"  method="post">
+                 <div class="formRow">
+                    <label class="label">SEO title</label>
+                    <div class="field">
+                       <input  type="text"  name="SiteTitle" id="SiteTitle"  placeholder="Please enter the website title" value="<?php echo $this->getSeoConfiguration['SiteTitle']; ?>">  
+                    </div>
+                 </div>
+                 <div class="formRow">
+                    <label class="label">SEO description</label>
+                    <div class="field">
+                       <textarea name="SiteDescription" id="SiteDescription"  placeholder="Please enter the website seo description" ><?php echo $this->getSeoConfiguration['SiteDescription']; ?></textarea>  
+                    </div>
+                 </div>
+                 <div class="formRow">
+                    <div class="field">
+                       <input type="submit" class="btn btn-green" value="Save" name="submit" />
+                    </div>
+                 </div>
+              </form>
+              </div>
+               <div id="sessionexpirytime" class="dbtabContent">
+                  <div class="formRow right" id="makePrivate">
+                     <label class="label">Admin session timeout</label>
+                     <div class="field">
+                        <div class="helponoff" id="socialAction">
+                           <div class="fieldInput">
+                              <select name="globalTimeSetting">
+                                 <option value='0'  <?php if($this->expireTime==0){echo'selected=selected';}?>>Never</option>
+                                 <option value='5'  <?php if($this->expireTime==5){echo'selected=selected';}?>>After 5 minutes</option>
+                                 <option value='10' <?php if($this->expireTime==10){echo'selected=selected';}?>>After 10 minutes</option>
+                                 <option value='30' <?php if($this->expireTime==30){echo'selected=selected';}?>>After 30 minutes</option>
+                                 <option value='60' <?php if($this->expireTime==60){echo'selected=selected';}?>>After an hour</option>
+                              </select>
+                           </div>
+                           <div class="fieldInput">
+                              <button class="gTimeSet btn btn-green" style="margin-top:10px" name="Submit" type="submit">
+                              <i class="fa fa-chevron-sign-right"> </i>Set
+                              </button>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+          </div>
+      </div>
+     
+   </div>
+   <!--end tab content-->
+  
+   <!-- <div data-id="pollcompliance" class="accountContent" >
+      <form name="ajaxpollcompliance" action ="//admin/myaccount/ajaxpollcompliance" class=" " id="ajaxpollcompliance"  method="post">
+         <h2>Poll compliance </h2>
+         <div class="checkboxGroup">
+            <ul>
+               <li>
+                  <label class="label">                       
+                  <input type="radio" id="pollcomment0" name="pollcomment" value="0" <?php if($this->PollComments_On_Option==0){echo'checked="checked"';} ?>>
+                  <label  class="radio" for="pollcomment0"></label> 
+                  Votes on - Comments off 
+                  </label>
+               </li>
+               <li>
+                  <label class="label">                       
+                  <input type="radio" id="pollcomment2" name="pollcomment" value="2" <?php if($this->PollComments_On_Option==2){echo'checked="checked"';} ?>>
+                  <label class="radio" for="pollcomment2"></label> 
+                  Votes on - Comments on (Both visible to admin, neither visible to users) 
+                  </label>  
+               </li>
+               <li>
+                  <label class="label">                       
+                  <input type="radio" id="pollcomment3" name="pollcomment" value="3" <?php if($this->PollComments_On_Option==3){echo'checked="checked"';} ?>>
+                  <label class="radio" for="pollcomment3"></label> 
+                  Votes on - Comments on (Both visible to admin and users) 
+                  </label>
+               </li>
+               <li>
+                  <label class="label">                       
+                  <input type="radio" id="pollcomment4" name="pollcomment" value="4" <?php if($this->PollComments_On_Option==4){echo'checked="checked"';} ?>>
+                  <label class="radio" for="pollcomment4"></label> 
+                  Votes on - Comments on (Only comments visible to admin, neither visible to users) 
+                  </label>  
+               </li>
+               <li>
+                  <label class="label">                       
+                  <input type="radio" id="pollcomment5" name="pollcomment" value="5" <?php if($this->PollComments_On_Option==5){echo'checked="checked"';} ?>>
+                  <label class="radio" for="pollcomment5"></label> 
+                  Votes on - Comment on (Both visible to admin, only votes visible to users) 
+                  </label>   
+               </li>
+            </ul>
+         </div>
+      </form>
+   </div> -->
+   <!--tab content-->
+  
+   <!--end tab content-->  
+   <!--tab content-->
+   <div data-id="socialconnect" class="accountContent">
+      <div class="dbtabContainer">
+        <ul class="dbtab">
+          <li class="active"><a href="#socialconnectTab">Social connect</a></li>
+          <li><a href="#signinability">Social linking/inviting</a></li>
+          <li><a href="#SocialShareMsg">Social share messages</a></li>
+          <li><a href="#sociallogo">Social share logo</a></li>
+        </ul>
+        <div class="dbTabContainerDiv">
+            <div id="socialconnectTab" class="dbtabContent myAccountSocialConnect" style="display:block">
+                 <div class="pull-left" style="width:100%;">
+                 <h2 class="hdTitle">Platform social feeds</h2>
+                  <div class="smallDescription" style="margin-bottom:20px;">
+                 Linking your social feeds allows users to see your Facebook pages or Twitter account activity.
+                  <br><a rel="socialFeedPop" class="screenPopup" data-title="Platform social feeds">Show me</a>
+                </div>
+                 <div class="dbtabContainer">
+                 <div class="socConnTab">
+                    <ul class="dbtab">
+                      <li class="active"><a href="javascript:void(0)" rel="fbTab"><i class="fa fa-facebook"></i> Facebook</a></li>
+                      <li><a href="javascript:void(0)" rel="twitterTab"><i class="fa fa-twitter"></i> Twitter</a></li>
+                    </ul>            
+                  </div>
+                    <div class="socConnMain">
+                       <div id="fbTab" class="socConntList">
+                           <?php $dataResult = json_decode($this->session_data['facebook_connect_data']); if(empty($this->facebookconnect)) { ?>
+                           <a href="<?php echo BASE_URL; ?>/admin/social/facebook?type=config" class="myscWrp  fbMyWrp"><i class="socialSpecialIcons ssfbIcon"> </i> Facebook connect</a>
+                           <?php } else { ?>
+                           <a href="#" class="socialdisconnect myscWrp  fbMyWrp" type="facebook" dataurl="<?php echo BASE_URL; ?>/admin/social/facebook?type=config"><i class="socialSpecialIcons ssfbIcon"> </i> Facebook disconnect</a> 
+                           <?php echo '<span class ="userName facebook">Connected account: <i>'.trim($dataResult->facebookname).'</i></span>'; } ?>
+                            
+                          <?php 
+                             
+                             $pages = json_decode($dataResult->facebookPage); // get all pages information from 
+                             $dropdown = '<option value="">Select Facebook Page</option>';
+                             $selectedCount = 0;
+                             $selected = "";
+                             for($i=0;$i<count($pages->data);$i++)
+                             {
+                                if($this->facebookPage==$pages->data[$i]->access_token."-".$pages->data[$i]->id)
+                                {
+                                  $selectedCount = 1;
+                                  $selected = "selected ='selected'";
+                                }else{
+                                  $selected = '';
+                                }
+                                $dropdown .= "<option ".$selected."  value='".$pages->data[$i]->access_token."-".$pages->data[$i]->id."'>".$pages->data[$i]->name."</option>";
+                             }
+                             if($selectedCount == 1)
+                             {
+                                  $classs = '';
+                                  $error ='';
+                             }else
+                             {
+                                  $classs = 'activeSocial';
+                                  $error = '<span class="socialDroptxt">Please select one of your facebook pages</span>';
+                             }
+                             if($dropdown!='' && !empty($this->facebookconnect))
+                             echo $dropdown1 = '<div class="clear"></div><div class="'.$classs.' selectPagesFb" id="fbContDet"><select name="page" id="pagestatus">'.$dropdown.'</select><a href="javascript:void(0)" class="clickpagestatus btn btn-green">Save</a> '.$error.'<div class="socFeedTitle">To protect your privacy we would rather not share your personal feeds, therefore you are only allowed to connect your Facebook pages.</div></div>';
+
+                             ?>
+                       </div>
+
+                      <div id="twitterTab" class="socConntList" style="display:none;">
+                          <?php  $tResult = json_decode($this->session_data['twitter_connect_data']);  if(empty($this->twitterconnect)) { ?>
+                           <a href="<?php echo BASE_URL; ?>/admin/social/twitter?type=config" class="myscWrp twMyWrp " dataurl='<?php echo BASE_URL; ?>/admin/social/twitter?type=config' ><i class="socialSpecialIcons sstwIcon" > </i> Twitter connect</a>
+                           <?php } else { ?>
+                           <a href="<?php echo BASE_URL; ?>/admin/social/twitter?type=config" class="socialdisconnect myscWrp twMyWrp" type="twitter" dataurl='<?php echo BASE_URL; ?>/admin/social/twitter?type=config'><i class="socialSpecialIcons sstwIcon"> </i> Twitter disconnect</a>
+                           <?php  echo '<span class ="userName twitter">Connected account: <i>@'.trim($tResult->screen_name).'</i></span>'; } ?>
+                       </div>
+                       <div class="clearfix"></div>            
+                    </div>
+                  </div>
+            </div>
+     
+              <div class="myTablesocialUrs">
+              
+               <h2 class="hdTitle"><b>Posting with Twitter #tags</b></h2>
+               <div class="smallDescription">
+                 You as the administrator can choose whether or not to enable all of your platform's users to add related Twitter hashtags when creating a new post.  You can also individually select which users have this permission.  Users granted this permission have the ability to choose whether or not to allow other users to add (and comment on) relevant tweets to a given post.
+                  <br><a rel="twitterTagsPop" class="screenPopup" data-title="Posting with Twitter #tags">Show me</a>
+                </div>
+                <div class="formRow" id="PostTargetTwitter">
+                 <label class="label" style="width:265px; padding-left:0px;">Allow all users to post with Twitter #tags?</label>
+                 <div class="field">
+                    <div class="helponoff socialAction2" id="socialAction" >
+                       <input type="checkbox" id="socialPostTargetTwitter" <?php if($this->allowedPostWithTwitter==0){echo'checked="checked"';} ?>  caller="allowedPostWithTwitter" />
+                       <label for="socialPostTargetTwitter">
+                          <div class="onHelp" off="Off" on="On"></div>
+                          <div class="onHelptext">
+                             <span>On</span>
+                             <span>Off</span>
+                             
+                          </div>
+                       </label>
+                    </div>
+                 </div>
+              </div>
+              <div class="responsiveTable">
+                 <table class="table-border userListTable table  <?php if($this->allowedPostWithTwitter==1){ ?>disabled<?php } ?>" id="RefPostTargetTwitterTable">
+                    <thead>
+                       <tr>
+                          <td colspan="1">
+                             <div class="rpGraphTop clearfix" style="float: left; font-size:20px; margin-top:6px;">Users allowed to post with Twitter #tags</div>
+                             <div style="float: right;">
+                                <button class="btn btn-green fluidBtn pull-right <?php if($this->allowedPostWithTwitter==1){ ?>disabled<?php } ?>" style="margin-right:0px;" type="button"  onclick="fetchDbeeUser(this,'twitter');">
+                                <i class="fa fa-plus fa-lg"></i>
+                                Add more
+                                </button>
+                             </div>
+                          </td>
+                       </tr>
+                    </thead>
+                    <tbody>
+                       <tr>
+                          <td colspan='2'>
+                             <div class="acntImgThumb userlist"> 
+                             </div>
+                          </td>
+                       </tr>
+                    </tbody>
+                 </table>
+              </div>
+              </div>
+            </div>
+            <div id="signinability" class="dbtabContent">
+                  <!--tab content-->
+                    <?php 
+                          if($this->selctsocialSetting['allSocialstatus']==1) {
+                             $disabledAll ='disabledAll';
+                             $disablestatus ='disabled="disabled"';
+                           } 
+
+                           if($this->selctsocialSetting['allSocialinvite']==1) {
+                             $disabledAllInvite ='disabledAll';
+                             $disablestatusinvite ='disabled="disabled"';
+                           }  
+                          ?>
+                    <?php 
+                          if($this->selctsocialSetting['Facebookstatus']==1 ) {
+                             $disabledfb ='disabled';
+                           }     
+                           if($this->selctsocialSetting['Twitterstatus']==1 ) {
+                             $disabledtw ='disabled';
+                           }     
+                           if( $this->selctsocialSetting['Gplusstatus']==1 ) {
+                             $disabledgp ='disabled';
+                           }     
+                            if( $this->selctsocialSetting['Linkedinstatus']==1){
+                             $disabledlnd ='disabled';
+                           }  
+
+                           if($this->selctsocialSetting['Facebookinvite']==1 ) {
+                             $disabledfbinvite ='disabled';
+                           }     
+                           if($this->selctsocialSetting['Twitterinvite']==1 ) {
+                             $disabledtwinvite ='disabled';
+                           }     
+                           if( $this->selctsocialSetting['Gplusinvite']==1 ) {
+                             $disabledgpinvite ='disabled';
+                           }     
+                            if( $this->selctsocialSetting['Linkedininvite']==1){
+                             $disabledlndinvite ='disabled';
+                           }    
+                          ?>
+
+                       <div class="signinability">
+
+                        <div id="socialLinking" class="socialLinkingInvite <?php echo $disabledAll; ?>">
+                       <!--   <div class="smallDescription" style="margin-bottom:20px;">
+                           <u>Social login</u><br>
+ Allows users to log into the platform with either the Facebook Twitter, LinkedIn or Google+ account.<br><br>
+<u>Social Linking and inviting</u><br>
+Allows users to socially link their Facebook and Twitter accounts, and also allows them to invite users from each. <br><br>
+
+<strong>NOTE</strong> - LinedIn and Google+ are not applicable to social linking and inviting
+                            <br><a rel="SocialInvitingPop" class="screenPopup" data-title="Social linking/inviting">Show me</a>
+                          </div> -->
+
+                          <h2>Social login</h2>    
+                          <div class="smallDescription" style="margin-top:10px;">Allow or restrict your platform's users from logging into your platform via one of their 'social network' account credentials.</div>                   
+                          <!--tab content-->
+                          <div class="socTabOver">
+                          
+                          <div class="formRow makefbsignability ">                  
+                                <div class="signInWidth signinfb"><i class="fa fa-facebook"></i> Facebook</div>
+                                <div class="helponoff socialActionsignin" id="socialActionsignin">
+                                   <input type="checkbox" id="socialTargetfblogin" <?php if($this->selctsocialSetting['Facebooklogin']==1){echo'checked="checked"';} ?>  caller="fbsociallogin" />
+                                   <label for="socialTargetfblogin" class="managesocialTarget">
+                                      <div class="onHelp" on="ON" off="OFF"></div>
+                                      <div class="onHelptext">
+                                         <span>ON</span>
+                                         <span>OFF</span>
+                                      </div>
+                                   </label>
+                                
+                             </div>
+                          </div>
+                          <div class="formRow makefbsignability">                  
+                                <div class="signInWidth signintw"><i class="fa fa-twitter"></i> Twitter</div>
+                                <div class="helponoff socialActionsignin" id="socialActionsignin" >
+                                   <input type="checkbox" id="socialTargettwlogin" <?php if($this->selctsocialSetting['Twitterlogin']==1){echo'checked="checked"';} ?>  caller="twsociallogin" />
+                                   <label for="socialTargettwlogin" class="managesocialTarget">
+                                      <div class="onHelp" on="ON" off="OFF"></div>
+                                      <div class="onHelptext">
+                                         <span>ON</span>
+                                         <span>OFF</span>
+                                      </div>
+                                   </label>
+                                </div>
+                          </div>
+
+                          <div class="formRow makefbsignability">                  
+                                <div class="signInWidth signingp"><i class="fa fa-google-plus"></i> Google Plus</div>
+                                <div class="helponoff socialActionsignin" id="socialActionsignin" >
+                                   <input type="checkbox" id="socialTargetgplogin" <?php if($this->selctsocialSetting['Gpluslogin']==1){echo'checked="checked"';} ?>  caller="gpsociallogin" />
+                                   <label for="socialTargetgplogin" class="managesocialTarget">
+                                      <div class="onHelp" on="ON" off="OFF"></div>
+                                      <div class="onHelptext">
+                                         <span>ON</span>
+                                         <span>OFF</span>
+                                      </div>
+                                   </label>
+                                </div>
+                          </div> 
+                          
+                           <div class="formRow makefbsignability" >                  
+                                <div class="signInWidth signinld"><i class="fa fa-linkedin"></i> LinkedIn</div>
+                                <div class="helponoff socialActionsignin" id="socialActionsignin" >
+                                   <input type="checkbox" id="socialTargetldlogin" <?php if($this->selctsocialSetting['Linkedinlogin']==1){echo'checked="checked"';} ?>  caller="ldsociallogin" />
+                                   <label for="socialTargetldlogin" class="managesocialTarget">
+                                      <div class="onHelp" on="ON" off="OFF"></div>
+                                      <div class="onHelptext">
+                                         <span>ON</span>
+                                         <span>OFF</span>
+                                      </div>
+                                   </label>
+                                </div>                             
+                          </div> 
+                          </div>
+                       </div>
+
+
+
+
+                        <hr> 
+                        <div id="socialLinking" class="socialLinkingInvite <?php echo $disabledAll; ?>">
+                          <h2>Social linking</h2><br>      
+                          <div class="smallDescription" style="margin-bottom:10px;">Selecting ‘ON’ enables users to link their Facebook and Twitter accounts and view activity from these on your platform.  It also enables them to share content from your platform to Facebook and Twitter, and vice versa, and to ‘post’ directly to these from their dashboard on your platform.</div>
+                          <!--tab content-->
+                          <div class="socTabOver">
+                            <!-- <div class="formRow squareIcon" id="makeallsigninabilitysocial">         
+                                <div class="pull-left signinfb"><i class="fa fa-facebook-square"></i> <i class="fa fa-twitter-square"></i> <i class="fa fa-google-plus-square"></i> <i class="fa fa-linkedin-square"></i></div>
+                                <div class="helponoff socialActionsignin " id="socialActionsignin" >
+                                   <input type="checkbox" id="socialTargetall" <?php if($this->selctsocialSetting['allSocialstatus']==1){echo'checked="checked"';} ?>  caller="allsocialsignin" />
+                                   <label for="socialTargetall"  class="managesocialTarget" >
+                                      <div class="onHelp" on="ON" off="OFF"></div>
+                                      <div class="onHelptext">
+                                         <span>ON</span>
+                                         <span>OFF</span>
+                                      </div>
+                                   </label>
+                                </div>         
+                            </div> -->
+                          <div class="formRow makefbsignability <?php echo $disabledfb; ?>">                  
+                                <div class="signInWidth signinfb"><i class="fa fa-facebook"></i> Facebook</div>
+                                <div class="helponoff socialActionsignin" id="socialActionsignin">
+                                   <input type="checkbox" id="socialTargetfb" <?php if($this->selctsocialSetting['Facebookstatus']==1){echo'checked="checked"';} ?>  caller="fbsocialsignin"  <?php echo $disablestatus; ?> />
+                                   <label for="socialTargetfb" class="managesocialTarget">
+                                      <div class="onHelp" on="ON" off="OFF"></div>
+                                      <div class="onHelptext">
+                                         <span>ON</span>
+                                         <span>OFF</span>
+                                      </div>
+                                   </label>
+                                
+                             </div>
+                          </div>
+                          <div class="formRow makefbsignability <?php echo $disabledtw; ?>">                  
+                                <div class="signInWidth signintw"><i class="fa fa-twitter"></i> Twitter</div>
+                                <div class="helponoff socialActionsignin" id="socialActionsignin" >
+                                   <input type="checkbox" id="socialTargettw" <?php if($this->selctsocialSetting['Twitterstatus']==1){echo'checked="checked"';} ?>  caller="twsocialsignin"  <?php echo $disablestatus; ?> />
+                                   <label for="socialTargettw" class="managesocialTarget">
+                                      <div class="onHelp" on="ON" off="OFF"></div>
+                                      <div class="onHelptext">
+                                         <span>ON</span>
+                                         <span>OFF</span>
+                                      </div>
+                                   </label>
+                                </div>
+                             
+                          </div>
+                         <!--  <div class="formRow makefbsignability <?php echo $disabledgp; ?>">                  
+                                <div class="signInWidth signingp"><i class="fa fa-google-plus"></i> Google Plus</div>
+                                <div class="helponoff socialActionsignin" id="socialActionsignin" >
+                                   <input type="checkbox" id="socialTargetgp" <?php if($this->selctsocialSetting['Gplusstatus']==1){echo'checked="checked"';} ?>  caller="gpsocialsignin"  <?php echo $disablestatus; ?> />
+                                   <label for="socialTargetgp" class="managesocialTarget">
+                                      <div class="onHelp" on="ON" off="OFF"></div>
+                                      <div class="onHelptext">
+                                         <span>ON</span>
+                                         <span>OFF</span>
+                                      </div>
+                                   </label>
+                                </div>
+                             
+                          </div> -->
+                          <!-- <div class="formRow makefbsignability <?php echo $disabledlnd; ?>" >                  
+                                <div class="signInWidth signinld"><i class="fa fa-linkedin"></i> LinkedIn</div>
+                                <div class="helponoff socialActionsignin" id="socialActionsignin" >
+                                   <input type="checkbox" id="socialTargetld" <?php if($this->selctsocialSetting['Linkedinstatus']==1){echo'checked="checked"';} ?>  caller="ldsocialsignin" <?php echo $disablestatus; ?> />
+                                   <label for="socialTargetld" class="managesocialTarget">
+                                      <div class="onHelp" on="ON" off="OFF"></div>
+                                      <div class="onHelptext">
+                                         <span>ON</span>
+                                         <span>OFF</span>
+                                      </div>
+                                   </label>
+                                </div>
+                             
+                          </div> -->
+                          </div>
+                       </div>
+                     
+                     <hr> 
+                    <div id="SocialInviting" class="socialLinkingInvite <?php echo $disabledAllInvite; ?>">
+                           <h2>Social inviting</h2>
+                            <div class="smallDescription" style="margin-top:10px;">You as the administrator can choose whether or not to enable your platform’s users to invite their Facebook and/or Twitter contacts to your platform.  When 'ON', users will be able to send 'general' social invites from your platform as well as, specifically, invitations to join platform Groups and social invites to prospective Experts / Speakers.</div>    
+                          <!--tab content-->
+                          <div class="socTabOver">
+                           <!--  <div class="formRow squareIcon" id="makeallsigninabilitysocial">         
+                                <div class="pull-left signinfb"><i class="fa fa-facebook-square"></i> <i class="fa fa-twitter-square"></i> <i class="fa fa-google-plus-square"></i> <i class="fa fa-linkedin-square"></i></div>
+                                <div class="helponoff socialActionsignin " id="socialActionsignin" >
+                                   <input type="checkbox" id="socialTargetallinvite" <?php if($this->selctsocialSetting['allSocialinvite']==1){echo'checked="checked"';} ?>  caller="allsocialsignininvite" />
+                                   <label for="socialTargetallinvite"  class="managesocialTarget" >
+                                      <div class="onHelp" on="ON" off="OFF"></div>
+                                      <div class="onHelptext">
+                                         <span>ON</span>
+                                         <span>OFF</span>
+                                      </div>
+                                   </label>
+                                </div>         
+                            </div> -->
+                          <div class="formRow makefbsignability <?php echo $disabledfbinvite; ?>">                  
+                                <div class="signInWidth signinfb"><i class="fa fa-facebook"></i> Facebook</div>
+                                <div class="helponoff socialActionsignin" id="socialActionsignin">
+                                   <input type="checkbox" id="socialTargetfbinvite" <?php if($this->selctsocialSetting['Facebookinvite']==1){echo'checked="checked"';} ?>  caller="fbsocialsignininvite"  <?php echo $disablestatusinvite; ?> />
+                                   <label for="socialTargetfbinvite" class="managesocialTarget">
+                                      <div class="onHelp" on="ON" off="OFF"></div>
+                                      <div class="onHelptext">
+                                         <span>ON</span>
+                                         <span>OFF</span>
+                                      </div>
+                                   </label>
+                                
+                             </div>
+                          </div>
+                          <div class="formRow makefbsignability <?php echo $disabledtwinvite; ?>">                  
+                                <div class="signInWidth signintw"><i class="fa fa-twitter"></i> Twitter</div>
+                                <div class="helponoff socialActionsignin" id="socialActionsignin" >
+                                   <input type="checkbox" id="socialTargettwinvite" <?php if($this->selctsocialSetting['Twitterinvite']==1){echo'checked="checked"';} ?>  caller="twsocialsignininvite"  <?php echo $disablestatusinvite; ?> />
+                                   <label for="socialTargettwinvite" class="managesocialTarget">
+                                      <div class="onHelp" on="ON" off="OFF"></div>
+                                      <div class="onHelptext">
+                                         <span>ON</span>
+                                         <span>OFF</span>
+                                      </div>
+                                   </label>
+                                </div>
+                             
+                          </div>
+                         <!--  <div class="formRow makefbsignability <?php echo $disabledgpinvite; ?>">                  
+                                <div class="signInWidth signingp"><i class="fa fa-google-plus"></i> Google Plus</div>
+                                <div class="helponoff socialActionsignin" id="socialActionsignin" >
+                                   <input type="checkbox" id="socialTargetgpinvite" <?php if($this->selctsocialSetting['Gplusinvite']==1){echo'checked="checked"';} ?>  caller="gpsocialsignininvite"  <?php echo $disablestatusinvite; ?> />
+                                   <label for="socialTargetgpinvite" class="managesocialTarget">
+                                      <div class="onHelp" on="ON" off="OFF"></div>
+                                      <div class="onHelptext">
+                                         <span>ON</span>
+                                         <span>OFF</span>
+                                      </div>
+                                   </label>
+                                </div>
+                             
+                          </div> -->
+                          <!-- <div class="formRow makefbsignability <?php echo $disabledlndinvite; ?>" >                  
+                                <div class="signInWidth signinld"><i class="fa fa-linkedin"></i> LinkedIn</div>
+                                <div class="helponoff socialActionsignin" id="socialActionsignin" >
+                                   <input type="checkbox" id="socialTargetldinvite" <?php if($this->selctsocialSetting['Linkedininvite']==1){echo'checked="checked"';} ?>  caller="ldsocialsignininvite" <?php echo $disablestatusinvite; ?> />
+                                   <label for="socialTargetldinvite" class="managesocialTarget">
+                                      <div class="onHelp" on="ON" off="OFF"></div>
+                                      <div class="onHelptext">
+                                         <span>ON</span>
+                                         <span>OFF</span>
+                                      </div>
+                                   </label>
+                                </div>
+                             
+                          </div> -->
+                          </div>
+                       </div>
+
+                       </div>
+            </div>
+            <div id="SocialShareMsg" class="dbtabContent">
+                    <h2>Social share messages</h2>
+                    <div class="smallDescription" style="margin-bottom:20px;">
+                        These are the default messages that will appear to recipients when your platform’s users externally share content or invite external contacts to your platform.  All text within each message box below can be edited with the exception of the dynamic text, in the [ ] brackets.
+                      <br><a rel="socialSharemsgPop" class="screenPopup" data-title="Social share messages">Show me</a>
+                    </div>
+                   
+                    <form name="ajaxsocialshare" action ="<?php echo BASE_URL;?>/admin/myaccount/ajaxsocialshare" class="right " id="ajaxsocialshare" enctype="multipart/form-data" method="post">
+                       <div class="formRow">
+                          <label class="label">Group invite</label>
+                          <div class="field">
+                             <textarea name="group_share" id="group_share"   ><?php echo $this->getSocialShareMsg['group_share']; ?></textarea>  
+                          </div>
+                       </div>
+                       <div class="formRow">
+                          <label class="label">Event invite</label>
+                          <div class="field">
+                             <textarea name="event_share" id="event_share"><?php echo $this->getSocialShareMsg['event_share']; ?></textarea>  
+                          </div>
+                       </div>
+                       <div class="formRow">
+                          <label class="label">Post share</label>
+                          <div class="field">
+                             <textarea name="post_share" id="post_share"><?php echo $this->getSocialShareMsg['post_share']; ?></textarea>  
+                          </div>
+                       </div>
+                       <div class="formRow">
+                          <label class="label">Expert invite</label>
+                          <div class="field">
+                             <textarea name="expert_share" id="expert_share"><?php echo $this->getSocialShareMsg['expert_share']; ?></textarea>  
+                          </div>
+                       </div>
+                       <div class="formRow">
+                          <label class="label">Platform invite</label>
+                          <div class="field">
+                             <textarea name="plateform_share" id="plateform_share"><?php echo $this->getSocialShareMsg['plateform_share']; ?></textarea>  
+                          </div>
+                       </div>
+                       <div class="formRow">
+                          <div class="field">
+                             <input type="submit" class="btn btn-green" value="Save" name="submit" />
+                          </div>
+                       </div>
+                    </form>
+            </div>
+            <div id="sociallogo" class="dbtabContent sociallogo">
+                  <div class="smallDescription" style="margin-bottom:20px;">
+                      This is the logo image that users on Facebook, Twitter and other ‘social networks’ will see when your users externally share a link from your platform.
+                    <!-- <br><a rel="socialSharemsgPop" class="screenPopup" data-title="Social share messages">Show me</a> -->
+                  </div>
+                  <div class="formRow">
+                     <form name="configuration" action ="/admin/myaccount/ajaxsociallogo" class="right " id="ajaxsociallogo" enctype="multipart/form-data" method="post">
+                        <label class="label">Social share logo</label>
+                        <div class="field appendType">
+                           <input type="text" readonly="" name="" class="uploadType">
+                           <a href="javascript:void(0);" class="btn btn-black">Browse<input type="file" name="sociallogo" class="fileType">
+                           </a>
+                           <div class="clearfix" style=" display:none;"></div>
+                           <?php if($this->SocialLogo!='') { ?>
+                           <div class="acntImgThumb">
+                              <div id="newpic" class="proPic Sociallogoimage">
+                                 <img  src="<?php echo BASE_URL .'/img/'.$this->SocialLogo; ?>" class="imgStyle ">
+                                 <a href="javascript:void(0);" type="Sociallogoimage" class="removeSociallogoimage removeCompare">x</a>
+                              </div>
+                                <input type="hidden" name="hiddenSocialLogo" value="<?php echo $this->SocialLogo; ?>" id="hiddenSocialLogo">
+                           </div>
+                              <?php } ?>
+                            
+                           <div class="clearfix"></div>
+                        </div>
+                        <div class="field">
+                           <input type="submit" name="submitsign" value="Save" class="btn btn-green SigninPupPreview" />
+                        </div>
+                     </form>
+                  </div>
+            </div>
+        </div>
+      </div>
+
+
+      
+  </div>
+ 
+   <!--end tab content-->
+
+    
+
+   
+   <!--end tab content-->
+
+   <div data-id="seosetting" class="accountContent" >
+      
+   </div>
+  <!--  <div data-id="Leagues-score" class="accountContent">
+      <form name="ajaxpostscore" action ="<?php echo BASE_URL;?>/admin/myaccount/ajaxpostscore" class="right " id="ajaxpostscore"  method="post">
+         <label class="label">Platform scoring </label>
+         <div class="field">
+            <div class="helponoff socialAction2" id="socialAction" >
+               <input type="checkbox" id="socialTarget2" <?php if($this->plateform_scoring==1){echo'checked="checked"';} ?>  caller="scoringoff" />
+               <label for="socialTarget2">
+                  <div class="onHelp"  on="On" off="Off"></div>
+                  <div class="onHelptext">
+                     <span>On</span>
+                     <span>Off</span>
+                  </div>
+               </label>
+            </div>
+         </div>
+      </form>
+      <form name="ajaxpostscoreset" action ="<?php echo BASE_URL;?>/admin/myaccount/ajaxpostscoreset" class="right " id="ajaxpostscoreset"  method="post">
+         <div style="margin:20px 0px" >
+            <label class="label">Scoring icons </label>
+            <div class="field">
+               <table style="width:100%; border-collapse: separate; margin-left: 15px; display: inline" cellpadding="10" >
+                  <tr>
+                     <td class="tdscoreset" width="80">
+                        <label for="scoreset1">
+                           <div style="float:left"><input name="scoreset" id="scoreset1"  value="0" <?php if($this->scoreset==0){?>checked="checked" <?php } ?> type="radio" >
+                        <label for="scoreset1"></label></div>
+                        <div style="float:left; margin-top:2px;"><i class="fa fa-smile-o fa-lg"></i><br> 
+                           <i class="fa fa-thumbs-o-up fa-lg brakdownicon"></i><br> 
+                           <i class="fa fa-thumbs-o-down fa-lg brakdownicon" ></i><br> 
+                           <i class="fa fa-frown-o fa-lg brakdownicon" ></i>
+                        </div>
+                        <span style="color:#999"></span></label>
+                     </td>
+                     <td class="tdscoreset">
+                        <label for="scoreset2">
+                           <div style="float:left"><input name="scoreset" id="scoreset2" <?php if($this->scoreset==1){?>checked="checked" <?php } ?> value="1" type="radio">
+                        <label for="scoreset2"></label></div>
+                        <div style="float:left; margin-top:2px;"><i class="fa fa-plus-square fa-lg"></i><br>
+                           <i class="fa fa-plus-square  brakdownicon" ></i><br>
+                           <i class="fa fa-minus-square fa-lg brakdownicon"></i><br>
+                           <i class="fa fa-minus-square brakdownicon"></i>
+                        </div>
+                        <span style="color:#999"></span></label>
+                     </td>
+                  </tr>
+               </table>
+            </div>
+         </div>
+      </form>
+   </div> -->
+   <!-- post Score edit  -->
+   <div data-id="expert" class="accountContent" >
+      <h2>Expert / Speaker</h2>
+      <div class="smallDescription" style="margin-top:10px;">
+        Here you can change the 'title' of your Expert / Speaker (for example, 'Special Guest', 'Resident Expert', etc).
+        <br><a rel="expertPop" class="screenPopup" data-title="Expert / Speaker">Show me</a>
+      </div>
+      <form name="ajaxexpert" action ="/admin/myaccount/ajaxexpert" class="right " id="ajaxexpert"  method="post">
+         <div class="formRow">
+            <label class="label">Expert / Speaker</label>
+            <div class="field">
+               <input  type="text"  name="expert" id="expert"  placeholder="Please enter the expert text" value="<?php echo $this->expert; ?>">  
+            </div>
+         </div>
+         <div class="formRow">
+            <div class="field">
+               <input type="submit" class="btn btn-green" value="Save" name="submit" />
+            </div>
+         </div>
+      </form>
+   </div>
+   <div data-id="staticpages" class="accountContent" >
+      <h2>Static pages</h2>
+         <!-- <div class="smallDescription" style="margin-bottom:20px;">
+       Manny just have the 1 maple here for now
+        <br><a rel="staticPagesPop" class="screenPopup" data-title="Static pages">Show me</a>
+      </div>
+       -->
+      <form name="ajaxstaticpages" action ="<?php echo BASE_URL;?>/admin/myaccount/ajaxstaticpages" class="right " id="ajaxstaticpages" enctype="multipart/form-data" method="post">
+         <div class="formRow">
+            <label class="label">About us</label>
+            <div class="field">
+               <textarea name="aboutus" id="aboutus"   ><?php echo $this->getStaticPage['aboutus']; ?></textarea>  
+            </div>
+         </div>
+         <div class="formRow">
+            <label class="label">Privacy policy</label>
+            <div class="field">
+               <textarea name="privacy" id="privacy"><?php echo $this->getStaticPage['privacy']; ?></textarea>  
+            </div>
+         </div>
+         <div class="formRow">
+            <label class="label">Terms & conditions</label>
+            <div class="field">
+               <textarea name="terms" id="terms"><?php echo $this->getStaticPage['terms']; ?></textarea>  
+            </div>
+         </div>
+
+          <div class="formRow">
+            <label class="label">Cookie Policy</label>
+            <div class="field">
+               <textarea name="CookiePolicy" id="CookiePolicy" style="height:250px;"><?php echo $this->getStaticPage['CookiePolicy']; ?></textarea>  
+            </div>
+         </div>
+         <div class="formRow">
+            <div class="field">
+               <input type="submit" class="btn btn-green" value="Save" name="submit" />
+            </div>
+         </div>
+      </form>
+   </div>
+   <!-- <div data-id="category" class="accountContent">
+     
+   </div> -->
+   <div data-id="biofields" class="accountContent">
+      <div id="categorycontainer">
+         <h2>User biography fields</h2>
+         <div id="addcat" class="dropDown pull-right" style="margin-top:-22px">
+            <a class="pull-right btn btn-green dropDownTarget"  href="#">Add new field</a>
+
+            <div class="dropDownList right">
+               <form class="right">
+                  <div class="formRow">
+                     <input type="text" placeholder="Field name" name="biofield" id="biofield"> 
+                  </div>
+                  <div class="formRow">
+                     <input type="text" placeholder="Priority" value="" id="priority2" name="priority2">
+                  </div>
+                  <div class="subText" style="ttext-indent:justify"> 
+                     <i class="fa-info-sign"></i>Fields will be displayed in descending order of priority, ie. the Field with the highest number will appear at the top.<br />
+                  </div>
+                  <div class="formRow">
+                     <input type="hidden" value="vipusers" id="calling">
+                     <button style="margin-right:0px;" id="biofieldsubmit" class="btn btn-green fluidBtn pull-right" type="button"> 
+                     <i class="fa-plus-save fa-lg"></i> Save </button>
+                  </div>
+               </form>
+            </div>
+         </div><br>
+         <div class="smallDescription" style="margin-right:100px;">Here you can customise the Biography section of a user's profile page, including the ability to edit field names and placement, and delete fields.  A field cannot be deleted once any user has entered information in it however the field name and placement can continue to be edited.
+                  <br><a rel="biographyPop" class="screenPopup" data-title="User biography fields">Show me</a>
+                </div>
+
+         <ul id="biofields-items"> </ul>
+      </div>
+   </div>
+
+   <!-- <div data-id="PostLive" class="accountContent">
+     <h2>Admin post control</h2>
+      <div class="smallDescription" style="margin-top:10px;">This feature enables you to control the posts that appear on your platform by only displaying those that you have verified.  You can choose whether to be notified of new user posts by platform notifications only or additionally by email.
+                  <br><a rel="adminPostControlPop" class="screenPopup" data-title="Admin post control">Show me</a>
+                </div>
+     
+      <form name="AjaxPostLiveConf" action ="<?php echo BASE_URL;?>/admin/myaccount/ajaxpostliveconf" class="right " id="AjaxPostLiveConf" enctype="multipart/form-data" method="post">
+        
+         <div class="formRow">
+            <label class="labelsigninability">Verify posts</label>
+            <div class="field">
+                <div class="helponoff pull-left">
+                  <?php if($this->allow_admin_post_live==1) { 
+                     $checked = 'checked="checked"'; 
+                     } else{
+                     $checked='';
+                     }?>
+                  <input type="checkbox" name="allow_admin_post_live" value="1" id="adminPostAllow" <?php echo  $checked ?>>
+                  <label for="adminPostAllow">
+                     <div off="ON" on="OFF" class="onHelp"></div>
+                     <div class="onHelptext">
+                        <span>OFF</span>
+                        <span>ON</span>
+                     </div>
+                  </label>
+               </div> 
+
+            </div>
+         </div>
+         
+         <div class="formRow">
+          <div class="GroupBackgroundRow <?php if($this->allow_admin_post_live==0){ ?>disabled<?php }?>">
+            <label class="labelsigninability">Inform via email</label>
+            <div class="field">
+                <div class="helponoff pull-left">
+                  <?php if($this->informviaemail==1) { 
+                     $checked = 'checked="checked"'; 
+                     } else{
+                     $checked='';
+                     }?>
+                  <input type="checkbox" <?php if($this->allow_admin_post_live==0){ ?> class="disabled" disabled="disabled"  <?php }?> name="informviaemail" value="1" id="informviaemail" <?php echo  $checked ?>>
+                  <label for="informviaemail">
+                     <div off="ON" on="OFF" class="onHelp"></div>
+                     <div class="onHelptext">
+                        <span>OFF</span>
+                        <span>ON</span>
+                     </div>
+                  </label>
+               </div> 
+            </div>
+          </div>
+
+         </div>
+        
+      </form>
+   </div> -->
+   <div data-id="groupCategoryList" class="accountContent">
+      <div class="dbtabContainer">
+        <ul class="dbtab">
+          <li class="active"><a href="#postCategoriesTab">Post categories</a></li>
+          <li><a href="#groupCategoriesTab" groupcat-data="group categories" >Group categories</a></li>
+        </ul>
+        <div class="dbTabContainerDiv">
+           
+            <div id="postCategoriesTab"  style="display:block" class="dbtabContent">
+                 <div id="categorycontainer">
+                   <div id="addcat" class="dropDown pull-right">
+                      <a class="pull-right btn btn-green dropDownTarget"  href="#">Add new post category</a>
+                      <div class="dropDownList right">
+                         <form class="right">
+                            <div class="formRow">
+                               <input type="text" placeholder="Category name" name="category1" id="category1"> 
+                            </div>
+                            <div class="formRow">
+                               <input type="text" placeholder="Priority" value="" id="priority1" name="priority1">
+                            </div>
+                            <div class="subText" style="ttext-indent:justify"> 
+                               <i class="fa-info-sign"></i>Categories will be displayed in descending order of priority, ie. the category with the highest number will appear at the top.<br />
+                            </div>
+                            <div class="formRow">
+                               <input type="hidden" value="vipusers" id="calling">
+                               <button style="margin-right:0px;" id="catsubmit" class="btn btn-green fluidBtn pull-right" type="button"> 
+                               <i class="fa-plus-save fa-lg"></i> Save </button>
+                            </div>
+                         </form>
+                      </div>
+                   </div>
+                   <div class="smallDescription">
+                      Here you can customise the categories into which posts are organised.  You can create new categories, edit the name of existing ones, and change their displayed order.  Note that an existing category cannot be deleted once any user has linked a post to it.
+                      <br><a rel="postcatPop" class="screenPopup" data-title="Post categories">Show me</a>
+                    </div>
+                   <ul id="category-items"> </ul>
+                </div>
+            </div>
+             <div id="groupCategoriesTab" class="dbtabContent">
+                <div id="categorycontainer">
+                   <div id="grpcat" class="dropDown pull-right">
+                      <a class="pull-right btn btn-green dropDownTarget"  href="#">Add new group category</a>
+                      <div class="dropDownList right">
+                         <form class="right">
+                            <div class="formRow">
+                               <input type="text" placeholder="Group category name" name="groupcatname" id="groupcatname"> 
+                            </div>
+                            <div class="formRow">
+                               <input type="text" placeholder="Priority" value="" id="grouppriority" name="grouppriority">
+                            </div>
+                            <div class="subText" style="ttext-indent:justify"> 
+                               <i class="fa-info-sign"></i>
+                               Categories will be displayed in descending order of their priority. For example, category with the highest number will be shown at the top.<br />
+                            </div>
+                            <div class="formRow">
+                               <input type="hidden" value="vipusers" id="calling">
+                               <button style="margin-right:0px;" id="grpcatsubmit" class="btn btn-green fluidBtn pull-right" type="button"> 
+                               <i class="fa-plus-save fa-lg"></i> Save </button>
+                            </div>
+                         </form>
+                      </div>
+                   </div>
+                   <div class="smallDescription">
+                     Here you can customise the categories to which the platform's Groups are linked, and by which they are organised.  You can create new categories, edit the name of existing ones, and change their displayed order.  Note that an existing category cannot be deleted once any user has linked a Group to it.
+                      <br><a rel="groupcatPop" class="screenPopup" data-title="Group categories">Show me</a>
+                    </div>
+                   <ul id="glist"></ul>
+                </div>
+
+            </div>
+        </div>
+      </div>
+      
+   </div>
+ 
+    <div class="accountContent msgAlertLoginTC" data-id="AfterLoginTC">
+      <h2>User login message alert</h2>
+        <div class="smallDescription" style="margin-bottom:20px; margin-top:10px;">
+         Often, ‘social network’ users choose to not click on links to Terms & Conditions, Privacy Policies, etc.  To increase the likelihood that users will read your platform’s Terms & Conditions set the user login message alert to ‘ON’.  The text dialogue box appears here so that you as the administrator can add additional text, as required.
+      </div>
+      <form name="ajaxAfterLoginTC" action ="<?php echo BASE_URL;?>/admin/myaccount/ajaxafterlogintc" class="right " id="ajaxAfterLoginTC" enctype="multipart/form-data" method="post">
+
+         <div class="formRow">
+          <label class="label" style="padding-left:0px; padding-right:0px;">Show message to users on login?</label>
+               <div class="field">
+                  <div class="helponoff socialAction2" id="socialAction" >
+                     <input type="checkbox" id="allow_login_terms" <?php if($this->AllowLoginTerms==0){echo'checked="checked"';} ?>  caller="AllowLoginTerms" />
+                     <label for="allow_login_terms">
+                        <div class="onHelp"  on="Yes" off="No"></div>
+                        <div class="onHelptext">
+                           <span>Yes</span>
+                           <span>No</span>
+                        </div>
+                     </label>
+                  </div>
+               </div>
+          </div>
+              
+         <div class="formRow" id="Reflogin_terms" <?php if($this->AllowLoginTerms==0){echo'style="opacity:0.4"';} ?>>
+            <label class="label">Message</label>
+            <div class="field">
+               <textarea name="login_terms" id="login_terms" style="height:400px;" <?php if($this->AllowLoginTerms==0){echo'disabled="disabled"';} ?>><?php echo $this->login_terms; ?></textarea>  
+            </div>
+         </div>
+         <div class="formRow">
+            <div class="field">
+               <input type="submit" class="btn btn-green <?php if($this->AllowLoginTerms==0){echo'disabled';} ?>" id="login_terms_btn" <?php if($this->AllowLoginTerms==0){echo'disabled="disabled"';} ?> value="Save" name="submit" />
+            </div>
+         </div>
+      
+      </form>
+   </div>
+   
+   <!--tab content-->
+ <!--   <div data-id="changepassword" class="accountContent">
+     
+   </div> -->
+   <!--end tab content-->
+   <!--End Container-->
+   <!--tab content-->
+   <div data-id="Managefeed" class="accountContent">
+      <div style="padding-bottom:10px;">
+         <h2 style="display:inline-block; padding-bottom:10px;">RSS feeds</h2> 
+        
+        <a href="javascript:void(0);" class="btn btn-green pull-right" id="addNewfeed"><i class="fa fa-rss"></i> Add new feed</a>
+       <div class="smallDescription">
+          Allows the admin to choose which RSS feeds users can see via their social feeds. You can add a new feed via the ‘Add new feed’ button.
+            <br><a rel="rssPop" class="screenPopup" data-title="RSS feeds">Show me</a>
+          </div>
+      </div>
+
+      <div class="addNewfeedwrapper" id="addfeedsnc">
+       
+         <form id="formfee" method="post" enctype="multipart/form-data" >
+            <div class="addNewFeedContent">
+              <div class="smallDescription">To add a custom RSS link, copy the RSS feed URL (suffixed .xml)  and paste into the box. Then select the related 'Country' and click ‘Save’. This RSS feed will then appear as an option for your platform's users to select and you as the administrator can choose to make this custom RSS feed a default option.</div><br>
+           <!--    <div class="formRow" id="pdfuserboxdl">
+                 <span>
+                    <div id="flnright">
+                       <label class="label"> </label>
+                       <div >
+                       </div>
+                    </div>
+                 </span>
+              </div> -->
+              <div class="formRow">
+                 <label class="label">Feed title</label>
+                 <div class="field" style="width:400px">
+                    <input type="text"  name="feedtitle" id="feedtitle" /> 
+                 </div>
+              </div>
+              <div class="formRow" >
+                 <label class="label">Feed URL</label>
+                 <div class="field" style="width:400px">
+                    <input type="text"  name="feedurl" id="feedurl" /> 
+                 </div>
+              </div>
+             <!--  <div class="formRow">
+                 <label class="label">Feed logo</label>
+                 <div class="fieldInput field">
+                    <div class="dropzone" id="feedlogo">
+                       <div class="appendType fallback"  >
+                          <input type="file" name="feedlogo">
+                       </div>
+                    </div>
+                    <div class="bcfeedlogo removeImgWrp" id="backgroundImage">
+                    </div>
+                    <div class="clear"></div>
+                 </div>
+              </div> -->
+             <!--  <div class="formRow" id="pdfusersetboxdl">
+                 <label class="label">Feed country</label>
+                 <div class="field dropDwonRowSuggestion">
+                    <select name="country" id="country">
+                       <option value='0'> - Select a country - </option>
+                       <?php
+                         // foreach($this->country as $row):
+                            //echo "<option value='".$row['ID']."'>".$row['Name']."</option>";
+                           // endforeach;
+                          ?>
+                    </select>
+                 </div>
+              </div> -->
+            </div>
+            <div class="formRow buttonWrapper">
+              <div class="field clearfix">
+               <button type="submit"  class="btn btn-green btn-medium pull-left" name="addfeed" id="addfeed"  style="margin-right:10px;"><i class=""> </i> Save</button> 
+               <button  type="button" class="btn btn-gray btn-medium pull-left" name="addfeed" id="feedcancle"  >Close</button>
+              </div>
+            </div>
+         </form>
+      </div>
+
+
+
+
+      <div id="feedcontent">
+      <!--    <div class="fdHeaderBr">
+            <div class="feedrowOver">
+               <div class="feedrow">
+                   <label class="dotcircle active">
+                    <i class="fa fa-circle"></i></label> Default feeds <!--<a rel="dbTip" href="#" title="Active feed to show new user as default " style="font-size: 14px;"><i class="fa fa-question-circle"></i></a>-->
+             <!--   </div> 
+               <div class="delfeed">
+              <label >
+                    <i class="fa fa-times"></i></label>  Remove feed
+              </div>
+              <!--
+              <div class="feedrow" style="margin-left:20px">
+               <lable class="dotcircle">
+                    <i class="fa fa-circle-o"></i></lable>No default feed <a rel="dbTip" href="#" title="Active feed to show new user as default " style="font-size: 14px;"><i class="fa fa-question-circle"></i></a>
+              </div>
+           
+            </div>
+
+            <div class="rssSelAllrow"> -->
+           <!--  <label title="Select all" class="selectAllFd">
+              <input class="chkallfeed" id="chkallfeed" type="checkbox" value="allInResults" name="chkallfeed">
+                 <label for="chkallfeed"></label> Select all </label>
+             
+            <a href="javascript:void(0);"  class="btn btn-yellow pull-left" id="updatechkfeed1">Activate</a>-->
+
+           <!--   <a href="javascript:void(0);"  class="btn btn-yellow pull-left" id="updatefeedalldective" action="active">Activate all </a>
+            <a href="javascript:void(0);"  class="btn btn-red updatefeedalldectivem" id="updatefeedalldective"  action="deactive">Deactivate all</a>
+            <a href="javascript:void(0);" class="btn btn-red pull-right" id="delfeedall" style="margin-left: -10px;"><i class="fa fa-times"></i> Delete all</a> 
+          </div> 
+     </div>
+         <?php
+              $counter=1;
+              $labelcounter=1;
+              $i=1;
+              $userrss = $this->userrss;
+              $dnt = array(); 
+              if(count($this->siterss)>0){
+                foreach($this->siterss as $typeRow):
+                $active = '0';
+                $activecls = 'fa fa-circle-o';
+                  if($typeRow['Active']==1) { $checked='checked="checked"';   } else { $checked=''; $color='';  
+                  }
+                 if(!in_array($typeRow['cname'],$dnt)){
+                  array_push($dnt,$typeRow['cname']);
+               
+                  echo "<div class='next-line'></div>";
+                     if($i>1) echo '</div>';
+                   echo "<div class='box-row'>";
+                  echo "<div class='heading-bold' >".$typeRow['cname']."</div>";
+                }
+                if($typeRow['isdefault']==1){
+
+                  $active = 'active';
+                  $activecls = 'fa fa-circle';
+
+                } 
+            
+                ?>
+         <div class="rssrow">
+            <label class="labelCheckbox">
+              <input type="checkbox" id="check<?=$i;?>" class="check" value="<?=$typeRow['ID']?>" <?=$checked?>>
+              <label class="checkbox" for="check<?=$i;?>"></label><span><?=$typeRow['Name']?></span>
+             
+            </label>
+             <div class="delrss" title="delete" rssid="<?=$typeRow['ID']?>"><i class="fa fa-times"></i></div>
+              <div class="defaultrss <?=$active;?>" title="set default" rssid="<?=$typeRow['ID']?>"> <i class="<?php echo $activecls;?>"></i> </div>
+            <div style="height:1px"></div>
+         </div>
+         <?php
+            if($counter=='4') {
+              echo '<div class="next-line"></div>';
+              $counter=1;
+            } else $counter++;  
+            $i++;
+            endforeach;
+            }else { ?>
+              <div>RSS not found</div>
+            <?php } 
+            ?>
+      </div> -->
+     
+  <table class="table-border  table table-hover table-stripe">
+  
+     
+   
+    
+       <?php
+              $counter=1;
+              $labelcounter=1;
+              $i=1;
+              $userrss = $this->userrss;
+              $dnt = array(); 
+              if(count($this->siterss)>0){ ?>
+              <thead>
+               <tr class="trstrong">
+                  <th>Title</th>
+                  <th>Feed URL</th>                  
+                  <th width="100">Action</th>       
+              </tr>
+            </thead>
+            
+            <tbody>
+            <?php
+            
+                foreach($this->siterss as $typeRow):
+                $active = '0';
+                $activecls = 'fa fa-circle-o';
+                  if($typeRow['Active']==1) { $checked='checked="checked"';   } else { $checked=''; $color='';  
+                  }
+             
+                 if($typeRow['isdefault']==1){
+
+                  $active = 'active';
+                  $activecls = 'fa fa-circle';
+
+                } 
+            
+                ?>
+        
+  <tr id="<?=$typeRow['ID']?>" class="globalAdminSet">
+     <td><?=$typeRow['Name']?></td>
+     <td><?=$typeRow['URL']?></td>     
+     <td><a href="javascript:void(0);" title="delete" rssid="<?=$typeRow['ID']?>" class="btn btn-danger delrss btn-mini"> Delete </a>
+      </td>
+     </tr> 
+
+         <?php
+            
+            $i++;
+            endforeach;
+            }else { ?>
+              <div>RSS not found</div>
+            <?php } 
+            ?>
+
+
+
+
+
+   </tbody>
+    
+  </table>
+
+   </div>
+</div>
+<!--end tab content-->
+
+  <div class="setPopimg" id="accountSettingPop">
+     <div class="popimgList flexslider">
+         <ul class="slides">
+            <li><img src="<?php echo BASE_URL; ?>/img/accountsettings1.png"/></li>
+            <li><img src="<?php echo BASE_URL; ?>/img/accountsettings2.png"/></li>
+         </ul>
+      </div>
+  </div>
+  <div id="adminPostControlPop" class="setPopimg">
+    <div class="popimgList flexslider">
+         <ul class="slides">
+            <li><img src="<?php echo BASE_URL; ?>/img/postcontrol.png"/></li>
+            <li><img src="<?php echo BASE_URL; ?>/img/postcontrol2.png"/></li>
+            <li><img src="<?php echo BASE_URL; ?>/img/postcontrol3.png"/></li>
+            <li><img src="<?php echo BASE_URL; ?>/img/postcontrol4.png"/></li>
+            <li><img src="<?php echo BASE_URL; ?>/img/postcontrol5.png"/></li>
+         </ul>
+      </div>
+  </div>
+  <div id="biographyPop" class="setPopimg">
+    <div class="popimgList flexslider">
+         <ul class="slides">
+            <li><img src="<?php echo BASE_URL; ?>/img/biog1.png"/></li>
+            <li><img src="<?php echo BASE_URL; ?>/img/biog2.png"/></li>
+         </ul>
+      </div>
+  </div>
+  <div id="expertPop" class="setPopimg">
+    <div class="popimgList flexslider">
+         <ul class="slides">
+            <li><img src="<?php echo BASE_URL; ?>/img/expert1.png"/></li>
+            <li><img src="<?php echo BASE_URL; ?>/img/expert2.png"/></li>
+         </ul>
+      </div>
+  </div>
+  <div id="groupcatPop" class="setPopimg">
+    <div class="popimgList flexslider">
+         <ul class="slides">
+            <li><img src="<?php echo BASE_URL; ?>/img/groupcats1.png"/></li>
+            <li><img src="<?php echo BASE_URL; ?>/img/groupcats2.png"/></li>
+         </ul>
+      </div>
+  </div>
+  <div id="postcatPop" class="setPopimg">
+    <div class="popimgList flexslider">
+         <ul class="slides">
+            <li><img src="<?php echo BASE_URL; ?>/img/postcat1.png"/></li>
+            <li><img src="<?php echo BASE_URL; ?>/img/postcat2.png"/></li>
+         </ul>
+      </div>
+  </div>
+  <div id="rssPop" class="setPopimg">
+    <div class="popimgList flexslider">
+         <ul class="slides">
+            <li><img src="<?php echo BASE_URL; ?>/img/rss1.png"/></li>
+            <li><img src="<?php echo BASE_URL; ?>/img/rss2.png"/></li>
+         </ul>
+      </div>
+  </div>
+  <div id="twitterTagsPop" class="setPopimg">
+    <div class="popimgList flexslider">
+         <ul class="slides">
+            <li><img src="<?php echo BASE_URL; ?>/img/twitterhashtag1.png" /><div class="sliderSubTitle">Twitter hashtag permission OFF</div></li>
+            <li><img src="<?php echo BASE_URL; ?>/img/twitterhashtag2.png"/><div class="sliderSubTitle">Twitter hashtag permission ON</div></li>
+            <li><img src="<?php echo BASE_URL; ?>/img/twitter1.png"/><div class="sliderSubTitle">Post with a Hashtag</div></li>
+            <li><img src="<?php echo BASE_URL; ?>/img/twitter2.png"/><div class="sliderSubTitle">Tweets display on the right hand side of the main discussion page</div></li>
+         </ul>
+      </div>
+  </div>
+  <div id="socialFeedPop" class="setPopimg">
+    <img src="<?php echo BASE_URL; ?>/img/socialfeeds.png" />
+  </div>
+<div id="SocialInvitingPop" class="setPopimg">
+  <div class="popimgList flexslider">
+       <ul class="slides">
+          <li><img src="<?php echo BASE_URL; ?>/img/sociallinking1.png"/></li>
+          <li><img src="<?php echo BASE_URL; ?>/img/sociallinking2.png"/></li>
+          <li><img src="<?php echo BASE_URL; ?>/img/sociallinking3.png"/></li>
+       </ul>
+    </div>
+</div>
+
+<div id="socialSharemsgPop" class="setPopimg">
+  <img src="<?php echo BASE_URL; ?>/img/socialsharemsg.png" />
+</div>
+
+<div id="staticPagesPop" class="setPopimg">
+  <div class="popimgList flexslider">
+       <ul class="slides">
+          <li><img src="<?php echo BASE_URL; ?>/img/staticpages1.png"/></li>
+          <li><img src="<?php echo BASE_URL; ?>/img/staticpages1a.png"/></li>
+       </ul>
+    </div>
+</div>
+  

@@ -1,0 +1,814 @@
+<script type="text/javascript" src="<?php echo BASE_URL."/adminraw/js/strength.js";?>"></script>
+<script type="text/javascript" src="<?php echo BASE_URL."/adminraw/js/usergroup.js";?>"></script>
+<script> 
+   $(document).ready(function() {
+    $(window).load(function() {
+      $('.popimgList').flexslider({
+        animation: "slide",
+        slideshow:false,
+        smoothHeight:false,        
+        useCSS:true
+      });
+
+
+      $('body').on('click','.moreGlobalset a', function(){
+       var globalRel = $(this).attr('rel');       
+       var globalTitle =$(this).closest('.formRow').find('label.label:first').text();        
+         $('#'+ globalRel).dialog({title:globalTitle,});           
+         var sd = $('.popimgList').data('flexslider');
+         sd.resize();  
+         $(window).resize();      
+      });
+      
+
+            
+    });
+
+
+  $('body').on('click', '#AjaxPostLiveConf input', function() {
+       
+       var url = BASE_URL + '/admin/myaccount/ajaxpostliveconf';
+       var thisEl = $(this);
+       var nameValue = $(this).attr('name');
+       var value = 0;
+       var msg = '';
+       /*if($(this).is(':checked')==true){
+          value = $(this).val();
+       }*/      
+        if(nameValue=='allow_admin_post_live'){
+              if($(this).is(':checked')==true) { 
+                msg = 'Are you sure you want to allows Admin to verify each post?';
+                globelSettingVal=1;
+            }else{
+                 msg ='Are you sure you want to remove the ability to allows Admin to verify each post?';
+                 globelSettingVal=0;
+            }
+        }else if(nameValue=='informviaemail'){
+
+            if($(this).is(':checked')==true) { 
+              msg = 'Are you sure you want to enable the ability i.e. admin is alerted each time a new post has been added, via email?';
+              globelSettingVal=1;
+          }else{
+               msg ='Are you sure you want to remove the ability i.e. admin is alerted each time a new post has been added, via email?';
+               globelSettingVal=0;
+          }
+
+        }
+
+      $('#dialogConfirmSetting').remove();
+      $('body').append('<div id="dialogConfirmSetting">'+msg+'</div>');
+      $( "#dialogConfirmSetting" ).dialog({
+      resizable: false,
+      title:'Please confirm',
+      modal: true,
+      buttons: {
+      "Yes": function() {
+      $( this ).dialog("close"); 
+           $.ajax({
+             type: "POST",
+             dataType: 'json',
+             url: url,
+             data:{ "globelSettingVal": globelSettingVal,'calling':nameValue,},
+             success: function(response) {
+               $messageSuccess("updated successfully");
+               if(thisEl.is(':checked')==false){               
+                 if(nameValue=='allow_admin_post_live'){                                 
+                    if(localTick==false)
+                      socket.emit('disablesocial', nameValue,clientID);
+                     $('#informviaemail').addClass('disabled');
+                     $('#informviaemail').attr('disabled', 'disabled');
+                     $('form#AjaxPostLiveConf .GroupBackgroundRow').addClass('disabled');
+                  }
+               }
+               else
+               {  
+                  if(nameValue=='allow_admin_post_live'){                                 
+                    if(localTick==false)
+                      socket.emit('enablesocial', nameValue,clientID);
+                     $('#informviaemail').removeClass('disabled');
+                     $('#informviaemail').attr('disabled', false);
+                     $('form#AjaxPostLiveConf .GroupBackgroundRow').removeClass('disabled');
+                  }                
+               }
+             }
+           });
+         }  //yes
+        }  //button
+       }); //dialog
+       
+     });
+
+
+  $('#ajaxpostscore').ajaxForm(function() {
+       
+       if ($("#ScoreName1").val() == "") {
+         alert("Please enter Score Name 1!");
+         document.getElementById('ScoreName1').focus();
+         return false;
+       } else if ($("#ScoreIconText1").val() == "") {
+         alert("Please select Score icon 1!");
+         document.getElementById('ScoreIcon1').focus();
+         return false;
+       } else if ($("#ScoreName2").val() == "") {
+         alert("Please enter Score Name 2!");
+         document.getElementById('ScoreName2').focus();
+         return false;
+       } else if ($("#ScoreIconText2").val() == "") {
+         alert("Please select Score icon 2!");
+         document.getElementById('ScoreIcon2').focus();
+         return false;
+       } else if ($("#ScoreName3").val() == "") {
+         alert("Please enter Score Name 3!");
+         document.getElementById('ScoreName3').focus();
+         return false;
+       } else if ($("#ScoreIconText3").val() == "") {
+         alert("Please select Score icon 3!");
+         document.getElementById('ScoreIcon3').focus();
+         return false;
+       } else if ($("#ScoreName4").val() == "") {
+         alert("Please enter Score Name 4!");
+         document.getElementById('ScoreName4').focus();
+         return false;
+       } else if ($("#ScoreIconText4").val() == "") {
+         alert("Please select Score icon 4!");
+         document.getElementById('ScoreIcon4').focus();
+         return false;
+       } else if ($("#ScoreName5").val() == "") {
+         alert("Please enter Score Name 5!");
+         document.getElementById('ScoreName5').focus();
+         return false;
+       } else if ($("#ScoreIconText5").val() == "") {
+         alert("Please select Score icon 5!");
+         document.getElementById('ScoreIcon5').focus();
+         return false;
+       }
+       
+       $messageSuccess("Score names/icons updated successfully");
+       
+       
+       return true;
+       
+     });
+
+ $('input[type=radio]:not([name="pollcomment"])').click(function() {
+       // $("#ajaxpostscoreset").submit();
+       
+       var selectedVal = "ewwe";
+       var selected = $("input[type='radio'][name='scoreset']:checked");
+       if (selected.length > 0) {
+         selectedVal = selected.val();
+       }
+       
+       $.ajax({
+         type: "POST",
+         dataType: 'json',
+         data: {
+           'scoreset': selectedVal
+         },
+         url: BASE_URL + '/admin/myaccount/ajaxpostscoreset',
+         success: function(response) {
+           $messageSuccess('updated successfully');                     
+         }
+       });
+       
+       $('#ajaxpostscoreset').ajaxForm(function() {
+         $messageSuccess("updated successfully");
+       });
+       
+     });
+
+    $('select[name="pollcomment"]').change(function() {
+      // var selectedVal = "ewwe";
+       var selected = $(this);
+       //if (selected.length > 0) {
+         var selectedVal = selected.val();
+       //}
+       //alert(selectedVal);
+       //return false;
+       
+       $.ajax({
+         type: "POST",
+         dataType: 'json',
+         data: {
+           'pollsettingval': selectedVal
+         },
+         url: BASE_URL + '/admin/myaccount/ajaxpollcompliance',
+         success: function(response) {
+           $messageSuccess('Poll compliance updated successfully');
+           
+         },
+         error: function(error) {
+           
+         }
+         
+       });
+       
+       $('#ajaxpollcompliance').ajaxForm(function() {
+         $messageSuccess("Poll compliance updated successfully");
+       });
+       
+     });
+    
+
+  });
+</script>
+  <div class="jointElement">
+    <ul>
+      <li class="active"><a href="#">Global Settings</a></li>
+      <li><a href="<?php echo BASE_URL.'/admin/myaccount/configuration';?>">General Settings</a></li>
+    </ul>
+ </div>
+
+<h1 class="pageTitle">Global Settings 
+
+</h1>
+<!--Container -->
+<div  class="accountContainer globalAdminSet" style="min-height:750px;margin-left:0px">
+
+ <!--tab content-->
+   <div data-id="globalsettng" class="accountContent"  >
+
+    <div class="formRow" id="makePrivate">
+         <label class="label">Make platform private</label>          
+            <div class="globalSetTxt">Make your platform 'private' to prevent visitors from creating an account or using social login to access the platform.  A 'private' platform also restricts existing users from sharing content to, and inviting other people to join via, linked social channels.</div>
+         <div class="moreGlobalset"><a rel="makePlatform">Show me</a></div>
+         <div class="field">
+           <dSiv class="helponoff socialAction2" id="socialAction" >
+             <input type="checkbox" id="socialTarget" <?php if($this->globalSettingVal==1){echo'checked="checked"';} ?> caller="social" />
+             <label for="socialTarget">
+                <div class="onHelp" on="OFF" off="ON"></div>
+                <div class="onHelptext">
+                   <span>OFF</span>
+                   <span>ON</span>
+                </div>
+             </label>
+          </div>
+      </div>
+         
+      
+      
+      
+      <div class="formRow" id="swevent">
+          <div class="optionRow">
+          <h3 class="innerTitleBox">Left side menu options</h3> 
+          <!--<label class="label">Show All Users</label>
+          <div class="globalSetTxt" >If you don’t want to publicly display a list of all platform users, set 'Show All Users' to OFF to hide 'All Users' in the main menu.</div> 
+           <div class="field">
+            <div class="helponoff socialAction2" id="socialAction">
+               <input type="checkbox" id="showAllUsers" <?php if($this->showAllUsers==1) {echo'checked="checked"';} ?> caller="showAllUsers" />
+               <label for="showAllUsers">
+                  <div on="OFF" off="ON" class="onHelp"></div>
+                  <div class="onHelptext">
+                     <span>OFF</span>
+                     <span>ON</span>
+                  </div>
+               </label>            
+             </div>
+         </div>     -->     
+
+         <!-- <div id="showAllUsersBackground" class="GroupBackgroundRow <?php if($this->showAllUsers==0){ ?>disabled<?php }?>">
+         <label class="label">Non-activated user search display</label>         
+         <div class="globalSetTxt">Some users invited to join your platform may not yet have activated their account.  By selecting 'ON' here, these people will be searchable on your platform by other users.</div>
+         <div class="moreGlobalset"><a rel="allUsersPop">Show me</a></div>
+         <div class="field">
+            <div class="helponoff socialAction2" id="socialAction" >
+               <input type="checkbox" <?php if($this->showAllUsers==0){ ?> class="disabled" disabled="disabled"  <?php }?>  id="socialTarget6" <?php if($this->userconfirmed==1){echo'checked="checked"';} ?>  caller="userconfirmed" />
+               <label for="socialTarget6">
+                  <div class="onHelp" on="OFF" off="ON" data="<?=$this->userconfirmed?>"></div>
+                  <div class="onHelptext">
+                     <span>OFF</span>
+                     <span>ON</span>
+                  </div>
+               </label>
+            </div>
+         </div>
+       </div> -->
+     </div>
+
+        <div class="optionRow">
+         <label class="label">Show events</label>         
+         <div class="globalSetTxt">If you are not setting up events on your platform you can set 'Show Events' to OFF to hide 'Live Events' in the main user menu.</div>
+         <div class="moreGlobalset"><a rel="showEvents">Show me</a></div>   
+         <div class="field">
+            <div class="helponoff socialAction2" id="socialAction" >
+               <input type="checkbox" id="eventid" <?php if($this->event==1) {echo'checked="checked"';} ?> caller="event" />
+               <label for="eventid">
+                  <div class="onHelp" on="OFF" off="ON"></div>
+                  <div class="onHelptext">
+                     <span>OFF</span>
+                     <span>ON</span>
+                  </div>
+               </label>
+            </div>
+         </div>
+       </div>
+
+       <div class="optionRow">
+        <label class="label">Video events</label>         
+        <div class="globalSetTxt">If you are not setting up video events on your platform you can set ‘Video events' to OFF to hide 'Video Events' in the main user menu.</div>
+        <div class="field">
+            <div class="helponoff socialAction2" id="socialAction" >
+               <input type="checkbox" id="ShowVideoEvent" <?php if($this->ShowVideoEvent==1){echo'checked="checked"';} ?> caller="ShowVideoEvent" />
+               <label for="ShowVideoEvent">
+                  <div on="OFF" off="ON" class="onHelp"></div>
+                  <div class="onHelptext">
+                     <span>OFF</span>
+                     <span>ON</span>
+                  </div>
+               </label>
+            </div>
+         </div>
+       
+         <label class="label">Live video events</label>               
+        
+          <div class="globalSetTxt">If you are not setting up live video broadcasts on your platform you can set ‘Live video broadcasts' to OFF to hide 'Live Video Broadcasts' in the main user menu.</div> 
+         <div class="moreGlobalset"><a rel="videoEventPop">Show me</a></div>
+         <div class="field">
+            <div class="helponoff socialAction2" id="socialAction">
+               <input type="checkbox" id="ShowLiveVideoEvent" <?php if($this->ShowLiveVideoEvent==1) {echo'checked="checked"';} ?> caller="ShowLiveVideoEvent" />
+               <label for="ShowLiveVideoEvent">
+                  <div on="OFF" off="ON" class="onHelp"></div>
+                  <div class="onHelptext">
+                     <span>OFF</span>
+                     <span>ON</span>
+                  </div>
+               </label>
+            </div>
+         </div>
+       </div>
+
+        <div class="optionRow">
+         <label class="label">Surveys</label>         
+         <div class="globalSetTxt">By selecting 'OFF' the Surveys feature is disabled and won't appear on the user dashboard menu.</div>
+         <div class="moreGlobalset"><a rel="surveys">Show me</a></div>
+         <div class="field">
+            <div class="helponoff socialAction2" id="socialAction" >
+               <input type="checkbox" id="socialTarget19" <?php if($this->IsSurveysOn==1){echo'checked="checked"';} ?>  caller="IsSurveysOn" />
+               <label for="socialTarget19">
+                  <div class="onHelp"  on="OFF" off="ON" data="<?=$this->IsSurveysOn?>"></div>
+                  <div class="onHelptext">
+                     <span>OFF</span>
+                     <span>ON</span>
+                  </div>
+               </label>
+            </div>
+         </div>
+       </div>
+
+      </div>
+
+
+      <div class="formRow" id="swgroupbg">
+        <h3 class="innerTitleBox">Groups</h3> 
+         <label class="label">Allow user Group creation</label>         
+        <div class="globalSetTxt">This setting allows you to control whether or not users can create custom Groups on your platform.</div>
+        <div class="field">
+            <div class="helponoff socialAction2" id="socialAction" >
+               <input type="checkbox" id="creategrp" <?php if($this->creategrp==1){echo'checked="checked"';} ?> caller="creategrp" />
+               <label for="creategrp">
+                  <div on="OFF" off="ON" class="onHelp"></div>
+                  <div class="onHelptext">
+                     <span>OFF</span>
+                     <span>ON</span>
+                  </div>
+               </label>
+            </div>
+         </div>
+
+        <div class="GroupBackgroundRow <?php if($this->creategrp==0){ ?>disabled<?php }?>">
+         <label class="label">Allow Group backgrounds</label>         
+       </div>
+        
+          <div class="globalSetTxt">Choose 'ON' if you wish to allow users to further customise their Groups by enabling them to add a background image.</div>           
+         <div class="moreGlobalset"><a rel="allowGroup">Show me</a></div>
+         <div class="field">
+            <div class="helponoff socialAction2" id="socialAction">
+               <input type="checkbox"<?php if($this->creategrp==0){ ?> class="disabled" disabled="disabled"  <?php }?> id="groupbg" <?php if($this->groupbg==1) {echo'checked="checked"';} ?> caller="groupbg" />
+               <label for="groupbg">
+                  <div on="OFF" off="ON" class="onHelp"></div>
+                  <div class="onHelptext">
+                     <span>OFF</span>
+                     <span>ON</span>
+                  </div>
+               </label>
+            </div>
+         </div>
+
+          <div class="GroupBackgroundRow <?php if($this->creategrp==0){ ?>disabled<?php }?>">
+         <label class="label"> Group email</label>         
+       </div>
+        
+          <div class="globalSetTxt">Choose 'ON' if you wish to allow users to send email on add post in group .</div>           
+        <!--  <div class="moreGlobalset"><a rel="allowGroup">Show me</a></div> -->
+         <div class="field">
+            <div class="helponoff socialAction2" id="socialAction">
+               <input type="checkbox" id="groupemail" <?php if($this->groupemail==1) {echo'checked="checked"';} ?> caller="groupemail" />
+               <label for="groupemail">
+                  <div on="OFF" off="ON" class="onHelp"></div>
+                  <div class="onHelptext">
+                     <span>OFF</span>
+                     <span>ON</span>
+                  </div>
+               </label>
+            </div>
+         </div>
+
+
+      </div>
+
+      <!-- <div class="formRow" id="swcgroup">
+         <label class="label">Allow user Group creation</label>
+         <div class="field">
+            <div class="helponoff socialAction2" id="socialAction" >
+               <input type="checkbox" id="creategrp" <?php if($this->creategrp==1){echo'checked="checked"';} ?> caller="creategrp" />
+               <label for="creategrp">
+                  <div class="onHelp"></div>
+                  <div class="onHelptext">
+                     <span>No</span>
+                     <span>Yes</span>
+                  </div>
+               </label>
+            </div>
+         </div>
+         <div class="globalSetTxt">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when</div>
+         <div class="moreGlobalset"><a rel="allowUserGroup">Show me</a></div>
+      </div> -->
+
+      <div class="formRow" id="googleidexing">
+         <label class="label">Google indexable</label>         
+         <div class="globalSetTxt">Do you want your platform to be indexable and searchable on Google?  If so, select 'ON'</div>
+         <div class="field">
+            <div class="helponoff socialAction2" id="socialAction" >
+               <input type="checkbox" id="socialTarget3" <?php if($this->google_spider==1){echo'checked="checked"';} ?>  caller="gspider" />
+               <label for="socialTarget3">
+                  <div class="onHelp" on="OFF" off="ON"></div>
+                  <div class="onHelptext">
+                     <span>OFF</span>
+                     <span>ON</span>
+                  </div>
+               </label>
+            </div>
+         </div>
+      </div>
+
+      <!-- <div class="formRow" id="semantriaseen" style="display:none">
+         <label class="label">Display sentiment</label>           
+          <div class="globalSetTxt">If you are using sentiment analysis, by selecting 'ON' here, your platform users will see 'snapshot' sentiment displayed (positive, neutral or negative; general, post-wide sentiment).</div>  
+          <div class="moreGlobalset"><a rel="displaySentiment">Show me</a></div>   
+          <div class="field" >
+            <div class="helponoff socialAction2" id="socialAction" >
+               <input type="checkbox" id="socialTarget4" <?php if($this->semantria_seen==1){echo'checked="checked"';} ?>  caller="semantria_seen" />
+               <label for="socialTarget4">
+                  <div class="onHelp" on="OFF" off="ON"></div>
+                  <div class="onHelptext">
+                     <span>OFF</span>
+                     <span>ON</span>
+                  </div>
+               </label>
+            </div>    
+         </div>    
+      </div> -->
+
+     <!--  <div class="formRow" id="userconfirmed">
+         
+       
+      </div> -->
+
+
+      <!-- <div class="formRow" id="allowexperts" style="display:none">
+         <label class="label">Allow users to ask questions to experts</label>         
+         <div class="globalSetTxt">If you wish for both you as the Administrator and your platform users to pose questions to an Expert / Speaker, select 'ON'.   Selecting 'OFF' restricts all questions.</div>
+         <div class="moreGlobalset"><a rel="allowUsersQues">Show me</a></div>
+         <div class="field">
+            <div class="helponoff socialAction2" id="socialAction" >
+               <input type="checkbox" id="socialTarget18" <?php if($this->allowexperts==1){echo'checked="checked"';} ?>  caller="allowexperts" />
+               <label for="socialTarget18">
+                  <div class="onHelp" on="OFF" off="ON" data="<?=$this->allowexperts?>"></div>
+                  <div class="onHelptext">
+                     <span>OFF</span>
+                     <span>ON</span>
+                  </div>
+               </label>
+            </div>
+         </div>
+      </div> -->
+
+     <!--  <div class="formRow" id="IsSurveysOn">
+         
+      </div> -->
+
+      <!-- <div class="formRow" id="Profanityfilter"  style="display:none" >
+         <label class="label">Profanity & content restriction filter</label>         
+         <div class="globalSetTxt">As the platform administrator, you have the option to use the profanity and content / keyword restriction filter to ensure both appropriate and / or compliant usage.</div>
+         <div class="field">
+            <div class="helponoff socialAction2" id="Profanityaction" >
+               <input type="checkbox" id="pfilterchkbox" <?php if($this->Profanityfilter==1){echo'checked="checked"';} ?>  caller="Profanityfilter" />
+               <label for="pfilterchkbox">
+                  <div class="onHelp"  on="OFF" off="ON" data="<?=$this->Profanityfilter?>"></div>
+                  <div class="onHelptext">
+                     <span>OFF</span>
+                     <span>ON</span>
+                  </div>
+               </label>
+            </div>
+         </div>
+      </div> -->
+      
+      <div class="formRow" id="swcgroup">
+         <h3 class="innerTitleBox">Polls</h3> 
+         <label class="label">Allow user poll creation</label>         
+         <div class="globalSetTxt" style="padding-bottom:0px">
+          This setting allows you to control whether or not users can create their own voting polls on your platform.  Please note that if user poll creation is switched to 'OFF' after one or more user polls have been created you as the administrator can still access and edit the Poll Compliance settings.
+         </div>
+         <div class="globalSetTxt">
+      <div data-id="pollcompliance" >
+        <form name="ajaxpollcompliance" action ="//admin/myaccount/ajaxpollcompliance" class=" grid" id="ajaxpollcompliance"  method="post">
+           <label class="label" style="margin-bottom:5px">Poll compliance </label>
+           <div class="checkboxGroup">
+            <select name="pollcomment" style="width:100%;">
+              <option value="0" <?php if($this->PollComments_On_Option==0){echo'selected="selected"';} ?>>Votes on - Comments off</option>
+              <option value="2" <?php if($this->PollComments_On_Option==2){echo'selected="selected"';} ?>>Votes on - Comments on (Both visible to admin, neither visible to users) </option>
+              <option value="3" <?php if($this->PollComments_On_Option==3){echo'selected="selected"';} ?>>Votes on - Comments on (Both visible to admin and users)</option>
+              <option value="4" <?php if($this->PollComments_On_Option==4){echo'selected="selected"';} ?>>Votes on - Comments on (Only comments visible to admin, neither visible to users)</option>
+              <option value="5" <?php if($this->PollComments_On_Option==5){echo'selected="selected"';} ?>>Votes on - Comments on (Both visible to admin, only votes visible to users)</option>
+            </select>
+           </div>
+        </form>
+      </div>
+         </div>
+         <div class="moreGlobalset"><a rel="allowUserPollCrt">Show me</a></div>
+         <div class="field">
+            <div class="helponoff socialAction2" id="socialAction" >
+               <input type="checkbox" id="allow_user_create_polls" <?php if($this->allow_user_create_polls==1){echo'checked="checked"';} ?> caller="allow_user_create_polls" />
+               <label for="allow_user_create_polls">
+                  <div class="onHelp" on="OFF" off="ON"></div>
+                  <div class="onHelptext">
+                     <span>OFF</span>
+                     <span>ON</span>
+                  </div>
+               </label>
+            </div>
+         </div>
+      </div>
+
+
+
+      <!-- <div class="formRow" style="display:none">
+         <label class="label">Allow multiple experts on a post</label>         
+         <div class="globalSetTxt">When set to 'ON', your platform's users will be able to invite multiple Experts / Speakers to Q&A sessions within their posts.  Whether users can externally invite Experts / Speakers (ie. via external social invitations) to their posts will depend on whether 'Social Invitations' is set to 'ON'.  If not, users can invite multiple Experts / Speakers but only from amongst your platform's users.  When multiple Expert / Speaker is enabled, the user effectively becomes the Administrator of the Q&A.<br/><br/>When set to 'OFF', a user can only invite one person (either internally or externally depending on the 'Social Invitations' setting) as the Expert / Speaker, or nominate him/herself as such.
+          </div>
+          <div class="field">
+            <div class="helponoff socialAction2" id="socialAction" >
+               <input type="checkbox" id="socialTarget17" <?php if($this->allowmultipleexperts==3){echo'checked="checked"';} ?>  caller="allowmultipleexperts" />
+               <label for="socialTarget17">
+                  <div class="onHelp" on="OFF" off="ON" data="<?=$this->allowmultipleexperts?>"></div>
+                  <div class="onHelptext">
+                     <span>OFF</span>
+                     <span>ON</span>
+                  </div>
+               </label>
+            </div>
+         </div>
+      </div> -->
+
+
+
+      <div class="formRow" id="Profanityfilter">
+      <form name="ajaxpostscore" action ="<?php echo BASE_URL;?>/admin/myaccount/ajaxpostscore" class="right grid" id="ajaxpostscore"  method="post">
+         <h3 class="innerTitleBox">Platform scoring </h3>
+         
+        </form>
+       <div class="globalSetTxt">
+        By selecting 'OFF' your platform's scoring system is disabled and won't appear anywhere on the platform.</div> 
+        <div class="field">
+            <div class="helponoff socialAction2" id="socialAction" >
+               <input type="checkbox" id="socialTarget2" <?php if($this->plateform_scoring==0){echo'checked="checked"';} ?>  caller="scoringoff" />
+               <label for="socialTarget2">
+                  <div class="onHelp"  on="OFF" off="ON"></div>
+                  <div class="onHelptext">
+                     <span>OFF</span>
+                     <span>ON</span>
+                  </div>
+               </label>
+            </div>
+         </div>
+       <!-- <form name="ajaxpostscoreset" action ="<?php echo BASE_URL;?>/admin/myaccount/ajaxpostscoreset" class="right grid" id="ajaxpostscoreset"  method="post" style="display:none">
+         
+            <label class="label">Scoring icons </label>
+
+            <div class="scoringLabel">
+              <div class="scoresetItem">
+                  <label for="scoreset1">
+                     <div style="float:left;"><input name="scoreset" id="scoreset1"  value="0" <?php if($this->scoreset==0){?>checked="checked" <?php } ?> <?php if($this->plateform_scoring==1){ ?> class="disabled" disabled="disabled"  <?php }?> type="radio" >
+                  <label for="scoreset1"></label></div>
+                  <div style="float:left;"><i class="fa fa-smile-o fa-lg brakdownicon"></i>
+                     <i class="fa fa-thumbs-o-up fa-lg brakdownicon"></i>
+                     <i class="fa fa-thumbs-o-down fa-lg brakdownicon" ></i> 
+                     <i class="fa fa-frown-o fa-lg brakdownicon" ></i>
+                  </div>
+                  <span style="color:#999"></span></label>
+               </div>
+               
+               <div class="scoresetItem">
+                  <label for="scoreset2">
+                     <div style="float:left"><input name="scoreset" id="scoreset2" <?php if($this->scoreset==1){?>checked="checked" <?php } ?> value="1" <?php if($this->plateform_scoring==1){ ?> class="disabled" disabled="disabled"  <?php }?> type="radio">
+                  <label for="scoreset2"></label></div>
+                  <div style="float:left;"><i class="fa fa-plus-square fa-lg brakdownicon"></i>
+                     <i class="fa fa-plus-square brakdownicon"></i>
+                     <i class="fa fa-minus-square fa-lg brakdownicon"></i>
+                     <i class="fa fa-minus-square brakdownicon"></i>
+                  </div>
+                  <span style="color:#999"></span></label>
+               </div>  
+               
+            </div>
+         
+      </form> -->
+          
+      <!-- <div class="globalSetTxt" style="display:none">
+       <div class="GroupBackgroundRow <?php if($this->plateform_scoring==1){ ?>disabled<?php }?>">
+          <label class="label">Score admin posts</label>           
+          <div class="globalSetTxt">As your platform's Administrator, you may or may not wish for users to be able to score your posts.  If so, select 'OFF'.</div>
+      </div> -->
+         
+         <!-- <div class="moreGlobalset" style="display:none"><a rel="platScorePop">Show me</a></div> -->
+         <!-- <div class="field" style="display:none">
+              <div class="helponoff socialAction2" id="socialAction" >
+                 <input type="checkbox" id="socialTarget7" <?php if($this->adminpostscore==1){echo'checked="checked"';} ?> <?php if($this->plateform_scoring==1){ ?> class="disabled" disabled="disabled"  <?php }?> caller="adminpostscore" />
+                 <label for="socialTarget7">
+                    <div class="onHelp" on="OFF" off="ON" data="<?=$this->adminpostscore?>"></div>
+                    <div class="onHelptext">
+                       <span>OFF</span>
+                       <span>ON</span>
+                    </div>
+                 </label>
+              </div>
+           </div> -->
+           </div>
+
+      
+      <div class="formRow">
+         <form name="AjaxPostLiveConf" action ="<?php echo BASE_URL;?>/admin/myaccount/ajaxpostliveconf" class="right " id="AjaxPostLiveConf" enctype="multipart/form-data" method="post">
+         <!--tab content-->
+       
+            <label class="labelsigninability label">Verify posts</label>
+            <div class="field">
+                <div class="helponoff pull-left">
+                  <?php if($this->allow_admin_post_live==1) { 
+                     $checked = 'checked="checked"'; 
+                     } else{
+                     $checked='';
+                     }?>
+                  <input type="checkbox" name="allow_admin_post_live" value="1" id="adminPostAllow" <?php echo  $checked ?>>
+                  <label for="adminPostAllow">
+                     <div off="ON" on="OFF" class="onHelp"></div>
+                     <div class="onHelptext">
+                        <span>OFF</span>
+                        <span>ON</span>
+                     </div>
+                  </label>
+               </div> 
+            </div>
+        
+         <!--tab content-->
+        
+          <div class="GroupBackgroundRow <?php if($this->allow_admin_post_live==0){ ?>disabled<?php }?>">
+            <label class="labelsigninability label">Inform via email</label>
+          </div>
+        
+      </form>
+        <div class="globalSetTxt">This feature enables you to control the posts that appear on your platform by only displaying those that you have verified. You can choose whether to be notified of new user posts by platform notifications only or additionally by email.</div>
+        <div class="moreGlobalset"><a rel="verifyPostPop">Show me</a></div>
+        <div class="field" style="overflow:hidden;">
+                <div class="helponoff pull-left">
+                  <?php if($this->informviaemail==1) { 
+                     $checked = 'checked="checked"'; 
+                     } else{
+                     $checked='';
+                     }?>
+                  <input type="checkbox" <?php if($this->allow_admin_post_live==0){ ?> class="disabled" disabled="disabled"  <?php }?> name="informviaemail" value="1" id="informviaemail" <?php echo  $checked ?>>
+                  <label for="informviaemail">
+                     <div off="ON" on="OFF" class="onHelp"></div>
+                     <div class="onHelptext">
+                        <span>OFF</span>
+                        <span>ON</span>
+                     </div>
+                  </label>
+               </div> 
+            </div>
+      </div>
+
+
+     
+       <div class="formRow">
+
+        <label class="label">RSS</label>
+          <div class="globalSetTxt">If you are not setting up RSS on your platform you can set 'RSS' to OFF to hide 'RSS' in the users social feeds.</div> 
+         <div class="moreGlobalset"><a rel="rssPop">Show me</a></div>
+         <div class="field">
+            <div class="helponoff socialAction2" id="socialAction">
+               <input type="checkbox" id="ShowRSS" <?php if($this->ShowRSS==1) {echo'checked="checked"';} ?> caller="ShowRSS" />
+               <label for="ShowRSS">
+                  <div on="OFF" off="ON" class="onHelp"></div>
+                  <div class="onHelptext">
+                     <span>OFF</span>
+                     <span>ON</span>
+                  </div>
+               </label>           
+             </div>
+         </div>
+         
+      </div>
+
+<!--
+      <div class="formRow">       
+         
+      </div> -->
+
+
+      <!-- <div class="formRow rowHalfWth" style="margin-bottom:0;">       
+         <label class="label">Show All Users</label>
+         <div class="field">
+            <div class="helponoff socialAction2" id="socialAction">
+               <input type="checkbox" id="showAllUsers" <?php if($this->showAllUsers==1) {echo'checked="checked"';} ?> caller="showAllUsers" />
+               <label for="showAllUsers">
+                  <div on="OFF" off="ON" class="onHelp"></div>
+                  <div class="onHelptext">
+                     <span>OFF</span>
+                     <span>ON</span>
+                  </div>
+               </label>            </div>
+         </div>
+      
+        
+          <div class="globalSetTxt">If you don’t want platform users to search one another, you can set 'Show All Users' to OFF to hide 'All Users' in the main menu.</div> 
+         <div class="moreGlobalset"><a rel="allUsersPop">Show me</a></div>
+      </div> -->
+
+      
+
+
+   </div>
+     </div>
+   <!--end tab content-->
+
+
+
+
+  <div class="setPopimg" id="makePlatform"><img src="<?php echo BASE_URL; ?>/img/make-platform-private.png"/></div>
+
+  <div class="setPopimg" id="showEvents"><img src="<?php echo BASE_URL; ?>/img/show-events.png"/></div>
+
+  <div class="setPopimg" id="allowGroup">
+     <div class="popimgList flexslider">
+         <ul class="slides">
+            <li><img src="<?php echo BASE_URL; ?>/img/create-a-group.png"/></li>
+            <li><img src="<?php echo BASE_URL; ?>/img/groupbg1.png"/></li>
+            <li><img src="<?php echo BASE_URL; ?>/img/groupbg2.png"/></li>
+            <li><img src="<?php echo BASE_URL; ?>/img/my-group.png"/></li>
+         </ul>
+      </div>
+  </div>
+
+  <div class="setPopimg" id="allowUserGroup"><img src="<?php echo BASE_URL; ?>/img/create-a-group.png"/></div>
+
+  <div class="setPopimg" id="displaySentiment"><img src="<?php echo BASE_URL; ?>/img/sentiment.png"/></div>
+
+  <div class="setPopimg" id="scoreInfluence"><img src="<?php echo BASE_URL; ?>/img/score-admin.png"/></div>
+
+  <div class="setPopimg" id="allowUsersQues"><img src="<?php echo BASE_URL; ?>/img/ask-the-expert.png"/></div>
+
+  <div class="setPopimg" id="surveys"><img src="<?php echo BASE_URL; ?>/img/surveys.png"/></div>
+  
+  <div class="setPopimg" id="allowUserPollCrt">
+     <div class="popimgList flexslider">
+         <ul class="slides">
+            <li><img src="<?php echo BASE_URL; ?>/img/poll1.png"/></li>
+            <li><img src="<?php echo BASE_URL; ?>/img/poll2.png"/></li>
+         </ul>
+      </div>
+  </div>
+
+  <div class="setPopimg" id="verifyPostPop">
+     <div class="popimgList flexslider">
+         <ul class="slides">
+            <li><img src="<?php echo BASE_URL; ?>/img/postcontrol.png"/></li>
+            <li><img src="<?php echo BASE_URL; ?>/img/postcontrol2.png"/></li>
+            <li><img src="<?php echo BASE_URL; ?>/img/postcontrol3.png"/></li>
+            <li><img src="<?php echo BASE_URL; ?>/img/postcontrol4.png"/></li>
+            <li><img src="<?php echo BASE_URL; ?>/img/postcontrol5.png"/></li>
+         </ul>
+      </div>
+  </div>
+
+  <div class="setPopimg" id="platScorePop"><img src="<?php echo BASE_URL; ?>/img/score-admin.png"/></div>
+  <div class="setPopimg" id="videoEventPop"><img src="<?php echo BASE_URL; ?>/img/video-events-pop.png"/></div>
+  <div class="setPopimg" id="rssPop"><img src="<?php echo BASE_URL; ?>/img/rss-pop.png"/></div>
+  <div class="setPopimg" id="allUsersPop"><img src="<?php echo BASE_URL; ?>/img/allusers-pop.png"/></div>
+
+
+
+
+  
+   
+

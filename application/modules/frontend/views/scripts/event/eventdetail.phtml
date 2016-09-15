@@ -1,0 +1,206 @@
+<?php
+$user       = $this->user;
+$cookieuser = $this->userid;
+$myclientdetails = new Application_Model_Clientdetails();
+$groupModel = new Application_Model_Groups();
+// CHECK IF PROFILE HOLDER
+if ($cookieuser == $user) {
+    $ProfileHolder     = true;
+    $ProfileHolderSend = 1;
+} else {
+    $ProfileHolder     = false;
+    $ProfileHolderSend = 0;
+}
+// CHECK IF PROFILE HOLDER
+$MemberOf = false;
+$memberof = $this->memberof;
+if ($memberof == 1) {
+    $MemberOf  = true;
+    // COLLECT ALL GROUP IDS THIS USER IS MEMBER OF
+    $Groups[0] = 0;
+    $allsql    = $groupModel->collectallgroups($user, $ProfileHolderSend);
+    foreach ($allsql as $Row) {
+        $Groups[] = $Row['GroupID'];
+    }
+    // COLLECT ALL GROUP IDS THIS USER IS MEMBER OF
+}
+
+if ($MemberOf) {
+    $result = $groupModel->collectallgroupbygroupdes($Groups);
+} else {
+	
+    $result = $groupModel->collectallgroupbyuserdes($user);
+}
+
+if (count($result) > 0) {
+    $groupexist = false;
+    if (isset($_GET['reload']))
+        $startnew = $end;
+    else
+        $startnew = $start + 5;
+    if (count($result) < 5) {
+        $startnew     = $start;
+        $seemorelabel = '- no more groups to show -';
+    } else {
+        $seemorelabel = '<img src="/images/seemore.png">';
+    }
+    
+    foreach ($result as $row) {
+    	
+        $chk = true;
+        if ($row['GroupPrivacy'] == 2)
+            $chk = false;
+        if ($row['GroupPrivacy'] == 4)
+        	$chk = false;
+        if ($row['User'] == $this->loginid)
+            $chk = true;
+        if ($memberof == 1)
+            $chk = true;
+       
+        if ($chk) {
+            
+            $groupexist = true;
+            $grouplink  = BASE_URL.'/group/groupdetails/group/' . $row['ID'];
+            
+            // CHECK IF LOGGED IN USER IS A MEMBER OF THIS GROUP, IF REQUEST TO JOIN OR PRIVATE
+            if (!$ProfileHolder) {
+                if ($row['GroupPrivacy'] == '3') {
+                    $checkMemberre = $groupModel->checkuser($row['ID'], $cookieuser);
+                    $checkMember   = count($checkMemberre);
+                    if ($checkMember == 0)
+                        $grouplink = BASE_URL."/group/groupdetails/group/" . $row['ID'] . "";
+                }
+                
+                elseif ($row['GroupPrivacy'] == '2') {
+                    if ($userNum == 0)
+                        $grouplink = "";
+                }
+            }
+            // CHECK IF LOGGED IN USER IS A MEMBER OF THIS GROUP, IF REQUEST TO JOIN OR PRIVATE
+            // SELECT GROUP OWNER DETAILS	
+            $grpOwnerRow = $groupModel->caltotaluser($row['User']);
+            // SELECT GROUP OWNER DETAILS
+            // GROUP PRIVACY
+           $group_url_image = BASE_URL_IMAGES.'/';
+            if ($row['GroupPrivacy'] == '1') {
+                $grpPrivacy = 'Open Group';
+            } elseif ($row['GroupPrivacy'] == '2') {
+                $grpPrivacy = 'Private Group';
+            } elseif ($row['GroupPrivacy'] == '3') {
+                $grpPrivacy = 'Request to join Group';
+            } elseif ($row['GroupPrivacy'] == '4') {
+            	$grpPrivacy = 'Vip Group';
+            	$group_url_image = adminURL;    	
+            	
+            }
+            // GROUP PRIVACY
+            // SELECT GROUP MEMBERS
+            
+            $members      = '';
+            $totalmembers = '';
+            $Res          = $groupModel->calgroupmembers($row['ID']);
+            
+            $TotalMembers = count($Res);
+       
+            if ($TotalMembers > 0) {
+                $totalmembers = '<div class="group-members-title"><span class="small-font-bold">Members: ' . $TotalMembers . '</span>';
+                if ($TotalMembers > 12)
+                    $totalmembers .= ' - <span class="small-font"><a href="#">see all</a></span>';
+                $totalmembers .= '</div>';
+                $counter = 1;
+                
+                foreach ($Res as $key => $Row) {
+                    $members .= '<div class="follower-box-profile" title="' . $myclientdetails->customDecoding($Row['Name']) . '"><a href="'.BASE_URL.'/user/' . $myclientdetails->customDecoding($Row['Username']) . '">
+					<img src="'.IMGPATH.'/users/small/' . $Row['ProfilePic'] . '" width="35" height="35" border="0" /></a></div>';
+                    if ($counter % 12 == 0)
+                        $return .= '<div class="next-line"></div>';
+                    $counter++;
+                }
+            }
+            
+            // SELECT GROUP MEMBERS
+            $Name = $myclientdetails->customDecoding($row['Name']);
+            if (!$ProfileHolder)
+                $redb = '&nbsp;&nbsp;&nbsp;re'.POST_NAME.'';
+            else
+                $redb = '';
+            $ago = '';
+            
+            $ago .= ' ago';
+            $GID .= $row['ID'] . ',';
+            
+            if ($ProfileHolder && !$MemberOf) 
+            {
+                
+                $groupsettings = '<a href="javascript:void(0);" class="groupmembers" group_id = "' . $row['ID'] . '"><i class="fa fa-users"></i> <span>members</span></a>';
+				//if($row['GroupPrivacy'] == '4'){
+					$groupsettings .='<a href="javascript:void(0);" group_id = "' . $row['ID'] . '" class="editgroup" ><i class="fa fa-pencil-square-o"></i> <span>edit</span></a>
+					<a href="javascript:void(0);"  group_id = "' . $row['ID'] . '" class="deletegroup" ><i class="fa fa-minus-circle"></i> <span>delete</span></a>';
+				//}
+			                
+            }else{
+                $groupsettings = '';
+            }
+            
+            $return .= '<li id="mygroup-row-' . $row['ID'] . '" class="group-feed" data-url="' . $grouplink . '">
+			<div class="group-feed-left">';
+            if ($row['GroupPic'] != 'default_pic.jpg') {
+                $checkImage = new Application_Model_Commonfunctionality();
+                $groupimg = $checkImage->checkImgExist($row['GroupPic'],'grouppics','default-avatar.jpg');
+                $return .= '<div style="width:80px; height:80px;  background-position: center top; background-image:url('.IMGPATH.'/grouppics/medium/' . $groupimg . '); background-repeat:no-repeat; background-size:contain"></div>';
+            } else {
+                $return .= '<div class="grpDefaultImgSmall">group</div>';
+            }
+            $return .= '</div>
+			<div class="groupFeedRight">
+			<div id="label-group-name' . $row['ID'] . '" style="float:left;" class="medium-font-bold">' . $row['GroupName'] . '</div>
+			<div style="float:right;" class="groupOptionsContainer medium-font-bold">' . $grpPrivacy . '</div>';
+            
+             $groupcats = $row['TypeName'];
+             if($groupcats!='0' && $groupcats != ''){
+		            if ($groupcats != -1 ) {
+		                $return .= '<br><div style="font-size:10px;"><b>Categories:</b> ' . $groupcats . '</div>';
+		            }else{            	
+		            	$return .= '<div style="margin-bottom:30px;"><b>Categories:</b> ' . $row['GroupTypeOther'] . '</div>';
+		            }
+              }
+		            $return .= '<div class="grdec" fulldata="'.$row['GroupDesc'].'">'.$this->myclientdetails->dbSubstring($row['GroupDesc'], 270, '<a class="seeMoreFulltext" href="javascript:void(0);"><i class="fa fa-plus-circle"></i> see more</a>').'</div>';
+		           
+       		
+            
+            $return .= '</div>';
+            if ($ProfileHolder && $MemberOf) {
+                $return .= '<div class="gcby" style="clear:both">
+				<b>Created by:</b> <a href="/profile/index/id/' . $row['User'] . '">' .$myclientdetails->customDecoding($grpOwnerRow[0]['Name']) . '</a>
+				</div><div class="clearfix"></div>';
+            }
+            $return .= '<div class="group-members-wrapper">' . $totalmembers . $members . '</div></div></div>
+            <div class="pstBriefFt">' . $groupsettings . '</div>
+			</li>';
+        }
+        
+    }
+    
+    if (!$groupexist)
+        $return = '<div align="center" class="noFound" style="margin-top:110px;">No group started yet.</div>';
+    
+} else {
+    if (!$MemberOf) {
+        if ($ProfileHolder)
+            $return = '<div align="center" class="noFound" style="margin-top:110px;">You have not started any groups yet.</div>';
+        else
+            $return = '<div align="center" class="noFound" style="margin-top:110px;">No group started yet.</div>';
+    } else {
+        if ($ProfileHolder)
+            $return = '<div align="center" class="noFound" style="margin-top:110px;">You are not a member of any groups.</div>';
+        else
+            $return = '<div align="center" class="noFound" style="margin-top:110px;">Not a member of any groups.</div>';
+    }
+}
+
+$GID = substr($GID, 0, -1);
+if (isset($_GET['reload']))
+    echo $return;
+else
+    echo $return . '~#~' . $end . '~#~' . $Name . '~#~' . $GID;
+?>

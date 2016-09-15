@@ -1,0 +1,359 @@
+<?php $this->title = "Influencers"; $this->headTitle($this->title); $commonObj = new Admin_Model_Common(); ?>
+
+<h1 class="pageTitle ">Influencers</h1>
+
+
+<div class="clearfix"></div>
+
+<div class="clearfix">
+    <?php //echo $this->paginationControl($this->paginator,'Sliding','/partials/my_pagination_control.phtml'); ?></div>
+<div class=" clearfix">
+    <!-- <h2 class="pull-left">Total record: <span id="totalinfluence"><?php echo $this->totUsers; ?><span></h2> -->
+
+    <?php if($this->totalpostinf > 0 || $this->totalgrpinf > 0 || $this->totaleventinf > 0) { ?>
+        <form action="<?php echo $this->url(array('controller'=>'influence','action'=>'index'));?>" method="POST" class="pull-left select2DropDown">
+            <select class="gh-tb select2" maxlength="350" value="" id="posttype" name="posttype" onchange="InflunceTypeFilter(this.value);">
+                <option value=""> - Select - </option>
+                <?php if($this->totalpostinf > 0) { ?>
+                <option value="0"> Posts </option>
+                <?php } ?>
+                <?php if($this->totalgrpinf > 0) { ?>
+                <option value="1"> Groups</option>
+                <?php } ?>
+                <?php if($this->totaleventinf > 0) { ?>
+                <option value="2"> Events</option>
+                <?php } ?>
+            </select>
+        </form>
+    <?php } 
+    $Groupdropdown=$commonObj->Groupdropdown(); 
+    $groupFound='block'; 
+    if(empty($Groupdropdown)){ 
+        $notfound = '<div class="noFound">No groups found</div>';
+     $groupFound='none'; } ?>
+
+    <form id="formComment" class="pull-left select2DropDown">
+        <div class="search" id="divforcomment" style="margin-left: 10px;"></div>
+    </form>
+</div>
+
+
+
+<input type="hidden" value="scoringandleagues" name="action2" id="action2">
+
+<div id="messageWrapper" class="dbtabContainer advWrpMain" data-type="table" style="margin-top:20px">
+    <ul class="dbtab">
+        <li class="active"><a href="#post" rel="lovelike">Influential posts</a>
+        </li>
+        <!-- <li><a href="#user" rel="PlateformGroup">Users</a>
+        </li> -->
+        <div class="grpTopTabel"> 
+        <?php echo $grouplist = $commonObj->addtogroupbutton(); ?>
+      </div>  
+    </ul>
+
+
+
+
+    <div id="post" class="dbtabContent" style="display:block">
+        <div class="responsiveTable">
+        <table class="reportingTable table-border userListTable table table-hover table-stripe">
+             <?php if (count($this->paginator2)){ ?>
+            <thead>
+               
+                <?php $rowchange=0 ; ?>
+                
+                <tr>
+                    <td width="50">
+                        <label title="Select all">
+                            <input type="checkbox" name="goupusermain" id="tlallresult" class="goupusermain" value="allInResults" />
+                            <label for="tlallresult"></label> 
+                        </label>
+                    </td>
+                    <td width="300">
+                        <div class="searchInRpTable">
+                            <input type="text" value="" onkeyup="javascript:filterReportUser(this)" placeholder="type name to filter list" class="searchByName"> Name
+                            <div class="sprite searchIcon2"></div>
+                        </div>
+                    </td>
+                    <td>
+                        Post
+                    </td>
+                    <td nowrap="nowrap" width="150">Influence score</td>
+                     <td nowrap="nowrap" width="150">&nbsp;</td>
+                </tr>
+            </thead>
+
+            <tbody id="inflist">
+                <?php foreach($this->paginator2 as $user) : ?>
+                <?php if($rowchange%2==1) {$color='#CCC' ;} else {$color='#FFF' ;} ?>
+
+                <tr id="<?php echo $user['total'];?>">
+                    <td>
+                         <label>
+                            <input class="goupuser" type="checkbox" value="<?php echo $user['UserID'];?>"  id="goupuserid<?php echo $user['UserID'];?>">
+                            <label ></label>
+                        </label>
+                    </td>
+                    <td>
+                       
+
+                            <img class="imgStyle" src="<?php echo IMGPATH ?>/users/small/<?php echo $user['ProfilePic']; ?>" width="40" height="40">
+                         
+
+                            <span><?php echo $this->myclientdetails->customDecoding($this->escape($user['Name'])).' '.$this->myclientdetails->customDecoding($this->escape($user['lname']));?></span>
+                    </td>   
+                    <td>
+                         <?=$this->escape($user['text'])?> 
+                    </td>
+                    
+                    <td width="50">
+                        <?php echo $user[ 'total'];?>
+                    </td>
+
+                    <td>
+                        <input type="hidden" name="page2" id="page2" value="2">
+                        <div class="ViewAllClickedUsers">
+                           <input type="hidden" name="page" id="page" value="2">
+                            <a class="btn btn-mini btn-yellow" href="#" data-articleid="<?php echo $user['ArticleId']; ?>" data-articletype="0" data-datatypexx="post" style="margin-top:-8px;">
+                            <i class="fa fa-user"> </i>
+                            Users
+                            </a>
+                        </div>
+                   </td>
+                </tr>
+
+                <?php endforeach; ?>
+
+                <?php } else { ?>
+
+                <tr>
+                    <td colspan="5"><div class="notfound">No results <input type="hidden" id="postnotfound" value="0"></div></td>
+                </tr>
+                <?php } ?>
+            </tbody>
+        </table>
+    </div>
+        <?php if ($this->paginatorcount2 > 20){ ?>
+        <div id="results"></div>
+        <div align="center">
+            <button class="load_more btn btn-large btn-full" id="load_more_button" data-type="post">More</button>
+            <div class="animation_image" style="display:none;"><img src="<?php echo BASE_URL ?>/images/loader2.gif"> Loading...</div>
+        </div>
+        <?php } ?>
+
+
+    </div>
+
+
+    <div id="user" class="dbtabContent">
+
+
+      <!--   <table class="reportingTable table-border userListTable table table-hover table-stripe">
+              <?php if (count($this->paginator)){ ?>
+            <thead>
+              
+                <?php $rowchange=0 ; ?>
+              
+
+                <tr>
+                    <td width="20">
+                        <label title="Select all ">
+                            <input type="checkbox" name="goupusermain" id="userAllresult" class="goupusermain" value="allInResults" />
+                            <label for="userAllresult"></label>
+                        </label>
+                    </td>
+                    <td>
+                        <div class="searchInRpTable">
+                            <input type="text" value="" onkeyup="javascript:filterReportUser(this)" placeholder="type name to filter list" class="searchByName"> Name
+                            <div class="sprite searchIcon2"></div>
+                        </div>
+                    </td >
+                    <td width="150">Influence score</td>
+
+                    <td width="150">&nbsp;</td>
+                </tr>
+            </thead>
+
+            <tbody id="inflist">
+                <?php foreach($this->paginator as $user) : ?>
+                <?php if($rowchange%2==1) {$color='#CCC' ;} else {$color='#FFF' ;} ?>
+
+                <tr id="<?php echo $user['total'];?>">
+                    <td>
+                         <label>
+                            <input class="goupuser" type="checkbox" value="<?php echo $user['UserID'];?>" name="goupuserid"  id="goupuserid<?php echo $user['UserID'];?>">
+                            <label></label>
+                         </label>
+                    </td>
+                    <td>
+                       
+
+                            <img class="imgStyle" src="<?php echo BASE_URL ?>/timthumb.php?src=/userpics/<?php echo $user['ProfilePic']; ?>&amp;q=100&amp;w=40&amp;h=40">
+                         
+
+                            <span><?php echo $this->myclientdetails->customDecoding($this->escape($user['Name'])).' '.$this->myclientdetails->customDecoding($this->escape($user['lname']));?></span>
+                       
+                    </td>
+                    <td width="50">
+                        <?php echo $user[ 'total'];?>
+                    </td>
+                    <td>
+                        <div class="ViewAllClickedUsers">
+                           <input type="hidden" name="page" id="page" value="2">
+                            <a class="btn btn-mini btn-yellow" href="#" data-articleid="<?php echo $user['ArticleId']; ?>" data-articletype="1" data-datatypexx="user" style="margin-top:-8px;">
+                            <i class="fa fa-user"> </i>
+                            Users
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+
+                <?php endforeach; ?>
+
+                <?php } else { ?>
+
+                <tr><tr>
+                    <td colspan="4"><div class="notfound">No results <input type="hidden" id="usernotfound" value="0"></div></td>
+                </tr>
+                <?php } ?>
+            </tbody>
+        </table> -->
+
+        <?php if ($this->paginatorcount > 20){ ?>
+        <div id="results"></div>
+        <div align="center">
+            <button class="load_more btn btn-large btn-full" id="load_more_button" data-type="user">More</button>
+            <div class="animation_image" style="display:none;"><img src="<?php echo BASE_URL ?>/images/loader2.gif"> Loading...</div>
+        </div>
+         <?php } ?>
+
+        <div>
+
+        </div>
+
+      <style type="text/css">
+       .responsiveTable table td{white-space: normal;}
+      </style>
+
+        <script type="text/javascript">
+            $(function() {
+                $('#posttype').select2({
+                    width: 350
+                });
+
+                $('.dbtab > li a').click(function(){
+                    var tab = $(this).attr('href');
+                   checkDataReport(tab);
+                });
+            });
+       
+            $(function(){
+              $('body').on('click','.ViewAllClickedUsers a', function(e){
+                e.stopPropagation();
+                e.preventDefault();
+                
+
+                var bannerid    = '';
+                var gaobj       = $(this);
+                var articleid   = $(this).attr('data-articleid');
+                var articletype = $(this).attr('data-articletype');
+                var datatypexx  = $(this).attr('data-datatypexx');
+                 $( "#surveyDialog1" ).remove();
+
+                var htmlLightbox = '<div id="surveyDialog1"  title="Platform users"><div id="grouplist"></div>\
+                  <div id="userInfoContainer"></div>\
+                          </div>';
+                var checkHtml = '<label class="surveychkall">\
+                          <input type="checkbox" value="1" id="grpchkall" class="" name="commentduring" >\
+                          <label for="grpchkall"></label>\
+                          Select all\
+                        </label>';
+
+                  $('body').append(htmlLightbox);
+                  $( "#surveyDialog1" ).dialog({
+                      dialogClass:'surveyDialog',             
+                      width:800,
+                      height:500,  
+                      title:'Influencers',
+                      open:function(){                
+                          $fluidDialog();
+                           $("#datacollect").html('');      
+                           $('#userInfoContainer').append('<div class="loaderOverlay2"></div>'); 
+                          
+                            // $('.ui-dialog-buttonset').before(htmlCheckAll);
+                        $.ajax({
+                          type : "POST",
+                          dataType : 'json',
+                          data:{'articleid':articleid,'articletype':articletype,'datatypexx':datatypexx},
+                          url : BASE_URL + '/admin/influence/showuserlist',                                       
+                          success : function(response) 
+                          {   
+
+                              $('.loaderOverlay2').remove();
+                              $('#surveyDialog1 #userInfoContainer').html(response.content);
+                              
+                              if(response.grouplist!=null && response.grouplist!='')
+                              {
+                              $('#surveyDialog1 #grouplist').html(response.grouplist+checkHtml);
+                              }
+                              $select('.ui-dialog .createdGrpDrp select');
+                            
+                      }
+
+                      });
+                      }
+                });
+                
+              });  
+        })
+
+
+     
+            $(".load_more").click(function(e) { //user clicks on button    
+                var thisEl = $(this);
+                
+                var dataType = thisEl.attr('data-type');
+                var ID=$("#page").val();
+                var URL = BASE_URL + '/admin/influence/inflistpostpaging';
+                if (dataType == 'user') {
+                    var ID=$("#page").val();
+                    URL = BASE_URL + '/admin/influence/inflistpaging';
+                }
+                var parentEl = thisEl.closest('.dbtabContent');
+                var lastId = parentEl.find('table tbody tr:last').attr('id');
+
+                var comentid = $('#influencecomment').val();
+
+                var thisFormValue = $(this).closest('form').serializeArray();
+                $.ajax({
+                    url: URL,
+                    type: "POST",
+                    dataType: 'json',
+                    data: {
+                        'ID':ID,
+                        'lastId': lastId,
+                        'influencecomment': comentid
+                    },
+                    beforeSend: function() {
+                        $('i', thisEl).remove();
+                        thisEl.append('<i class="fa fa-spin fa-spinner"></i>');
+                    },
+                    success: function(data) {
+                        $('i', thisEl).remove();
+                        if (data.content != "") {
+                            $('tbody', parentEl).append(data.content);
+                            //  $('#totalinfluence', parentEl).html(data.total);
+                            
+                            if (data.total > 0) {
+                                thisEl.show();
+                            } else {
+                                thisEl.hide();
+                            }
+
+                        }
+
+                    }
+                });
+            });
+        </script>

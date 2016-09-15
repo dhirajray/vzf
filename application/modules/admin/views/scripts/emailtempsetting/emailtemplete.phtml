@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+  <script type="text/javascript" src="<?php echo BASE_URL."/adminraw/js/jquery-1.9.1.min.js"; ?>?v=<?php echo filemtime('/adminraw/js/jquery-1.9.1.min.js');?>"></script>
+	<link href="<?php echo BASE_URL."/adminraw/css/email-template.css";?>?v=<?php echo filemtime('/adminraw/css/email-template.css');?>" rel="stylesheet" type="text/css" media="all" />
+  <?php
+   
+    $jsonEmailtemplateval = $this->emailTemplatejson;
+    $myImgurl = BASE_URL.'/adminraw/img/bgs/';
+    $logoImgurl = BASE_URL.'/adminraw/img/emailbgimage/';
+    $defaultemailtemplateval = Array(
+                                    'fontColor' => 'cccccc',
+                                    'background' => 'e8e9eb', 
+                                    'bodycontentfontColor' =>'cccccc',
+                                    'bodycontentbacgroColor' =>'e8e9eb',
+                                    'bodycontenttxture' =>'',
+                                    'headerfontColor' =>'333',
+                                    'headerbacgroColor' =>'fff',
+                                    'headertxture' =>'',
+                                    'contentbodyfontColor' => '333',
+                                    'contentbodybacgroColor' => 'fff',
+                                    'contentbodytxture' =>'',
+                                    'bannerfreshimg' => BASE_URL.'/adminraw/img/emailbgimage/dblogo-black.png',
+                                    'footerfontColor' => '333',
+                                    'footerbacgroColor' => 'd3d3d3',
+                                    'footertxture' => '',
+                                    'footerMsgval' => 'powered by db corporate social platforms'
+                                   );
+        
+?>
+	<script type="text/javascript">
+		$(function(){
+              
+              $('.emailinfochange').hide();
+              $('.emailinfotitle').css("background-color","transparent");
+              //Function to convert hex format to a rgb color
+              function rgb2hex(rgb) {
+              var hexDigits = ["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f"];
+              rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+              function hex(x) {
+              return isNaN(x) ? "00" : hexDigits[(x - x % 16) / 16] + hexDigits[x % 16];
+              }
+              return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+              }
+
+
+
+             $('body').on('click','.editingBlck:not(.disabled)',function(event) {
+              event.preventDefault();
+              var parentWin = window.parent.document;
+              $('.colpick',parentWin).hide();
+               $('#footerNotes', parentWin).hide();
+               
+              $(this).closest('html').find('.editingActiveBlock').removeClass('editingActiveBlock').removeAttr('contenteditable');
+              $(this).addClass('editingActiveBlock');
+            /*******crated ,for desable the font color*****************/ 
+              var current_td =  $(this).closest('html').find('.editingActiveBlock').attr('edittype');
+              var current_class =  $(this).attr('style');
+              var font_color =  $(this).css("color");
+                  font_color = (rgb2hex(font_color));
+              var background_color =  $(this).css("background-color");
+                  background_color = (rgb2hex(background_color));
+                  $('.fontcolorclass', parentWin).val(font_color);
+                  $('.fontcolorclass', parentWin).css("background",font_color);
+                  $('.bacgroColor', parentWin).val(background_color);
+                  $('.bacgroColor', parentWin).css("background-color",background_color);
+              
+              var title =  $(this).closest('html').find('.editingActiveBlock').attr('titleval');
+              if(title){$('.titleEditingType span', parentWin).html(title)}
+              if(current_td=='bodycontent' || current_td=='header'){
+                    if(current_td=='bodycontent'){$('.uploadBannerLogo',parentWin).closest('.fieldRow').hide();}
+                    else{$('.uploadBannerLogo', parentWin).closest('.fieldRow').show();} 
+                    var fontclass = $('#fontColor', parentWin).attr('class');
+                    if(fontclass=='fontcolorclass'){
+                            $('#fontColor_colpicker', parentWin).removeClass('colpicker').hide();
+                            $('#fontcol', parentWin).hide();
+
+                    }
+              }
+              else if(current_td=='contentbody' || current_td=='footer'){
+                  $('.uploadBannerLogo',parentWin).closest('.fieldRow').hide();
+                  $('#fontColor_colpicker', parentWin).addClass('colpicker').show();
+                  $('#fontcol', parentWin).show();
+              }
+            /*******crated ,for desable the font color*****************/ 
+                if($(this).attr('editType')=='footer' || $(this).attr('editType')=='contentbody'){
+
+                }
+                 if($(this).attr('editType')=='footer'){
+                  $('#footerNotes', parentWin).show().find('input').val($.trim($(this).text()));
+                  
+                }
+                return false;
+             });
+        });
+	</script>
+</head>
+
+<?php 
+
+
+?>
+
+<body style="background: #e8e9eb url(<?php echo BASE_URL;?>/img/bg1.gif) repeat;" class="editingBlck removedecoration"   editType="backgroundMain">
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tbody>
+        <tr>
+            <td style="padding-bottom:100px;background:<?php if($jsonEmailtemplateval['bodycontentbacgroColor']){echo '#'.$jsonEmailtemplateval['bodycontentbacgroColor'];}else{echo '#'.$defaultemailtemplateval['bodycontentbacgroColor'];}?> url(<?php if($jsonEmailtemplateval['bodycontenttxture']){echo $myImgurl.$jsonEmailtemplateval['bodycontenttxture'];}else{echo $defaultemailtemplateval['bodycontenttxture'];}?>) repeat;" class="editingBlck" titleval="Body" editType="bodycontent" id="bodycontent">
+              <div class="emailinfotitle"><span class="emailinfochange"><?php echo $this->emailTemplate[0]['title']; ?></span></div>
+              <form id="mainForm">
+                 <div class="subjectedit" for="subjectEnter">
+                  <label>Subject</label>
+                  <div  id="subjectEnter" contenteditable="true"> <?php  echo html_entity_decode($this->emailTemplate[0]['subject']); ?> </div>
+                  </div>
+
+                <table width="623" style="background:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:13px" align="center" border="0" cellspacing="0" cellpadding="30">
+                    <tbody>
+                        <tr>
+                            <td class="editingBlck" titleval="Header" id="Header" editType="header" style="background:<?php if($jsonEmailtemplateval['headerbacgroColor']){echo '#'.$jsonEmailtemplateval['headerbacgroColor'];}else{echo '#'.$defaultemailtemplateval['headerbacgroColor'];}?> url(<?php if($jsonEmailtemplateval['headertxture']){echo $myImgurl.$jsonEmailtemplateval['headertxture'];}else{echo $defaultemailtemplateval['headertxture'];}?>) repeat; padding-top:20px; padding-bottom:20px;"><a href="#"  ><img src="<?php if($jsonEmailtemplateval['bannerfreshimg']){echo $logoImgurl.$jsonEmailtemplateval['bannerfreshimg'];}else{echo $defaultemailtemplateval['bannerfreshimg'];}?>" id="bannerHolder" border="0" style="display:inline-block" alt="dbee logo"></a>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="color:<?php if($jsonEmailtemplateval['contentbodyfontColor']){echo '#'.$jsonEmailtemplateval['contentbodyfontColor'];}else{echo '#'.$defaultemailtemplateval['contentbodyfontColor'];}?>; padding:20px 30px 30px 30px; background:<?php if($jsonEmailtemplateval['contentbodybacgroColor']){echo '#'.$jsonEmailtemplateval['contentbodybacgroColor'];}else{echo '#'.$defaultemailtemplateval['contentbodybacgroColor'];}?> url(<?php if($jsonEmailtemplateval['contentbodytxture']){echo $myImgurl.$jsonEmailtemplateval['contentbodytxture'];}else{echo $defaultemailtemplateval['contentbodytxture'];}?>) repeat;"  class="editingBlck bodymsg" titleval="Body container" editType="contentbody" id="bodymsg">
+                                <div id="bodyEmailMsg" contenteditable="true"><?php  echo html_entity_decode($this->emailTemplate[0]['body']); ?></div>                              
+                            </td>
+                        </tr>                                                                     
+                        <tr>
+                            <td style="color:<?php if($jsonEmailtemplateval['footerfontColor']){echo '#'.$jsonEmailtemplateval['footerfontColor'];}else{echo '#'.$defaultemailtemplateval['footerfontColor'];}?>;background:<?php if($jsonEmailtemplateval['footerbacgroColor']){echo '#'.$jsonEmailtemplateval['footerbacgroColor'];}else{echo '#'.$defaultemailtemplateval['footerbacgroColor'];}?> url(<?php if($jsonEmailtemplateval['footertxture']){echo $myImgurl.$jsonEmailtemplateval['footertxture'];}else{echo $defaultemailtemplateval['footertxture'];}?>) repeat;" class="editingBlck" titleval="Footer" id="Footer" editType="footer">
+                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                    <tbody>
+                                        <tr>
+                                            <td>                                            
+                                    <div align="right"><a href="javascript:void(0);" style="text-decoration:none; color:<?php if($jsonEmailtemplateval['footerfontColor']){echo '#'.$jsonEmailtemplateval['footerfontColor'];}else{echo '#'.$defaultemailtemplateval['footerfontColor'];}?>"  editType="footercontent" id="footerMsg"><?php 
+
+                                          if(!empty($this->emailTemplate[0]['footertext']) && isset($jsonEmailtemplateval['footerMsgval'])){echo $this->emailTemplate[0]['footertext'];} 
+                                          else if(!empty($this->emailTemplate[0]['footertext']) && empty($jsonEmailtemplateval['footerMsgval'])){echo $this->emailTemplate[0]['footertext'];}
+                                          else if(empty($this->emailTemplate[0]['footertext']) && isset($jsonEmailtemplateval['footerMsgval'])){echo $this->emailTemplate[0]['footertext'];}
+                                          else{ echo $defaultemailtemplateval['footerMsgval'];}
+                                          ?></a>
+                                    </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </form>    
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+</body>

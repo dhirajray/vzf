@@ -1,0 +1,635 @@
+<script src="js/speechbubbles.js"></script>
+
+<script type="text/javascript">
+
+jQuery(function($){ //on document.ready
+
+// $('.addspeech').speechbubble()
+
+})
+
+</script>
+
+<!-- BEGIN INCLUDE SCRIPTS TO CALL DHTML TOOLTIP -->
+
+
+
+<script type="text/javascript" src="scripts/ajaxupload.js"></script>
+
+
+
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+
+
+
+<!-- SLIDING BACK TO TOP -->
+
+<script language="javascript" type="text/javascript" src="js/jquery.slideto.v1.1.js"></script>
+
+<script language="javascript" type="text/javascript">
+
+var jqnctop = jQuery.noConflict();
+
+jqnctop(document).ready(function(){
+
+	jqnctop('a[name=slidetotop]').slideto({
+
+		target : '#pagetop',
+
+		speed  : 700
+
+	});
+
+});
+
+
+
+$(window).scroll(function(){
+
+	if($(window).scrollTop() > 200 ){
+
+		$('#backtotop').fadeIn("slow");
+
+	} else if($(window).scrollTop() < 200 ){
+
+		$('#backtotop').fadeOut("fast");
+
+	}
+
+});
+
+</script>
+
+<!-- SLIDING BACK TO TOP -->
+
+<!-- BEGIN INCLUDE SCRIPTS FOR TABBED CONTENT FOR INVITE TABS -->
+
+<link rel="stylesheet" type="text/css" href="css/tabcontent.css" />
+
+<script type="text/javascript" src="js/tabcontent.js"></script>
+
+<!-- BEGIN INCLUDE SCRIPTS FOR TABBED CONTENT FOR INVITE TABS -->
+
+
+
+
+
+<!-- SLIDING FOOTER FUNCTION -->
+
+<script language="javascript" type="text/javascript">
+
+$(function() {
+
+	var open = false;
+
+	$('#footerSlideButton').click(function() {
+
+		if(open === false) {
+
+			document.getElementById('footerSlideText').style.display='block';
+
+			$('#footerSlideContent').animate({ height: '50px' });
+
+			$(this).css('backgroundPosition', 'bottom left');
+
+			open = true;
+
+		} else {
+
+			document.getElementById('footerSlideText').style.display='none';
+
+			$('#footerSlideContent').animate({ height: '0px' });
+
+			$(this).css('backgroundPosition', 'top left');
+
+			open = false;
+
+		}
+
+	});
+
+});
+
+</script>
+
+<!-- SLIDING FOOTER FUNCTION -->
+
+
+
+<div id="fb-root"></div>
+
+<script>(function(d, s, id) {
+
+  var js, fjs = d.getElementsByTagName(s)[0];
+
+  if (d.getElementById(id)) return;
+
+  js = d.createElement(s); js.id = id;
+
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+
+  fjs.parentNode.insertBefore(js, fjs);
+
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<meta property="og:url" content="http://www.dbeelife.com/profile/comment/4138" /> 
+
+<meta property="og:type" content="article" /> 
+
+<meta property="og:title" content="dbee.me | The debate n rate social network" /> 
+
+<meta property="og:site_name" content="dbee.me" /> 
+
+<meta property="og:description" content="Are there any unbiased news sources? I'm bringing up this issue as i recently cxame across Russia Today channel on YouTube which covers United States and other world affairs on a much balanced manner than the AFP, Associated Press or even CNN or BBC. I'm not saying that RT is unbiased but it's coverage seems much more objective. What's your take?
+
+" /> 
+
+<meta property="og:image" content="http://www.dbeelife.com/images/landing-logo.png" />
+
+
+
+<!--<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.0/jquery.min.js"></script>-->
+
+
+
+<script charset="utf-8" src="http://widgets.twimg.com/j/2/widget.js"></script>
+
+<script type="text/javascript" src="twitter-search-api/main.js"></script>
+
+
+
+<script>
+
+function reloadComments(db) {
+
+	if(document.getElementById('currcommentsortorder'))
+
+		var sortorder=document.getElementById('currcommentsortorder').value;
+
+	else var sortorder='DESC';
+
+	var end=$('#reloadend').val();
+
+	end=parseInt(end)+5;
+
+		$('#dbee-comments').fadeOut('slow').load('ajax_dbeecomments.php?db='+db+"&reload=1&end="+end+"&sortorder="+sortorder, function() { fadepopup();  Shadowbox.init(); Shadowbox.setup(); }).fadeIn("slow");
+
+	}
+
+
+
+$(function() {
+
+		seedbee(<?php echo $dbeeid; ?>,0);
+
+		$('#toggleml').click(function() {
+
+			$('#comment-league-wrapper').slideToggle('slow', function() {
+
+				document.getElementById('toggleml').innerHTML=(document.getElementById('toggleml').innerHTML=='close') ? 'open' : 'close';
+
+			});
+
+		});
+
+							searchtwitter('1',0,4,0,'%23media%23russiatoday');
+
+			intReloadTwFeed = setInterval("searchtwitter('0',0,4,0,'%23media%23russiatoday')",7000);
+
+			document.getElementById('twitterIntervalSet').value='1';
+
+	
+
+	// initialize twitter advanced search options
+
+//	$(".slidingTwitterSearch").hide();
+
+	$('#toggle-twitter-asearch').click(function(){
+
+		$(".slidingTwitterSearch").slideToggle('fast');
+
+		if(document.getElementById('toggle-twitter-asearch').className=='twitter-search-arrow-closed')
+
+			document.getElementById('toggle-twitter-asearch').className='twitter-search-arrow-open';
+
+		else
+
+			document.getElementById('toggle-twitter-asearch').className='twitter-search-arrow-closed'
+
+	});
+
+	// initialize twitter advanced search options
+
+});
+
+
+
+// Create the tooltips only on document load
+
+//$(document).ready(function() 
+
+function load_qtip(apply_qtip_to)
+
+{
+
+   // Notice the use of the each() method to acquire access to each elements attributes
+
+   $(apply_qtip_to).each(function()
+
+   {
+
+      $(this).qtip({
+
+         content: $(this).attr('tooltip'), // Use the tooltip attribute of the element for the content
+
+         style: 'dark' // Give it a crea mstyle to make it stand out
+
+      });
+
+   });
+
+}
+
+//});
+
+
+
+function createdrop(start,end) {
+
+	for(i=start;i<=end;i++) {
+
+		dropdowncontent.init("scorecomment"+i, "left-bottom", 100, "mouseover");
+
+	}
+
+}
+
+
+
+function changeHistory() {
+
+	var box=document.getElementById('historyMonths');
+
+	var month=box.options[box.selectedIndex].value;
+
+	seehistorylist(14657,month);
+
+}
+
+
+
+	$(window).scroll(function(){
+
+		var totalcomments=$('#totalcomments').val();
+
+		if(totalcomments>20) {
+
+			var mystart=$('#startnew').val();
+
+			if  ($(window).scrollTop() == $(document).height() - $(window).height()){
+
+			   seemorecomments(mystart,20,4138);
+
+			}
+
+		}
+
+	});
+
+</script>
+
+<style type="text/css">
+
+.ac_results {margin-top:-82px;}
+
+</style>
+
+
+
+<!-- AUTOCOMPLETE SEARCH -->
+
+<script type="text/javascript" src="/js/autocomplete/jquery.js"></script>
+
+<script type='text/javascript' src='/js/autocomplete/jquery.autocomplete.js'></script>
+
+<link rel="stylesheet" type="text/css" href="css/jquery.autocomplete.css" />
+
+<!-- AUTOCOMPLETE SEARCH -->
+
+<script language="javascript" type="text/javascript">
+
+$().ready(function() {
+
+	$("#searchword").autocomplete("/myhome/searchmain", {
+
+		width: 195,
+
+		matchContains: true,
+
+		//mustMatch: true,
+
+		minChars: 3,
+
+		//multiple: true,
+
+		//highlight: false,
+
+		//multipleSeparator: ",",
+
+		selectFirst: false
+
+	});
+
+
+
+	$("#searchword").result(function(event, data, formatted) {
+
+		$("#searchid").val(data[2]);
+
+	});
+
+});
+
+</script>
+
+
+
+<script type="text/javascript" src="/js/ddaccordion.js">
+
+/***********************************************
+
+* Accordion Content script- (c) Dynamic Drive DHTML code library (www.dynamicdrive.com)
+
+* Visit http://www.dynamicDrive.com for hundreds of DHTML scripts
+
+* This notice must stay intact for legal use
+
+***********************************************/
+
+</script>
+
+
+
+<style type="text/css">
+
+.accordion {
+
+	cursor: hand;
+
+	cursor: pointer;
+
+	color:#000000;
+
+	width:180px;
+
+	padding:10px;
+
+	background-color:#FFFA7F;
+
+	border:1px solid #FFEA00;
+
+
+
+	-webkit-box-shadow: 0px 0px 3px #999;
+
+	-moz-box-shadow: 0px 0px 3px #999;
+
+	box-shadow: 0px 0px 3px #999;
+
+
+
+	-webkit-border-radius: 3px;
+
+	-moz-border-radius: 3px;
+
+	border-radius: 3px;
+
+	margin-bottom:10px;
+
+/*
+
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
+
+	filter:alpha(opacity=70);
+
+	opacity:0.7;
+
+*/
+
+}
+
+
+
+.accordionopen {
+
+	color:#999999;
+
+/*
+
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+
+	filter:alpha(opacity=100);
+
+	opacity:1;
+
+*/
+
+}
+
+
+
+.accordioncontent {
+
+	padding:10px;
+
+}
+
+</style>
+
+
+
+<script type="text/javascript">
+
+//Initialize Accordion
+
+ddaccordion.init({
+
+	headerclass: "accordion", //Shared CSS class name of headers group
+
+	contentclass: "accordioncontent", //Shared CSS class name of contents group
+
+	revealtype: "click", //Reveal content when user clicks or onmouseover the header? Valid value: "click" or "mouseover"
+
+	mouseoverdelay: 300, //if revealtype="mouseover", set delay in milliseconds before header expands onMouseover
+
+	collapseprev: true, //Collapse previous content (so only one open at any time)? true/false 
+
+	defaultexpanded: [0], //index of content(s) open by default [index1, index2, etc]
+
+	onemustopen: false, //Specify whether at least one header should be open always (so never all headers closed)
+
+	animatedefault: false, //Should contents open by default be animated into view?
+
+	persiststate: false, //persist state of opened contents within browser session?
+
+	toggleclass: ["", "accordionopen"], //Two CSS classes to be applied to the header when it's collapsed and expanded, respectively ["class1", "class2"]
+
+	togglehtml: ["none", "", ""], //Additional HTML added to the header when it's collapsed and expanded, respectively  ["position", "html1", "html2"] (see docs)
+
+	animatespeed: "500", //speed of animation: "fast", "normal", or "slow"
+
+	oninit:function(expandedindices){ //custom code to run when headers have initalized
+
+		//do nothing
+
+	},
+
+	onopenclose:function(header, index, state, isuseractivated){ //custom code to run whenever a header is opened or closed
+
+		//do nothing
+
+	}
+
+})
+
+</script>
+
+<script type="text/javascript">
+
+
+
+var _gaq = _gaq || [];
+
+_gaq.push(['_setAccount', 'UA-28197067-1']);
+
+_gaq.push(['_trackPageview']);
+
+
+
+(function() {
+
+var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+
+ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+
+var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+
+})();
+
+
+
+</script><meta name="google-translate-customization" content="5f2a4c40cd5125dd-09a1e1cb47103ab4-g3003f54bff74f499-7"></meta>
+
+</head>
+
+
+
+<body>
+
+<script language="javascript" type="text/javascript">setInterval("chktopnotification(1)",2000);</script>
+
+<?php include 'top.php';?>
+
+<input type="hidden" id="curr-notification-count">
+
+<input type="hidden" id="notifications-top-hidden" value="0">
+
+<input type="hidden" id="notifications-top-redb-hidden" value="0">
+
+<input type="hidden" id="notifications-top-mentions-hidden" value="0">
+
+<input type="hidden" id="notifications-top-score-hidden" value="0">
+
+<input type="hidden" id="notifications-top-comment-hidden" value="0">
+
+<input type="hidden" id="notifications-top-msg-hidden" value="0">
+
+<input type="hidden" id="notifications-top-grpinvite-hidden" value="0">
+
+<div id="Middle">
+
+	<div id="MiddleTopPost">
+
+		<a href="<?php echo BASE_URL; ?>/myhome"><div id="Logo" style="margin-bottom:20px;"></div></a><div class="startnewdb" onclick="javascript:openpostdb()">new <?php echo POST_NAME;?></div>		<div class="next-line"></div>
+
+			
+
+<div id="postdbee-popup" class="popup_block"><?php echo POST_NAME;?> posted to your profile.</div>
+
+<div id="favourite-popup" class="popup_block"><?php echo POST_NAME;?> added to your favourites.</div>
+
+<div id="archivemsg-popup" class="popup_block">Message deleted from your list.</div>
+
+<div id="deletefavourite-popup" class="popup_block">Do you really want to remove this <?php echo POST_NAME;?> from your favourites?<br /><br /><div id="deletefavourite-controls"></div></div>
+
+<div id="joingroup-popup" class="popup_block">Request sent to group owner.</div>
+
+<div id="hideuserdb-popup" class="popup_block"></div>
+
+
+
+<div class="sticky-left-wrapper">
+
+<!--	<div class="sticky-left-fblike sticky-left"></div> -->
+
+	<a href="http://www.facebook.com/dbee.me" target="_blank"><div class="sticky-left-fb sticky-left"></div></a>
+
+	<a href="https://twitter.com/dbee_me" target="_blank"><div class="sticky-left-twitter sticky-left"></div></a>
+
+	<div class="sticky-left-about sticky-left" onclick="javascript:openabout();"></div>
+
+</div>
+
+
+
+<div id="sticky-left-newcomm" style="display:block" onclick="javascript:opennewcomm()">
+
+	<div class="sticky-left-newcomm"><div id="sticky-left-newcomm-num">2</div></div>
+
+</div>
+
+<a href="dbleagues"><div class="sticky-left-leagues"></div></a>
+
+
+
+<div id="ghstpopup"><div id="ghstpopup-text">Adam Jones added a new <?php echo POST_NAME;?>.</div></div>
+
+
+
+<a name="slidetotop"><div id="backtotop" class="sticky-backtotop"></div></a>
+
+
+
+<!-- QTIP FUNCTION -->
+
+<script type="text/javascript" src="js/qtip/jquery.qtip-1.0.0-rc3.min.js"></script>
+
+<!-- QTIP FUNCTION -->
+
+<!-- SCRIPTS FOR QTIP -->
+
+<script type="text/javascript" src="js/qtip/jquery.qtip-1.0.0-rc3.min.js"></script>
+
+<!-- SCRIPTS FOR QTIP -->
+
+
+
+<!-- SCRIPT FOR FADE POPUP -->
+
+<div id="joingroup-popup" class="popup_block">Request sent to group admin.</div>
+
+<div id="follow-popup" class="popup_block"></div>
+
+
+<script type="text/javascript">
+
+var jqnc=jQuery.noConflict();
+
+jqnc(document).ready(function(){
+
+	fadepopup();
+
+});
+
+</script>
+

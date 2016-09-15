@@ -1,0 +1,44 @@
+*{
+  box-sizing:border-box; -webkit-box-sizing:border-box; -moz-webkit-box-sizing:border-box;
+
+}
+body{margin: 1px; font-family: Arial,Helvetica,sans-serif; }
+#bodycontent {font-size: 13px;}
+#bodycontent label, #bodycontent input{font-size: 14px;}
+.editingBlck {cursor: pointer;}
+.editingActiveBlock{outline:1px dotted red ; }
+
+.emailinfotitle{padding: 20px;margin-bottom: 80px;background-color: rgba(204, 204, 204, 0.18);font-family: sans-serif;text-align: center;
+}
+.emailinfochange{
+ color: #CCC;text-align: center;
+}
+input:focus{outline: none;}
+.subjectedit{ width: 625px;  display: none; margin: 0 auto; padding: 10px; background: #fff; border:1px solid #ccc; margin-bottom: 10px;}
+.subjectedit label{color: #ccc; float: left; width: 60px;  }
+.subjectedit input{ display: block; border: none; margin-left: 65px; min-width: 89%;}
+
+.fromname {color: #999;font-size: 18px;margin-left: 20px;margin-top: 10px;margin-bottom: 10px;}
+.fromnamefield{margin-left: 10px;}
+
+.formedit{ font-family: arial; width: 452px; height: 40px; display: none;  padding: 10px;  margin:10px 130px 0px 0px;  background: #fff; border:1px solid #D9D9D9;  border-radius:5px;box-shadow:#ccc;float:right;clear:both;}
+.formedit label{color: #ccc; float: left; width: 50px; font-size: 14px; margin-top: 2px;}
+.formedit input{ display: block; border: none; margin-left: 40px;font-size: 14px; min-width: 82%;}
+.bodymsg{font-size: 14px;width: 625px;}
+td.col-class1, div.col-class1  {background: #fff !important;}
+#bodyEmailMsg  table{max-width: 625px}
+#bodyEmailMsg  a{max-width: 500px}
+/*.col-class2 {background: white !important;}*/
+
+.usrOptionChk {
+    display: inline-block;
+    padding: 20px 0;
+    width: 100%;
+}
+.searchFieldut {
+    display: inline-block;
+    margin-bottom: 10px;
+    margin-right: 0;
+    width: 100%;
+}
+[contenteditable="false"]{opacity: 0.6; cursor:not-allowed;}

@@ -1,0 +1,80 @@
+<?php
+ $group=$this->group;
+ $user =$this->user;
+ $Row =$this->grouptypes->selectgroupprivacy($group);
+ $GroupName=$Row[0]['GroupName'];
+if($Row[0]['User']==$user) $Show=true; else $Show=false;
+?>
+<script>
+$(function() {
+	<? if($Show) { ?>loadfollowersforgroup('directinvite',<?=$group;?>); loadfollowingforgroup('directinvite',<?=$group;?>);<? } ?>
+	$('#invitetabs a').click(function(){	
+		var selectedTab = $(this).attr('rel');
+		$(this).closest('ul').find('.active').removeClass('active');
+		$(this).addClass('active');
+		$('.shadowedBorder .tabcontent').hide();
+		$('.shadowedBorder #'+selectedTab+'').show();
+		$.dbeePopup('resize');
+	});
+});
+</script>
+	<div>
+	<?php if($Show) { ?>
+		<h2 class="titlePop">Invite users to - <?=$GroupName;?></h2>
+		<div class="next-line"></div>
+			<div id="invite-group-members" style="z-index:100;">
+				<div style="float:left; font-size:14px; margin-bottom:10px;">Invite people you are following and people who are following you, and search for new people to add to your group.</div>
+				<div class="next-line"></div>
+				<ul id="invitetabs" class="tabLinks">
+					<li><a href="#" rel="followers-list-create" class="active">Followers</a></li>
+					<li><a href="#" rel="following-list-create">Following</a></li>
+					<li><a href="#" rel="search-list">Search</a></li>
+					<li><a href="#" rel="user_list" id="userset">User set</a></li>
+				</ul>
+				<div class="shadowedBorder" style="padding:10px;">
+					<div class="postTypeContent" id="passform" style="margin-top:0px;">
+						<div id="followers-list-create" class="tabcontent" style="display:block"></div>
+						<div id="following-list-create" class="tabcontent"></div>
+						<div id="search-list" class="tabcontent">
+							<div class="singleRow">
+								<div class="formField">
+									<div id="searchUserBox" class="srcUsrWrapper" style="margin:0px;">
+										<form name="searchGroupUsers" id="searchGroupUsers" onsubmit="searchuserstoinvite(); return false;">
+												<div class="fa fa-search fa-lg searchIcon2"></div>
+												<input type="text" id="groupkeywords" class="textfieldSearch" placeholder="search users to invite" value="">
+												<!-- <button class="btn btn-yellow" type="submit"><i class="searchIconWhite"></i></button> -->
+										</form>
+									</div>
+								</div>
+							</div>
+							<div class="formRow" style="display:none;" id="search-invite-list"><div class="formField"></div></div>
+						</div>
+						<div id="user_list" class="tabcontent"><div id="passform1" class="postTypeContent1"><?php echo $this->userselectns; ?> </div>
+						</div>
+					</div>
+				</div>
+				<input type="hidden" id="from" name="from" value="directinvite">
+				<input type="hidden" id="total-followers">
+				<input type="hidden" id="total-following">
+				<input type="hidden" id="total-search">
+				<input type="hidden" id="total-users-toinvite">
+			</div>
+			<div id="invite-selected-div" style="display:none;">
+				<div id="invitetogroup-header" style="float:left; font-size:14px; margin-bottom:10px;">Invite people you are following and people who are following you, and search for new people to add to your group.</div>
+				<div class="next-line"></div>
+				<div class="maindb-wrapper-border" style="padding:10px;">
+					<div id="selected-users-label" style="font-size:12px; margin-bottom:10px;">Users selected by you to invite to group.</div>
+					<div class="next-line"></div>
+					<div id="invite-selected"></div>
+					<div class="next-line"></div>
+					<br style="clear:both; font-size:1px">
+				</div>
+			</div>
+			<div id="invite-message"></div>
+			<input type="hidden" id="groupid" value="<?=$group;?>">
+	<?php } else { ?>
+		<div align="center" style="font-size:14px; color:#666666; margin-top:50px; margin-left:auto; margin-right:auto; width:250px; padding:8px; background-color:#FFFFCC; border:1px solid #FF9933;">This doesn't seem to be your group!</div>
+	<?php } ?>
+	</div>
+
+

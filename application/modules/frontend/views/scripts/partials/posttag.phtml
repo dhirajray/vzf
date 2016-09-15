@@ -1,0 +1,115 @@
+<?php $dbIdArray = array();
+$tagArray = explode(',', $this->resultData['DbTag']);
+$tagArray = array_filter($tagArray); 
+
+
+if(!empty($tagArray))
+	{ ?>
+
+<?php 
+$i=1;
+foreach ($tagArray as $value) 
+{
+	$tagurl = BASE_URL . "/myhome/hashtag/tag/" . $value;
+	$postData = $this->myhome_obj->getRelativePost($value, $this->resultData['DbeeID']);
+	if(!empty($postData))
+	{
+	 ?>
+		<?php
+		if(!empty($postData))
+		{
+			
+			foreach ($postData as $valueData) 
+			{
+				if (!in_array($valueData['DbeeID'], $dbIdArray)) 
+				{
+					$title = $valueData['Text'];  
+					$TotalComments = $this->dbeeCommentobj->totacomment($valueData['DbeeID']);
+
+					if($i==1)
+						echo '<div class="tagsRightContainer whiteBox active"><h2>Matching post #tags</h2>
+						<div class="rboxContainer"><ul class="tagListingRight">';
+					?>
+
+
+					<li>
+						<div class="tagRightProPic"> 
+
+							<?php 
+							if($valueData['usertype']==100 && $this->session['usertype']!=100 && isADMIN!=1) {
+							?>
+							<a href="javascript:void(0);">
+								<img border="0" src="<?php echo IMGPATH.'/users/medium/'.VIPUSERPIC; ?>" width="57" height="57">
+							</a>
+
+							<?php
+							}else if($valueData['hideuser']==1 && $this->session['UserID']!=$valueData['UserID'] && isADMIN!=1) {
+								?>
+								<a href="javascript:void(0);">
+								<img border="0" src="<?php echo IMGPATH.'/users/medium/'.HIDEUSERPIC; ?>" width="57" height="57">
+							</a>
+							<?php
+							}
+							else 
+							{
+								?>
+							<a href="/user/<?php echo $this->myclientdetails->customDecoding($valueData['Username']); ?>">
+								<img border="0" src="<?php echo IMGPATH.'/users/medium/'.$valueData['ProfilePic']; ?>" width="57" height="57">
+							</a>
+							<?php
+						    }	
+							?>
+						</div>
+						<div class="tagRightProContent">
+							<h3 class="oneline"><?php 
+						if($valueData['usertype']==100 && $this->session['usertype']!=100 && isADMIN!=1) {
+							echo VIPUSER; 
+						   
+						}else if($valueData['hideuser']==1 && $this->session['UserID']!=$valueData['UserID'] && isADMIN!=1) {
+							echo HIDEUSER; 
+						   
+						}else
+						{
+							echo $this->myclientdetails->customDecoding($valueData['Name']); 
+						    echo $this->myclientdetails->customDecoding($valueData['lname']);
+						}
+
+
+							 ?></h3>
+							<p>
+								<?php  echo $this->myclientdetails->dbSubstring($valueData['Text'],'90','...') ; ?>
+							</p>
+							
+						</div>
+						<div class="clearfix">
+							<a href="<?php echo BASE_URL; ?>/dbee/<?php echo $valueData['dburl']; ?>" class="btn btn-mini pull-right">more</a>
+							<a href="<?php echo $tagurl; ?>" class="tags pull-right">#<?php echo $value; ?></a> 
+						
+						</div>
+						
+						
+					</li>
+				<?php 
+				}
+				$dbIdArray[] = $valueData['DbeeID'];
+				++$i;
+			} 
+		}
+		?>
+	
+<?php } } ?>
+
+<?php if($i!=1)
+	echo '</ul></div></div>';
+?>
+<?php } ?>
+<?php $i=0; if(empty($dbIdArray) && count($this->result)>0) {  ?>
+<div class="whiteBox hashTagresult popularTagsListing noCollapse active">
+	<h2>Popular tags</h2>
+	<div class="rboxContainer tagsListingWrp">
+		<?php foreach ($this->result as $paramName => $paramValue) {  ?>
+		<a href="<?php echo BASE_URL; ?>/myhome/hashtag/tag/<?php echo $paramName; ?>" class="hasTagCloud oneline">#<?php echo $paramName; ?></a>
+		<?php  $i++;} ?>
+	</div>
+</div>
+<?php } ?>

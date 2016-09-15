@@ -1,0 +1,316 @@
+<script type="text/javascript" src="<?php echo BASE_URL."/adminraw/js/message.js"; ?>?v=<?php echo filemtime('/adminraw/js/message.js');?>"></script>
+<!-- SCRIPT FOR FADE POPUP -->
+<script type="text/javascript">
+var jsonusertype = '<?php echo $this->usertype; ?>';
+var jsonuserdetails = '<?php echo $this->userdetails; ?>';
+//alert(jsonuserdetails);
+</script>
+<?php         
+$this->title = "Users Details";
+$this->headTitle($this->title);
+require_once 'includes/globalfileadmin.php';
+$common		=   new Admin_Model_Common();
+$deshboard  =   new Admin_Model_Deshboard();
+$deshboard		= new Admin_Model_Deshboard();
+$reporting	=	new Admin_Model_reporting();
+$defaultimagecheck = new Admin_Model_Common();
+$DbeeChartData 	= $deshboard->TotalChartData();
+$userModal	=	new Admin_Model_User();
+$userArr= $this->userArr;
+$logindate  = 	!(int)($userArr[0]['LastLoginDate']) ? 'Not Available' : date('d-M-Y h:i A',strtotime($userArr[0]['LastLoginDate']));
+$pupddate 	=	!(int)($userArr[0]['LastUpdateDate']) ? 'Not Available' : date('d-M-Y',strtotime($userArr[0]['LastUpdateDate']));
+	
+$ProfilePicpic = $common->checkImgExist($userArr[0]['ProfilePic'],'userpics','default-avatar.jpg');
+echo '<input type="hidden" id="useridactivity" value="'.$this->userid.'">';
+?>
+
+<script type="text/javascript">
+	$("document").ready(function(){	
+			callglobalajax('livedbeeds','user','livedbee', 'livedbee','<?php echo $userArr[0]['UserID'];?>'); 
+
+			callglobalajax('latestComment','user','livecomment', 'livecomment','<?php echo $userArr[0]['UserID'];?>');  
+
+			callglobalajax('livegroup','user','livegroupusr', 'livegroupusr','<?php echo $userArr[0]['UserID'];?>'); 
+
+			callglobalajax('livescore','user','livescoreusr', 'livescore','<?php echo $userArr[0]['UserID'];?>');  
+
+			callglobalajax('livescoreme','user','livescoremeusr', 'livescoremeusr','<?php echo $userArr[0]['UserID'];?>'); 
+
+			callglobalajax('postvisiting','index','callingajaxcontainers', 'postvisitinguser','<?php echo $userArr[0]['UserID'];?>'); 
+
+			callglobalajax('mysendmessage','user','usermessages', 'userdetailsmessages','<?php echo $userArr[0]['UserID'];?>'); 
+			
+			//chartforcategories(<?php echo $this->catProvidersdata ?>,<?php echo $this->catArrcategory?>,'topdebatecontainer',"Interest based report",'users interest on categories','Platform Users','categoryusers','categoryusers','',<?php echo $this->catArrPoints ?>);
+	});	
+</script>
+<script language="javascript" type="text/javascript">
+updateactivity();
+setInterval("updateactivity()",6000);
+</script>
+<style type="text/css">
+	.removeatresult {text-align:center;padding:50px; }
+</style>
+
+<h1 class="pageTitle "><?php echo $this->myclientdetails->customDecoding($userArr[0]['Name']).' '.$this->myclientdetails->customDecoding($userArr[0]['lname']).'<span class="udSubtitle">@'. $this->myclientdetails->customDecoding($userArr[0]['Username']).'</span>'; ?>
+
+
+</h1>
+
+<input type="hidden" id="userdetails" value="yes">
+<input type="hidden" id="singleaddgrp" value="<?php echo $userArr[0]['UserID'] ?>" checked="checked" >
+
+
+<div class="statusButton">
+	<div class="helponoff userActiveInactive updateUserDetailStatus"> 
+			<?php 
+				if($userArr[0]['Status']==1)
+					echo '<input type="checkbox" id="switcherTarget" user_id="'.$userArr[0]['UserID'].'"  status="0">' ;
+				else
+					echo  '<input type="checkbox" id="switcherTarget" checked="checked" user_id="'.$userArr[0]['UserID'].'"  status="1"> ';
+				?>
+		
+		<label for="switcherTarget">
+			<div class="onHelp" on="Active" off="Inactive"></div>
+			<div class="onHelptext">
+				<span>Activate</span>
+                <span>Deactivate</span>
+			</div>
+		</label>
+	</div>
+	<div style="float:right; margin-right:5px; margin-top: -5px; font-size:12px;">
+	<div class="dropDown pull-right" id="userAddNew" style="float:right; ">
+		<a href="#" class="btn dropDownTarget"><i class="fa fa-plus fa-lg"></i> Send message to user</a>
+		<div class="dropDownList right">
+			<p class="validateTips " >All form fields are required.</p>
+			<form class="right">
+				<!-- <div class="formRow">
+					<input type="text" id="usernameInput" name="usernameInput" placeholder="Name"> 
+				</div> -->
+				
+				<div class="formRow" >
+					<input type="radio" name="idoremail" id="usermessage" value="<?php echo $userArr[0]['UserID'] ?>" style="position:inherit" checked="checked"/> Message
+					<input type="radio" name="idoremail" id="useremail" value="<?php echo $this->myclientdetails->customDecoding($userArr[0]['Email']) ?>" style="position:inherit" /> Email	
+				</div>
+				<div class="formRow">
+					<input type="text" id="subjectval" name="subject" placeholder="Subject"> 
+				</div>
+				<div class="formRow">
+					<textarea id="messageval" name="message" rows="4" cols="40" placeholder="Message"></textarea>	
+					<div class="subText"><i class="fa-info-sign">
+					</i> Add a email below list, send message to a user. <br><br>	<i class="fa-info-sign"></i> Separate multiple email addresses with a comma (,)
+					<!-- 
+					Accounts will display on the list below once activated by the user --></div> 
+				</div>
+				<div class="formRow">	     			
+						<button type="button" class="btn btn-green fluidBtn  pull-right sendusermsgemail" id="sendusermsgemail" style="margin-right:0px;"> 
+							<i class="fa fa-plus fa-lg"></i>  Send message 
+						</button>
+				</div>
+			</form>
+
+		</div>
+	</div>
+	</div>
+	<div style="float:right; margin-right:5px; margin-top: -5px;">
+
+	<?php echo $common->addtogroupbutton(1); ?>
+
+</div>
+	<?php 
+	if($userArr[0]['ScoringStatus']==0)
+	$ScoringStatus =  'Off';
+	else
+	$ScoringStatus = 'On'; 
+	?>
+
+<div class="userUpBar">
+	
+
+	<?php
+	if($userArr[0]['Status']==1){
+		$uStatus = "Active";
+	}else{
+		$uStatus = "Inactive";
+	}
+	if($userArr[0]['isonline']==1)
+		$userOnline = '<span class="onlineuser">Online</span>';
+	else
+		$userOnline = '<span class="offlineuser">Offline</span>';
+
+	$typearray = array('Normal','Deligate','Speaker','Sponser');
+	$acctypearray = array('Standard','Facebook','Twitter','Linkedin','Google');
+	$birthDate = '';
+        if($userArr[0]['Birthdate']!='0000-00-00'){
+        	 $birthDate = date('d-M-Y',strtotime($userArr[0]['Birthdate']));
+        }
+  	$ret 	=	'';
+  	
+        $ret 	.= '<div>
+		  	<div class="popUserDetails ">
+		  		<div class="popUserPic">
+		  			<div class="box_image">
+		  				<span style="background:url('.IMGPATH.'/users/'.$ProfilePicpic.') no-repeat; background-size:cover; width:145px; height:145px; display:inline-block""></span>
+						'.$userOnline.'
+					</div>
+		  		</div>
+		  		<div class="popColUserDetailsWrapper">
+			  		<div class="popColUserDetails">
+			  			<div class="userdtlrow">
+				  			<div class="userdtlrow105">Name : </div>
+				  			<div class="userdtlrow150">&nbsp;'.$this->myclientdetails->customDecoding($userArr[0]['Name']) .' '.$this->myclientdetails->customDecoding($userArr[0]['lname']) .'</div>
+			  			</div>
+
+			  			<div class="userdtlrow">
+				  			<div class="userdtlrow105">User Name : </div>
+				  			<div class="userdtlrow150">&nbsp;'.$this->myclientdetails->customDecoding($userArr[0]['Username']).'</div>
+			  			</div>
+			  			<div  class="userdtlrow">
+				  			<div class="userdtlrow105">User Email : </div>
+				  			<div class="userdtlrow150">&nbsp;'. $this->myclientdetails->customDecoding($userArr[0]['Email']).'</div>
+			  			</div>
+			  			<div  class="userdtlrow" >
+				  			<div class="userdtlrow105">Gender : </div>
+				  			<div class="userdtlrow150">&nbsp;'.$this->myclientdetails->customDecoding($userArr[0]['Gender']).'</div>
+				  		</div>';
+				  		if($userArr[0]['Birthdate']!='0000-00-00'){	
+			  			$ret.='<div class="userdtlrow" >
+				  			<div class="userdtlrow105">Birth date : </div>
+				  			<div class="userdtlrow150">&nbsp;'.$birthDate.'</div>
+				  		</div>';
+				  	}
+				  	$ret.='</div>
+				  	<div class="popColUserDetails">
+					
+						<div class="userdtlrow">
+				  			<div class="userdtlrow105">Title: </div>
+				  			<div class="userdtlrow150">&nbsp;'.  $this->myclientdetails->customDecoding($userArr[0]['title']).'</div>
+				  		</div>	
+						<div class="userdtlrow">
+				  			<div class="userdtlrow105">Company : </div>
+				  			<div class="userdtlrow150">&nbsp;'.  $this->myclientdetails->customDecoding($userArr[0]['company']).'</div>
+				  		</div>	
+						<div class="userdtlrow">
+				  			<div class="userdtlrow105">Type : </div>
+				  			<div class="userdtlrow150">&nbsp;'.  $typearray[$userArr[0]['usertype']].'</div>
+				  		</div>	
+						
+				  		<div class="userdtlrow">
+				  			<div class="userdtlrow105">Registration Date : </div>
+				  			<div class="userdtlrow150">&nbsp;'.  date('d-M-Y',strtotime($userArr[0]['RegistrationDate'])).'</div>
+				  		</div>	
+				  		<div class="userdtlrow">
+				  			<div class="userdtlrow105">Last Login Date : </div>
+				  			<div class="userdtlrow150">&nbsp;'.  $logindate.'</div>
+				  		</div>
+				  		
+			  		</div>
+					<div class="popColUserDetails" style="border-right:0px;">
+					
+						<div class="userdtlrow">
+				  			<div class="userdtlrow105">Country Name : </div>
+				  			<div class="userdtlrow150">&nbsp;'.  $this->myclientdetails->customDecoding($userArr[0]['country_name']).'</div>
+				  		</div>
+						<div class="userdtlrow">
+				  			<div class="userdtlrow105">Account Type : </div>
+				  			<div class="userdtlrow150">&nbsp;'.  $acctypearray[$userArr[0]['Socialtype']].'</div>
+				  		</div>	
+						<div class="userdtlrow">
+				  			<div class="userdtlrow105">Status : </div>
+				  			<div class="userdtlrow150 statusEffect">&nbsp;'. $uStatus.'</div>
+				  		</div>';	
+
+				  		/*if ($this->plateform_scoring==0) {		  			
+				  		
+				  		 $ret 	.= '<div class="userdtlrow">
+				  			<div class="userdtlrow105">Scoring Status : </div>
+				  			<div class="userdtlrow150 statusEffect">&nbsp;'. $ScoringStatus.'</div>
+				  		</div>';	
+						}*/
+
+			  		 $ret 	.= '</div>';
+		  	$que = "select * from tblUserBiography b left join tbl_biofields bf on b.field_id=bf.id where b.UserID = ".$userArr[0]['UserID']." AND b.clientID = ".clientID;
+	   
+					    $userBio = $this->myclientdetails->passSQLquery($que);
+					    if(count($userBio)>0){
+					    	$ret .= '<div class="popColUserDetails aboutusMoreDetails"><ul><li style="margin-bottom: 10px; font-size: 18px; color: #CCC;">Biography</li>';
+					    	foreach ($userBio as $key => $value) {
+					    		if($value['field_value']!='')
+					    		$ret .= '<li style="margin-bottom:10px;"><span class="userdtlrow105">'. $value['name'].' : </span> <span class="userdtlrow150">'.$value['field_value'].'</span></li> ';
+					    	}
+					    	$ret .= '</ul></div>';
+					    	$ret;
+					    }
+				  		
+		  $ret .= '</div></div><div id="container" style="margin: 0 auto;"></div>
+		 
+	    
+		  	</div>';
+	    echo $ret;
+	    
+	    
+	?>	
+	
+	<div id="userDetailsWrapper">
+		<div class="dashBlock smallStyleview"  id="id_7"  index="7">
+		<h2 class="dragHandler">latest activity  
+			<!--<a href="javascript:void(0);" class="btn btn-mini btn-warning btnRefresh" param="score"><i class="blockRefreshIcon spriteIcons"></i></a>-->
+		</h2>
+		 <div id="lastactivity" class="dashContent" style="height:400px;overflow:auto;">
+		 </div> </div>
+		<div class="dashBlock"  id="id_6"  index="6">
+		<h2 class="dragHandler">live posts  
+			<a href="javascript:void(0);" class="btn btn-mini btn-warning btnRefresh" param="dbee" uid="<?php echo $userArr[0]['UserID']?>"><i class="blockRefreshIcon spriteIcons"></i></a>
+		</h2>
+		 <div id="livedbeeds" class="dashContent" style="height:400px;overflow:auto;"></div> </div>
+<!--end live dbee-->
+	<!--Latest commnets-->
+	<div class="dashBlock"  id="id_6"  index="6">
+		<h2 class="dragHandler">latest comments
+		<a href="javascript:void(0);" class="btn btn-mini btn-warning btnRefresh" param="comment" uid="<?php echo $userArr[0]['UserID']?>"><i class="blockRefreshIcon spriteIcons"></i></a>	
+			</h2>
+			<div id="latestComment" class="dashContent" style="height:400px;overflow:auto;"></div></div>
+	<!--End Latest commnets-->
+<!--Live Groops-->
+	<div class="dashBlock"  id="id_5"  index="5">
+		<h2 class="dragHandler">live groups			
+			<a href="javascript:void(0);" class="btn btn-mini btn-warning btnRefresh" param="group" uid="<?php echo $userArr[0]['UserID']?>"><i class="blockRefreshIcon spriteIcons"></i></a>	
+		</h2>
+		<div id="livegroup" class="dashContent" style="height:400px;overflow:auto;"></div></div>
+		
+	<!--end Live group-->
+	<?php if($this->plateform_scoring==0) { ?>
+	<div class="dashBlock"  id="id_7"  index="7">
+		<h2 class="dragHandler">scores given 
+			<a href="javascript:void(0);" class="btn btn-mini btn-warning btnRefresh" param="score" uid="<?php echo $userArr[0]['UserID']?>"><i class="blockRefreshIcon spriteIcons"></i></a>
+		</h2>
+		 <div id="livescore" class="dashContent" style="height:400px;overflow:auto;">
+		 
+		</div> 
+	</div>
+
+  
+ 
+	<div class="dashBlock"  id="id_7"  index="7">
+		<h2 class="dragHandler">scores received  
+			<a href="javascript:void(0);" class="btn btn-mini btn-warning btnRefresh" param="scoreme" uid="<?php echo $userArr[0]['UserID']?>"><i class="blockRefreshIcon spriteIcons"></i></a>
+		</h2>
+	<div id="livescoreme" class="dashContent" style="height:400px;overflow:auto;"></div> </div>
+	<?php } ?>
+
+
+
+	<div class="dashBlock"  id="id_8"  index="8">
+		<h2 class="dragHandler">post visited  
+			<a href="javascript:void(0);" class="btn btn-mini btn-warning btnRefresh" param="postvisiter" uid="<?php echo $userArr[0]['UserID']?>"><i class="blockRefreshIcon spriteIcons"></i></a>
+		</h2>
+	<div id="postvisiting" class="dashContent" style="height:400px;overflow:auto;"></div> 
+   </div>
+
+   <div class="dashBlock"  id="id_9"  index="9">
+		<h2 class="dragHandler">messages
+			<a href="javascript:void(0);" class="btn btn-mini btn-warning btnRefresh" param="sendmessage" uid="<?php echo $userArr[0]['UserID']?>"><i class="blockRefreshIcon spriteIcons"></i></a>
+		</h2>
+	   <div id="mysendmessage" class="meggagecounter dashContent" style="height:400px;overflow:auto;"> </div> 
+	</div>
+	
+</div>

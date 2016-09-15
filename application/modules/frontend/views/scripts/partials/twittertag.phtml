@@ -1,0 +1,115 @@
+<?php if($this->resultData['TwitterTag']!='') { ?>
+<div class="whiteBox">
+    <h2 class="twFdTitle"><i class="fa dbTwitterIcon fa-2x"> </i> Twitter Feed</h2>
+    <?php 
+        $addtoreply=true; 
+        //print_r($this->resultData);
+        $chkstoptweetreply = ($this->resultData['StopTweetsReply']=='1')?'checked':''; 
+        //var_dump($chkstoptweetreply);
+        if($this->resultData['User']==$this->userid)
+        {
+    ?>
+    <div id="tks">
+                 <span class="refTwLable">User tweet referencing</span>
+
+            <label data-type="2" for="stoptweets" class="switcher notiSettingBtn" style="float:none"><input type="checkbox" id="stoptweets" onclick="javascript:stoptweetreply('<?php echo $this->resultData['DbeeID']; ?>');" type="checkbox" <?php echo $chkstoptweetreply; ?>>
+                <span class="switchOnOff">
+                    <span class="switchOn"></span>
+                </span>
+            </label>
+        <div style="cursor:pointer;float:right" id="reftwiterright" onclick="changetweetdataRefresh('<?php echo $this->resultData['DbeeID']; ?>', '<?php echo $this->resultData['TwitterTag']; ?>');">
+          <i class="fa fa-refresh fa-lg"></i>
+        </div>
+        <div id="timer-msg"></div></div>
+
+
+        <?php 
+            }
+            if($this->twitter_token_secret==''){
+              $addtoreply=3;
+           }else if($this->resultData['StopTweetsReply']==1 && $this->resultData['User']!=$this->userid){
+              $addtoreply=false;
+           }
+           else{
+            $addtoreply='twitterconnected';
+           }
+            //var_dump($addtoreply);
+            $keyword = explode(",",trim($this->resultData['TwitterTag']));
+            $count =  count($keyword); 
+            
+            $counter=1;
+            $profileholder = false;
+            $stoptweetreply = 0;
+            $from=0;
+            $counter=1;
+            $return='';
+            $divtitle='';
+            $twTags='';
+
+            for ($i=0; $i < $count; $i++) {
+                if($i==0) 
+                  $active='active';
+                else
+                  $active ='';
+                $twTags .='<li class="'.$active.'"><span>'.$keyword[$i].'</span></li>';
+            }
+        ?>
+        <div id="alltweet" >
+            <ul class="twTagsTab"><?php echo $twTags; ?></ul>
+            <ul id="twiterKeyContainer">
+            <?php
+            for ($j=0; $j < $count; $j++) 
+            { 
+              ?>   
+               <li>
+                <div class="twKeyDetails">
+                <ul>
+                <?php 
+                $twitterData = $this->myhome_obj->gettwitterNew($this->resultData['DbeeID'], $keyword[$j]);
+               foreach($twitterData as $row)
+               { 
+                    if(!file_get_contents($row['ProfilePic'])) $imgPath=BASE_URL."/timthumb.php?src=/userpics/twitteruserDefault.png&q=100&w=48&h=48";
+                    else $imgPath=str_replace('http://a0.twimg.com/','https://si0.twimg.com/',$row['ProfilePic']);
+                    
+                    if($this->userid == $row['UserID'])
+                      $closee = "<span data-id='".$row['ID']."' class='tweetDelete' ><i class='fa fa-times'></i></span>";
+                    else
+                      $closee ='';
+
+                    $return.="<li id='tweet_".$row['ID']."' >".$closee."<div class='photoTwitter'><img src='".$imgPath."' /></div><div class='rightTwitterDetails'><b>". $row['ScreenName'] ."</b>".str_replace('<a href=','<a target=\"_blank\" href=',$row['Tweet'])."</div>";
+                  
+                      if($from==0)
+                       { 
+                         $return.="<div class='twitter-addtoreply-div' ".$divtitle." >";
+                         if($addtoreply==true && $addtoreply=='twitterconnected')
+                            $return.="<a href=\"javascript:addtoreply(".$counter.",'".$row['ScreenName']."')\" class='addtoreply addtoreply".$counter."'>Add tweet to discussion</a>";
+                          elseif ($addtoreply==3) 
+                           $return.="<a href='javascript:void(0);' data-id='".$this->resultData['DbeeID']."' class='addtoreply connectToTwitter'>Add tweet to discussion</a>";
+                         else
+                            $return.="<a href='javascript:void(0);' class='addtoreply addtoreply-blocked'>Add tweet to discussion</a>";
+                         $return.="</div></li>";
+                      }
+                  
+                      $hiddenval="<div class='twitterCommentReplyBox'>
+                        <div class='photoTwitter'><img src='".$imgPath."' /></div>
+                        <div class='rightTwitterDetails'>
+                          <b>". $row['ScreenName'] ."</b>".str_replace('<a href=','<a target=\"_blank\" href=',$row['Tweet'])."
+                        </div>
+                        <div style='float:right;'>
+                          <a href='javascript:void(0);' style='font-size:11px' onclick='javascript:removetweetfromnewcomment();'>remove</a>
+                        </div>
+                      </div>";
+                      $hidden.="<input type='hidden' id='twitter-result-".$counter."' value=\"".str_replace('"','\'',$hiddenval)."\">";
+                      $counter++;
+               }
+               echo $return.'</ul>';
+               $return ='';
+               echo $hidden;
+               echo '</div>';
+               echo '</li>';
+            } ?>
+            </ul>
+        </div>
+    </div>
+</div>
+<?php } ?>

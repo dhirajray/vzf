@@ -1,0 +1,1470 @@
+<?php
+$layouts  = new Admin_Model_Layouts();
+?>
+
+<script type="text/javascript">
+
+function moveAnimate(element, newParent){
+    //Allow passing in either a jQuery object or selector
+    element = $(element);
+    newParent= $(newParent);
+
+    var oldOffset = element.offset();
+    element.appendTo(newParent);
+    var newOffset = element.offset();
+
+    var temp = element.clone().appendTo('body');
+    temp.css({
+        'position': 'absolute',
+        'left': oldOffset.left,
+        'top': oldOffset.top,
+        'z-index': 1000
+    });
+    element.hide();
+    temp.animate({'top': newOffset.top, 'left': newOffset.left}, 'slow', function(){
+       element.show();
+       temp.remove();
+    });
+}
+
+	$("document").ready(function(){	
+	
+	callglobalajax('debatingcontainer','index','callingajaxcontainers', 'topdebating','topdebateusers'); // category
+	/*if(clientID!='21' && clientID!='22')
+    {
+		callglobalajax('signedcontainer','index','callingajaxcontainers', 'usersignupfromplateform','usersignup'); //users from various plateforms
+	}*/	
+	callglobalajax('popularcontainer','index','callingajaxcontainers', 'populardebate','populardebates'); //users top scorer plateforms
+	
+	//callglobalajax('SematriaCategories','index','callingajaxcontainers', 'SematriaCategories','SematriaCategories'); 
+	//Sematrai categories
+	
+	
+	 $matchtaglist = function(){
+	   $.ajax({
+		    	type: "POST",
+		    	dataType: 'json',
+		    	data: data,
+		    	url:  BASE_URL+'/admin/index/matchtaglist',
+		    	beforeSend:function(){
+		    		$dbLoader({element:'#mctagcontent', close:true});
+		    		$dbLoader({element:'#mctagcontent', prepend:true, apClass:'centerLoader'}); 
+
+		    	},
+		    	success: function(response){			    	
+		    		$dbLoader({element:'#mctagcontent', close:true});  
+		    		 var tagstr;
+		    		 $('#mctagcontent').html(response.content);
+
+		    }   	
+		 });
+	}		
+
+	$matchtaglist();
+	$('body').on('click','.viewonlineusers',function(e){
+		var uonlinelist  = '<div id="onlineuserlist"  title="Platform users"><div id="onlineusrContainer"></div></div>';
+		$('body').append(uonlinelist);
+		$( "#onlineuserlist" ).dialog({                      
+			width:800,
+			height:500,  
+			title:'Online users',
+			close:function(){
+				$(this).dialog("close");
+				$("#onlineuserlist" ).remove();
+			},
+			open:function()
+			{                
+				$fluidDialog();
+				$('#onlineusrContainer').append('<div class="loaderOverlay2"></div>'); 
+				$.ajax({
+					type : "POST",
+					dataType : 'json',
+					url:  BASE_URL+'/admin/usergroup/getonlineuserlist',        
+					success : function(response) {    
+						$('.loaderOverlay2').remove();
+						$('#onlineuserlist #onlineusrContainer').html(response.content);                         
+					}
+				});
+			}
+		});
+    });
+
+	$('body').on('click','#mctagcontent li .tagusrsetd',function(e){
+		//$('.addToGrpWrap').removeClass('on');
+		//$('.addToGrpWrap').addClass('on');
+		var El = $(this);
+		var tag = El.attr('tag');
+		var title = El.attr('title');
+		var company = El.attr('company');		
+		var cli = El.closest('li');
+		var data = {'tag':tag,'title':title,'company':company}
+		
+
+	var ulisttag = '<div id="dtaguserlist"  title="Platform users"><div id="tagusrContainer"></div></div>';
+      $('body').append(ulisttag);
+      $( "#dtaguserlist" ).dialog({                      
+          width:800,
+          height:500,  
+          title:'Users list',
+            close:function(){
+               $(this).dialog("close");
+              $("#dtaguserlist" ).remove();
+              },
+          open:function(){                
+              $fluidDialog();
+               //$("#datacollect").html('');      
+               $('#tagusrContainer').append('<div class="loaderOverlay2"></div>'); 
+            $.ajax({
+              type : "POST",
+              dataType : 'json',
+              data:{'tag':tag,'title':title,'company':company},
+              url:  BASE_URL+'/admin/usergroup/getuserlistbytag',        
+              success : function(response) {    
+                $('.loaderOverlay2').remove();
+                $('#dtaguserlist #tagusrContainer').html(response.content);                         
+              }
+            });
+          }
+    });
+    
+	});
+
+	$('body').on('click','.taginput',function(e){
+		 	
+                        var closestFl = $(this).closest('li');
+                        var totalCheckBox = $('#mctagcontent').find('input[type="checkbox"]:checked').size();
+                        //alert(totalCheckBox);
+                        if(totalCheckBox>0){                          
+                          $('.dropDownTarget').removeClass('disabled');
+                        }else{                         
+                          $(' .dropDownTarget').addClass('disabled')
+                        }
+
+   });
+
+	$('body').on('click','#quicksearchbtn',function(){
+			
+			var gender = $("#gender option:selected").val();
+			var sdate = $('#sdate').val().trim();
+			var edate = $('#edate').val().trim();
+			var cat = $('#cat option:selected').val();
+			var age1 = '';
+			var age2 = '';
+			var nd = '';
+			var nd2 = '';
+			var offset = '0';
+			var cnt = 0;	
+			 if(gender!='' && gender!='0') {
+				 cnt +=1;				
+            }           
+            if(sdate!='' && sdate!='0'){
+            	if(edate=='' || edate=='0'){
+            		$messageError("Please select end date");
+                return false;   
+            	}
+            	 cnt +=1;
+            }	 
+            if(edate!='' && edate!='0'){
+            	if(sdate=='' || sdate=='0'){
+            		$messageError("Please select end date");
+                return false;   
+            	}
+            	 cnt +=1;
+            }	
+            if(cat!=''){
+           	 cnt +=1;
+           }
+           if(sdate>edate){
+           	$messageError("Please enter a valid age range");
+                return false;           	
+           }
+            if(cnt<1){
+            	$messageError("Please select an option to search");
+                return false;
+                }
+            $("#searchcontent,#totalsres, #msgtotalq").html('');   
+			$('.quicksearchres').show(); 
+			$('#searchcontenttitle').hide();	 
+			/*$('#searchcontent').html('<div class="loaderImgnew"></div>'); */
+			$('input:checkbox[name=quickuser],input:checkbox[name=quickuserview]').attr('checked', false);
+
+			var currentDate = new Date()
+			var day = currentDate.getDate()
+			var month = currentDate.getMonth()
+			var year = currentDate.getFullYear();
+			if(sdate !='' && edate !=''){
+				age1 = (parseInt(year-sdate)) +'-'+ month + '-' + day
+				age2 = (parseInt(year-edate)) +'-'+ month + '-' + day
+			}
+			data = 'gender='+gender+'&age1='+age1+'&age2='+age2+'&cat='+cat+'&start='+offset; 
+			$('#quickusrcnt').val(offset);
+			$('#qage1').val(age1);
+			$('#qage2').val(age2);
+			$('#qcat').val(cat);
+			$('#qgender').val(gender);
+
+		    $.ajax({
+		    	type: "POST",
+		    	dataType: 'json',
+		    	data: data,
+		    	url:  BASE_URL+'/admin/index/searchusr',
+		    	beforeSend:function(){
+		    		$dbLoader({element:'.quicksearchres', close:true});
+		    		$dbLoader({element:'.quicksearchres', prepend:true, apClass:'centerLoader'});
+		    	},
+		    	success: function(response){	  
+		    		$dbLoader({element:'.quicksearchres', close:true});            
+		    		if(response.success==1){			    		
+			    		if(response.notfound==1){
+			    			$('#searchcontenttitle').show();	
+			    			$('#searchcontenttitle .contexTitle').hide();	
+				    	}else{
+				    		$('#searchcontenttitle, #searchcontenttitle .contexTitle').show();	
+				    		$('#searchcontenttitle .addToGrpWrap .dropDownTarget').addClass('disabled');	
+					    }
+		    		
+		    			$('#quickusrcnt').val(response.offset);	
+		    			$('.quicksearchres').show();		    		
+			    		$('#searchcontent').html(response.user);
+			    		$("#searchcontent").show( "slide", {direction: "up" }, 'slow' );
+		    			$('#qtotaluser').val(response.count2);
+		    			$('#totalsres').html(response.count2);
+		    			
+		    			if(response.count2){    			
+			    			$('#msgtotalq').fadeIn(function() {
+			    				if(response.count2>1)	{
+									var usercnts = ' users';
+								}else{
+									var usercnts = ' user';
+								}	
+								$(this).html(response.count2 + usercnts);
+							});
+		    			}
+		    		}else{
+		    		
+		    		}	    		
+		    	}    	
+		    });
+			
+	});
+
+	$('body').on('click','.closeContex',function(){
+		$('.quicksearchres').slideUp();
+	}); 
+	$('body').on('click','.qrsshowhi',function(){
+		//$(".chkqualbel").toggle();   
+	    $("#searchcontent").slideToggle();      
+		}); 
+
+	$('body').on('click','.labelCheckbox input:checkbox[name=goupuserid]', function(){		
+				var totaluser = $('#qtotaluser').val();
+				
+				var chbosize = $('input:checkbox[name=goupuserid]:checked').size();				
+				
+				if(chbosize==0){
+				 $('#searchcontenttitle .dropDownTarget').addClass('disabled');				
+				}else{
+				 $('#searchcontenttitle .dropDownTarget').removeClass('disabled');
+				}
+				
+	});
+
+
+	$('body').on('click','.quickallchkallview input', function(){
+
+		var totaluser = $('#qtotaluser').val();
+		
+		if(totaluser!=0){
+			
+			$('input:checkbox[name=quickuser]').attr('checked', false);	
+			
+			if($(this).is(':checked')==true){
+				$('input:checkbox[name=goupuserid]').attr('checked', true);
+				var chbosize = $('input:checkbox[name=goupuserid]:checked').size();					
+				//$('#msgtotalq').html('You have selected '+chbosize + '  out of '+totaluser+ ' user');			
+			}else{				
+				$('input:checkbox[name=goupuserid]').attr('checked', false);	
+				$('#searchcontenttitle .dropDownTarget').addClass('disabled');
+				$('#msgtotalq').html('Total : '+totaluser);
+			}
+		}
+	}); 
+	$('body').on('click','.quickallchkall input', function(){
+		
+		var totaluser = $('#qtotaluser').val();
+		//alert(totaluser);
+		 $('#searchcontenttitle .dropDownTarget').removeClass('disabled');
+
+		if(totaluser!=0){
+			$('input:checkbox[name=quickuserview]').attr('checked', false);	
+			var totaluser = $('#qtotaluser').val();
+
+			if($(this).is(':checked')==true){
+				$('input:checkbox[name=goupuserid]').attr('checked', true);	
+						
+				//$('#msgtotalq').html('You have selected '+totaluser + ' user');				
+			}else{
+				$('input:checkbox[name=goupuserid]').attr('checked', false);
+				$('#searchcontenttitle .dropDownTarget').addClass('disabled');
+				$('#msgtotalq').html('Total : '+totaluser);
+			}
+		}
+	}); 
+	$('body').on('click','.quickseemore a', function(e){
+		e.stopPropagation();
+		e.preventDefault();
+	  /*  $('.quickseemore').html('<div class="loaderImgnew2"></div>'); */
+		var el = $(this); 
+		var offset = $('#quickusrcnt').val();
+		var age1 = $('#qage1').val();
+		var age2 = $('#qage2').val();
+		var cat = $('#qcat').val();
+		var gender = $('#qgender').val();
+		var chk = $('input:checkbox[name=quickuser]:checked').size();		
+
+		data = 'gender='+gender+'&age1='+age1+'&age2='+age2+'&cat='+cat+'&start='+offset+'&chk='+chk; 
+		
+	    $.ajax({
+	    	type: "POST",
+	    	dataType: 'json',
+	    	data: data,
+	    	url:  BASE_URL+'/admin/index/searchusr',
+	    	beforeSend:function(){
+	    		$dbLoader({element:'.quickseemore', close:true});
+		    	$dbLoader({element:'.quickseemore'}); 
+	    	}, 
+	    	success: function(response){
+                //alert(response);return false;
+              
+	    		if(response.success==1){
+	    			$('.loaderImgnew').remove(); 
+	    			$('.quickseemore').remove();
+	    			$('#quickusrcnt').val(response.offset);		    			
+	    			//$('.quicksearchres').css('display','block');
+	    			$('#searchcontent').append(response.user).fadeIn('slow');
+	    			$('#msgtotalq').html('Total : '+response.count2);
+	    			if(chk==1){
+	    				$('input:checkbox[name=goupuserid]').attr('checked', false);	
+						$('input:checkbox[name=goupuserid]').attr('checked', true);	
+					}
+	    			
+	    		}else{
+	    		
+	    		}	    		
+	    	}    	
+	    });
+	});
+
+/*
+	  $('body').on('click', '#saveGrpNameq',function(){ 	
+	        var groupname = $('#gname').val();
+	        var groupdiscription = $('#grpDescription').val();	               
+	        var thisEl = $(this);
+	            if(groupname=='') {
+	                 $messageError("Set should not be empty");
+	                 return false;
+	            }            
+	             if(groupdiscription==''){
+	                 $messageError("Set description should not be empty");
+	                     return false;
+	            }	            
+	                $.ajax({
+	                    type : "POST",
+	                    dataType : 'json',
+	                    url : BASE_URL + '/admin/usergroup/addgroup',
+	                    data:{'groupname':groupname,'discription':groupdiscription},   
+	                    success : function(response) {                                      
+	                       $messageSuccess("Users saved to Set successfully");  	                      
+	                        $('#groupuserinsert .noFound').remove();	                      
+	                       thisEl.siblings('.cancelSaveFilter').click();
+	                        	 $('#grpselect').prepend('<option value="'+response.content+'" selected="selected">'+groupname+'</option>');	                        	
+	                        	 $select('#grpselect');
+	                        	 var chbosize = $('input:checkbox[name=goupuserid]:checked').size();	                        	
+	                        	 if(chbosize){
+	                        	  $('#quickgroupBtn').trigger('click');	   
+	                        	 }                      
+	                        $('#searchcontent').prop('checked', false);
+	                        $('.dropDown').removeClass('on');
+	                    },
+	                    error : function(error) {
+	                    $messageError("Some problems have occured. Please try again later: "+ error);	                       
+	                    }	                    
+	                    });
+	                return false;
+	  });
+*/
+
+
+});
+
+
+</script>
+<?php
+
+$deshboard		= new Admin_Model_Deshboard();
+$reporting	=	new Admin_Model_reporting();
+$defaultimagecheck = new Admin_Model_Common();
+$DbeeChartData 	= $deshboard->TotalChartData();
+$imparr	=	explode('=',$DbeeChartData );
+$cdata	=	array( 
+	array('name'=> 'Posts','y'=> (int)$imparr[1],'sliced'=> false, 'selected'=> false),
+	array('name'=> 'Comments','y'=>(int) $imparr[2],'sliced'=> false, 'selected'=> false),
+	
+	array('name'=> 'Groups','y'=> (int)$imparr[4],'sliced'=> false, 'selected'=> false)
+	);
+
+$cdatajson	=	json_encode($cdata);
+
+$totdata    =	(int)$imparr[1]+(int)$imparr[2]+(int)$imparr[4]; 
+$totaddata    =	(int)$imparr[1]+(int)$imparr[2]+(int)$imparr[4]; 
+
+/********* TOP DEBATE PROVDERS ACTION ************/	
+?>
+<script language="javascript">
+	$(function () {
+		$("document").ready(function(){
+			
+			updatenotification();
+
+			$('#loadchart li').on('click', function() {
+				var BASE_URL = $("#BASE_URL").val();	
+				var chart	 = $(this).attr('id');	
+				$(this).closest('ul').find('.active').removeClass('active');
+				$(this).addClass('active');
+				var thisEl = $(this);
+
+				$('#id_1').attr('calltype',chart);				
+				runEffect();				
+				var parentData =  $('.dateShowOnHeader');
+				var  datefrom  = $.trim(parentData.find('input[name="datefrom2"]').val());
+            	var  dateto    = $.trim(parentData.find('input[name="dateto2"]').val());
+
+				data  = "type="+ chart+"&datefrom="+datefrom+"&dateto="+dateto+"&ranglimit=5" ;	
+				url		=	BASE_URL+"/admin/index/callcharts";
+				$.ajax({                                      
+					  url: url,                  //the script to call to get data          
+					  data: data,                        //you can insert url argumnets here to pass to api.php
+					  method:'POST',
+					  cache  : true,
+					  async:false,
+					  beforeSend:function(){
+					  	 thisEl.closest('.dashBlock').addClass('loader'); 
+					  	 $('#piecontainer').html('');
+					  },			
+					  success: function(data)          //on recieve of reply
+					  {
+					  	thisEl.closest('.dashBlock').removeClass('loader'); 
+
+					  	var param=data.split("~");
+					  	$( "#effect" ).show( );						
+						switch(param[1])
+						{
+							case ('alladmin'):
+								if(param[2]>0) chartofdbees(JSON.parse(param[0]),'piecontainer',' ‘Admin created’ user activity vs ‘User created’ user activity');
+								else $('#piecontainer').html('<div class="dashBlockEmpty">no record found</div>');
+							break;
+							case ('adminbreck'):
+								if(param[2]>0) chartofdbees(JSON.parse(param[0]),'piecontainer','‘Admin created’ user activity breakdown');
+								else $('#piecontainer').html('<div class="dashBlockEmpty">no record found</div>');
+							break;
+							case ('platformbreck'):
+								if(param[2]>0) chartofdbees(JSON.parse(param[0]),'piecontainer',' ‘User created’ user activity breakdown');
+								else $('#piecontainer').html('<div class="dashBlockEmpty">no record found</div>');
+							break;
+							case ('dbee'):
+								if(param[2]>0) chartofdbees(<?php echo $cdatajson;?>,'piecontainer','Total platform activity ');
+								else $('#piecontainer').html('<div class="dashBlockEmpty">no record found</div>');
+							break;
+							case ('dbeetypes'):
+								
+								if(param[2]>0) chartofdbeetypes(JSON.parse(param[0]));
+								else $('#piecontainer').html('<div class="dashBlockEmpty">no record found</div>');
+							
+							break;	
+
+							case ('group'):
+								if(param[2]>0) chartofgrops(JSON.parse(param[0]));
+								else $('#piecontainer').html('<div class="dashBlockEmpty">no record found</div>');
+								break;	
+							case ('score'):
+								if(param[2]>0) chartofscores(JSON.parse(param[0]));
+								else $('#piecontainer').html('<div class="dashBlockEmpty">no record found</div>');
+								break;
+							case ('influence'):
+								if(param[2]>0) chartofdbees(JSON.parse(param[0]),'piecontainer','Total platform influence ');
+								else $('#piecontainer').html('<div class="dashBlockEmpty">no record found</div>');
+								break;	
+
+							default:
+							chartofdbees(JSON.parse(param[0]),'piecontainer','total platform activity ');
+						}
+					}
+				});			
+				return false;
+			});
+			$('#loadscorechart li').on('click', function() {
+				var BASE_URL = $("#BASE_URL").val();	
+				var chart	 = $(this).attr('id');	
+				$(this).closest('ul').find('.active').removeClass('active');
+				$(this).addClass('active');
+				var thisEl = $(this);
+				$('#id_4').attr('calltype',chart);
+				runEffect();
+				var parentData =  $('.dateShowOnHeader');
+				var  datefrom  = $.trim(parentData.find('input[name="datefrom2"]').val());
+            	var  dateto    = $.trim(parentData.find('input[name="dateto2"]').val());
+
+				data  = "type="+ chart+"&datefrom="+datefrom+"&dateto="+dateto+"&ranglimit=5" ;			
+				//data	=	"type="+ chart ;
+				url		=	BASE_URL+"/admin/index/callscorecharts";
+				$.ajax({                                      
+					  url: url,                  
+					  data: data,                     
+					  method:'POST',
+					  beforeSend:function(){
+					  	 thisEl.closest('.dashBlock').addClass('loader'); 
+					  	 $('#mostscorecontainer').html('');
+					  },					
+					  success: function(data)       
+					  {
+					  	var param=data.split("~");
+					  	//console.log(data);
+					  	thisEl.closest('.dashBlock').removeClass('loader'); 
+					  	$( "#effect" ).show( );			
+
+					  	if(param[6]>0) chartforbrowsersproviders(JSON.parse(param[0]),JSON.parse(param[1]),'mostscorecontainer',param[5],'score on comments','Score count','','',param[4],'user',JSON.parse(param[2]),JSON.parse(param[3]));
+						else $('#mostscorecontainer').html('<div class="dashBlockEmpty">no record found</div>');	
+
+						
+									
+					}
+				});
+				return false;
+				});
+
+		$('#loadscorechart li:first').trigger('click');
+		$('#loadchart li:first').trigger('click');
+	});
+
+	function runEffect() {
+	      // get effect type from
+	      var selectedEffect = 'scale';			
+	      var options = {};
+	      // run the effect
+	      $( "#effect" ).effect( selectedEffect, options, 500 );
+	};
+    // callback function to bring a hidden box back
+	function callback() {
+		setTimeout(function() {
+			$( "#effect" ).removeAttr( "style" ).hide().fadeIn();
+		}, 1000 );
+	};
+	});
+</script>
+
+<script type="text/javascript">
+	$(function() {
+	var seriesOptions = [],
+		yAxisOptions = [],
+		seriesCounter = 0,
+		names = ['USERS', 'ACTIVITIES'],
+		colors = Highcharts.getOptions().colors;
+
+		$.each(names, function(i, name) {
+
+			$.ajax({                                      
+				  url: BASE_URL+'/admin/index/callstockcharts',                  //the script to call to get data          
+				  data: { filename: name.toLowerCase() },                        //you can insert url argumnets here to pass to api.php
+				  method:'POST',
+				  cache  : true,
+				  async:false,
+				  dataType:'JSON',
+				 			
+				  success: function(datajs)          //on recieve of reply
+				  {
+				  		jondata = datajs.split('~');			  		
+				  		var keyval = '';
+
+				  		$.each(jondata, function(i, val) {
+				  			if(val!='')
+				  			{
+					  			keyvalsp = val.split(',');
+					  			keyval += '[Date.UTC('+keyvalsp[0]+',' +(keyvalsp[1]-1)+',' +keyvalsp[2]+'),'+ keyvalsp[3]+'],';
+					  		}
+				  		});
+				  		//console.log(keyval);
+				  		seriesdata = eval('['+keyval+']');
+				  		
+				  		seriesOptions[i] = {
+							name : name,
+				            data : seriesdata
+						};
+						seriesCounter++;
+
+						if (seriesCounter == names.length) {
+							createChart();
+						}
+				  }
+			});	  
+		});
+
+		function createChart() {
+
+		    $('#activitycontainer2').highcharts('StockChart', {
+		        chart: {
+		        },
+
+		        rangeSelector: {
+		            inputEnabled: $('#activitycontainer2').width() > 480,
+		            //inputDateFormat: '%d-%m-%Y',
+	            	inputEditDateFormat: '%d-%m-%Y',
+	            	allButtonsEnabled: true,
+		            selected: 5
+		        },
+		        xAxis: {
+			      type: 'datetime'
+
+			    },
+
+		        yAxis: {
+		            labels: {
+		                formatter: function() {
+		                    return (this.value > 0 ? ' ' : '') + this.value + '';
+		                }
+		            },
+		            plotLines: [{
+		                value: 0,
+		                width: 2,
+		                color: 'silver'
+		            }]
+		        },
+		        
+		        plotOptions: {
+		            series: {
+		                compare: ''
+		            }
+		        },
+		        
+		        tooltip: {
+		        	//pointFormat: '<span style="color:{series.color}">PLATEFORM {series.name} </span>: <b>{point.y}</b> <br/>',
+		        	valueDecimals: 0,
+		            
+		            formatter: function() {
+		                var s = '<b>'+ Highcharts.dateFormat('%a, %b %e, %Y', this.x) +'</b>';
+		                
+		                $.each(this.points, function(i, point) {
+		                	if(point.series.name =='USERS') sname = 'New registrations';
+		                	else sname = 'Total number of actions';
+		                    s += '<br/>'+ sname +': '+
+		                        point.y +'';
+		                });
+		                
+		                return s;
+		            },
+		            shared: true       
+		        },
+		        
+		        series: seriesOptions,
+
+		    }, chartDatepicker());
+			
+		}// End of creatchart()
+		
+
+
+		// Set the datepicker's date format
+	   
+
+		// create the chart when all data is loaded
+
+		$('.howUse').click(function(event) {
+		var userContent = $(this).attr('content-popup');
+		var popTitle = $(this).attr('title-popup');
+		$('#dialogConfirmSetting').remove();
+		$('body').append('<div id="dialogConfirmSetting" style="padding-bottom: 20px;">'+userContent+'</div>');
+
+	   $("#dialogConfirmSetting").dialog({
+	          resizable: false,
+	          title:popTitle,
+	          width:400,
+	          modal: true
+	        });
+		});
+	
+	});
+</script>
+<input type="hidden" id="charttype" value="<?php echo $this->charttype; ?>" >
+<h1 class="pageTitle">Dashboard</h1>
+
+
+<div class="dashQuickOption">
+	<ul class="slides">
+		<li>
+			<div class="dashQo">
+				<div class="dashIcon editSettingIcon"></div>
+				<div class="dashInfoCnt">
+					<h2>Edit your settings</h2>
+					<p>Customise your platform’s <br>
+					appearance & user settings</p>
+					<a href="<?php  echo BASE_URL.'/admin/myaccount/configuration' ;?>" class="dashLink">Edit</a>
+				</div>
+			</div>
+		</li>
+		<li>
+			<div class="dashQo">
+				<div class="dashIcon verifyUserPostIcon"></div>
+				<div class="dashInfoCnt">
+					<h2>User post control</h2>
+					<p>
+					Verify user posts before they <br /> ‘go live’</p>
+					<a href="<?php  echo BASE_URL.'/admin/myaccount/configuration#PostLive' ;?>" class="dashLink">Edit</a> <span style="margin-left:10px;">Status: <?php if($this->allow_admin_post_live==1){?><span class="off">On</span><?php } else {?><span class="on">Off</span><?php } ?></span>
+				</div>
+			</div>
+		</li>
+
+		<li>
+			<div class="dashQo">
+				<div class="dashIcon adminUserIcon"></div>
+				<div class="dashInfoCnt">
+					<h2>Admin user sets</h2>
+					<p>Create and manage your admin  <br />user sets</p>
+					<a href="#" class="dashLink howUse" title-popup="Admin user sets" content-popup="This section allows you to create an unlimited number of ‘user sets’ (selections of users) and add users to them from across the platform. These users will be unaware that they are in any given user set. From there, you can direct message these users, invite them to specific posts, surveys, video broadcasts or events, and create targeted advertising specifically aimed at them.">How does this work?</a>
+					<a href="<?php  echo BASE_URL.'/admin/usergroup/listing' ;?>" class="dashLink">Edit</a>
+				</div>
+			</div>
+		</li>
+		<!-- <li>
+			<div class="dashQo">
+				<div class="dashIcon adminVipGrpIcon"></div>
+				<div class="dashInfoCnt">
+					<h2>Admin VIP Groups</h2>
+					<p>Create and manage your Admin VIP Groups</p>
+					<a href="#" class="dashLink howUse" title-popup="Custom user groups" content-popup="Create groups of VIP users in a private space, invisible to the rest of the platform (with the exception of other VIP users), and where they can interact with each other privately (within the confines of the group). As with any ‘private’ group, a VIP Group will not be visible in a Group search other than when searched for by VIP users.">How does this work?</a>
+					<a href="<?php  echo BASE_URL.'/admin/vipuser/vipgroups' ;?>" class="dashLink">Edit</a>
+				</div>
+			</div>
+		</li> -->
+		
+		<li>
+			<div class="dashQo">
+				<div class="dashIcon editCatIcon"></div>
+				<div class="dashInfoCnt">
+					<h2>Edit your categories</h2>
+					<p>Customise user post categories </p>
+					<a href="<?php  echo BASE_URL.'/admin/myaccount/configuration#category' ;?>" class="dashLink">Edit</a>
+				</div>
+			</div>
+		</li>
+		<?php if(clientID!=19){ ?>
+		<li>
+			<div class="dashQo">
+				<div class="dashIcon advertismentsIcon"></div>
+				<div class="dashInfoCnt">
+					<h2>Advertising</h2>
+					<p>Upload and manage your  <br>platform ads</p>
+					<a href="<?php  echo BASE_URL.'/admin/advertisement#allUsers' ;?>" class="dashLink">Edit</a>
+				</div>
+			</div>
+		</li>
+		<?php } ?>
+		<li>
+			<div class="dashQo">
+				<div class="dashIcon contRestIcon"></div>
+				<div class="dashInfoCnt">
+					<h2>Content restrictions</h2>
+					<p>Profanity, content and restricted URL filters</p>
+					<a href="<?php  echo BASE_URL.'/admin/Restrictedurl/profanityfilter'; ?>" class="dashLink">Edit</a>
+				</div>
+			</div>
+		</li>
+		<!--
+		<li>
+			<div class="dashQo">
+				<a href="<?php  //echo BASE_URL.'/admin/myaccount/helpvideo' ;?>">
+					<div class="dashIcon helpVideoIcon"></div>
+					<div class="dashInfoCnt">
+						<h2>Help videos</h2>
+						<p>View video walk throughs  <br />
+							in our tutorial library
+							
+						</p>
+					</div>
+				</a>
+			</div>
+		</li>
+		-->
+
+
+	</ul>
+</div>
+
+<div class="newWhiteBox dashCol">
+	<h2>Platform set up</h2>
+	<ul>
+		<li <?php if($this->social_connect){ ?> class="complete" <?php } ?> > Connect your social accounts <?php if($this->social_connect){ ?>- <span>connected</span><?php } ?> <a href="<?php  echo BASE_URL.'/admin/myaccount/configuration#socialconnect' ;?>">(edit)</a></li>
+		<li>Customise your categories - <a href="<?php  echo BASE_URL.'/admin/myaccount/configuration#groupCategoryList' ;?>">edit</a></li>
+		<?php if(clientID!=19){ ?>
+		<li>Customise platform theme - <a href="<?php  echo BASE_URL.'/admin/platformsettings/themesetting' ;?>">edit</a></li>
+		<?php } ?>
+		<li>
+			Edit your social share logo - <a href="<?php  echo BASE_URL.'/admin/myaccount/configuration#socialconnect' ;?>">edit</a>
+			<p>This is what users on external social networks, such as Facebook, will see
+when a user shares a post from your platform.</p>
+		</li>
+	</ul>
+</div>
+<div class="newWhiteBox dashCol last">
+	<h2>Create content</h2>
+	<ul>
+		<li><i class="fa fa-pencil"></i> Start a post - <a href="<?php  echo BASE_URL.'/admin/dashboard/post/task/create' ;?>">Go</a></li>
+		<?php if(clientID!=19){ ?>
+		<li><i class="fa fa-calendar"></i> Create an event - <a href="<?php  echo BASE_URL.'/admin/event#createEvent' ;?>">Go</a></li>
+		<?php } ?>
+		<li><i class="fa fa-youtube-play"></i> Create a video broadcast - <a href="<?php  echo BASE_URL.'/admin/dashboard/specialdbs/task/create' ;?>">Go</a> </li>
+		<?php if(clientID!=19){ ?>
+		<li><i class="fa fa-list-alt"></i> Create a survey - <a href="<?php  echo BASE_URL.'/admin/survey/index/task/create' ;?>">Go</a></li>
+		<?php } ?>
+	</ul>
+</div>
+
+<div class="totalStatusActivites ">
+	<?php
+	$totalusers = $this->myclientdetails->getfieldsfromtable(array('UserID'),'tblUsers','Status','1');
+	$totalOnlineusers = $this->myclientdetails->getfieldsfromtable(array('UserID'),'tblUsers','isonline','1','Status','1');
+	
+	$totalposts = $this->myclientdetails->getfieldsfromtable(array('DbeeID'),'tblDbees','1','1');
+	$totalcmnts = $this->myclientdetails->getfieldsfromtable(array('CommentID'),'tblDbeeComments','1','1');
+	$totalgrups = $this->myclientdetails->getfieldsfromtable(array('ID'),'tblGroups','1','1');
+	$totalscors = $this->myclientdetails->getfieldsfromtable(array('ScoreID'),'tblScoring','1','1');
+	$totalmsgs = $this->myclientdetails->getfieldsfromtable(array('ID'),'tblMessages','1','1');
+	?>
+	<ul>
+		<li><span>Online users </span><i class="onlineCount"><?php echo count($totalOnlineusers)?></i><span class="magnifyIcon onlineUsers viewonlineusers"><i class="fa fa-search"></i></span></li>
+		<li><span>Platform users</span><i><?php echo count($totalusers)?></i><span class="magnifyIcon platformUsers"><a href="<?php echo BASE_URL; ?>/admin/user"><i class="fa fa-search"></i></a></span></li>
+		<li><span>Total posts</span><i><?php echo count($totalposts)?></i><span class="magnifyIcon totalPosts"><a href="<?php echo BASE_URL; ?>/admin/dashboard/post"><i class="fa fa-search"></i></a></span></li>
+		<li><span>Total comments</span><i><?php echo count($totalcmnts)?></i><span class="magnifyIcon totalComments"><a href="<?php echo BASE_URL; ?>/admin/dashboard/comments"><i class="fa fa-search"></i></a></span></li>
+
+		<?php if($this->plateform_scoring==0) { ?>
+		<li><span>Total scores</span><i><?php echo count($totalscors)?></i><span class="magnifyIcon totalScores"><a href="<?php echo BASE_URL; ?>/admin/dashboard/scores"><i class="fa fa-search"></i></a></span></li>
+		<?php } ?>
+
+		<li><span>Total Groups</span><i><?php echo count($totalgrups)?></i><span class="magnifyIcon totalGroups"><a href="<?php echo BASE_URL; ?>/admin/dashboard/groups"><i class="fa fa-search"></i></a></span></li>
+
+	    <li><span>Total messages</span><i><?php echo count($totalmsgs)?></i></li>
+	</ul>
+</div>
+<div class="dashBlock_full monthlySignup mctagheading" >
+	<h2 class="dragHandler"><lable>Category-based user search</lable></h2>	
+	<div class="qsearchContent">
+		<div class="searchineer">
+			<div class="field">
+			<div class="fieldTitle">Users who posted in</div>
+				<select name="cat" id="cat">
+					<option value="">Select category</option>	
+					<?php												
+					foreach ($this->category as $value) {													
+					echo '<option value="'.$value['CatID'].'" >'.$value['CatName'].'</option>';
+					}
+					?>	
+				</select>
+			</div>
+			<div class="field" style="margin-right:0px">
+				<div class="fieldTitle">Age range</div>
+				<input type="text" maxlength="15" name="filterName" id="sdate" placeholder="From" value="" style="min-width:0; width:60px">
+			</div>
+			<div class="field">
+				<input type="text" maxlength="15" name="filterName" id="edate" placeholder="To" value="" style="min-width:0; width:60px">
+			</div>
+			<div class="field">	
+				<div class="fieldTitle">Gender</div>					
+				<select name="gender" id="gender">	
+					<option value="0">Any</option>																							
+					<option value="Male">Male</option>
+					<option value="Female">Female</option>
+				</select>
+			</div>			
+			<div class="field">
+				<div class="btn btn-black" id="quicksearchbtn">Search</div>
+			</div>
+		</div>
+	</div>	
+	<div class="quicksearchres ">
+		<div id="searchcontenttitle">
+			<div class="contexBox default-contex">
+				<div class="contexTitle">
+					<div class="contexCol">
+						<div id="msgtotalq" ></div>
+						<div class='chkqualbel'>
+							<label class='quickallchkall' for="quickchkall">
+								<input id='quickchkall' class='quickuser' type='checkbox' name='quickuser' value='quickuser'>
+								<label for="quickchkall"></label> Select all 
+							</label>
+						</div>
+					    
+					
+					</div>
+				    <div class="contexCol">
+				    	<?php echo $defaultimagecheck->addtogroupbutton(); ?>
+				    </div>
+				    <div class="contexCol closeContex">
+				    	<i class="fa fa-times "></i>
+				    </div>
+				</div>
+				<div class="contexDetails">			
+					<ul id="searchcontent" class="quickSearchUserContent"></ul>	
+				</div>		
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="dashBlock_full mctag mctagheading" id="mctag">
+	<h2><lable>Top 10 matching users </lable><span class="addUserSetMactag">
+		<?php
+	//$common = new Admin_Model_Common();
+		echo $defaultimagecheck->addtogroupbutton2();
+	?></span></h2>
+	
+	 <div id="mctagcontent">		
+		<!-- <ul>		 	
+		   <li><a href="#" class="tag">#tag</a> 5 users using this tag</li>
+		   <li><a href="#" class="tag">#tag</a> 5 users using this tag</li>
+		  </ul>
+		   <ul>
+		   <li><a href="#" >#tag</a> 5 users using this tag</li>
+		   <li><a href="#">#tag</a> 5 users using this tag</li>
+		  </ul>
+
+		   <ul>
+		   <li><a href="#">#tag</a> 5 users using this tag</li>
+		   <li><a href="#">#tag</a> 5 users using this tag</li>
+		  </ul>-->
+
+		 <!--  <div id="tagwrapper">
+		    <div id="one" class="tagcnt">one one one one one one one one one one one one one one one one one one one one one</div>
+		    <div id="two" class="tagcnt">two two two two two two</div>
+		    <div id="two" class="tagcnt">two two two two two two</div>
+
+		</div>
+ -->
+
+
+	</div> 
+</div>
+
+
+<div class="dashBlock_full monthlySignup" >
+			<h2 class="dragHandler clearfix">
+				<div class="pull-left">
+				Monthly registrations & total activity
+				<div style="font-family:arial; font-size:11px; font-weight:normal; padding-top: 2px;">Total activity represents the total number of user actions, combining posts, comments, scoring and group creation</div>
+				</div>
+				<div style="float:right; font-family:arial;font-size:11px;font-weight:normal;">
+					<canvas id="myCanvas" width="30" height="2" style="border-top:4px solid #0D233A;" ></canvas>  New users<br />
+					<canvas id="myCanvas" width="30" height="2" style="border-top:4px solid #2F7ED8; margin-top: 10px;"></canvas> Total activity
+				</div>
+			</h2>	
+			<div id="activitycontainer2" class="dashContent"></div>	
+	</div>
+	
+	
+
+<div id="dashboardWrapper">
+
+	<div class="dashBlock notification" >
+		<h2 class="dragHandler">Admin notifications <span class="newMark" style="display:none">New</span> <a href="javascript:void(0);" class="btn btn-mini btn-warning pull-right" id="refreshNotification" ><i class="blockRefreshIcon spriteIcons"></i></a></h2>	
+		<div class="dashContent" id="notiactivity"></div>	
+	</div>
+	
+	<?php
+	//<i class="fa fa-save"> </i>
+	$blocks = array();
+	
+	$filterSaveChartHtml = $defaultimagecheck->filterSaveChartHtml('datefilter');
+				
+	$overallactivity = '<div class="dashBlock" id="id_1" index="1" callfrom="pie" calltype="dbee">
+				<h2 class="dragHandler">User activity'.$filterSaveChartHtml.'</h2>
+					<div id="DashLegends">
+						<ul class="loadchart" id="loadchart" >
+							<li id="alladmin" class="active"><a href="javascript:void(0)">All</a></li>
+							<li id="adminbreck"><a href="javascript:void(0)">Admin </a></li>
+							<li id="platformbreck"><a href="javascript:void(0)">User</a></li>
+							<li id="dbeetypes"><a href="javascript:void(0)">Posts </a></li>
+							<li id="group"><a href="javascript:void(0)">Groups</a></li>';
+
+							if($this->plateform_scoring==0){
+								$overallactivity .= '<li id="score"><a href="javascript:void(0)">Scoring</a></li>';
+							}
+						/*<li id="dbee" class=""><a href="javascript:void(0)">Posts</a></li>
+						<li id="influence"><a href="javascript:void(0)">Influence</a></li>
+						*/	
+						$overallactivity .= '</ul>	
+					</div>
+					<div id="piecontainer" class="dashContent"></div>
+				</div>';
+	$blocks[] =  $overallactivity;	
+	/*if(clientID!='21' && clientID!='22')
+    {			
+		$blocks[] = '<div class="dashBlock" id="id_3" index="3"  callfrom="pie" calltype="signedcontainer">
+			<h2 class="dragHandler">User sign up '.$filterSaveChartHtml.'</h2>
+			<div id="signedcontainer" class="signedupContent"></div>
+		</div>';
+	}*/	
+	$reporting	=	new Admin_Model_reporting();
+	$liveDbeeData = $reporting->gettopDbeeusers('all');
+	$totUsers	=	 count($liveDbeeData);
+	$blocks[] = '<div class="dashBlock mstactusr" id="id_5" index="5" callfrom="bar" calltype="debatingcontainer" >
+		<h2 class="dragHandler">Most active users'.$filterSaveChartHtml.'</h2>
+		<div id="debatingcontainer" class="dashContent"></div>';
+	if($totUsers>0){
+	$blocks[] .= '<div class="bfooter"><div class="activeUserTxt">Total activity represents the total number of user actions, combining posts and comments</div><a href="'.BASE_URL.'/admin/reporting/activeusersrecord"  class="btn">View all</a></div>';}
+	$blocks[] .='</div>';
+
+	
+	$blocks[] = '<div class="dashBlock mstpopuusr" id="id_6" index="6" callfrom="bar" calltype="popularcontainer" >
+		<h2 class="dragHandler">Most popular posts in the last month'.$filterSaveChartHtml.'</h2>
+		<div id="popularcontainer" class="dashContent"></div>
+		<div class="bfooter"><a href="'.BASE_URL.'/admin/dashboard/popularpost"  class="btn">View all</a></div>
+	</div>';
+
+	if($this->plateform_scoring==0) {
+		$scoreset =  $layouts->scoringFromDb(); // taking value from database
+		
+
+	$blocks[] = '<div class="dashBlock" id="id_4" index="4" callfrom="bar" calltype="'.$scoreset['Love'].'">
+		<h2 class="dragHandler">Scoring'.$filterSaveChartHtml.'</h2>
+		<div id="DashLegends">
+			<ul class="loadscorechart" id="loadscorechart" >
+				<li id="'.$scoreset['Love'].'" class="active"><a href="'. $this->url(array('controller'=>'index','action'=>'index','type'=>$scoreset['Love'])).'">'.$scoreset['Love'].'</a></li>	
+				<li id="'.$scoreset['Like'].'"><a href="'.$this->url(array('controller'=>'index','action'=>'index','type'=>$scoreset['Like'])).'">'.$scoreset['Like'].'</a></li>
+				
+				<li id="'.$scoreset['Dis Like'].'"><a href="'. $this->url(array('controller'=>'index','action'=>'index','type'=>$scoreset['Dis Like'])).'">'.$scoreset['Dis Like'].'</a></li>
+				<li id="'.$scoreset['Hate'].'"><a href="'. $this->url(array('controller'=>'index','action'=>'index','type'=>$scoreset['Hate'])).'">'.$scoreset['Hate'].'</a></li>
+			</ul>	
+		</div>
+		<div id="mostscorecontainer" class="dashContent"></div>
+	</div>';
+	}
+	
+	$blocks[] = '<div class="dashBlock SematriaCategoriesArea" id="id_7" index="7" callfrom="bar" calltype="SematriaCategories" >
+		<h2 class="dragHandler">Popular sentiment bearing keywords </h2>
+		<div id="SematriaCategories" class="dashContent"></div>		
+	</div>';
+
+	
+	echo $blocks[6]; // categry from sematira
+
+	//echo "<pre>"; print_r($blocks);exit;
+	echo $blocks[0]; // overall
+
+	echo $blocks[1]; //signup share activity break down
+
+	echo $blocks[2]; // popular post
+	echo $blocks[3]; //most debates active user
+	echo $blocks[4]; //most score post
+	//echo $blocks[4]; //most debates user
+
+	//echo $blocks[5]; // popular dbs
+
+	//echo $blocks[6]; // popular dbs
+
+// <!--live dbee-->
+?>
+
+<?php 
+	$blocksdbee ='';
+	$blocksdbee .= '<div class="dashBlock"  id="id_4"  index="4">
+			<h2 class="dragHandler">Latest posts		
+				<!--<a href="javascript:void(0);" class="btn btn-mini btn-warning btnExpand"><i class="blockExbandIcon spriteIcons"></i></a>
+				<a href="javascript:void(0);" class="btn btn-mini btn-warning btnMinimize"><i class="minimizeIcon spriteIcons"></i></a>-->
+				<a href="javascript:void(0);" class="btn btn-mini btn-warning btnRefresh" param="dbee"><i class="blockRefreshIcon spriteIcons"></i></a>
+			</h2>';
+			
+
+			if (count($this->liveDbeeData)){ 
+		$blocksdbee .='	<div id="liveDbee" class="dashContent">
+					<ul>';
+					foreach($this->liveDbeeData as $liveDbee) : 
+		$blocksdbee .=' <li>';
+								
+						$texttype = " created ";		
+						if($this->escape($liveDbee->type)==1) { 
+							$dbtype			=	' a text post';
+							$descDisplay	=	substr($liveDbee->description,0,100);
+						}
+						if($this->escape($liveDbee->LinkTitle)!='') { 
+							$dbtype			=	' a link';
+							$texttype = " posted  ";
+							$dbLink			=	$liveDbee->Link;
+							$dbLinkTitle	=	$liveDbee->LinkTitle;
+							$dbLinkDesc		=	$liveDbee->LinkDesc;
+							$dbUserLinkDesc	=	!empty($liveDbee->UserLinkDesc) ? $liveDbee->UserLinkDesc : $liveDbee->LinkTitle;
+
+							$descDisplay	=	'<div style=" background-color:#DAD9D9; padding:5px;">
+							<div class="font12">'.$dbUserLinkDesc.' - 
+							<a target="_blank" href="'.$dbLink.'">'.$dbLink.'</a>
+							</div>
+							</div>';
+						}
+						if($this->escape($liveDbee->Pic)!='') { 
+							$dbtype	=	' an image post';
+
+							$dbPic		=	$liveDbee->Pic;
+							$dbPicDesc	=	$liveDbee->PicDesc;
+                            $checkdbpic = $defaultimagecheck->checkImgExist($this->escape($dbPic),'imageposts','default-avatar.jpg');
+							$descDisplay	=	'<div style="float:left; width:360px; ">
+							<div style="float:left;  width:auto; padding:3px; border:1px solid #CCCCCC;"><a href="#"><img src="'.IMGPATH.'/imageposts/small/'.$checkdbpic.'&q=100&w=40&h=40" border="0" /></a></div>
+							<div class="font12" style="float:left; margin-left:10px; width:245px;">'.substr($dbPicDesc,0,100).'</div></div></p>';
+						}
+						if($this->escape($liveDbee->VidID)!='') { 
+							$dbtype	=	' a video post';
+
+							//$dbtype			=	'link db<div class="icon-db-link"></div>';
+							$dbVid			=	$liveDbee->VidID;
+							$dbVidDesc		=	$liveDbee->VidDesc;
+							$dbLinkDesc		=	$liveDbee->LinkDesc;
+							$dbUserLinkDesc	=	!empty($liveDbee->UserLinkDesc) ? $liveDbee->UserLinkDesc : $liveDbee->LinkTitle;
+							$descDisplay	=	'<div style="float:left; width:360px; ">
+							<div style="float:left;  width:auto; padding:3px; border:1px solid #CCCCCC;"><img border="0" src="https://i.ytimg.com/vi/'.$dbVid.'/0.jpg" width="40px" height="40px"></div>
+							<div class="font12" style="float:left; width:245px;">'.substr($dbVidDesc,0,100).'</div></div></p>';
+						}
+						if($this->escape($liveDbee->type)==5) {  
+							$dbPollText			=	$liveDbee->PollText;
+							$dbtype	=	' a voting poll';
+							$descDisplay	=	substr($dbPollText,0,100);
+						}
+                        $checkupic = $defaultimagecheck->checkImgExist($liveDbee->image,'userpics','default-avatar.jpg');
+			$blocksdbee .='<div class="userPic">
+									<img src="'.IMGPATH.'/users/medium/'.$checkupic.'" width="80" height="80" border="0" />
+								</div>
+								<div class="userDetails">
+									<div class="usertitle">
+										<span class="username"><a href="javascript:void(0)" class="show_details_user username" userid="'.$liveDbee->User.'">'.$this->myclientdetails->customDecoding($this->escape($liveDbee->username)).' '.$this->myclientdetails->customDecoding($this->escape($liveDbee->lname)).'</a></span>
+										<span class="userposted">'.$texttype. $dbtype.'</span>
+										<span class="userposted"> on '.date('d M, Y',strtotime($this->escape($liveDbee->PostDate))).'</span>
+										<br><span class="userposted">';
+										$totcmnt 	=	$deshboard->getTotalComments($liveDbee->DbeeID);
+										if($totcmnt>0)
+										{
+											if($totcmnt==1) $cmntCount = $totcmnt.' comment'; else $cmntCount = $totcmnt.' comments';
+											$blocksdbee .= $cmntCount;
+										}
+										$blocksdbee .='</span>
+										<span class="usrcomment">';
+											$blocksdbee .='	<i> <a href="'.BASE_URL.'/admin/dashboard/post/id/'.$liveDbee->DbeeID .'">More</a> | <a href="'.BASE_URL.'/admin/dashboard/postreport/m_-_xxp=t/'.base64_encode($liveDbee->DbeeID).'">Post report</a></i>
+										</span>
+									</div>
+									<br><p>'. strip_tags($descDisplay) .'</p>';
+									if($liveDbee->Active==0)
+									{
+										$blocksdbee .= '<p style="color:red">INACTIVE</p>';
+									}
+								$blocksdbee .='</div>
+							</li>';
+						 endforeach; 
+		$blocksdbee .='	</ul>
+							<div class="bfooter">
+								<span class="bfTotal"> <strong>'.$this->escape($deshboard->getTotalDbee()).'</strong> total posts</span>';
+								 if($deshboard->getTotalDbee()>4){
+		$blocksdbee .='<a href="'. BASE_URL.'/admin/dashboard/post" class="btn">View all</a>'; }
+		$blocksdbee .='</div></div>';
+					 } else { 
+		$blocksdbee .='	<div class="dashBlockEmpty">no posts found</div>';
+			 }	
+		$blocksdbee .='</div>';		
+		echo $blocksdbee;
+
+		?>
+<!--end live dbee-->
+<!--Latest commnets-->
+	<div class="dashBlock"  id="id_6"  index="6">
+		<h2 class="dragHandler">Latest comments	
+			<a href="javascript:void(0);" class="btn btn-mini btn-warning btnRefresh" param="comment"><i class="blockRefreshIcon spriteIcons"></i></a>
+		</h2>
+		<?php 
+		
+		if (count($this->latestCommentData)){ ?>
+			<div id="latestComment" class="dashContent">
+				<ul>
+					<?php foreach($this->latestCommentData as $latestComment) : ?>
+
+					<?php 	
+					$dbtype	='';		
+					if($this->escape($latestComment->type)==1) { 								
+						$descDisplay	=	substr($latestComment->Comment,0,100);
+					}
+					if($this->escape($latestComment->type)==2) { 
+								
+						$dbLink			=	$latestComment->Link;
+						$dbLinkTitle	=	$latestComment->LinkTitle;
+						$dbLinkDesc		=	$latestComment->LinkDesc;
+						$dbUserLinkDesc	=	!empty($latestComment->UserLinkDesc) ? $latestComment->UserLinkDesc : $latestComment->LinkTitle;
+						$descDisplay	=	'<div style="padding:5px; margin-top:5px; margin-bottom:5px; background-color:#DAD9D9;">
+						<div class="font12">'.$dbUserLinkDesc.' - 
+						<a target="_blank" href="'.$dbLink.'">'.$dbLink.'</a>
+						</div>
+						<div class="font12" style="margin-top:10px;"></div></div>';
+					}
+					if($this->escape($latestComment->type)==3) { 
+						$dbPic		=	$latestComment->Pic;
+						$dbPicDesc	=	$latestComment->PicDesc;
+                        $dbcheckpic = $defaultimagecheck->checkImgExist($this->escape($dbPic),'imageposts','default-avatar.jpg');
+						$descDisplay	=	'
+						<div style="float:left;  width:auto; padding:3px; border:1px solid #CCCCCC;"><a href="#"><img src="'.IMGPATH.'/imageposts/small/'.$dbcheckpic.'" width="80" border="0" /></a></div>
+						<div class="font12" style="float:left; margin-left:10px; width:245px;">'.substr($dbPicDesc,0,100).'</div>';
+					}
+					if($this->escape($latestComment->type)==4) {
+						$dbtype			=	'link db<div class="icon-db-link"></div>';
+						$dbVid			=	$latestComment->Vid;
+						$dbVidDesc		=	$latestComment->VidDesc;
+						$dbLinkDesc		=	$latestComment->LinkDesc;
+						$dbUserLinkDesc	=	!empty($latestComment->UserLinkDesc) ? $latestComment->UserLinkDesc : $latestComment->LinkTitle;
+
+						$descDisplay	=	'<div style="float:left;  width:auto; padding:3px; border:1px solid #CCCCCC;"><img width="50" height="50" border="0" src="'.$dbVid.'"></div>
+						<div class="font12" style="float:left; width:245px;">'.substr($dbUserLinkDesc,0,100).'</div>';
+					}
+					if($this->escape($latestComment->type)==5) {  
+						$dbPollText			=	$latestComment->PollText;								
+						$descDisplay	=	substr($dbPollText,0,100);
+					}
+                    $commpic = $defaultimagecheck->checkImgExist($this->escape($latestComment->image),'userpics','default-avatar.jpg');
+					?>
+						<li>
+						<div class="userPic"><img src="<?php echo IMGPATH ?>/users/small/<?php echo $commpic ?>" width="80" height="80" border="0" /></div>
+						<div class="userDetails">
+							<div class="usertitle">
+								<a href="javascript:void(0)" class="show_details_user username" userid="<?php echo $latestComment->UserID; ?>"><?php echo $this->myclientdetails->customDecoding($this->escape($latestComment->username)).' '.$this->myclientdetails->customDecoding($this->escape($latestComment->lname));?></a>
+								<span class="userposted">has commented on  <a href="javascript:void(0)" class="show_details_user username" userid="<?php echo $latestComment->OwnerID; ?>"><?php echo $this->escape($this->myclientdetails->customDecoding($latestComment->Ownername)).' '.$this->myclientdetails->customDecoding($this->escape($latestComment->Ownerlname));?></a>&rsquo;s post <?php echo $dbtype; ?> </span>
+								<span class="usrcomment">
+									<?php echo date('d M, Y',strtotime($this->escape($latestComment->CommentDate))); ?> -
+									<i> <a href="<?php  echo BASE_URL.'/dbee/'.$latestComment->dburl ;?>" target="_blank">view </a> </i>
+								</span>
+
+							</div>
+							<br>
+							<p>
+								<?php echo strip_tags($descDisplay);?>
+							</p>
+						</div>
+					</li>
+					<?php  endforeach; ?>
+				</ul>
+			  <div class="bfooter"><a href="<?php echo BASE_URL;?>/admin/dashboard/comments" class="btn">View all</a></div>
+			</div>
+		<?php } else { ?>
+			<div class="dashBlockEmpty" >comments not found</div>
+		<?php } ?> 
+	</div>
+	<!--End Latest commnets-->
+
+	
+	<div class="dashBlock"  id="id_5"  index="5">
+		<h2 class="dragHandler"> Groups		
+			<a href="javascript:void(0);" class="btn btn-mini btn-warning btnRefresh"  param="group"><i class="blockRefreshIcon spriteIcons"></i></a>
+		</h2>
+        <div id="DashLegends">
+			<ul class="dragHandler" >
+				<li id="createdgroup" class="active"><a href="javascript:void(0)">'User created' Groups</a></li>
+				<li id="mostactivatedgroup"><a href="javascript:void(0)">'Most active' Groups </a></li>
+			</ul>	
+		</div>
+
+		<!--Live Groops-->
+        <div class="useractGroup" style="display:block">		
+				<?php  		
+				if (count($this->liveGroupData)){ ?>
+					<div id="liveDbee" class="dashContent">
+						<ul>					
+							<?php foreach($this->liveGroupData as $liveGroup) :
+		                     $livegrouppic = $defaultimagecheck->checkImgExist($liveGroup->GroupPic,'grouppics','default-avatar.jpg');
+							 ?>					
+							<li>
+								<div class="userPic"><img src="<?php echo IMGPATH.'/grouppics/medium/'.$livegrouppic ?>" width="80" height="80" border="0" /></div>
+								<div class="userDetails">
+									<div class="usertitle">
+										<a href="<?php echo BASE_URL ?>/group/groupdetails/group/<?php echo $this->escape($liveGroup->ID); ?>" class="username" target="_blanck"><?php echo htmlentities($this->escape($liveGroup->GroupName), ENT_QUOTES, "UTF-8");?></a>
+									
+									
+										<span class="userposted">
+											Created by <a href="javascript:void(0)" class="show_details_user" userid="<?php echo $liveGroup->User; ?>"><?php echo $this->myclientdetails->customDecoding($liveGroup->username).' '.$this->myclientdetails->customDecoding($liveGroup->lname); ?></a>
+											<?php //echo  $this->escape($liveGroup->TypeName);?>
+										</span>
+										<span class="userposted"> on <?php echo date('d M, Y',strtotime($this->escape($liveGroup->Gdate))); ?></span></br>
+								<div class="nsinfo">
+								<?php if($liveGroup->memcnt > 0){
+								$mem = ($liveGroup->memcnt == 1)?' member':' members';
+								echo "<span class='userposted'><i>".$this->escape($liveGroup->memcnt).$mem." </i></span> ";
+								if($liveGroup->dbcnt > 0)$postbe = "-";
+
+							}
+								if($liveGroup->dbcnt > 0) {
+									$post = ($liveGroup->dbcnt == 1)?' post':' posts';
+								echo "<span class='userposted'><i>".$this->escape($liveGroup->dbcnt).$post." </i> </span>";
+							}
+							?>
+								</div>	
+									</div>
+									<p>
+										<?php if($this->escape($liveGroup->description)) {
+											echo strip_tags(substr($liveGroup->description,0,100));
+										} else {
+											echo '&nbsp';
+										} ?>
+									</p>
+								</div>
+							</li>
+						<?php  endforeach; ?>
+						</ul>
+						<div class="bfooter">
+							<span class="bfTotal"><strong><?php echo count($this->getLiveGrouptotal);?></strong> total groups </span>
+							<?php if(count($this->getLiveGrouptotal)>4){?><a href="<?php echo BASE_URL; ?>/admin/dashboard/groups" class="btn">View all</a><?php } ?>
+						</div>
+					</div>
+				<?php } else { ?>
+				<div class="dashBlockEmpty">no groups found</div>
+				<?php } ?>		
+        </div><!--end Live group-->
+
+        <!--Top activated Groups-->
+        <div class="mostserGroup" style="display:none">		
+				<?php  		
+				if (count($this->topGroupActivityList)){ ?>
+					<div id="liveDbee" class="dashContent">
+						<ul>					
+							<?php foreach($this->topGroupActivityList as $topactiveGroup) :
+							//echo'<pre>';print_r($topactiveGroup);
+		                     $livegrouppic = $defaultimagecheck->checkImgExist($topactiveGroup['GroupPic'],'grouppics','default-avatar.jpg');
+							 ?>					
+							<li>
+								<div class="userPic"><img src="<?php echo IMGPATH.'/grouppics/medium/'.$livegrouppic ?>" width="80" height="80" border="0" /></div>
+								<div class="userDetails">
+									<div class="usertitle">
+										<a href="<?php echo BASE_URL ?>/group/groupdetails/group/<?php echo $this->escape($topactiveGroup['ID']); ?>" class="username" target="_blanck"><?php echo htmlentities($this->escape($topactiveGroup['GroupName']), ENT_QUOTES, "UTF-8");?></a>
+									
+									
+										<span class="userposted">
+											Created by <a href="javascript:void(0)" class="show_details_user" userid="<?php echo $topactiveGroup['User']; ?>"><?php echo $this->myclientdetails->customDecoding($topactiveGroup['Name']).' '.$this->myclientdetails->customDecoding($topactiveGroup['lname']); ?></a>
+											<?php //echo  $this->escape($liveGroup->TypeName);?>
+										</span>
+										<span class="userposted"> on <?php echo date('d M, Y',strtotime($this->escape($topactiveGroup['GroupDate']))); ?></span></br>
+								<div class="nsinfo">
+								<?php /*if($liveGroup->memcnt > 0){
+								$mem = ($liveGroup->memcnt == 1)?' member':' members';
+								echo "<span class='userposted'><i>".$this->escape($liveGroup->memcnt).$mem." </i></span> ";
+								if($liveGroup->dbcnt > 0)$postbe = "-";
+
+							}*/
+								if($topactiveGroup['totalcount'] > 0) {
+								    $post = ($topactiveGroup['totalcount'] == 1)?' action':' actions';
+									echo "<span class='userposted'><i>".$this->escape($topactiveGroup['totalcount']).$post." </i> </span>";
+								}
+							?>
+								</div>	
+									</div>
+									<p>
+										<?php if($this->escape($topactiveGroup['description'])) {
+											echo htmlentities(substr($this->escape($topactiveGroup['description']),0,100), ENT_QUOTES, "UTF-8");
+										} else {
+											echo '&nbsp';
+										} ?>
+									</p>
+								</div>
+							</li>
+						<?php  endforeach; ?>
+						</ul>
+						<div class="bfooter">
+							<span class="bfTotal"><strong><?php 
+		                    $totalActivegroup = $deshboard->getTopactivegroup();
+		                    $nooftotalActivegroup = count($totalActivegroup);
+							echo $nooftotalActivegroup;
+							?></strong> total groups </span>
+							<?php if($nooftotalActivegroup>4){?><a href="<?php echo BASE_URL; ?>/admin/dashboard/totalactivegroups" class="btn">View all</a><?php } ?>
+						</div>
+					</div>
+				<?php } else { ?>
+				<div class="dashBlockEmpty">no groups found</div>
+				<?php } ?>		
+        </div><!--end Live group-->
+	</div>
+	
+
+	
+
+	<?php if($this->plateform_scoring==0) { 
+
+	$configurations = $deshboard->getConfigurations();
+	$post_score_setting = json_decode($configurations['ScoreNames'],true);
+
+		?>
+	<div class="dashBlock"  id="id_7"  index="7">
+		<h2 class="dragHandler">Scores  
+			<a href="javascript:void(0);" class="btn btn-mini btn-warning btnRefresh" param="score"><i class="blockRefreshIcon spriteIcons"></i></a>
+		</h2>
+		 <div id="livecalculaterDbee" class="dashContent">
+		 	<ul>
+				<?php 
+
+				$scorediv="";
+
+				if (count($this->liveScoreData)){ 		
+					foreach($this->liveScoreData as $liveScore) :
+						if($this->escape($liveScore->type)==1)  { $dbtype =   'post'; } else {   $dbtype = 'comment';  }
+						
+						if($this->escape($liveScore->Score)==1){ 
+							//$scorediv   ='<span class="scoreSprite scoreLove"></span>' ; 
+							$scorediv=$this->myclientdetails->ShowScoreIcon($post_score_setting[1]['ScoreIcon1']);
+						} 
+						else if ($this->escape($liveScore->Score)==2){ 
+							//$scorediv   = '<span class="scoreSprite scoreLike"></span>' ;  
+							$scorediv=$this->myclientdetails->ShowScoreIcon($post_score_setting[2]['ScoreIcon2']);
+						} 
+						else if ($this->escape($liveScore->Score)==3){ 
+							//$scorediv   = '<span class="scoreSprite scoreFft"></span>' ;   
+							//$scorediv=$this->myclientdetails->ShowScoreIcon($post_score_setting[1]['ScoreIcon1']);
+						} 
+						else if ($this->escape($liveScore->Score)==4){ 
+							//$scorediv   = '<span class="scoreSprite scoreUnLike"></span>'; 
+							$scorediv=$this->myclientdetails->ShowScoreIcon($post_score_setting[3]['ScoreIcon3']);
+						} 
+						else if ($this->escape($liveScore->Score)==5){ 
+							//$scorediv   = '<span class="scoreSprite scoreHate"></span>' ;
+							$scorediv=$this->myclientdetails->ShowScoreIcon($post_score_setting[4]['ScoreIcon4']); 
+
+							 }
+						$livescorepic = $defaultimagecheck->checkImgExist($this->escape($liveScore->image),'userpics','default-avatar.jpg');
+						?>
+						<li>
+							<div class="userPic"><img src="<?php echo IMGPATH ?>/users/small/<?php echo $livescorepic ?>" width="80" height="80" border="0" /></div>
+							<div class="userDetails">
+								<span class="decsScoreCal"><a href="javascript:void(0)" class="show_details_user" userid="<?php echo $liveScore->UserID; ?>"><span class="username"><?php echo $this->myclientdetails->customDecoding($this->escape($liveScore->username)).' '.$this->myclientdetails->customDecoding($this->escape($liveScore->lname));?></span></a> scored <a href="javascript:void(0)" class="show_details_user" userid="<?php echo $liveScore->OwnerID; ?>"><span class="username"><?php echo $this->myclientdetails->customDecoding($this->escape($liveScore->Ownername)).' '.$this->myclientdetails->customDecoding($this->escape($liveScore->Ownerlname)); ?>&rsquo;s </span></a><?php echo $dbtype;?></span> 	
+								<?php echo $scorediv; ?>			
+
+							</div>
+						</li>
+					<?php  endforeach; ?>
+					</ul>
+					<div class="bfooter"><a href="<?php echo BASE_URL; ?>/admin/dashboard/scores" class="btn">View all</a></div>
+				</div>	
+					<?php } else { ?>
+					<div class="dashBlockEmpty">scores not found</div>
+					<?php } ?>
+			 </div>
+			 <?php  }  ?>
+</div>
+<script type="text/javascript">
+	$(function(){
+		if(isMobile==null){
+		 $('.dashBlock').equalizeHeights(); 
+		 }
+
+
+
+	});
+</script>
+<input type="hidden" name="quickusrcnt" id="quickusrcnt" value="0" />
+<input type="hidden" name="qgender" id="qgender" value="" />
+<input type="hidden" name="qgender" id="qtotaluser" value="" />
+<input type="hidden" name="qage1" id="qage1" value="" />
+<input type="hidden" name="qage2" id="qage2" value="" />
+<input type="hidden" name="qcat" id="qcat" value="" />
